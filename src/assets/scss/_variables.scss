@@ -1,0 +1,637 @@
+// =============================================================================
+// 7thSense theme — design tokens + Bootstrap variable overrides
+// Source: 7thsense-ui-review.html (dark, border-led, orange as a precise accent)
+// Loaded BEFORE bootstrap/scss/variables so every `!default` below wins.
+// =============================================================================
+
+@use "sass:math";
+
+// px → rem (root font-size is 13px, see $font-size-root)
+$ts-root-px: 13;
+@function ts-rem($px) {
+  @return math.div($px, $ts-root-px) * 1rem;
+}
+
+// -----------------------------------------------------------------------------
+// 1. Design tokens
+// -----------------------------------------------------------------------------
+
+// Surfaces
+$ts-bg:        #0e0e0d; // page
+$ts-appbar:    #141312; // top bar / sub nav
+$ts-panel:     #1a1a18; // cards, tables, modals
+$ts-panel-2:   #232320; // inputs, inner boxes, hover
+$ts-line:      #33322e; // every border / divider
+
+// Text
+$ts-ink:       #f4f4ee; // primary
+$ts-ink-2:     #b9b8ad; // secondary
+$ts-ink-3:     #7d7c72; // muted / captions
+
+// Accent
+$ts-orange:    #f58220;
+$ts-orange-2:  #ff9d4d; // hover
+$ts-on-accent: #1a1205; // text on orange
+
+// Status
+$ts-good:      #3ec46d;
+$ts-amber:     #fab219;
+$ts-serious:   #ec835a;
+$ts-red:       #e0483f;
+$ts-blue:      #5aa9e6;
+$ts-violet:    #9085e9;
+$ts-neutral:   #9b9a90;
+
+// Tint strengths used for soft backgrounds
+$ts-tint-row:    8%;  // highlighted table row
+$ts-tint-soft:   14%; // soft badges / subtle bg
+$ts-tint-strong: 18%; // filled chips
+$ts-tint-border: 45%; // subtle borders
+
+// Typography
+$ts-font-sans: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+$ts-font-mono: ui-monospace, Menlo, Consolas, monospace;
+
+$ts-fs-2xs:  ts-rem(10);   // badges, pills
+$ts-fs-xs:   ts-rem(10.5); // table head, eyebrow
+$ts-fs-sm:   ts-rem(11.5); // notes, captions
+$ts-fs-md:   ts-rem(12.5); // dense UI text
+$ts-fs-base: ts-rem(13);
+$ts-fs-lg:   ts-rem(15);
+$ts-fs-xl:   ts-rem(20);   // page title
+
+// Display numbers (KPIs)
+$ts-num-sm: ts-rem(22);
+$ts-num-md: ts-rem(30);
+$ts-num-lg: ts-rem(40);
+$ts-num-xl: ts-rem(52);
+
+$ts-fw-title: 650;
+$ts-ls-tight: -.02em;
+$ts-ls-wide:  .06em;
+$ts-ls-wider: .1em;
+
+// Spacing scale (px based on the reference)
+$ts-space-1: ts-rem(4);
+$ts-space-2: ts-rem(8);
+$ts-space-3: ts-rem(12);
+$ts-space-4: ts-rem(16);
+$ts-space-5: ts-rem(24);
+$ts-space-6: ts-rem(40);
+
+// Radius
+$ts-radius-xs:   ts-rem(5);
+$ts-radius-sm:   ts-rem(6);
+$ts-radius:      ts-rem(8);
+$ts-radius-md:   ts-rem(10);
+$ts-radius-lg:   ts-rem(12);
+$ts-radius-xl:   ts-rem(14);
+$ts-radius-xxl:  ts-rem(16);
+$ts-radius-pill: 999px;
+
+// Shadows (borders do most of the work — shadows only on hover / overlays)
+$ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .35);
+$ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .45);
+$ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .5);
+
+// Layout
+$ts-appbar-height: ts-rem(56);
+$ts-page-max:      1180px;
+$ts-sidebar-width: 240px;
+$ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
+$ts-control-h:     ts-rem(34);
+
+$ts-transition: .12s ease;
+
+// Exposed as CSS custom properties (--ts-*) in _components.scss
+$ts-tokens: (
+  "bg": $ts-bg,
+  "appbar": $ts-appbar,
+  "panel": $ts-panel,
+  "panel-2": $ts-panel-2,
+  "line": $ts-line,
+  "ink": $ts-ink,
+  "ink-2": $ts-ink-2,
+  "ink-3": $ts-ink-3,
+  "orange": $ts-orange,
+  "orange-2": $ts-orange-2,
+  "on-accent": $ts-on-accent,
+  "good": $ts-good,
+  "amber": $ts-amber,
+  "serious": $ts-serious,
+  "red": $ts-red,
+  "blue": $ts-blue,
+  "violet": $ts-violet,
+  "neutral": $ts-neutral,
+  "radius": $ts-radius,
+  "radius-lg": $ts-radius-lg,
+  "shadow-hover": $ts-shadow-hover,
+  "appbar-height": $ts-appbar-height,
+  "page-max": $ts-page-max,
+  "sidebar-width": $ts-sidebar-width,
+);
+
+// -----------------------------------------------------------------------------
+// 2. Bootstrap — colors
+// -----------------------------------------------------------------------------
+
+$enable-dark-mode: false; // the product is dark by design
+$enable-shadows:   false;
+$enable-gradients: false;
+$enable-negative-margins: true;
+
+$white: #fff;
+$black: #000;
+
+$gray-100: $ts-ink;
+$gray-200: #dcdbd2;
+$gray-300: $ts-ink-2;
+$gray-400: $ts-neutral;
+$gray-500: $ts-ink-3;
+$gray-600: #55544d;
+$gray-700: $ts-line;
+$gray-800: $ts-panel-2;
+$gray-900: $ts-panel;
+
+$primary:   $ts-orange;
+$secondary: $ts-neutral;
+$success:   $ts-good;
+$info:      $ts-blue;
+$warning:   $ts-amber;
+$danger:    $ts-red;
+$light:     $ts-ink;
+$dark:      $ts-panel;
+
+$theme-colors: (
+  "primary":   $primary,
+  "secondary": $secondary,
+  "success":   $success,
+  "info":      $info,
+  "warning":   $warning,
+  "danger":    $danger,
+  "serious":   $ts-serious,
+  "violet":    $ts-violet,
+  "light":     $light,
+  "dark":      $dark,
+);
+
+// Status colours only (no light/dark) — used for generated component variants
+$ts-status-colors: (
+  "primary":   $primary,
+  "secondary": $secondary,
+  "success":   $success,
+  "info":      $info,
+  "warning":   $warning,
+  "danger":    $danger,
+  "serious":   $ts-serious,
+  "violet":    $ts-violet,
+);
+
+// Dark-friendly emphasis / subtle maps (alerts, list-group, *-subtle utilities)
+$theme-colors-text: ();
+$theme-colors-bg-subtle: ();
+$theme-colors-border-subtle: ();
+$table-variants: ();
+@each $name, $color in $theme-colors {
+  $theme-colors-text: map-merge($theme-colors-text, ($name: $color));
+  $theme-colors-bg-subtle: map-merge($theme-colors-bg-subtle, ($name: mix($color, $ts-panel, $ts-tint-soft)));
+  $theme-colors-border-subtle: map-merge($theme-colors-border-subtle, ($name: mix($color, $ts-panel, $ts-tint-border)));
+  $table-variants: map-merge($table-variants, ($name: mix($color, $ts-panel, $ts-tint-row * 1.5)));
+}
+
+$primary-text-emphasis: $ts-orange;
+$primary-bg-subtle:     mix($ts-orange, $ts-panel, $ts-tint-soft);
+$primary-border-subtle: mix($ts-orange, $ts-panel, $ts-tint-border);
+
+$min-contrast-ratio:   4.5;
+$color-contrast-dark:  $ts-on-accent;
+$color-contrast-light: $ts-ink;
+
+// -----------------------------------------------------------------------------
+// 3. Bootstrap — body, links, typography
+// -----------------------------------------------------------------------------
+
+$body-bg:              $ts-bg;
+$body-color:           $ts-ink;
+$body-secondary-color: $ts-ink-2;
+$body-secondary-bg:    $ts-panel;
+$body-tertiary-color:  $ts-ink-3;
+$body-tertiary-bg:     $ts-panel-2;
+$body-emphasis-color:  $white;
+
+$link-color:            $ts-orange;
+$link-hover-color:      $ts-orange-2;
+$link-decoration:       none;
+$link-hover-decoration: underline;
+
+$border-color:       $ts-line;
+$border-color-translucent: $ts-line;
+$hr-border-color:    $ts-line;
+$hr-opacity:         1;
+
+$component-active-color: $ts-on-accent;
+$component-active-bg:    $ts-orange;
+
+$focus-ring-width:   3px;
+$focus-ring-opacity: .3;
+$focus-ring-color:   rgba($ts-orange, .3);
+
+$font-family-sans-serif: $ts-font-sans;
+$font-family-monospace:  $ts-font-mono;
+$font-size-root:  $ts-root-px * 1px;
+$font-size-base:  1rem;
+$font-size-sm:    ts-rem(12);
+$font-size-lg:    $ts-fs-lg;
+$line-height-base: 1.5;
+$line-height-sm:   1.35;
+$line-height-lg:   1.65;
+
+$font-weight-semibold: 600;
+$font-weight-bold:     700;
+
+$h1-font-size: $ts-fs-xl;
+$h2-font-size: ts-rem(16);
+$h3-font-size: $ts-fs-lg;
+$h4-font-size: ts-rem(14);
+$h5-font-size: $ts-fs-base;
+$h6-font-size: ts-rem(11);
+$headings-font-weight:   $ts-fw-title;
+$headings-line-height:   1.3;
+$headings-margin-bottom: $ts-space-1;
+$headings-color:         $ts-ink;
+
+$display-font-sizes: (
+  1: $ts-num-xl,
+  2: $ts-num-lg,
+  3: $ts-num-md,
+  4: ts-rem(26),
+  5: $ts-num-sm,
+  6: ts-rem(18),
+);
+$display-font-weight: 700;
+$display-line-height: 1;
+
+$small-font-size: 85%;
+$text-muted:      $ts-ink-3;
+$code-color:      $ts-orange-2;
+$kbd-bg:          $ts-panel-2;
+$kbd-color:       $ts-ink;
+$mark-bg:         mix($ts-amber, $ts-panel, 30%);
+$mark-color:      $ts-ink;
+
+// -----------------------------------------------------------------------------
+// 4. Bootstrap — spacing, grid, radius, shadows
+// -----------------------------------------------------------------------------
+
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $ts-space-1,
+  2: $ts-space-2,
+  3: $ts-space-3,
+  4: $ts-space-4,
+  5: $ts-space-5,
+  6: $ts-space-6,
+);
+
+$grid-gutter-width: $ts-space-5; // 12px each side
+$container-padding-x: ts-rem(32); // 16px each side
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: $ts-page-max,
+);
+
+$border-width:       1px;
+$border-radius:      $ts-radius;
+$border-radius-sm:   $ts-radius-sm;
+$border-radius-lg:   $ts-radius-lg;
+$border-radius-xl:   $ts-radius-xl;
+$border-radius-xxl:  $ts-radius-xxl;
+$border-radius-pill: $ts-radius-pill;
+
+$box-shadow:       $ts-shadow-hover;
+$box-shadow-sm:    0 1px 2px rgba(0, 0, 0, .3);
+$box-shadow-lg:    $ts-shadow-overlay;
+$box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .3);
+
+// -----------------------------------------------------------------------------
+// 5. Bootstrap — buttons & forms
+// -----------------------------------------------------------------------------
+
+$input-btn-padding-y:    ts-rem(7);
+$input-btn-padding-x:    ts-rem(10);
+$input-btn-font-size:    $ts-fs-base;
+$input-btn-focus-width:  3px;
+$input-btn-focus-color-opacity: .3;
+$input-btn-focus-color:  rgba($ts-orange, .3);
+
+$btn-padding-y:      ts-rem(7);
+$btn-padding-x:      ts-rem(13);
+$btn-font-size:      ts-rem(12.5);
+$btn-font-weight:    600;
+$btn-line-height:    1.4;
+$btn-border-radius:  ts-rem(7);
+$btn-padding-y-sm:   ts-rem(4);
+$btn-padding-x-sm:   ts-rem(10);
+$btn-font-size-sm:   ts-rem(12);
+$btn-border-radius-sm: $ts-radius-sm;
+$btn-padding-y-lg:   ts-rem(9);
+$btn-padding-x-lg:   ts-rem(16);
+$btn-font-size-lg:   ts-rem(14);
+$btn-border-radius-lg: $ts-radius-md;
+$btn-disabled-opacity: .45;
+$btn-hover-bg-tint-amount:     20%;
+$btn-hover-border-tint-amount: 20%;
+$btn-active-bg-tint-amount:    10%;
+$btn-active-border-tint-amount: 10%;
+$btn-link-color:       $ts-orange;
+$btn-link-hover-color: $ts-orange-2;
+$btn-link-disabled-color: $ts-ink-3;
+$btn-transition: color $ts-transition, background-color $ts-transition, border-color $ts-transition, box-shadow $ts-transition;
+
+$input-bg:                  $ts-panel-2;
+$input-color:               $ts-ink;
+$input-border-color:        $ts-line;
+$input-border-radius:       $ts-radius;
+$input-border-radius-sm:    $ts-radius-sm;
+$input-border-radius-lg:    $ts-radius-md;
+$input-placeholder-color:   $ts-ink-3;
+$input-focus-bg:            $ts-panel-2;
+$input-focus-color:         $ts-ink;
+$input-focus-border-color:  $ts-orange;
+$input-disabled-bg:         $ts-panel;
+$input-disabled-border-color: $ts-line;
+$input-plaintext-color:     $ts-ink;
+$input-group-addon-bg:      $ts-panel;
+$input-group-addon-color:   $ts-ink-2;
+
+$form-label-font-size:     ts-rem(11);
+$form-label-font-weight:   600;
+$form-label-color:         $ts-ink-2;
+$form-label-margin-bottom: $ts-space-1;
+$form-text-font-size:      $ts-fs-sm;
+$form-text-color:          $ts-ink-3;
+
+$form-select-indicator-color: $ts-ink-2;
+$form-select-bg:              $ts-panel-2;
+$form-select-disabled-bg:     $ts-panel;
+
+$form-check-input-bg:             $ts-panel-2;
+$form-check-input-border:         1px solid $ts-line;
+$form-check-input-checked-color:  $ts-on-accent;
+$form-check-input-checked-bg-color: $ts-orange;
+$form-check-input-checked-border-color: $ts-orange;
+$form-check-input-focus-border:   $ts-orange;
+$form-switch-color:               $ts-ink-3;
+$form-switch-focus-color:         $ts-orange;
+$form-switch-checked-color:       $ts-on-accent;
+
+$form-range-track-bg:   $ts-panel-2;
+$form-range-thumb-bg:   $ts-orange;
+$form-range-thumb-active-bg: $ts-orange-2;
+
+$form-valid-color:   $ts-good;
+$form-invalid-color: $ts-red;
+
+// -----------------------------------------------------------------------------
+// 6. Bootstrap — components
+// -----------------------------------------------------------------------------
+
+// Tables
+$table-color:            $ts-ink;
+$table-bg:               $ts-panel;
+$table-border-color:     $ts-line;
+$table-cell-padding-y:   ts-rem(9);
+$table-cell-padding-x:   ts-rem(12);
+$table-cell-padding-y-sm: ts-rem(6);
+$table-cell-padding-x-sm: ts-rem(8);
+$table-th-font-weight:   600;
+$table-striped-bg:       rgba($ts-ink, .025);
+$table-striped-color:    $ts-ink;
+$table-active-bg:        $ts-panel-2;
+$table-active-color:     $ts-ink;
+$table-hover-bg:         $ts-panel-2;
+$table-hover-color:      $ts-ink;
+$table-group-separator-color: $ts-line;
+$table-caption-color:    $ts-ink-3;
+
+// Cards
+$card-bg:            $ts-panel;
+$card-color:         $ts-ink;
+$card-border-color:  $ts-line;
+$card-border-radius: $ts-radius-lg;
+$card-spacer-y:      ts-rem(14);
+$card-spacer-x:      ts-rem(16);
+$card-title-spacer-y: $ts-space-1;
+$card-cap-bg:        transparent;
+$card-cap-color:     $ts-ink;
+$card-cap-padding-y: ts-rem(12);
+$card-cap-padding-x: ts-rem(16);
+$card-group-margin:  ts-rem(12);
+
+// Nav / tabs
+$nav-link-padding-y:     ts-rem(8);
+$nav-link-padding-x:     ts-rem(12);
+$nav-link-font-size:     ts-rem(13.5);
+$nav-link-font-weight:   500;
+$nav-link-color:         $ts-ink-2;
+$nav-link-hover-color:   $ts-ink;
+$nav-link-disabled-color: $ts-ink-3;
+$nav-tabs-border-color:  $ts-line;
+$nav-tabs-border-radius: 0;
+$nav-tabs-link-hover-border-color: transparent;
+$nav-tabs-link-active-color: $ts-orange;
+$nav-tabs-link-active-bg:    transparent;
+$nav-tabs-link-active-border-color: transparent transparent $ts-orange;
+$nav-pills-border-radius:    $ts-radius;
+$nav-pills-link-active-color: $ts-on-accent;
+$nav-pills-link-active-bg:   $ts-orange;
+$nav-underline-link-active-color: $ts-orange;
+
+// Navbar
+$navbar-padding-y:          0;
+$navbar-padding-x:          null;
+$navbar-nav-link-padding-x: ts-rem(12);
+$navbar-brand-font-size:    ts-rem(18);
+$navbar-brand-padding-y:    0;
+$navbar-toggler-padding-y:  ts-rem(5);
+$navbar-toggler-padding-x:  ts-rem(9);
+$navbar-toggler-border-radius: $ts-radius;
+$navbar-dark-color:         $ts-ink-2;
+$navbar-dark-hover-color:   $ts-ink;
+$navbar-dark-active-color:  $ts-ink;
+$navbar-dark-disabled-color: $ts-ink-3;
+$navbar-dark-brand-color:   $ts-ink;
+$navbar-dark-brand-hover-color: $ts-ink;
+$navbar-dark-toggler-border-color: $ts-line;
+$navbar-light-color:        $ts-ink-2;
+$navbar-light-hover-color:  $ts-ink;
+$navbar-light-active-color: $ts-ink;
+$navbar-light-disabled-color: $ts-ink-3;
+$navbar-light-brand-color:  $ts-ink;
+$navbar-light-brand-hover-color: $ts-ink;
+$navbar-light-toggler-border-color: $ts-line;
+
+// Dropdowns
+$dropdown-bg:               $ts-panel;
+$dropdown-color:            $ts-ink;
+$dropdown-border-color:     $ts-line;
+$dropdown-border-radius:    $ts-radius-md;
+$dropdown-box-shadow:       $ts-shadow-float;
+$dropdown-divider-bg:       $ts-line;
+$dropdown-font-size:        $ts-fs-base;
+$dropdown-link-color:       $ts-ink-2;
+$dropdown-link-hover-color: $ts-ink;
+$dropdown-link-hover-bg:    $ts-panel-2;
+$dropdown-link-active-color: $ts-on-accent;
+$dropdown-link-active-bg:   $ts-orange;
+$dropdown-link-disabled-color: $ts-ink-3;
+$dropdown-header-color:     $ts-ink-3;
+$dropdown-item-padding-y:   ts-rem(6);
+$dropdown-item-padding-x:   ts-rem(12);
+
+// Pagination
+$pagination-padding-y:       ts-rem(5);
+$pagination-padding-x:       ts-rem(10);
+$pagination-font-size:       ts-rem(12);
+$pagination-color:           $ts-ink;
+$pagination-bg:              $ts-panel-2;
+$pagination-border-color:    $ts-line;
+$pagination-border-radius:   ts-rem(7);
+$pagination-hover-color:     $ts-ink;
+$pagination-hover-bg:        $ts-panel-2;
+$pagination-hover-border-color: $ts-orange;
+$pagination-focus-color:     $ts-ink;
+$pagination-focus-bg:        $ts-panel-2;
+$pagination-active-color:    $ts-on-accent;
+$pagination-active-bg:       $ts-orange;
+$pagination-active-border-color: $ts-orange;
+$pagination-disabled-color:  $ts-ink-3;
+$pagination-disabled-bg:     $ts-panel;
+$pagination-disabled-border-color: $ts-line;
+
+// Badges
+$badge-font-size:     $ts-fs-2xs;
+$badge-font-weight:   700;
+$badge-color:         $ts-ink;
+$badge-padding-y:     ts-rem(3);
+$badge-padding-x:     ts-rem(8);
+$badge-border-radius: $ts-radius-sm;
+
+// Alerts
+$alert-padding-y:     ts-rem(10);
+$alert-padding-x:     ts-rem(14);
+$alert-margin-bottom: ts-rem(14);
+$alert-border-radius: $ts-radius-md;
+$alert-link-font-weight: 600;
+
+// Progress (meters / tracks)
+$progress-height:        ts-rem(8);
+$progress-font-size:     $ts-fs-2xs;
+$progress-bg:            $ts-panel-2;
+$progress-border-radius: 4px;
+$progress-bar-color:     $ts-on-accent;
+$progress-bar-bg:        $ts-orange;
+$progress-bar-transition: width .5s ease;
+
+// List group
+$list-group-color:        $ts-ink;
+$list-group-bg:           $ts-panel;
+$list-group-border-color: $ts-line;
+$list-group-border-radius: $ts-radius-lg;
+$list-group-item-padding-y: ts-rem(10);
+$list-group-item-padding-x: ts-rem(14);
+$list-group-hover-bg:     $ts-panel-2;
+$list-group-active-color: $ts-on-accent;
+$list-group-active-bg:    $ts-orange;
+$list-group-active-border-color: $ts-orange;
+$list-group-disabled-color: $ts-ink-3;
+$list-group-action-color: $ts-ink-2;
+$list-group-action-hover-color: $ts-ink;
+$list-group-action-active-color: $ts-ink;
+$list-group-action-active-bg: $ts-panel-2;
+
+// Modals
+$modal-inner-padding:        ts-rem(18);
+$modal-content-color:        $ts-ink;
+$modal-content-bg:           $ts-panel;
+$modal-content-border-color: $ts-line;
+$modal-content-border-radius: $ts-radius-xl;
+$modal-content-box-shadow-xs: $ts-shadow-overlay;
+$modal-content-box-shadow-sm-up: $ts-shadow-overlay;
+$modal-backdrop-bg:          $black;
+$modal-backdrop-opacity:     .55;
+$modal-header-border-color:  $ts-line;
+$modal-footer-border-color:  $ts-line;
+$modal-header-padding-y:     ts-rem(14);
+$modal-header-padding-x:     ts-rem(18);
+$modal-footer-bg:            $ts-panel;
+$modal-xl:                   1000px;
+
+// Close button
+$btn-close-color:         $ts-ink;
+$btn-close-opacity:       .6;
+$btn-close-hover-opacity: 1;
+$btn-close-focus-shadow:  0 0 0 3px rgba($ts-orange, .3);
+
+// Toasts
+$toast-max-width:          380px;
+$toast-padding-x:          ts-rem(16);
+$toast-padding-y:          ts-rem(10);
+$toast-font-size:          ts-rem(12.5);
+$toast-color:              $ts-ink;
+$toast-background-color:   $ts-panel;
+$toast-border-color:       $ts-orange;
+$toast-border-radius:      ts-rem(9);
+$toast-box-shadow:         $ts-shadow-float;
+$toast-header-color:       $ts-ink;
+$toast-header-background-color: $ts-panel-2;
+$toast-header-border-color: $ts-line;
+
+// Tooltips & popovers
+$tooltip-bg:            $ts-panel-2;
+$tooltip-color:         $ts-ink;
+$tooltip-font-size:     $ts-fs-sm;
+$tooltip-border-radius: $ts-radius-sm;
+$tooltip-opacity:       1;
+$popover-bg:            $ts-panel;
+$popover-border-color:  $ts-line;
+$popover-header-bg:     $ts-panel-2;
+$popover-header-color:  $ts-ink;
+$popover-body-color:    $ts-ink-2;
+$popover-box-shadow:    $ts-shadow-float;
+$popover-font-size:     $ts-fs-md;
+
+// Offcanvas (mobile sidebar)
+$offcanvas-bg-color:     $ts-appbar;
+$offcanvas-color:        $ts-ink;
+$offcanvas-border-color: $ts-line;
+$offcanvas-horizontal-width: $ts-sidebar-width;
+$offcanvas-backdrop-opacity: .55;
+
+// Accordion
+$accordion-color:              $ts-ink;
+$accordion-bg:                 $ts-panel;
+$accordion-border-color:       $ts-line;
+$accordion-border-radius:      $ts-radius-lg;
+$accordion-button-color:       $ts-ink;
+$accordion-button-bg:          $ts-panel;
+$accordion-button-active-bg:   $ts-panel-2;
+$accordion-button-active-color: $ts-orange;
+$accordion-button-focus-border-color: $ts-orange;
+$accordion-icon-color:         $ts-ink-2;
+$accordion-icon-active-color:  $ts-orange;
+
+// Breadcrumbs
+$breadcrumb-font-size:     $ts-fs-base;
+$breadcrumb-margin-bottom: ts-rem(14);
+$breadcrumb-divider-color: $ts-ink-3;
+$breadcrumb-active-color:  $ts-ink;
+
+// Spinners / placeholders
+$spinner-border-width: .2em;
+$placeholder-opacity-max: .35;
+$placeholder-opacity-min: .15;

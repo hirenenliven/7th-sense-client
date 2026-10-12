@@ -1,0 +1,825 @@
+// =============================================================================
+// 7thSense theme — component layer
+// Extends Bootstrap classes first; `ts-*` classes only where Bootstrap has no
+// equivalent. Uses tokens from _variables.scss only — no raw values.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Root tokens (CSS custom properties) + base
+// -----------------------------------------------------------------------------
+
+:root {
+  @each $name, $value in $ts-tokens {
+    --ts-#{$name}: #{$value};
+  }
+  color-scheme: dark;
+}
+
+body {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba($ts-orange, .35);
+  color: $ts-ink;
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: $ts-line; border-radius: $ts-radius-xs; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes ts-pulse {
+  50% { opacity: .35; }
+}
+
+// -----------------------------------------------------------------------------
+// App shell: wrapper, page, page header, sidebar
+// -----------------------------------------------------------------------------
+
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+}
+
+.ts-page {
+  width: 100%;
+  max-width: $ts-page-max;
+  margin-inline: auto;
+  padding: $ts-space-4 ts-rem(18) ts-rem(60);
+}
+
+.ts-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: ts-rem(14);
+  margin-bottom: $ts-space-4;
+
+  h1, .h1 {
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+}
+
+.ts-page-subtitle {
+  margin: ts-rem(2) 0 0;
+  font-size: ts-rem(12);
+  color: $ts-ink-2;
+}
+
+.ts-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ts-space-2;
+  margin-left: auto;
+
+  @include media-breakpoint-down(md) {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+// Sidebar: use with `offcanvas-lg offcanvas-start` so it collapses below lg
+.ts-sidebar {
+  background: $ts-appbar;
+  border-right: 1px solid $ts-line;
+
+  @include media-breakpoint-up(lg) {
+    width: $ts-sidebar-width;
+    flex: 0 0 $ts-sidebar-width;
+    position: sticky;
+    top: $ts-appbar-height;
+    height: calc(100vh - #{$ts-appbar-height});
+    overflow-y: auto;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: $ts-space-2;
+    border-radius: $ts-radius;
+    color: $ts-ink-2;
+    transition: background-color $ts-transition, color $ts-transition;
+
+    &:hover { background: $ts-panel-2; color: $ts-ink; }
+
+    &.active {
+      background: $ts-panel-2;
+      color: $ts-ink;
+      box-shadow: inset $ts-edge-width 0 0 $ts-orange;
+    }
+
+    &.disabled { color: $ts-ink-3; }
+  }
+}
+
+.ts-sidebar-heading {
+  padding: $ts-space-3 $ts-space-3 $ts-space-1;
+  font-size: $ts-fs-xs;
+  font-weight: 600;
+  letter-spacing: $ts-ls-wide;
+  text-transform: uppercase;
+  color: $ts-ink-3;
+}
+
+// -----------------------------------------------------------------------------
+// Typography helpers
+// -----------------------------------------------------------------------------
+
+.ts-eyebrow {
+  font-size: ts-rem(11);
+  font-weight: 600;
+  letter-spacing: $ts-ls-wider;
+  text-transform: uppercase;
+  color: $ts-ink-2;
+}
+
+.ts-section-title {
+  font-size: ts-rem(14);
+  font-weight: $ts-fw-title;
+  margin-bottom: $ts-space-1;
+}
+
+.ts-note {
+  font-size: $ts-fs-sm;
+  color: $ts-ink-2;
+}
+
+// Large KPI numbers: <div class="ts-number ts-number-md">82<small>%</small></div>
+.ts-number {
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: $ts-ls-tight;
+  white-space: nowrap;
+
+  small {
+    font-size: .5em;
+    font-weight: 600;
+    color: $ts-ink-2;
+    letter-spacing: 0;
+  }
+}
+
+.ts-number-sm { font-size: $ts-num-sm; }
+.ts-number-md { font-size: $ts-num-md; }
+.ts-number-lg { font-size: $ts-num-lg; }
+.ts-number-xl {
+  font-size: $ts-num-sm * 1.6;
+
+  @include media-breakpoint-up(md) { font-size: $ts-num-xl; }
+}
+
+.ts-delta-up   { color: $ts-good; font-weight: 700; }
+.ts-delta-down { color: $ts-red; font-weight: 700; }
+
+// -----------------------------------------------------------------------------
+// Navbar (app bar) + sub-nav tabs
+// -----------------------------------------------------------------------------
+
+.navbar {
+  min-height: $ts-appbar-height;
+  background-color: $ts-appbar;
+  border-bottom: 1px solid $ts-line;
+
+  &.sticky-top { z-index: $zindex-sticky; }
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: $ts-ls-tight;
+
+  b, .ts-brand-accent { color: $ts-orange; }
+}
+
+.navbar-nav .nav-link {
+  border-radius: $ts-radius;
+  white-space: nowrap;
+  transition: background-color $ts-transition, color $ts-transition;
+
+  &:hover,
+  &:focus-visible { background-color: $ts-panel-2; }
+
+  &.active {
+    background-color: transparent;
+    box-shadow: inset 0 -2px 0 $ts-orange;
+    border-radius: $ts-radius $ts-radius 0 0;
+  }
+
+  &.disabled { color: $ts-ink-3; }
+}
+
+// Collapsed (mobile) menu: active marker moves to the left edge
+.navbar-collapse {
+  @include media-breakpoint-down(md) {
+    padding-bottom: $ts-space-2;
+
+    .navbar-nav .nav-link.active {
+      box-shadow: inset $ts-edge-width 0 0 $ts-orange;
+      border-radius: $ts-radius;
+    }
+  }
+}
+
+.navbar-toggler:focus { box-shadow: 0 0 0 3px rgba($ts-orange, .3); }
+
+// Sub-nav strip under the app bar
+.ts-subnav {
+  background: $ts-appbar;
+  border-bottom: 1px solid $ts-line;
+  position: sticky;
+  top: $ts-appbar-height;
+  z-index: $zindex-sticky - 1;
+
+  .nav-tabs { border-bottom: 0; }
+}
+
+// Tabs are underline-style everywhere
+.nav-tabs {
+  flex-wrap: nowrap;
+  gap: $ts-space-1;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  .nav-link {
+    margin-bottom: -1px;
+    padding: ts-rem(11) ts-rem(14);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &:hover { color: $ts-ink; }
+  }
+
+  .nav-link.active,
+  .nav-item.show .nav-link {
+    border-bottom-color: $ts-orange;
+  }
+}
+
+.nav-pills .nav-link {
+  font-weight: 600;
+
+  &:hover:not(.active) { background: $ts-panel-2; color: $ts-ink; }
+}
+
+.breadcrumb {
+  flex-wrap: wrap;
+  color: $ts-ink-2;
+
+  .breadcrumb-item a { color: $ts-ink-2; }
+  .breadcrumb-item a:hover { color: $ts-ink; }
+  .breadcrumb-item.active { font-weight: 600; }
+}
+
+// -----------------------------------------------------------------------------
+// Buttons
+// -----------------------------------------------------------------------------
+
+.btn:disabled,
+.btn.disabled {
+  cursor: default;
+}
+
+// Ghost: the default secondary action in the reference
+.btn-ghost {
+  --bs-btn-color: #{$ts-ink-2};
+  --bs-btn-bg: #{$ts-panel-2};
+  --bs-btn-border-color: #{$ts-line};
+  --bs-btn-hover-color: #{$ts-ink};
+  --bs-btn-hover-bg: #{$ts-panel-2};
+  --bs-btn-hover-border-color: #{$ts-orange};
+  --bs-btn-focus-shadow-rgb: #{to-rgb($ts-orange)};
+  --bs-btn-active-color: #{$ts-on-accent};
+  --bs-btn-active-bg: #{$ts-orange};
+  --bs-btn-active-border-color: #{$ts-orange};
+  --bs-btn-disabled-color: #{$ts-ink-3};
+  --bs-btn-disabled-bg: #{$ts-panel-2};
+  --bs-btn-disabled-border-color: #{$ts-line};
+}
+
+.btn-link {
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// Square icon button (theme toggle, close, toolbar icons)
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $ts-control-h;
+  height: $ts-control-h;
+  padding: 0;
+  font-size: $ts-fs-lg;
+  border-radius: ts-rem(9);
+
+  &.btn-sm {
+    width: ts-rem(28);
+    height: ts-rem(28);
+    font-size: $ts-fs-base;
+  }
+}
+
+// Segmented control: <ButtonGroup><Button variant="ghost" active>…
+.btn-group > .btn-ghost {
+  border-color: $ts-line;
+
+  &:hover { border-color: $ts-line; background: rgba($ts-ink, .07); }
+
+  &.active { border-color: $ts-orange; }
+}
+
+// Count badge inside a button
+.btn .badge {
+  margin-left: $ts-space-1;
+  padding: 0 ts-rem(5);
+  min-width: ts-rem(16);
+  line-height: ts-rem(16);
+  border-radius: $ts-radius-pill;
+  background: rgba($ts-ink, .13);
+  color: inherit;
+  letter-spacing: 0;
+}
+
+.btn.active .badge,
+.btn-primary .badge {
+  background: rgba($black, .2);
+}
+
+// -----------------------------------------------------------------------------
+// Forms
+// -----------------------------------------------------------------------------
+
+.form-control,
+.form-select {
+  transition: border-color $ts-transition, box-shadow $ts-transition;
+
+  &:hover:not(:disabled):not(:focus) { border-color: $ts-ink-3; }
+}
+
+.form-control-color { background: $ts-panel-2; }
+
+.form-check-label { color: $ts-ink-2; }
+
+.form-switch .form-check-input:checked {
+  background-color: $ts-orange;
+  border-color: $ts-orange;
+}
+
+// Read-only form block (role-gated settings)
+.ts-readonly {
+  opacity: .55;
+  pointer-events: none;
+}
+
+// Inline filter / toolbar row above lists
+.ts-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ts-space-2;
+  margin-bottom: ts-rem(10);
+
+  .form-control,
+  .form-select { min-width: ts-rem(160); }
+
+  > .form-control { flex: 1; }
+}
+
+// -----------------------------------------------------------------------------
+// Tables
+// -----------------------------------------------------------------------------
+
+.table {
+  font-size: $ts-fs-md;
+  vertical-align: middle;
+
+  > thead th,
+  > thead td {
+    font-size: $ts-fs-xs;
+    font-weight: 600;
+    letter-spacing: $ts-ls-wide;
+    text-transform: uppercase;
+    color: $ts-ink-3;
+    white-space: nowrap;
+    border-bottom-color: $ts-line;
+  }
+
+  > tbody > tr:last-child > * { border-bottom-width: 0; }
+
+  > :not(caption) > * > * { border-bottom-color: $ts-line; }
+}
+
+.table-hover > tbody > tr {
+  transition: background-color $ts-transition;
+}
+
+// Clickable row
+.table > tbody > tr.ts-row-link { cursor: pointer; }
+
+// Status edge on the first cell: <tr class="row-status-danger">
+@each $name, $color in $ts-status-colors {
+  .table > tbody > tr.row-status-#{$name} > :first-child {
+    box-shadow: inset $ts-edge-width 0 0 $color;
+  }
+}
+
+// Table inside a card / standalone panel: rounded, no extra margin
+.card > .table,
+.card > .table-responsive > .table,
+.card-body > .table:last-child,
+.card-body > .table-responsive:last-child > .table {
+  margin-bottom: 0;
+}
+
+.card > .table,
+.card > .table-responsive {
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.ts-table-panel {
+  background: $ts-panel;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-lg;
+  overflow: hidden;
+
+  .table { margin-bottom: 0; }
+}
+
+// -----------------------------------------------------------------------------
+// Cards, KPI tiles, status cards
+// -----------------------------------------------------------------------------
+
+.card-title {
+  font-size: $ts-fs-lg;
+  font-weight: $ts-fw-title;
+}
+
+.card-subtitle {
+  font-size: ts-rem(11);
+  color: $ts-ink-3;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: ts-rem(10);
+  font-size: ts-rem(14);
+  font-weight: $ts-fw-title;
+
+  > .btn-link,
+  > .ts-header-actions { margin-left: auto; }
+}
+
+// Clickable card (drill-down)
+.card-clickable {
+  cursor: pointer;
+  transition: border-color $ts-transition, box-shadow $ts-transition;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $ts-orange;
+    box-shadow: $ts-shadow-hover;
+  }
+
+  &.active {
+    border-color: $ts-orange;
+    box-shadow: 0 0 0 1px $ts-orange;
+  }
+}
+
+// Inset panel inside a card (panel2 surface)
+.card-inset {
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-md;
+  padding: $ts-space-3;
+}
+
+// Coloured left edge: <Card className="card-status-danger">
+.card-status,
+.card-accent {
+  border-left-width: $ts-edge-width;
+}
+
+.card-accent { border-left-color: $ts-orange; }
+
+@each $name, $color in $ts-status-colors {
+  .card-status-#{$name} {
+    border-left: $ts-edge-width solid $color;
+  }
+}
+
+// KPI tile
+.ts-kpi {
+  .ts-kpi-label {
+    font-size: ts-rem(11);
+    font-weight: 600;
+    letter-spacing: $ts-ls-wide;
+    text-transform: uppercase;
+    color: $ts-ink-2;
+  }
+
+  .ts-kpi-value {
+    margin-top: ts-rem(6);
+    font-size: $ts-num-md;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: $ts-ls-tight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    small {
+      font-size: $ts-fs-lg;
+      font-weight: 600;
+      color: $ts-ink-2;
+      letter-spacing: 0;
+    }
+  }
+
+  .progress { margin-top: ts-rem(10); }
+
+  .ts-kpi-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $ts-space-2;
+    margin-top: $ts-space-2;
+    font-size: ts-rem(12);
+    color: $ts-ink-2;
+  }
+}
+
+.ts-drill {
+  float: right;
+  font-size: ts-rem(11);
+  color: $ts-ink-3;
+  transition: color $ts-transition;
+
+  .card-clickable:hover & { color: $ts-orange; }
+}
+
+// Empty state
+.ts-empty {
+  padding: ts-rem(18);
+  text-align: center;
+  font-size: $ts-fs-md;
+  color: $ts-ink-3;
+}
+
+// Legend for charts
+.ts-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: ts-rem(14);
+  margin-top: ts-rem(10);
+  font-size: ts-rem(11);
+  color: $ts-ink-2;
+
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: ts-rem(5);
+  }
+}
+
+.ts-swatch {
+  display: inline-block;
+  width: ts-rem(10);
+  height: ts-rem(10);
+  border-radius: 3px;
+  background: currentColor;
+}
+
+// -----------------------------------------------------------------------------
+// Progress (meters, tracks)
+// -----------------------------------------------------------------------------
+
+.progress-thin { --bs-progress-height: #{ts-rem(5)}; }
+.progress-sm   { --bs-progress-height: #{ts-rem(6)}; }
+.progress-lg   { --bs-progress-height: #{ts-rem(14)}; --bs-progress-border-radius: #{ts-rem(7)}; }
+
+.progress-bar { border-radius: inherit; }
+
+// -----------------------------------------------------------------------------
+// Badges, pills, chips, status dots
+// -----------------------------------------------------------------------------
+
+.badge {
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: ts-rem(5);
+}
+
+.badge.text-bg-primary,
+.badge.bg-primary { color: $ts-on-accent; }
+
+// Outline pill (reference .pill / .badge): <Badge bg="" className="badge-outline-success">
+// Soft chip (reference .cchip):              <Badge bg="" className="badge-soft-success">
+@each $name, $color in $ts-status-colors {
+  .badge-outline-#{$name} {
+    color: $color;
+    border-color: $color;
+    background-color: transparent;
+  }
+
+  .badge-soft-#{$name} {
+    color: $color;
+    background-color: rgba($color, $ts-tint-strong);
+  }
+}
+
+// Critical outline gets a faint fill like the reference
+.badge-outline-danger { background-color: rgba($ts-red, .1); }
+
+.badge-outline-muted {
+  color: $ts-ink-3;
+  border-color: $ts-line;
+}
+
+// Rounded status chip with optional dot: <span class="ts-chip text-success"><i class="ts-dot ts-dot-live"></i>Live</span>
+.ts-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: ts-rem(6);
+  padding: ts-rem(3) ts-rem(9);
+  font-size: ts-rem(11);
+  font-weight: 600;
+  line-height: 1.4;
+  color: $ts-ink-2;
+  border: 1px solid currentColor;
+  border-radius: $ts-radius-pill;
+  white-space: nowrap;
+
+  &.ts-chip-muted { border-color: $ts-line; }
+}
+
+// Clickable suggestion chip
+.ts-chip-action {
+  cursor: pointer;
+  background: $ts-panel-2;
+  border-color: $ts-line;
+  font-size: ts-rem(12);
+  padding: ts-rem(6) ts-rem(12);
+  transition: border-color $ts-transition, color $ts-transition;
+
+  &:hover { border-color: $ts-orange; color: $ts-ink; }
+}
+
+.ts-dot {
+  display: inline-block;
+  flex: none;
+  width: ts-rem(8);
+  height: ts-rem(8);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ts-dot-live {
+  box-shadow: 0 0 0 3px rgba($ts-good, .25);
+  animation: ts-pulse 1.6s infinite;
+}
+
+// -----------------------------------------------------------------------------
+// Alerts / banners — panel surface, line border, coloured left edge
+// -----------------------------------------------------------------------------
+
+.alert {
+  border-left-width: $ts-edge-width;
+  font-size: $ts-fs-md;
+  line-height: 1.55;
+}
+
+@each $name, $color in $ts-status-colors {
+  .alert-#{$name} {
+    --bs-alert-color: #{$ts-ink-2};
+    --bs-alert-bg: #{mix($color, $ts-panel, 7%)};
+    --bs-alert-border-color: #{$ts-line};
+    --bs-alert-link-color: #{$color};
+    border-left-color: $color;
+
+    b, strong, .alert-heading { color: $color; }
+  }
+}
+
+.alert-heading {
+  font-size: ts-rem(14);
+  font-weight: 700;
+  margin-bottom: $ts-space-1;
+}
+
+.alert-dismissible .btn-close { padding: ts-rem(13) $ts-space-4; }
+
+// -----------------------------------------------------------------------------
+// Modals, toasts, dropdowns, list groups
+// -----------------------------------------------------------------------------
+
+.modal-title {
+  font-size: ts-rem(16);
+  font-weight: $ts-fw-title;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: $ts-panel;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.modal-body { padding-bottom: ts-rem(22); }
+
+.toast {
+  &.toast-danger  { border-color: $ts-red; }
+  &.toast-success { border-color: $ts-good; }
+}
+
+.toast-container { z-index: $zindex-toast; }
+
+.dropdown-menu { padding: $ts-space-1; }
+
+.dropdown-item {
+  border-radius: $ts-radius-sm;
+  font-weight: 500;
+}
+
+.list-group-item-action { transition: background-color $ts-transition, color $ts-transition; }
+
+// -----------------------------------------------------------------------------
+// Steps (ticket progress)
+// -----------------------------------------------------------------------------
+
+.ts-steps {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ts-step {
+  position: relative;
+  flex: 1;
+  min-width: ts-rem(62);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ts-rem(5);
+  font-size: $ts-fs-2xs;
+  text-align: center;
+  color: $ts-ink-3;
+
+  &::before {
+    content: "";
+    position: relative;
+    z-index: 1;
+    width: ts-rem(14);
+    height: ts-rem(14);
+    border-radius: 50%;
+    background: $ts-panel;
+    border: 2px solid $ts-line;
+  }
+
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: ts-rem(6);
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: $ts-line;
+  }
+
+  &.done,
+  &.active { color: $ts-ink; }
+
+  &.done::before { background: $ts-good; border-color: $ts-good; }
+  &.done:not(:last-child)::after { background: $ts-good; }
+  &.active::before { background: $ts-orange; border-color: $ts-orange; }
+}
+
+// -----------------------------------------------------------------------------
+// Motion preferences
+// -----------------------------------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-dot-live { animation: none; }
+}

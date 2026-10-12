@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:theme": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme.scss dist-theme/theme.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme.scss dist-theme/theme.min.css"
   },
   "dependencies": {
     "axios": "^1.20.0",
@@ -26,6 +27,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "sass": "^1.89.2",
     "vite": "^6.3.5"
   }
 }

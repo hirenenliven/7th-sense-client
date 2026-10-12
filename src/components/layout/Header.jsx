@@ -19,6 +19,9 @@ function Header() {
             <Nav.Link as={NavLink} to={ROUTES.ABOUT}>
               About
             </Nav.Link>
+            <Nav.Link as={NavLink} to={ROUTES.THEME}>
+              Theme
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

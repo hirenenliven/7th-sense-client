@@ -2,6 +2,8 @@
 
 React 19 + Vite + JavaScript + Bootstrap 5 (via `react-bootstrap`). No Tailwind.
 
+Theme: SCSS on Bootstrap — see [THEME.md](THEME.md). Sample page at `/theme`.
+
 ## Scripts
 
 ```bash
@@ -10,6 +12,7 @@ npm run dev      # http://localhost:3000
 npm run build
 npm run preview
 npm run lint
+npm run build:theme  # standalone dist-theme/theme.css
 ```
 
 ## Environment
@@ -22,7 +25,7 @@ Copy `.env.example` to `.env`. Only `VITE_`-prefixed variables are exposed; read
 src/
 ├── assets/
 │   ├── images/
-│   └── styles/global.css     # global overrides on top of Bootstrap
+│   └── scss/                 # theme: _variables, _components, theme.scss (see THEME.md)
 ├── components/
 │   ├── common/               # reusable UI (Loader, ...)
 │   └── layout/               # Header, Footer, MainLayout
@@ -34,7 +37,7 @@ src/
 ├── services/apiClient.js     # axios instance + interceptors
 ├── utils/                    # helper functions
 ├── App.jsx
-└── main.jsx                  # Bootstrap CSS + Router setup
+└── main.jsx                  # theme + Router setup
 ```
 
 Imports use the `@` alias for `src` (e.g. `import Loader from '@/components/common/Loader'`).

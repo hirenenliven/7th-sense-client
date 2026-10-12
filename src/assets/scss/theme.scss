@@ -1,0 +1,89 @@
+// =============================================================================
+// 7thSense theme — single entry point
+// App:        imported by src/main.jsx (compiled by Vite)
+// Standalone: `npm run build:theme` → dist-theme/theme.css
+// =============================================================================
+
+// 1. Configuration
+@import "bootstrap/scss/functions";
+@import "variables"; // our tokens + overrides (must precede Bootstrap variables)
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// 2. Theme utilities (merged into Bootstrap's utility API)
+$utilities: map-merge(
+  $utilities,
+  (
+    "font-variant-numeric": (
+      property: font-variant-numeric,
+      class: font,
+      values: (tabular: tabular-nums),
+    ),
+    "letter-spacing": (
+      property: letter-spacing,
+      class: ls,
+      values: (
+        tight: $ts-ls-tight,
+        normal: 0,
+        wide: $ts-ls-wide,
+        wider: $ts-ls-wider,
+      ),
+    ),
+    "cursor": (
+      property: cursor,
+      class: cursor,
+      values: (pointer: pointer, default: default),
+    ),
+    "font-weight": map-merge(
+      map-get($utilities, "font-weight"),
+      (values: map-merge(map-get(map-get($utilities, "font-weight"), "values"), (title: $ts-fw-title))),
+    ),
+    "font-size": map-merge(
+      map-get($utilities, "font-size"),
+      (values: map-merge(map-get(map-get($utilities, "font-size"), "values"), (xs: $ts-fs-xs, sm: $ts-fs-md))),
+    ),
+  )
+);
+
+// 3. Bootstrap layout & components
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/accordion";
+@import "bootstrap/scss/breadcrumb";
+@import "bootstrap/scss/pagination";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/tooltip";
+@import "bootstrap/scss/popover";
+@import "bootstrap/scss/carousel";
+@import "bootstrap/scss/spinners";
+@import "bootstrap/scss/offcanvas";
+@import "bootstrap/scss/placeholders";
+@import "bootstrap/scss/helpers";
+
+// 4. Theme components (after Bootstrap so they extend it)
+@import "components";
+
+// 5. Utilities last so they win over component styles
+@import "bootstrap/scss/utilities/api";
