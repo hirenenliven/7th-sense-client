@@ -21,7 +21,11 @@ Live sample: **`/theme`** (`src/pages/ThemeShowcase/ThemeShowcase.jsx`).
 2. **Use Bootstrap first** (`Card`, `Table`, `Badge`, `Alert`, `Modal`, utilities such as `d-flex gap-2 mb-3`).
    Use a `ts-*` class only when Bootstrap has nothing equivalent.
 3. **New colours or sizes go into `_variables.scss`** as a token, and are then used by name.
-4. **Responsive:** use the Bootstrap grid (`<Row xs={1} sm={2} xl={4}>`) and responsive utilities (`d-md-flex`).
+4. **Use the full page width.** Every container (`Container`, `container-fluid`, `.ts-page`) fills the screen,
+   with only a small edge gutter: 12px on phones, 16px from `md`, 20px from `xl` (`$ts-gutter-x-*`).
+   Never add a `max-width` or extra side `px-*`/`mx-*` to a page wrapper. Fill wide screens with
+   more grid columns (`xl={4}`, `xxl={6}`) instead of leaving empty margins.
+5. **Responsive:** use the Bootstrap grid (`<Row xs={1} sm={2} xl={4}>`) and responsive utilities (`d-md-flex`).
 
 ## Tokens
 

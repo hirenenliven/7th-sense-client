@@ -48,11 +48,25 @@ body {
   flex: 1;
 }
 
+// Full-width containers with a responsive edge gutter (see $ts-gutter-x-*).
+// Applies to .container, .container-fluid, .container-{bp} and .ts-page.
+$ts-containers: ".container, .container-fluid, .ts-page";
+@each $bp, $w in $container-max-widths {
+  $ts-containers: "#{$ts-containers}, .container-#{$bp}";
+}
+
+#{$ts-containers} {
+  --ts-gutter-x: #{$ts-gutter-x-sm};
+  padding-inline: var(--ts-gutter-x);
+
+  @include media-breakpoint-up(md) { --ts-gutter-x: #{$ts-gutter-x-md}; }
+  @include media-breakpoint-up(xl) { --ts-gutter-x: #{$ts-gutter-x-lg}; }
+}
+
 .ts-page {
   width: 100%;
   max-width: $ts-page-max;
-  margin-inline: auto;
-  padding: $ts-space-4 ts-rem(18) ts-rem(60);
+  padding-block: $ts-space-4;
 }
 
 .ts-page-header {

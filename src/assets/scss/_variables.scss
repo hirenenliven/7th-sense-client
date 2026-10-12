@@ -96,7 +96,12 @@ $ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .5);
 
 // Layout
 $ts-appbar-height: ts-rem(56);
-$ts-page-max:      1180px;
+// Full-width layout: content always spans the viewport; only a small
+// responsive gutter separates it from the screen edge. Never cap page width.
+$ts-page-max:      100%;
+$ts-gutter-x-sm:   ts-rem(12); // < md   (phones)
+$ts-gutter-x-md:   ts-rem(16); // md–xl  (tablets, laptops)
+$ts-gutter-x-lg:   ts-rem(20); // ≥ xl   (desktops)
 $ts-sidebar-width: 240px;
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
@@ -128,6 +133,7 @@ $ts-tokens: (
   "shadow-hover": $ts-shadow-hover,
   "appbar-height": $ts-appbar-height,
   "page-max": $ts-page-max,
+  "gutter-x": $ts-gutter-x-sm,
   "sidebar-width": $ts-sidebar-width,
 );
 
@@ -295,13 +301,14 @@ $spacers: (
 );
 
 $grid-gutter-width: $ts-space-5; // 12px each side
-$container-padding-x: ts-rem(32); // 16px each side
+$container-padding-x: $ts-gutter-x-sm * 2; // Bootstrap halves this per side
+// Every .container is full width (same as .container-fluid) — no centred max-width.
 $container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1140px,
-  xxl: $ts-page-max,
+  sm: 100%,
+  md: 100%,
+  lg: 100%,
+  xl: 100%,
+  xxl: 100%,
 );
 
 $border-width:       1px;
