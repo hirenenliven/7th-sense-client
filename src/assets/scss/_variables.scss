@@ -103,6 +103,13 @@ $ts-gutter-x-sm:   ts-rem(12); // < md   (phones)
 $ts-gutter-x-md:   ts-rem(16); // md–xl  (tablets, laptops)
 $ts-gutter-x-lg:   ts-rem(20); // ≥ xl   (desktops)
 $ts-sidebar-width: 240px;
+$ts-sidebar-max-width-mobile: 85vw;
+$ts-sidebar-bg:    $ts-appbar;
+$ts-sidebar-transition: .22s ease;
+$ts-sidebar-icon-size:  ts-rem(17);
+$ts-sidebar-toggle-icon: ts-rem(22);
+$ts-sidebar-sub-indent: ts-rem(19); // aligns the submenu guide line under the parent icon
+$ts-backdrop-opacity: .55;
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
 
@@ -570,7 +577,7 @@ $modal-content-border-radius: $ts-radius-xl;
 $modal-content-box-shadow-xs: $ts-shadow-overlay;
 $modal-content-box-shadow-sm-up: $ts-shadow-overlay;
 $modal-backdrop-bg:          $black;
-$modal-backdrop-opacity:     .55;
+$modal-backdrop-opacity:     $ts-backdrop-opacity;
 $modal-header-border-color:  $ts-line;
 $modal-footer-border-color:  $ts-line;
 $modal-header-padding-y:     ts-rem(14);
@@ -617,7 +624,7 @@ $offcanvas-bg-color:     $ts-appbar;
 $offcanvas-color:        $ts-ink;
 $offcanvas-border-color: $ts-line;
 $offcanvas-horizontal-width: $ts-sidebar-width;
-$offcanvas-backdrop-opacity: .55;
+$offcanvas-backdrop-opacity: $ts-backdrop-opacity;
 
 // Accordion
 $accordion-color:              $ts-ink;

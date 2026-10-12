@@ -1,19 +1,32 @@
-import { Container } from 'react-bootstrap'
 import { Outlet } from 'react-router-dom'
-import Header from './Header'
+import Topbar from './Topbar'
+import Sidebar from './Sidebar'
 import Footer from './Footer'
+import SidebarProvider from '@/context/SidebarProvider'
+import useSidebar from '@/hooks/useSidebar'
+
+function AppShell() {
+  const { isOpen } = useSidebar()
+
+  return (
+    <div className={`ts-shell${isOpen ? ' sidebar-open' : ''}`}>
+      <Topbar />
+      <Sidebar />
+      <main className="ts-content">
+        <div className="ts-page">
+          <Outlet />
+        </div>
+        <Footer />
+      </main>
+    </div>
+  )
+}
 
 function MainLayout() {
   return (
-    <div className="app-wrapper">
-      <Header />
-      <main className="app-main py-4">
-        <Container>
-          <Outlet />
-        </Container>
-      </main>
-      <Footer />
-    </div>
+    <SidebarProvider>
+      <AppShell />
+    </SidebarProvider>
   )
 }
 

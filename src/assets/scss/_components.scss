@@ -38,19 +38,9 @@ body {
 // App shell: wrapper, page, page header, sidebar
 // -----------------------------------------------------------------------------
 
-.app-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-main {
-  flex: 1;
-}
-
 // Full-width containers with a responsive edge gutter (see $ts-gutter-x-*).
-// Applies to .container, .container-fluid, .container-{bp} and .ts-page.
-$ts-containers: ".container, .container-fluid, .ts-page";
+// Applies to .container, .container-fluid, .container-{bp}, .ts-page, top bar and footer.
+$ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer";
 @each $bp, $w in $container-max-widths {
   $ts-containers: "#{$ts-containers}, .container-#{$bp}";
 }
@@ -101,38 +91,287 @@ $ts-containers: ".container, .container-fluid, .ts-page";
   }
 }
 
-// Sidebar: use with `offcanvas-lg offcanvas-start` so it collapses below lg
-.ts-sidebar {
+// -----------------------------------------------------------------------------
+// App shell: top bar + toggleable sidebar + content
+//   <div class="ts-shell sidebar-open">     ← `sidebar-open` toggled by the Menu button
+//     <header class="ts-topbar">…
+//     <aside class="ts-sidebar">…            ← ≥ lg pushes content, < lg overlays it
+//     <div class="ts-sidebar-backdrop">      ← < lg only
+//     <main class="ts-content"><div class="ts-page">…</div><footer class="ts-footer">
+// -----------------------------------------------------------------------------
+
+.ts-shell {
+  min-height: 100vh;
+}
+
+// Top bar
+.ts-topbar {
+  position: sticky;
+  top: 0;
+  z-index: $zindex-fixed;
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+  height: $ts-appbar-height;
   background: $ts-appbar;
+  border-bottom: 1px solid $ts-line;
+}
+
+.ts-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-1;
+  min-width: 0;
+  margin-left: auto;
+
+  @include media-breakpoint-up(md) { gap: $ts-space-3; }
+}
+
+.ts-topbar-select {
+  width: auto;
+  max-width: ts-rem(130);
+}
+
+.ts-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-2;
+  margin-right: $ts-space-2;
+  font-size: ts-rem(18);
+  font-weight: 800;
+  letter-spacing: $ts-ls-tight;
+  color: $ts-ink;
+  white-space: nowrap;
+
+  &:hover {
+    color: $ts-ink;
+    text-decoration: none;
+  }
+}
+
+.ts-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: ts-rem(32);
+  height: ts-rem(32);
+  border: 2px solid $ts-orange;
+  border-radius: $ts-radius;
+  color: $ts-orange;
+  line-height: 1;
+}
+
+.ts-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: ts-rem(6);
+  font-weight: 500;
+
+  .bi {
+    font-size: $ts-sidebar-toggle-icon;
+    line-height: 1;
+  }
+}
+
+.ts-clock {
+  font-size: ts-rem(12);
+  color: $ts-ink-2;
+  white-space: nowrap;
+}
+
+.ts-notify-dot {
+  position: absolute;
+  top: ts-rem(7);
+  right: ts-rem(7);
+  width: ts-rem(7);
+  height: ts-rem(7);
+  border-radius: 50%;
+  background: $ts-orange;
+  box-shadow: 0 0 0 2px $ts-appbar;
+}
+
+.ts-user-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-2;
+  padding-block: ts-rem(3);
+  font-size: ts-rem(12);
+}
+
+.ts-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: ts-rem(30);
+  height: ts-rem(30);
+  border-radius: $ts-radius;
+  background: $ts-panel-2;
+  color: $ts-ink-2;
+  font-size: ts-rem(16);
+}
+
+// Sidebar (closed = slid out + hidden from tab order; open = visible)
+.ts-sidebar {
+  position: fixed;
+  top: $ts-appbar-height;
+  bottom: 0;
+  left: 0;
+  z-index: $zindex-fixed - 1;
+  width: $ts-sidebar-width;
+  max-width: $ts-sidebar-max-width-mobile;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: $ts-sidebar-bg;
   border-right: 1px solid $ts-line;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform $ts-sidebar-transition, visibility $ts-sidebar-transition;
+
+  .sidebar-open & {
+    transform: none;
+    visibility: visible;
+  }
+
+  > nav { padding: $ts-space-2 $ts-space-2 $ts-space-5; }
+}
+
+.ts-sidebar-backdrop {
+  position: fixed;
+  inset: $ts-appbar-height 0 0;
+  z-index: $zindex-fixed - 2;
+  background: rgba($black, $ts-backdrop-opacity);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity $ts-sidebar-transition, visibility $ts-sidebar-transition;
+
+  .sidebar-open & {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @include media-breakpoint-up(lg) { display: none; }
+}
+
+// Content column — pushed right on desktop while the sidebar is open
+.ts-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: calc(100vh - #{$ts-appbar-height});
+  transition: margin-left $ts-sidebar-transition;
+
+  > .ts-page { flex: 1 0 auto; }
 
   @include media-breakpoint-up(lg) {
-    width: $ts-sidebar-width;
-    flex: 0 0 $ts-sidebar-width;
-    position: sticky;
-    top: $ts-appbar-height;
-    height: calc(100vh - #{$ts-appbar-height});
-    overflow-y: auto;
+    .sidebar-open & { margin-left: $ts-sidebar-width; }
+  }
+}
+
+.ts-footer {
+  padding-block: $ts-space-3;
+  border-top: 1px solid $ts-line;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+  text-align: center;
+}
+
+// Sidebar menu
+.ts-sidenav-section + .ts-sidenav-section { margin-top: $ts-space-1; }
+
+.ts-sidenav,
+.ts-sidenav-sub {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ts-sidenav-link {
+  display: flex;
+  align-items: center;
+  gap: ts-rem(10);
+  width: 100%;
+  padding: ts-rem(8) ts-rem(10);
+  border: 0;
+  border-radius: $ts-radius;
+  background: transparent;
+  color: $ts-ink-2;
+  font-size: ts-rem(13.5);
+  font-weight: 500;
+  text-align: left;
+  transition: background-color $ts-transition, color $ts-transition;
+
+  &:hover {
+    background: $ts-panel-2;
+    color: $ts-ink;
+    text-decoration: none;
   }
 
-  .nav-link {
-    display: flex;
-    align-items: center;
-    gap: $ts-space-2;
-    border-radius: $ts-radius;
-    color: $ts-ink-2;
-    transition: background-color $ts-transition, color $ts-transition;
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba($ts-orange, .3);
+  }
 
-    &:hover { background: $ts-panel-2; color: $ts-ink; }
+  &.has-active { color: $ts-ink; }
+
+  &.active {
+    background: $ts-panel-2;
+    color: $ts-ink;
+    box-shadow: inset $ts-edge-width 0 0 $ts-orange;
+  }
+}
+
+.ts-sidenav-icon {
+  flex: none;
+  width: ts-rem(20);
+  font-size: $ts-sidebar-icon-size;
+  text-align: center;
+  color: $ts-ink-3;
+  transition: color $ts-transition;
+
+  .ts-sidenav-link:hover & { color: $ts-ink; }
+  .ts-sidenav-link.has-active &,
+  .ts-sidenav-link.active & { color: $ts-orange; }
+}
+
+.ts-sidenav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ts-sidenav-caret {
+  font-size: ts-rem(11);
+  color: $ts-ink-3;
+  transition: transform $ts-transition;
+
+  [aria-expanded="true"] > & { transform: rotate(180deg); }
+}
+
+// Submenu: indented under the parent icon with a guide line
+.ts-sidenav-sub {
+  margin: 2px 0 $ts-space-1 $ts-sidebar-sub-indent;
+  padding-left: ts-rem(10);
+  border-left: 1px solid $ts-line;
+
+  .ts-sidenav-link {
+    padding: ts-rem(6) ts-rem(10);
+    font-size: ts-rem(12.5);
 
     &.active {
-      background: $ts-panel-2;
-      color: $ts-ink;
-      box-shadow: inset $ts-edge-width 0 0 $ts-orange;
+      box-shadow: none;
+      color: $ts-orange;
     }
-
-    &.disabled { color: $ts-ink-3; }
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-sidebar,
+  .ts-sidebar-backdrop,
+  .ts-content { transition: none; }
 }
 
 .ts-sidebar-heading {
@@ -318,6 +557,23 @@ $ts-containers: ".container, .container-fluid, .ts-page";
   --bs-btn-disabled-color: #{$ts-ink-3};
   --bs-btn-disabled-bg: #{$ts-panel-2};
   --bs-btn-disabled-border-color: #{$ts-line};
+}
+
+// Plain: borderless top-bar / toolbar button
+.btn-plain {
+  --bs-btn-color: #{$ts-ink-2};
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: #{$ts-ink};
+  --bs-btn-hover-bg: #{$ts-panel-2};
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-focus-shadow-rgb: #{to-rgb($ts-orange)};
+  --bs-btn-active-color: #{$ts-ink};
+  --bs-btn-active-bg: #{$ts-panel-2};
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-color: #{$ts-ink-3};
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: transparent;
 }
 
 .btn-link {
@@ -591,6 +847,13 @@ $ts-containers: ".container, .container-fluid, .ts-page";
   padding: ts-rem(18);
   text-align: center;
   font-size: $ts-fs-md;
+  color: $ts-ink-3;
+}
+
+.ts-empty-icon {
+  display: block;
+  margin-bottom: $ts-space-2;
+  font-size: ts-rem(32);
   color: $ts-ink-3;
 }
 

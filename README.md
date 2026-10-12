@@ -28,10 +28,11 @@ src/
 │   └── scss/                 # theme: _variables, _components, theme.scss (see THEME.md)
 ├── components/
 │   ├── common/               # reusable UI (Loader, ...)
-│   └── layout/               # Header, Footer, MainLayout
+│   └── layout/               # MainLayout, Topbar, Sidebar, SidebarItem, Footer
 ├── config/env.js             # env variables
-├── constants/routes.js       # route paths
-├── hooks/                    # custom hooks (useFetch)
+├── constants/              # routes, navigation (sidebar menu), app settings
+├── context/                # SidebarProvider (open/close state)
+├── hooks/                  # useSidebar, useMediaQuery, useFetch
 ├── pages/                    # one folder per page
 ├── routes/AppRoutes.jsx      # route definitions (lazy loaded)
 ├── services/apiClient.js     # axios instance + interceptors

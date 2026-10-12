@@ -72,7 +72,6 @@ Text and background colours have Bootstrap classes:
 | Banner | `<Alert variant="{status}">` with `<b>` for the coloured lead text |
 | Toolbar above a list | `.ts-toolbar` |
 | Sub-nav strip | `.ts-subnav` wrapping `<Nav variant="tabs">` |
-| Sidebar | `<Offcanvas responsive="lg" className="ts-sidebar">` + `Nav className="flex-column"` |
 | Read-only form | `.ts-readonly` |
 | Steps | `<ol className="ts-steps"><li className="ts-step done">…` (`done` / `active`) |
 | Legend | `.ts-legend` > `<span className="text-{status}"><i className="ts-swatch" /> Label</span>` |
@@ -80,6 +79,27 @@ Text and background colours have Bootstrap classes:
 | Bar thickness | `progress-thin` 5px · `progress-sm` 6px · default 8px · `progress-lg` 14px |
 
 **Utilities added to Bootstrap:** `fs-xs`, `fs-sm`, `fw-title`, `font-tabular`, `ls-tight|wide|wider`, `cursor-pointer`.
+
+## App shell (top bar + sidebar)
+
+`MainLayout` renders the shell. **Pages never render their own navigation.**
+
+```
+.ts-shell(.sidebar-open)
+├── .ts-topbar        brand · Menu toggle · clock · language · notifications · user
+├── .ts-sidebar       sections → items → submenus (from constants/navigation.js)
+├── .ts-sidebar-backdrop   mobile only
+└── main.ts-content > .ts-page (your page) + .ts-footer
+```
+
+- **Menu button** toggles `sidebar-open`. On screens `lg` and wider the sidebar pushes the content aside and its open/closed state is remembered. Below `lg` it slides over the content with a backdrop, and closes on a link click, a backdrop click or Esc.
+- **Adding a menu item:** add the path to `constants/routes.js` and the item to `constants/navigation.js`.
+  The item has `{ key, label, icon: 'bi-…', path }`, or `children: [{ key, label, path }]` for a submenu.
+  The route appears automatically with a *Coming soon* page. Once the screen is built, add it to `PAGES` in `routes/AppRoutes.jsx`.
+- **State:** `useSidebar()` returns `{ isOpen, isDesktop, toggle, closeOnMobile }`.
+- **Icons:** [Bootstrap Icons](https://icons.getbootstrap.com), e.g. `<i className="bi bi-cpu" aria-hidden="true" />`.
+- **Tokens:** `$ts-sidebar-width`, `$ts-sidebar-bg`, `$ts-sidebar-transition`, `$ts-sidebar-icon-size`, `$ts-sidebar-sub-indent`.
+- **Plain button** (borderless, used in the top bar): `variant="plain"`.
 
 ## Example
 
