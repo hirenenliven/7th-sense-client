@@ -14,6 +14,8 @@ export const ROUTES = {
   REPORT_PRODUCTION: '/reports/production',
 
   // Masters
+  CUSTOMERS: '/masters/customers',
+  CUSTOMER_ADD: '/masters/customers/add',
   PARTS: '/masters/parts',
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',

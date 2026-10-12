@@ -57,6 +57,15 @@ export const NAV_SECTIONS = [
     title: 'Masters',
     items: [
       {
+        key: 'customers',
+        label: 'Customers',
+        icon: 'bi-building',
+        children: [
+          { key: 'customer-list', label: 'Customer List', path: ROUTES.CUSTOMERS },
+          { key: 'customer-add', label: 'Add Customer', path: ROUTES.CUSTOMER_ADD },
+        ],
+      },
+      {
         key: 'parts',
         label: 'Parts',
         icon: 'bi-rocket-takeoff',

@@ -647,6 +647,81 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   border-color: $ts-orange;
 }
 
+// Required field marker: <Form.Label className="required">
+.form-label.required::after {
+  content: " *";
+  color: $ts-red;
+}
+
+// Browser autofill keeps the dark input surface (Chrome paints it light by default)
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover {
+  -webkit-text-fill-color: $ts-ink;
+  caret-color: $ts-ink;
+  box-shadow: 0 0 0 100vmax $ts-panel-2 inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: $ts-ink;
+  box-shadow: 0 0 0 100vmax $ts-panel-2 inset, $input-focus-box-shadow;
+}
+
+// Selected-file preview (logo upload)
+.ts-file-preview {
+  display: flex;
+  align-items: center;
+  gap: ts-rem(10);
+  padding: $ts-space-2;
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+}
+
+.ts-file-preview-img {
+  flex: none;
+  width: ts-rem(40);
+  height: ts-rem(40);
+  object-fit: contain;
+  background: $ts-panel;
+  border-radius: $ts-radius-sm;
+}
+
+.ts-file-preview-meta {
+  flex: 1;
+  min-width: 0;
+  font-size: $ts-fs-md;
+}
+
+// Sticky save bar at the bottom of long forms
+.ts-form-actions {
+  position: sticky;
+  bottom: $ts-space-3;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $ts-space-2;
+  padding: $ts-space-3 $ts-space-4;
+  background: $ts-panel;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-lg;
+  box-shadow: $ts-shadow-float;
+
+  @include media-breakpoint-down(sm) {
+    .btn { flex: 1; }
+  }
+}
+
+.ts-form-actions-note {
+  margin-right: auto;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+
+  @include media-breakpoint-down(sm) { width: 100%; }
+}
+
 // Read-only form block (role-gated settings)
 .ts-readonly {
   opacity: .55;
@@ -1030,6 +1105,108 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 
 .toast-container { z-index: $zindex-toast; }
 
+// Global toasts — rendered by <Toaster />, raised with toast.success() / error() / warning() / info()
+$ts-toast-colors: (
+  "success": $ts-good,
+  "error": $ts-red,
+  "warning": $ts-amber,
+  "info": $ts-blue,
+);
+
+.ts-toaster {
+  position: fixed;
+  top: calc(#{$ts-appbar-height} + #{$ts-space-3});
+  right: $ts-gutter-x-sm;
+  left: $ts-gutter-x-sm;
+  z-index: $zindex-toast;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $ts-space-2;
+  pointer-events: none;
+
+  @include media-breakpoint-up(md) {
+    right: $ts-gutter-x-md;
+    left: auto;
+    width: $ts-toast-width;
+  }
+}
+
+.ts-toast {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  overflow: hidden;
+  pointer-events: auto;
+  background: $ts-panel;
+  border: 1px solid $ts-line;
+  border-left: $ts-edge-width solid var(--ts-toast-accent);
+  box-shadow: $ts-shadow-float;
+  animation: ts-toast-in $ts-toast-enter ease-out;
+
+  &.is-leaving { animation: ts-toast-out $ts-toast-exit ease-in forwards; }
+
+  .toast-body {
+    display: flex;
+    align-items: flex-start;
+    gap: ts-rem(10);
+    padding: ts-rem(12) ts-rem(12) ts-rem(14) ts-rem(14);
+  }
+}
+
+@each $name, $color in $ts-toast-colors {
+  .ts-toast-#{$name} { --ts-toast-accent: #{$color}; }
+}
+
+.ts-toast-icon {
+  flex: none;
+  font-size: ts-rem(18);
+  line-height: 1.2;
+  color: var(--ts-toast-accent);
+}
+
+.ts-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ts-toast-title {
+  font-size: $ts-fs-base;
+  font-weight: 700;
+  color: $ts-ink;
+}
+
+.ts-toast-message {
+  font-size: $ts-fs-md;
+  color: $ts-ink-2;
+  overflow-wrap: anywhere;
+}
+
+.ts-toast-close {
+  flex: none;
+  margin-top: ts-rem(2);
+  font-size: ts-rem(10);
+}
+
+.ts-toast-progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--ts-toast-accent);
+  opacity: .7;
+  transform-origin: left;
+}
+
+@keyframes ts-toast-in {
+  from { opacity: 0; transform: translateX($ts-toast-shift); }
+}
+
+@keyframes ts-toast-out {
+  to { opacity: 0; transform: translateX($ts-toast-shift); }
+}
+
 .dropdown-menu { padding: $ts-space-1; }
 
 .dropdown-item {
@@ -1098,5 +1275,7 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 // -----------------------------------------------------------------------------
 
 @media (prefers-reduced-motion: reduce) {
-  .ts-dot-live { animation: none; }
+  .ts-dot-live,
+  .ts-toast,
+  .ts-toast.is-leaving { animation: none; }
 }

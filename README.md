@@ -17,7 +17,7 @@ npm run build:theme  # standalone dist-theme/theme.css
 
 ## Environment
 
-Copy `.env.example` to `.env`. Only `VITE_`-prefixed variables are exposed; read them through `src/config/env.js`.
+Copy `.env.example` to `.env`. `VITE_USE_MOCK_API=true` makes services return mock data until the backend is ready. Only `VITE_`-prefixed variables are exposed; read them through `src/config/env.js`.
 
 ## Structure
 

@@ -110,6 +110,12 @@ $ts-sidebar-icon-size:  ts-rem(17);
 $ts-sidebar-toggle-icon: ts-rem(22);
 $ts-sidebar-sub-indent: ts-rem(19); // aligns the submenu guide line under the parent icon
 $ts-backdrop-opacity: .55;
+
+// Toasts (see utils/toast.js — durations live in constants/app.js TOAST_DEFAULTS)
+$ts-toast-width:  ts-rem(360);
+$ts-toast-enter:  .25s;
+$ts-toast-exit:   .2s; // keep in sync with TOAST_DEFAULTS.exitMs
+$ts-toast-shift:  ts-rem(16);
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
 
@@ -402,6 +408,10 @@ $form-check-input-focus-border:   $ts-orange;
 $form-switch-color:               $ts-ink-3;
 $form-switch-focus-color:         $ts-orange;
 $form-switch-checked-color:       $ts-on-accent;
+
+$form-file-button-color:    $ts-ink-2;
+$form-file-button-bg:       $ts-panel;
+$form-file-button-hover-bg: $ts-line;
 
 $form-range-track-bg:   $ts-panel-2;
 $form-range-thumb-bg:   $ts-orange;

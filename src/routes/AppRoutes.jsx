@@ -9,6 +9,7 @@ import { flattenNav } from '@/utils/navigation'
 const Home = lazy(() => import('@/pages/Home/Home'))
 const About = lazy(() => import('@/pages/About/About'))
 const ThemeShowcase = lazy(() => import('@/pages/ThemeShowcase/ThemeShowcase'))
+const AddCustomer = lazy(() => import('@/pages/Customers/AddCustomer'))
 const ComingSoon = lazy(() => import('@/pages/ComingSoon/ComingSoon'))
 const NotFound = lazy(() => import('@/pages/NotFound/NotFound'))
 
@@ -17,6 +18,7 @@ const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase /> },
+  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer /> },
 ]
 
 const BUILT_PATHS = new Set(PAGES.map((page) => page.path))

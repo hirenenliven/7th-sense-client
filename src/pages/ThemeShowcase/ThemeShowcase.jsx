@@ -13,9 +13,8 @@ import {
   ProgressBar,
   Row,
   Table,
-  Toast,
-  ToastContainer,
 } from 'react-bootstrap'
+import { toast } from '@/utils/toast'
 
 // Sample data — pages should receive this from services/hooks.
 const KPIS = [
@@ -50,7 +49,6 @@ function ThemeShowcase() {
   const [tab, setTab] = useState(TABS[0])
   const [filter, setFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
-  const [showToast, setShowToast] = useState(false)
 
   return (
     <>
@@ -259,7 +257,7 @@ function ThemeShowcase() {
                     </Col>
                   </Row>
                   <div className="d-flex flex-wrap gap-2 mt-3">
-                    <Button type="button" onClick={() => setShowToast(true)}>
+                    <Button type="button" onClick={() => toast.success('Reject logged for NX-3222.', { title: 'Saved' })}>
                       Save
                     </Button>
                     <Button type="button" variant="ghost">
@@ -289,6 +287,21 @@ function ThemeShowcase() {
             <Button size="sm">Small</Button>
             <Button size="lg">Large</Button>
             <Button disabled>Disabled</Button>
+          </div>
+          <h2 className="ts-section-title">Toasts</h2>
+          <div className="d-flex flex-wrap gap-2 my-3">
+            <Button variant="ghost" onClick={() => toast.success('Customer saved successfully.')}>
+              Success toast
+            </Button>
+            <Button variant="ghost" onClick={() => toast.error('Server did not respond.', { title: 'Save failed' })}>
+              Error toast
+            </Button>
+            <Button variant="ghost" onClick={() => toast.warning('Tool T12 is near end of life.')}>
+              Warning toast
+            </Button>
+            <Button variant="ghost" onClick={() => toast.info('Report export started.')}>
+              Info toast
+            </Button>
           </div>
           <div className="d-flex flex-wrap gap-2 mb-2">
             <Badge bg="" className="badge-outline-success">OK</Badge>
@@ -342,12 +355,6 @@ function ThemeShowcase() {
         </Modal.Footer>
       </Modal>
 
-      {/* Toast */}
-      <ToastContainer position="bottom-center" containerPosition="fixed" className="p-3">
-        <Toast show={showToast} onClose={() => setShowToast(false)} delay={3000} autohide>
-          <Toast.Body>Reject logged for NX-3222.</Toast.Body>
-        </Toast>
-      </ToastContainer>
     </>
   )
 }

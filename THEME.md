@@ -101,6 +101,42 @@ Text and background colours have Bootstrap classes:
 - **Tokens:** `$ts-sidebar-width`, `$ts-sidebar-bg`, `$ts-sidebar-transition`, `$ts-sidebar-icon-size`, `$ts-sidebar-sub-indent`.
 - **Plain button** (borderless, used in the top bar): `variant="plain"`.
 
+## Toasts (global notifications)
+
+`<Toaster />` is mounted once in `App.jsx`. Call `toast` from anywhere: components, services or axios interceptors.
+
+```js
+import { toast } from '@/utils/toast'
+
+toast.success('Customer saved')
+toast.error(error.message, { title: 'Could not save customer' })
+toast.warning('Please fix 3 highlighted fields.')
+const id = toast.info('Uploading…', { duration: 0 }) // 0 = stays until dismissed
+toast.dismiss(id)
+```
+
+- **Options:** `{ title, duration (ms), id }`. Calling again with the same `id` replaces that toast.
+- **Default durations and titles** are `TOAST_DEFAULTS` in `constants/app.js`. Errors stay longest.
+- **Behaviour:** toasts show top-right (full width on phones) with a coloured edge, an icon and a progress bar. The timer pauses on hover or focus. At most 5 are shown.
+
+## Forms
+
+Write forms with plain react-bootstrap markup, without wrapper components:
+
+```jsx
+<Form.Group as={Col} md={6} controlId="customer-email">
+  <Form.Label className="required">Email</Form.Label>
+  <Form.Control name="email" value={values.email} onChange={handleChange} isInvalid={!!errors.email} />
+  <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+</Form.Group>
+```
+
+- `Form.Label.required` adds a red `*`.
+- Group fields into `Card`s with a `Card.Header` that has an icon and a title.
+- Put the buttons in a `.ts-form-actions` bar, which sticks to the bottom of the screen. Include a `.ts-form-actions-note`.
+- `.ts-file-preview` shows the selected file: thumbnail, name, size and a remove button.
+- Shared validation rules are in `utils/validators.js`. Each form's own rules go next to the page, as in `pages/Customers/customerForm.js`.
+
 ## Example
 
 ```jsx

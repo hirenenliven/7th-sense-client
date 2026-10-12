@@ -52,8 +52,167 @@
 - **Local State**: useState for component-level state
 - **Global State**: React Context API for app-wide state
 - **Server State**: React Query for caching, synchronization, and background updates
-- **Form State**: React Hook Form or controlled components with validation
+- **Form State**: React Hook Form with Zod validation (see Form Handling Guidelines below)
 - **Performance**: Use React.memo, useMemo, useCallback to prevent unnecessary re-renders
+
+#### 4.1 Form Handling Guidelines (Golden Standard)
+
+**All forms in this project MUST use React Hook Form with Zod validation.**
+
+##### Required Dependencies
+```bash
+npm install react-hook-form zod @hookform/resolvers
+```
+
+##### Form Structure Pattern
+
+**Step 1: Create validation schema in a separate file (e.g., `customerForm.js`)**
+```javascript
+import { z } from 'zod'
+
+// Define your validation schema with Zod
+export const customerSchema = z.object({
+  name: z.string().min(2, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  machineId: z.coerce.number().min(1, 'Select a machine'),
+  // Add conditional validation with superRefine if needed
+}).superRefine((data, ctx) => {
+  // Conditional validation logic
+  if (data.country === 'IN' && !data.gstNo) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'GST No. is required',
+      path: ['gstNo'],
+    })
+  }
+})
+
+// Export initial values for the form
+export const INITIAL_VALUES = {
+  name: '',
+  email: '',
+  machineId: '',
+}
+```
+
+**Step 2: Use React Hook Form in your component**
+```jsx
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { customerSchema, INITIAL_VALUES } from './customerForm'
+
+function CustomerForm() {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(customerSchema),
+    defaultValues: INITIAL_VALUES,
+  })
+
+  // Watch specific fields for conditional logic
+  const country = watch('country')
+
+  const onSubmit = async (values) => {
+    // values are already validated by the schema
+    try {
+      await fetch('/api/customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
+      reset() // Reset form after successful submission
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Direct field name in label - no separate LABELS constant */}
+      <input className="form-control" {...register('name')} />
+      {errors.name && <small className="text-danger">{errors.name.message}</small>}
+
+      <input className="form-control" {...register('email')} />
+      {errors.email && <small className="text-danger">{errors.email.message}</small>}
+
+      <select className="form-select" {...register('machineId')}>
+        <option value="">Select</option>
+        <option value="1">Machine 1</option>
+      </select>
+      {errors.machineId && <small className="text-danger">{errors.machineId.message}</small>}
+
+      <button className="btn btn-primary" disabled={isSubmitting}>Save</button>
+    </form>
+  )
+}
+```
+
+##### Key Rules for Form Handling
+
+1. **NO separate LABELS constant**: Set field labels directly in JSX using the field name or any desired text
+2. **NO custom validation functions**: Use Zod schema for all validation logic
+3. **NO manual error state management**: React Hook Form handles errors automatically
+4. **NO manual touched state**: React Hook Form handles touched state automatically
+5. **Use `register` for all form fields**: Never use manual onChange handlers unless needed for special formatting
+6. **Use `watch` for conditional logic**: Watch fields that affect other fields (e.g., country → state)
+7. **Use `setValue` for programmatic updates**: Use setValue to update fields programmatically (e.g., reset state when country changes)
+8. **Display errors with `errors.field?.message`**: Use optional chaining to safely access error messages
+9. **Use `isSubmitting` instead of custom loading state**: React Hook Form provides this automatically
+10. **Use `reset()` to clear the form**: Never manually reset form state
+
+##### Handling Special Cases
+
+**Uppercase fields (e.g., GST, PAN):**
+```jsx
+const handleChange = (event) => {
+  const { name, value } = event.target
+  if (UPPERCASE_FIELDS.has(name)) {
+    setValue(name, value.toUpperCase())
+  }
+}
+
+<input {...register('gstNo', { onChange: handleChange })} />
+```
+
+**Conditional required fields (e.g., country-specific fields):**
+```javascript
+// In Zod schema using superRefine
+.superRefine((data, ctx) => {
+  if (data.country === 'IN' && !data.gstNo) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'GST No. is required',
+      path: ['gstNo'],
+    })
+  }
+})
+```
+
+**File upload with validation:**
+```javascript
+// In Zod schema
+logo: z
+  .instanceof(File, { message: 'Invalid file' })
+  .refine((file) => FILE_RULES.types.includes(file.type), 'Unsupported file type')
+  .refine((file) => file.size <= FILE_RULES.maxBytes, 'File too large')
+  .nullable()
+  .optional()
+```
+
+**Integration with React Bootstrap:**
+```jsx
+<Form.Control {...register('fieldName')} isInvalid={Boolean(errors.fieldName)} />
+<Form.Control.Feedback type="invalid">{errors.fieldName?.message}</Form.Control.Feedback>
+```
+
+##### Reference Implementation
+See `src/pages/Customers/AddCustomer.jsx` and `src/pages/Customers/customerForm.js` for a complete working example.
 
 #### 5. API Integration
 - **Axios Instance**: Centralized axios configuration in `src/services/apiClient.js`
