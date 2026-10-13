@@ -11,6 +11,10 @@ export const FIELD_HELP = {
     title: 'Customer',
     content: 'Customer account that owns this branch. Leave blank for a branch that is not tied to one customer.',
   },
+  userCityId: {
+    title: 'City',
+    content: 'City the branch is in, picked from your cities (Masters › City). Leave blank if it has none.',
+  },
   colorCode: {
     title: 'Colour',
     content: 'Colour used to tell this branch apart in lists and charts.',

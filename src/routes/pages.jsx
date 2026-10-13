@@ -10,11 +10,10 @@ const CustomerView = lazy(() => import('@/pages/Customers/CustomerView'))
 const BranchList = lazy(() => import('@/pages/Branches/BranchList'))
 const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
-// Masters › Country … Supervisor (Org prefix: Branch would clash with Masters › Branches)
+// Masters › Country … Supervisor (Org prefix keeps them apart from Masters › Branches)
 const OrgCountryList = lazy(() => import('@/pages/Organization/Countries/CountryList'))
 const OrgStateList = lazy(() => import('@/pages/Organization/States/StateList'))
 const OrgCityList = lazy(() => import('@/pages/Organization/Cities/CityList'))
-const OrgBranchList = lazy(() => import('@/pages/Organization/Branches/BranchList'))
 const OrgLocationList = lazy(() => import('@/pages/Organization/Locations/LocationList'))
 const OrgShopList = lazy(() => import('@/pages/Organization/Shops/ShopList'))
 const OrgLineList = lazy(() => import('@/pages/Organization/Lines/LineList'))
@@ -39,7 +38,6 @@ export const PAGES = [
   { path: ROUTES.ORG_COUNTRIES, element: <OrgCountryList /> },
   { path: ROUTES.ORG_STATES, element: <OrgStateList /> },
   { path: ROUTES.ORG_CITIES, element: <OrgCityList /> },
-  { path: ROUTES.ORG_BRANCHES, element: <OrgBranchList /> },
   { path: ROUTES.ORG_LOCATIONS, element: <OrgLocationList /> },
   { path: ROUTES.ORG_SHOPS, element: <OrgShopList /> },
   { path: ROUTES.ORG_LINES, element: <OrgLineList /> },

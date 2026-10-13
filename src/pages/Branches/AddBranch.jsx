@@ -7,6 +7,7 @@ import { BRANCH_STATUS } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { createBranch, getBranchById, updateBranch } from '@/services/branchService'
 import { getUsers } from '@/services/customerService'
+import { getUserCities } from '@/services/userCityService'
 import { PATTERNS } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
@@ -47,6 +48,10 @@ function AddBranch() {
   const [customersLoading, setCustomersLoading] = useState(true)
   const [customersError, setCustomersError] = useState('')
 
+  const [cities, setCities] = useState([])
+  const [citiesLoading, setCitiesLoading] = useState(true)
+  const [citiesError, setCitiesError] = useState('')
+
   // Branch being edited (null when adding)
   const [existing, setExisting] = useState(null)
   const [branchLoading, setBranchLoading] = useState(isEdit)
@@ -65,6 +70,22 @@ function AddBranch() {
         toast.error(error.message, { title: 'Could not load customers' })
       })
       .finally(() => active && setCustomersLoading(false))
+    return () => {
+      active = false
+    }
+  }, [])
+
+  // Load city options (Masters › City)
+  useEffect(() => {
+    let active = true
+    getUserCities()
+      .then((list) => active && setCities(list))
+      .catch((error) => {
+        if (!active) return
+        setCitiesError(error.message)
+        toast.error(error.message, { title: 'Could not load cities' })
+      })
+      .finally(() => active && setCitiesLoading(false))
     return () => {
       active = false
     }
@@ -96,7 +117,7 @@ function AddBranch() {
 
   const onSubmit = async (values) => {
     try {
-      const payload = toBranchPayload(values, existing)
+      const payload = toBranchPayload(values, existing, cities)
       if (isEdit) {
         await updateBranch(id, payload)
         toast.success(`${payload.name} has been updated.`, { title: 'Branch updated' })
@@ -233,10 +254,27 @@ function AddBranch() {
                 <Form.Control.Feedback type="invalid">{errors.address?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={4} controlId="city">
-                <Form.Label>City</Form.Label>
-                <Form.Control {...register('city')} autoComplete="address-level2" maxLength={100} isInvalid={Boolean(errors.city)} />
-                <Form.Control.Feedback type="invalid">{errors.city?.message}</Form.Control.Feedback>
+              <Form.Group as={Col} md={4} controlId="userCityId">
+                <FieldLabel help={FIELD_HELP.userCityId}>City</FieldLabel>
+                <Form.Select {...register('userCityId')} disabled={citiesLoading || Boolean(citiesError)} isInvalid={Boolean(errors.userCityId)}>
+                  <option value="">
+                    {citiesLoading ? 'Loading cities…' : citiesError ? 'Cities unavailable' : cities.length ? 'Select city' : 'No cities yet'}
+                  </option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.stateName ? `${city.name} · ${city.stateName}` : city.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">{errors.userCityId?.message}</Form.Control.Feedback>
+                {!citiesLoading && !citiesError && !cities.length && (
+                  <Form.Text>
+                    Add cities under <Link to={ROUTES.ORG_CITIES}>Masters › City</Link>.
+                  </Form.Text>
+                )}
+                {existing?.city && !existing.userCityId && (
+                  <Form.Text className="d-block">Saved as text: {existing.city}. Pick it from the list to link it.</Form.Text>
+                )}
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="gstNumber">

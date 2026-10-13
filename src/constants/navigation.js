@@ -65,7 +65,10 @@ export const NAV_SECTIONS = [
           { key: 'customer-add', label: 'Add Customer', path: ROUTES.CUSTOMER_ADD },
         ],
       },
-      {
+      { key: 'countries', label: 'Country', icon: 'bi-globe2', path: ROUTES.ORG_COUNTRIES },
+      { key: 'states', label: 'State', icon: 'bi-map', path: ROUTES.ORG_STATES },
+      { key: 'cities', label: 'City', icon: 'bi-pin-map', path: ROUTES.ORG_CITIES },
+        {
         key: 'branches',
         label: 'Branches',
         icon: 'bi-diagram-3',
@@ -74,10 +77,6 @@ export const NAV_SECTIONS = [
           { key: 'branch-add', label: 'Add Branch', path: ROUTES.BRANCH_ADD },
         ],
       },
-      { key: 'countries', label: 'Country', icon: 'bi-globe2', path: ROUTES.ORG_COUNTRIES },
-      { key: 'states', label: 'State', icon: 'bi-map', path: ROUTES.ORG_STATES },
-      { key: 'cities', label: 'City', icon: 'bi-pin-map', path: ROUTES.ORG_CITIES },
-      { key: 'org-branches', label: 'Branch', icon: 'bi-signpost-split', path: ROUTES.ORG_BRANCHES },
       { key: 'locations', label: 'Location', icon: 'bi-geo-alt', path: ROUTES.ORG_LOCATIONS },
       { key: 'shops', label: 'Shop', icon: 'bi-shop', path: ROUTES.ORG_SHOPS },
       { key: 'lines', label: 'Line', icon: 'bi-distribute-horizontal', path: ROUTES.ORG_LINES },

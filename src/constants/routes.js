@@ -32,7 +32,6 @@ export const ROUTES = {
   ORG_COUNTRIES: '/organization/countries',
   ORG_STATES: '/organization/states',
   ORG_CITIES: '/organization/cities',
-  ORG_BRANCHES: '/organization/branches',
   ORG_LOCATIONS: '/organization/locations',
   ORG_SHOPS: '/organization/shops',
   ORG_LINES: '/organization/lines',

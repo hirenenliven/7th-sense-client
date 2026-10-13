@@ -125,7 +125,7 @@ function LocationList() {
           ) : (
             <>
               <p className="mb-2">Every location belongs to a branch. Add a branch first.</p>
-              <Button as={Link} to={ROUTES.ORG_BRANCHES} size="sm" variant="ghost">
+              <Button as={Link} to={ROUTES.BRANCHES} size="sm" variant="ghost">
                 Go to Branches
               </Button>
             </>

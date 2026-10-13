@@ -11,7 +11,7 @@ export const INITIAL_VALUES = {
   email: '',
   customerId: '',
   address: '',
-  city: '',
+  userCityId: '',
   gstNumber: '',
   panNumber: '',
   colorCode: '',
@@ -32,7 +32,7 @@ export const branchSchema = z.object({
   email: optional(PATTERNS.email, 'Enter a valid email address'),
   customerId: z.string().optional(),
   address: z.string().max(500, 'Address is too long').optional(),
-  city: z.string().max(100, 'City is too long').optional(),
+  userCityId: z.string().optional(),
   gstNumber: optional(PATTERNS.gstin, 'Enter a valid 15-character GSTIN'),
   panNumber: optional(PATTERNS.pan, 'Enter a valid PAN, e.g. ABCDE1234F'),
   colorCode: optional(PATTERNS.hexColor, 'Enter a colour such as #F58220'),
@@ -46,13 +46,24 @@ export const branchSchema = z.object({
 const toId = (value) => (value === '' || value === null || value === undefined ? null : Number(value))
 const trim = (value) => (value ?? '').trim()
 
+// City text saved with the branch (shown in the Branch List): the picked city's name.
+// When the city is unchanged and its name is not at hand (status toggle, or an older branch
+// saved with a typed city and no userCityId), the saved text is kept.
+const cityName = (userCityId, cities, existing) => {
+  const picked = cities.find((city) => city.id === userCityId)
+  if (picked) return picked.name
+  return userCityId === (existing?.userCityId ?? null) ? existing?.city ?? '' : ''
+}
+
 // `existing` = the loaded branch when editing: keeps stateId, which the form does not edit.
-export const toBranchPayload = (values, existing = null) => ({
+// `cities` = GET /user-city records (the City dropdown options).
+export const toBranchPayload = (values, existing = null, cities = []) => ({
   code: trim(values.code),
   name: trim(values.name),
   email: trim(values.email),
   address: trim(values.address),
-  city: trim(values.city),
+  userCityId: toId(values.userCityId),
+  city: cityName(toId(values.userCityId), cities, existing),
   stateId: existing?.stateId ?? null,
   customerId: toId(values.customerId),
   gstNumber: trim(values.gstNumber),
@@ -69,7 +80,7 @@ export const toFormValues = (branch) => ({
   email: branch.email ?? '',
   customerId: branch.customerId ? String(branch.customerId) : '',
   address: branch.address ?? '',
-  city: branch.city ?? '',
+  userCityId: branch.userCityId ? String(branch.userCityId) : '',
   gstNumber: branch.gstNumber ?? '',
   panNumber: branch.panNumber ?? '',
   colorCode: branch.colorCode ?? '',
