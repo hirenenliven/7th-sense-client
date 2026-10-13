@@ -1,7 +1,9 @@
+import { ADMIN_ONLY } from './app'
 import { ROUTES } from './routes'
 
 // Sidebar menu. An item has either a `path` (link) or `children` (submenu).
 // `icon` is a Bootstrap Icons class: https://icons.getbootstrap.com
+// `roles` (optional, also on children): only these roles see the item; children inherit it.
 export const NAV_SECTIONS = [
   {
     key: 'main',
@@ -60,6 +62,7 @@ export const NAV_SECTIONS = [
         key: 'customers',
         label: 'Customers',
         icon: 'bi-building',
+        roles: ADMIN_ONLY,
         children: [
           { key: 'customer-list', label: 'Customer List', path: ROUTES.CUSTOMERS },
           { key: 'customer-add', label: 'Add Customer', path: ROUTES.CUSTOMER_ADD },
@@ -68,7 +71,7 @@ export const NAV_SECTIONS = [
       { key: 'countries', label: 'Country', icon: 'bi-globe2', path: ROUTES.ORG_COUNTRIES },
       { key: 'states', label: 'State', icon: 'bi-map', path: ROUTES.ORG_STATES },
       { key: 'cities', label: 'City', icon: 'bi-pin-map', path: ROUTES.ORG_CITIES },
-        {
+      {
         key: 'branches',
         label: 'Branches',
         icon: 'bi-diagram-3',
@@ -104,6 +107,7 @@ export const NAV_SECTIONS = [
         key: 'users',
         label: 'Users',
         icon: 'bi-people',
+        roles: ADMIN_ONLY,
         children: [
           { key: 'user-list', label: 'User List', path: ROUTES.USERS },
           { key: 'roles', label: 'Roles & Permissions', path: ROUTES.ROLES },

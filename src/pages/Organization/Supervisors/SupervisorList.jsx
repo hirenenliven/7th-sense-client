@@ -3,11 +3,13 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserSupervisor, getUserSupervisors } from '@/services/userSupervisorService'
 import { getUserCells } from '@/services/userCellService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import SupervisorFormModal from './SupervisorFormModal'
 import SupervisorRow from './SupervisorRow'
@@ -25,6 +27,8 @@ function SupervisorList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [cellFilter, setCellFilter] = useState('')
@@ -41,7 +45,7 @@ function SupervisorList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserSupervisors(), getUserCells()])
+    Promise.all([getUserSupervisors(null, userId), getUserCells(null, userId)])
       .then(([list, cellList]) => {
         if (!active) return
         setSupervisors(list)
@@ -52,7 +56,7 @@ function SupervisorList() {
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -83,7 +87,7 @@ function SupervisorList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserSupervisor(pendingDelete.id)
+      await deleteUserSupervisor(pendingDelete.id, userId)
       setSupervisors((list) => list.filter((supervisor) => supervisor.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Supervisor deleted' })
       setPendingDelete(null)
@@ -227,6 +231,14 @@ function SupervisorList() {
           <p className="ts-page-subtitle">Your supervisors and the cell each belongs to.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setCellFilter('')
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add Supervisor

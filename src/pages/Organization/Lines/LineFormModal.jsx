@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserLine, updateUserLine } from '@/services/userLineService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, lineSchema, toLinePayload, toFormValues } from './lineForm'
 
 // Add / edit a line: its shop and name. `line` = the line being edited, null when adding.
 function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
   const isEdit = Boolean(line)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -29,7 +33,7 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
   const onSubmit = async (values) => {
     try {
       const payload = toLinePayload(values)
-      const saved = isEdit ? await updateUserLine(line.id, payload) : await createUserLine(payload)
+      const saved = isEdit ? await updateUserLine(line.id, payload, userId) : await createUserLine(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Line updated' : 'Line added' })
       onSaved(saved)
     } catch (error) {
@@ -45,6 +49,7 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="line-shop" className="mb-3">
             <Form.Label className="required">Shop</Form.Label>
             <Form.Select {...register('userShopId')} isInvalid={Boolean(errors.userShopId)}>

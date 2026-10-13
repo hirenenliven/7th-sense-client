@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserShop, updateUserShop } from '@/services/userShopService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, shopSchema, toShopPayload, toFormValues } from './shopForm'
 
 // Add / edit a shop: its location and name. `shop` = the shop being edited, null when adding.
 function ShopFormModal({ show, shop, locations, defaultLocationId, onSaved, onHide }) {
   const isEdit = Boolean(shop)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -29,7 +33,7 @@ function ShopFormModal({ show, shop, locations, defaultLocationId, onSaved, onHi
   const onSubmit = async (values) => {
     try {
       const payload = toShopPayload(values)
-      const saved = isEdit ? await updateUserShop(shop.id, payload) : await createUserShop(payload)
+      const saved = isEdit ? await updateUserShop(shop.id, payload, userId) : await createUserShop(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Shop updated' : 'Shop added' })
       onSaved(saved)
     } catch (error) {
@@ -45,6 +49,7 @@ function ShopFormModal({ show, shop, locations, defaultLocationId, onSaved, onHi
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="shop-location" className="mb-3">
             <Form.Label className="required">Location</Form.Label>
             <Form.Select {...register('userLocationId')} isInvalid={Boolean(errors.userLocationId)}>

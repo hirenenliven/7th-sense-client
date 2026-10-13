@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   SIDEBAR_OPEN: 'ts.sidebar.open',
   LANGUAGE: 'ts.language',
   THEME: 'ts.theme',
+  REMEMBERED_USERNAME: 'ts.login.username', // set when "Remember" is ticked on the login screen
 }
 
 // UI themes (users API `theme`, user_profiles.theme). Light is built from theme-light.scss.
@@ -35,11 +36,27 @@ export const LANGUAGES = [
 
 export const CLOCK_TICK_MS = 1000
 
-// Placeholder until authentication is wired up — replace with the auth context.
-export const DEMO_USER = {
-  name: '7th Sense Admin',
-  role: 'Administrator',
+// Role names (backend roles.name). The server enforces access; the UI only hides what a role cannot use.
+export const ROLES = {
+  ADMIN: 'admin',
+  SUPERVISOR: 'supervisor',
+  OPERATOR: 'operator',
+  CUSTOMER: 'customer',
+  QC: 'qc',
+  SHOP_HEAD: 'shop_head',
 }
+
+export const ROLE_LABELS = {
+  [ROLES.ADMIN]: 'Administrator',
+  [ROLES.SUPERVISOR]: 'Supervisor',
+  [ROLES.OPERATOR]: 'Operator',
+  [ROLES.CUSTOMER]: 'Customer',
+  [ROLES.QC]: 'Quality Control',
+  [ROLES.SHOP_HEAD]: 'Shop Head',
+}
+
+// `roles` of admin-only pages and menu items (same rule as the server's admin-only routes)
+export const ADMIN_ONLY = [ROLES.ADMIN]
 
 // Toast notifications (see utils/toast.js)
 export const TOAST_DEFAULTS = {

@@ -135,6 +135,26 @@ $ts-control-h:     ts-rem(34);
 
 $ts-transition: .12s ease;
 
+// Login screen (pages/Login) — slate backdrop with line rings, light Login button
+$ts-login-bg:        #15181d !default; // page behind the rings
+$ts-login-ring:      #232a35 !default; // ring arcs
+$ts-login-glow:      #27303c !default; // soft halo behind the form
+$ts-login-field-bg:  #111317 !default; // inputs
+$ts-login-btn-bg:    #d4d4d4 !default;
+$ts-login-btn-hover: #ebebeb !default;
+$ts-login-btn-color: #1d1c19 !default;
+$ts-login-form-width:   ts-rem(406);
+$ts-login-logo-width:   ts-rem(150);
+$ts-login-field-height: ts-rem(42);
+$ts-login-check-size:   ts-rem(22);
+$ts-login-ring-stroke:  6; // SVG user units (viewBox 1600 × 900)
+$ts-login-glow-opacity: .9;
+$ts-login-day-size:     ts-rem(30);
+$ts-logo-stroke:        3.4; // SVG user units (viewBox 150 × 64)
+$ts-logo-word-size:     22px; // SVG user units
+$ts-logo-sup-size:      9px;  // SVG user units
+$ts-login-clock-clearance: ts-rem(120); // top space for the clock on phones
+
 // Exposed as CSS custom properties (--ts-*) in _components.scss
 $ts-tokens: (
   "bg": $ts-bg,

@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserSupervisor, updateUserSupervisor } from '@/services/userSupervisorService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, supervisorSchema, toSupervisorPayload, toFormValues } from './supervisorForm'
 
 // Add / edit a supervisor: its cell and name. `supervisor` = the supervisor being edited, null when adding.
 function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, onHide }) {
   const isEdit = Boolean(supervisor)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -29,7 +33,7 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
   const onSubmit = async (values) => {
     try {
       const payload = toSupervisorPayload(values)
-      const saved = isEdit ? await updateUserSupervisor(supervisor.id, payload) : await createUserSupervisor(payload)
+      const saved = isEdit ? await updateUserSupervisor(supervisor.id, payload, userId) : await createUserSupervisor(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Supervisor updated' : 'Supervisor added' })
       onSaved(saved)
     } catch (error) {
@@ -45,6 +49,7 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="supervisor-cell" className="mb-3">
             <Form.Label className="required">Cell</Form.Label>
             <Form.Select {...register('userCellId')} isInvalid={Boolean(errors.userCellId)}>

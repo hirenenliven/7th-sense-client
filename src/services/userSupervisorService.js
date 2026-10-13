@@ -1,6 +1,7 @@
-import apiClient, { sharedGet } from './apiClient'
+import apiClient, { sharedGet, withQuery } from './apiClient'
 
-// The logged-in user's supervisors (user_supervisor table). The server picks the user.
+// The logged-in user's supervisors (user_supervisor table). The server picks the user;
+// an admin passes userId to work on another user's rows.
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
 const PATH = '/user-supervisor'
@@ -10,14 +11,15 @@ const unwrap = (response) => response.data.data
 const unwrapList = (response) => unwrap(response) ?? []
 
 // userCellId (optional) keeps only the supervisors of that cell
-export const getUserSupervisors = async (userCellId) =>
-  unwrapList(await sharedGet(userCellId ? `${PATH}?userCellId=${userCellId}` : PATH))
+export const getUserSupervisors = async (userCellId, userId) =>
+  unwrapList(await sharedGet(withQuery(PATH, { userCellId, userId })))
 
 // supervisor = { userCellId, name }
-export const createUserSupervisor = async (supervisor) => unwrap(await apiClient.post(PATH, supervisor))
+export const createUserSupervisor = async (supervisor, userId) => unwrap(await apiClient.post(withQuery(PATH, { userId }), supervisor))
 
-export const updateUserSupervisor = async (id, supervisor) => unwrap(await apiClient.put(`${PATH}/${id}`, supervisor))
+export const updateUserSupervisor = async (id, supervisor, userId) =>
+  unwrap(await apiClient.put(withQuery(`${PATH}/${id}`, { userId }), supervisor))
 
-export const deleteUserSupervisor = async (id) => {
-  await apiClient.delete(`${PATH}/${id}`)
+export const deleteUserSupervisor = async (id, userId) => {
+  await apiClient.delete(withQuery(`${PATH}/${id}`, { userId }))
 }

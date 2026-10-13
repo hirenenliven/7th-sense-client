@@ -5,6 +5,8 @@ import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { getCountryCode, getStates } from '@/constants/locations'
 import { createUserState } from '@/services/userStateService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, stateSchema, toStatePayload } from './stateForm'
 
@@ -14,6 +16,8 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 // country library (constants/locations.js). States already added to that country are hidden.
 // A country the library has no states for gets a free-text name.
 function StateFormModal({ show, states, countries, defaultCountryId, onSaved, onHide }) {
+  const { userId } = useOrgUser()
+
   const {
     register,
     handleSubmit,
@@ -47,7 +51,7 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
 
   const onSubmit = async (values) => {
     try {
-      const saved = await createUserState(toStatePayload(values))
+      const saved = await createUserState(toStatePayload(values), userId)
       toast.success(`${saved.name} has been added.`, { title: 'State added' })
       onSaved(saved)
     } catch (error) {
@@ -69,6 +73,7 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="state-country" className="mb-3">
             <Form.Label className="required">Country</Form.Label>
             <Form.Select

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { deleteUserCountry, getUserCountries } from '@/services/userCountryService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import CountryFormModal from './CountryFormModal'
 import CountryRow from './CountryRow'
@@ -21,6 +23,8 @@ function CountryList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
@@ -35,14 +39,14 @@ function CountryList() {
     let active = true
     setLoading(true)
     setError('')
-    getUserCountries()
+    getUserCountries(userId)
       .then((list) => active && setCountries(list))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false))
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -62,7 +66,7 @@ function CountryList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserCountry(pendingDelete.id)
+      await deleteUserCountry(pendingDelete.id, userId)
       setCountries((list) => list.filter((country) => country.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Country deleted' })
       setPendingDelete(null)
@@ -173,6 +177,13 @@ function CountryList() {
           <p className="ts-page-subtitle">The countries your organization works in.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add Country

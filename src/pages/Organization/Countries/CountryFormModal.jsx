@@ -5,6 +5,8 @@ import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { COUNTRIES } from '@/constants/locations'
 import { createUserCountry } from '@/services/userCountryService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, countrySchema, toCountryPayload } from './countryForm'
 
@@ -13,6 +15,8 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 // Add a country: pick one from the country library (constants/locations.js).
 // Countries the user already added are hidden.
 function CountryFormModal({ show, countries, onSaved, onHide }) {
+  const { userId } = useOrgUser()
+
   const {
     register,
     handleSubmit,
@@ -35,7 +39,7 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
 
   const onSubmit = async (values) => {
     try {
-      const saved = await createUserCountry(toCountryPayload(values))
+      const saved = await createUserCountry(toCountryPayload(values), userId)
       toast.success(`${saved.name} has been added.`, { title: 'Country added' })
       onSaved(saved)
     } catch (error) {
@@ -51,6 +55,7 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="country-name">
             <Form.Label className="required">Country</Form.Label>
             <Form.Select {...register('name')} isInvalid={Boolean(errors.name)}>

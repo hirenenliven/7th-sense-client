@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { BRANCH_STATUS } from '@/constants/app'
+import { ADMIN_ONLY, BRANCH_STATUS } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
+import useAuth from '@/hooks/useAuth'
 import { createBranch, getBranchById, updateBranch } from '@/services/branchService'
 import { getUsers } from '@/services/customerService'
 import { getUserCities } from '@/services/userCityService'
@@ -31,6 +32,9 @@ function AddBranch() {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
+  // The customer list (GET /users) is admin-only; other users keep the branch's customer as is
+  const { hasRole } = useAuth()
+  const canPickCustomer = hasRole(ADMIN_ONLY)
 
   const {
     register,
@@ -45,7 +49,7 @@ function AddBranch() {
   })
 
   const [customers, setCustomers] = useState([])
-  const [customersLoading, setCustomersLoading] = useState(true)
+  const [customersLoading, setCustomersLoading] = useState(canPickCustomer)
   const [customersError, setCustomersError] = useState('')
 
   const [cities, setCities] = useState([])
@@ -61,6 +65,7 @@ function AddBranch() {
 
   // Load customer options
   useEffect(() => {
+    if (!canPickCustomer) return undefined
     let active = true
     getUsers()
       .then((list) => active && setCustomers(list))
@@ -73,7 +78,7 @@ function AddBranch() {
     return () => {
       active = false
     }
-  }, [])
+  }, [canPickCustomer])
 
   // Load city options (Masters › City)
   useEffect(() => {
@@ -198,20 +203,22 @@ function AddBranch() {
                 <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId="customerId">
-                <FieldLabel help={FIELD_HELP.customerId}>Customer</FieldLabel>
-                <Form.Select {...register('customerId')} disabled={customersLoading || Boolean(customersError)} isInvalid={Boolean(errors.customerId)}>
-                  <option value="">
-                    {customersLoading ? 'Loading customers…' : customersError ? 'Customers unavailable' : 'No customer'}
-                  </option>
-                  {customers.map((customer) => (
-                    <option key={customer.id} value={customer.id}>
-                      {customerName(customer)}
+              {canPickCustomer && (
+                <Form.Group as={Col} md={6} xxl={4} controlId="customerId">
+                  <FieldLabel help={FIELD_HELP.customerId}>Customer</FieldLabel>
+                  <Form.Select {...register('customerId')} disabled={customersLoading || Boolean(customersError)} isInvalid={Boolean(errors.customerId)}>
+                    <option value="">
+                      {customersLoading ? 'Loading customers…' : customersError ? 'Customers unavailable' : 'No customer'}
                     </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">{errors.customerId?.message}</Form.Control.Feedback>
-              </Form.Group>
+                    {customers.map((customer) => (
+                      <option key={customer.id} value={customer.id}>
+                        {customerName(customer)}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">{errors.customerId?.message}</Form.Control.Feedback>
+                </Form.Group>
+              )}
 
               <Form.Group as={Col} md={6} xxl={4} controlId="colorCode">
                 <FieldLabel help={FIELD_HELP.colorCode}>Colour</FieldLabel>

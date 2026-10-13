@@ -1,15 +1,22 @@
+import { useMemo } from 'react'
 import SidebarItem from './SidebarItem'
 import { NAV_SECTIONS } from '@/constants/navigation'
+import useAuth from '@/hooks/useAuth'
 import useSidebar from '@/hooks/useSidebar'
+import { filterNavByRole } from '@/utils/navigation'
 
 function Sidebar() {
   const { isOpen, closeOnMobile } = useSidebar()
+  const { hasRole } = useAuth()
+
+  // Only the menu items the user's role can open
+  const sections = useMemo(() => filterNavByRole(NAV_SECTIONS, hasRole), [hasRole])
 
   return (
     <>
       <aside id="app-sidebar" className="ts-sidebar" inert={!isOpen}>
         <nav aria-label="Main navigation">
-          {NAV_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <div key={section.key} className="ts-sidenav-section">
               <div className="ts-sidebar-heading">{section.title}</div>
               <ul className="ts-sidenav">

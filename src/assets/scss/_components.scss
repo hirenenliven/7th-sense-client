@@ -1387,6 +1387,205 @@ $ts-toast-colors: (
 }
 
 // -----------------------------------------------------------------------------
+// Brand logo (components/common/BrandLogo.jsx)
+// -----------------------------------------------------------------------------
+
+.ts-logo {
+  display: block;
+  overflow: visible;
+}
+
+.ts-logo-mark {
+  fill: none;
+  stroke: $ts-orange;
+  stroke-width: $ts-logo-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ts-logo-word,
+.ts-logo-sup {
+  font-family: $ts-font-sans;
+  font-weight: 600;
+}
+
+.ts-logo-word {
+  fill: $ts-ink;
+  font-size: $ts-logo-word-size;
+  letter-spacing: .04em;
+}
+
+.ts-logo-sup {
+  fill: $ts-orange;
+  font-size: $ts-logo-sup-size;
+}
+
+// -----------------------------------------------------------------------------
+// Login screen (pages/Login)
+// -----------------------------------------------------------------------------
+
+.ts-login {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: $ts-login-bg;
+}
+
+.ts-login-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ts-login-ring {
+  fill: none;
+  stroke: $ts-login-ring;
+  stroke-width: $ts-login-ring-stroke;
+  stroke-linecap: round;
+}
+
+.ts-login-glow {
+  fill: $ts-login-glow;
+  opacity: $ts-login-glow-opacity;
+}
+
+.ts-login-clock {
+  position: absolute;
+  top: $ts-space-5;
+  left: $ts-gutter-x-sm;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $ts-space-1;
+  color: $ts-ink;
+  font-size: $ts-fs-md;
+
+  @include media-breakpoint-up(md) {
+    top: $ts-space-6;
+    left: $ts-space-6;
+  }
+}
+
+.ts-login-clock-sep {
+  margin: 0 $ts-space-2;
+  color: $ts-ink-3;
+}
+
+.ts-login-clock-day {
+  color: $ts-orange;
+  font-size: $ts-login-day-size;
+  font-weight: 300;
+  line-height: 1.1;
+}
+
+.ts-login-main {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: $ts-login-clock-clearance $ts-gutter-x-sm $ts-space-6; // phones: clear the clock
+
+  @include media-breakpoint-up(md) {
+    padding-top: $ts-space-6;
+  }
+}
+
+.ts-login-panel {
+  width: 100%;
+  max-width: $ts-login-form-width;
+}
+
+.ts-login-logo {
+  width: $ts-login-logo-width;
+  margin: 0 auto $ts-space-6;
+}
+
+.ts-login {
+  .form-label {
+    color: $ts-ink;
+    font-size: $ts-fs-base;
+    margin-bottom: $ts-space-2;
+  }
+
+  .form-control {
+    height: $ts-login-field-height;
+    padding-inline: $ts-space-4;
+    background-color: $ts-login-field-bg;
+    border-color: transparent;
+    font-size: $ts-fs-base;
+
+    &:focus { border-color: $ts-orange; }
+    &.is-invalid { border-color: $ts-red; }
+  }
+
+  // Autofill keeps the field colour (Chrome paints its own otherwise)
+  .form-control:-webkit-autofill,
+  .form-control:-webkit-autofill:hover,
+  .form-control:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 100px $ts-login-field-bg inset;
+    -webkit-text-fill-color: $ts-ink;
+  }
+}
+
+.ts-login-remember {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-3;
+  padding-left: 0;
+
+  .form-check-input {
+    width: $ts-login-check-size;
+    height: $ts-login-check-size;
+    margin: 0;
+    float: none;
+    border-radius: 50%;
+    background-color: $ts-login-field-bg;
+    border-color: transparent;
+  }
+
+  .form-check-input:checked {
+    background-color: $ts-orange;
+    border-color: $ts-orange;
+  }
+
+  .form-check-label {
+    color: $ts-ink;
+    font-weight: 600;
+  }
+}
+
+.ts-login-link {
+  padding: 0;
+  font-size: $ts-fs-md;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ts-login-submit {
+  height: $ts-login-field-height;
+  font-size: $ts-fs-lg;
+  font-weight: 500;
+  --bs-btn-color: #{$ts-login-btn-color};
+  --bs-btn-bg: #{$ts-login-btn-bg};
+  --bs-btn-border-color: #{$ts-login-btn-bg};
+  --bs-btn-hover-color: #{$ts-login-btn-color};
+  --bs-btn-hover-bg: #{$ts-login-btn-hover};
+  --bs-btn-hover-border-color: #{$ts-login-btn-hover};
+  --bs-btn-active-color: #{$ts-login-btn-color};
+  --bs-btn-active-bg: #{$ts-login-btn-hover};
+  --bs-btn-active-border-color: #{$ts-login-btn-hover};
+  --bs-btn-disabled-color: #{$ts-login-btn-color};
+  --bs-btn-disabled-bg: #{$ts-login-btn-bg};
+  --bs-btn-disabled-border-color: #{$ts-login-btn-bg};
+}
+
+// -----------------------------------------------------------------------------
 // Motion preferences
 // -----------------------------------------------------------------------------
 

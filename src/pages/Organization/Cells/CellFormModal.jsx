@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserCell, updateUserCell } from '@/services/userCellService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, cellSchema, toCellPayload, toFormValues } from './cellForm'
 
 // Add / edit a cell: its line and name. `cell` = the cell being edited, null when adding.
 function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
   const isEdit = Boolean(cell)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -29,7 +33,7 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
   const onSubmit = async (values) => {
     try {
       const payload = toCellPayload(values)
-      const saved = isEdit ? await updateUserCell(cell.id, payload) : await createUserCell(payload)
+      const saved = isEdit ? await updateUserCell(cell.id, payload, userId) : await createUserCell(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Cell updated' : 'Cell added' })
       onSaved(saved)
     } catch (error) {
@@ -45,6 +49,7 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="cell-line" className="mb-3">
             <Form.Label className="required">Line</Form.Label>
             <Form.Select {...register('userLineId')} isInvalid={Boolean(errors.userLineId)}>

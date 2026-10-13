@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { ADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 
 const Home = lazy(() => import('@/pages/Home/Home'))
@@ -22,15 +23,16 @@ const OrgSupervisorList = lazy(() => import('@/pages/Organization/Supervisors/Su
 
 // Screens that exist. Every other sidebar link renders <ComingSoon /> until it is built.
 // Also read by the User Guide to show which screens are available.
+// `roles`: only these roles may open the screen (omit = every logged-in user).
 // eslint-disable-next-line react-refresh/only-export-components -- route table, not a component module
 export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase /> },
-  { path: ROUTES.CUSTOMERS, element: <CustomerList /> },
-  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer /> },
-  { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer /> },
-  { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView /> },
+  { path: ROUTES.CUSTOMERS, element: <CustomerList />, roles: ADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer />, roles: ADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: ADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView />, roles: ADMIN_ONLY },
   { path: ROUTES.BRANCHES, element: <BranchList /> },
   { path: ROUTES.BRANCH_ADD, element: <AddBranch /> },
   { path: ROUTES.BRANCH_EDIT, element: <AddBranch /> },

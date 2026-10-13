@@ -3,11 +3,13 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserShop, getUserShops } from '@/services/userShopService'
 import { getUserLocations } from '@/services/userLocationService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import ShopFormModal from './ShopFormModal'
 import ShopRow from './ShopRow'
@@ -25,6 +27,8 @@ function ShopList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [locationFilter, setLocationFilter] = useState('')
@@ -41,7 +45,7 @@ function ShopList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserShops(), getUserLocations()])
+    Promise.all([getUserShops(null, userId), getUserLocations(null, userId)])
       .then(([list, locationList]) => {
         if (!active) return
         setShops(list)
@@ -52,7 +56,7 @@ function ShopList() {
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -83,7 +87,7 @@ function ShopList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserShop(pendingDelete.id)
+      await deleteUserShop(pendingDelete.id, userId)
       setShops((list) => list.filter((shop) => shop.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Shop deleted' })
       setPendingDelete(null)
@@ -227,6 +231,14 @@ function ShopList() {
           <p className="ts-page-subtitle">Your shops and the location each belongs to.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setLocationFilter('')
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add Shop

@@ -3,11 +3,13 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserCity, getUserCities } from '@/services/userCityService'
 import { getUserStates } from '@/services/userStateService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import CityFormModal from './CityFormModal'
 import CityRow from './CityRow'
@@ -25,6 +27,8 @@ function CityList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState('')
@@ -41,7 +45,7 @@ function CityList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserCities(), getUserStates()])
+    Promise.all([getUserCities(null, userId), getUserStates(null, userId)])
       .then(([list, stateList]) => {
         if (!active) return
         setCities(list)
@@ -52,7 +56,7 @@ function CityList() {
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -83,7 +87,7 @@ function CityList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserCity(pendingDelete.id)
+      await deleteUserCity(pendingDelete.id, userId)
       setCities((list) => list.filter((city) => city.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'City deleted' })
       setPendingDelete(null)
@@ -227,6 +231,14 @@ function CityList() {
           <p className="ts-page-subtitle">Your cities and the state each belongs to.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setStateFilter('')
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add City

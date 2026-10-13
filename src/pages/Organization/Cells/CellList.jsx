@@ -3,11 +3,13 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserCell, getUserCells } from '@/services/userCellService'
 import { getUserLines } from '@/services/userLineService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import CellFormModal from './CellFormModal'
 import CellRow from './CellRow'
@@ -25,6 +27,8 @@ function CellList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [lineFilter, setLineFilter] = useState('')
@@ -41,7 +45,7 @@ function CellList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserCells(), getUserLines()])
+    Promise.all([getUserCells(null, userId), getUserLines(null, userId)])
       .then(([list, lineList]) => {
         if (!active) return
         setCells(list)
@@ -52,7 +56,7 @@ function CellList() {
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -83,7 +87,7 @@ function CellList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserCell(pendingDelete.id)
+      await deleteUserCell(pendingDelete.id, userId)
       setCells((list) => list.filter((cell) => cell.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Cell deleted' })
       setPendingDelete(null)
@@ -227,6 +231,14 @@ function CellList() {
           <p className="ts-page-subtitle">Your cells and the line each belongs to.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setLineFilter('')
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add Cell

@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserLocation, updateUserLocation } from '@/services/userLocationService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, locationSchema, toLocationPayload, toFormValues } from './locationForm'
 
 // Add / edit a location: its branch and name. `location` = the location being edited, null when adding.
 function LocationFormModal({ show, location, branches, defaultBranchId, onSaved, onHide }) {
   const isEdit = Boolean(location)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -23,13 +27,13 @@ function LocationFormModal({ show, location, branches, defaultBranchId, onSaved,
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(location ? toFormValues(location) : { ...INITIAL_VALUES, userBranchId: defaultBranchId })
+    if (show) reset(location ? toFormValues(location) : { ...INITIAL_VALUES, branchId: defaultBranchId })
   }, [show, location, defaultBranchId, reset])
 
   const onSubmit = async (values) => {
     try {
       const payload = toLocationPayload(values)
-      const saved = isEdit ? await updateUserLocation(location.id, payload) : await createUserLocation(payload)
+      const saved = isEdit ? await updateUserLocation(location.id, payload, userId) : await createUserLocation(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Location updated' : 'Location added' })
       onSaved(saved)
     } catch (error) {
@@ -45,17 +49,18 @@ function LocationFormModal({ show, location, branches, defaultBranchId, onSaved,
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="location-branch" className="mb-3">
             <Form.Label className="required">Branch</Form.Label>
-            <Form.Select {...register('userBranchId')} isInvalid={Boolean(errors.userBranchId)}>
+            <Form.Select {...register('branchId')} isInvalid={Boolean(errors.branchId)}>
               <option value="">Select branch</option>
               {branches.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.cityName ? `${option.name} · ${option.cityName}` : option.name}
+                  {option.city ? `${option.name} · ${option.city}` : option.name}
                 </option>
               ))}
             </Form.Select>
-            <Form.Control.Feedback type="invalid">{errors.userBranchId?.message}</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{errors.branchId?.message}</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="location-name">
@@ -98,7 +103,7 @@ LocationFormModal.propTypes = {
   location: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
-    userBranchId: PropTypes.number,
+    branchId: PropTypes.number,
   }),
   branches: PropTypes.arrayOf(recordShape).isRequired,
   defaultBranchId: PropTypes.string,

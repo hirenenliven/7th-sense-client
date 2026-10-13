@@ -32,12 +32,15 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      host: true,
       port: 3000,
       open: true,
       proxy: {
         '/api': {
           target: env.API_PROXY_TARGET || 'http://localhost:8080',
-          changeOrigin: true,
+          // Keep the browser's Host header: the API's CSRF check (Go CrossOriginProtection)
+          // compares Origin with Host, so rewriting Host makes every POST/PUT/DELETE fail with 403.
+          changeOrigin: false,
         },
       },
     },

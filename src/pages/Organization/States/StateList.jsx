@@ -3,11 +3,13 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
+import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserState, getUserStates } from '@/services/userStateService'
 import { getUserCountries } from '@/services/userCountryService'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import StateFormModal from './StateFormModal'
 import StateRow from './StateRow'
@@ -25,6 +27,8 @@ function StateList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
+  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
+  const { userId } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [countryFilter, setCountryFilter] = useState('')
@@ -41,7 +45,7 @@ function StateList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserStates(), getUserCountries()])
+    Promise.all([getUserStates(null, userId), getUserCountries(userId)])
       .then(([list, countryList]) => {
         if (!active) return
         setStates(list)
@@ -52,7 +56,7 @@ function StateList() {
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, userId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -81,7 +85,7 @@ function StateList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserState(pendingDelete.id)
+      await deleteUserState(pendingDelete.id, userId)
       setStates((list) => list.filter((state) => state.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'State deleted' })
       setPendingDelete(null)
@@ -224,6 +228,14 @@ function StateList() {
           <p className="ts-page-subtitle">Your states and the country each belongs to.</p>
         </div>
         <div className="ts-page-actions">
+          <OrgUserSelect
+            disabled={loading}
+            onChange={() => {
+              setCountryFilter('')
+              setSearch('')
+              setPage(1)
+            }}
+          />
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add State

@@ -29,3 +29,6 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 ## Routing
 - New menu: add path to `constants/routes.js` and item to `constants/navigation.js` (auto-renders Coming Soon).
 - Built screen: add to `PAGES` in `src/routes/pages.jsx` (not `AppRoutes.jsx`). User Guide reads `BUILT_PATHS` for status.
+
+## Masters (organization) screens
+- Countries … Supervisors act on one user's organization. Admins pick the user with `<OrgUserSelect>` in the page actions; read it with `useOrgUser()` (`context/OrgUserProvider.jsx`) and pass `userId` to every `user*Service` call (sent as `?userId=`; `''` = the logged-in user). Form modals show `<OrgUserNote />`.

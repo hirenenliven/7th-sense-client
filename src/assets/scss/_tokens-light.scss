@@ -39,6 +39,15 @@ $ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .12);
 $ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .18);
 $ts-backdrop-opacity: .35;
 
+// Login screen: pale slate backdrop, dark Login button
+$ts-login-bg:        #eef0f3;
+$ts-login-ring:      #d6dbe3;
+$ts-login-glow:      #ffffff;
+$ts-login-field-bg:  #ffffff;
+$ts-login-btn-bg:    #2b2f36;
+$ts-login-btn-hover: #1d1c19;
+$ts-login-btn-color: #ffffff;
+
 // Bootstrap greys run light → dark here (the dark theme maps them dark → light)
 $gray-100: #f7f6f2;
 $gray-200: #edece6;

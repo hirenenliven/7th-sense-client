@@ -23,7 +23,7 @@ set on the customer form). The light theme is the **same SCSS built again with l
 |---|---|
 | `src/assets/scss/_tokens-light.scss` | Light values of the colour tokens (surfaces, ink, accent, status, greys, shadows) |
 | `src/assets/scss/theme-light.scss` | Imports `tokens-light`, then `theme` |
-| `src/utils/theme.js` | `applyTheme()` loads `theme-light.scss?inline` on demand and adds it after the dark stylesheet; `refreshUserTheme()` applies the logged-in user's theme (`GET /me`) |
+| `src/utils/theme.js` | `applyTheme()` loads `theme-light.scss?inline` on demand and adds it after the dark stylesheet; `refreshUserTheme()` applies the logged-in user's theme (`GET /me`, called by `AuthProvider` after login / session restore) |
 
 The colour tokens in `_variables.scss` are `!default`, so the light file sets them first. Bootstrap bakes colours
 into SVG icons and `to-rgb()` values at compile time, which is why this is a second build and not CSS variables.

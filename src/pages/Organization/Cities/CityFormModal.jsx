@@ -4,12 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserCity, updateUserCity } from '@/services/userCityService'
+import OrgUserNote from '@/components/common/OrgUserNote'
+import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, citySchema, toCityPayload, toFormValues } from './cityForm'
 
 // Add / edit a city: its state and name. `city` = the city being edited, null when adding.
 function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) {
   const isEdit = Boolean(city)
+
+  const { userId } = useOrgUser()
 
   const {
     register,
@@ -29,7 +33,7 @@ function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) 
   const onSubmit = async (values) => {
     try {
       const payload = toCityPayload(values)
-      const saved = isEdit ? await updateUserCity(city.id, payload) : await createUserCity(payload)
+      const saved = isEdit ? await updateUserCity(city.id, payload, userId) : await createUserCity(payload, userId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'City updated' : 'City added' })
       onSaved(saved)
     } catch (error) {
@@ -45,6 +49,7 @@ function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) 
         </Modal.Header>
 
         <Modal.Body>
+          <OrgUserNote />
           <Form.Group controlId="city-state" className="mb-3">
             <Form.Label className="required">State</Form.Label>
             <Form.Select {...register('userStateId')} isInvalid={Boolean(errors.userStateId)}>
