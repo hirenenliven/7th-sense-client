@@ -16,31 +16,34 @@ $ts-root-px: 13;
 // 1. Design tokens
 // -----------------------------------------------------------------------------
 
+// Colour tokens are !default so the light theme (theme-light.scss → _tokens-light.scss)
+// can set them before this file. The dark values below are the product default.
+
 // Surfaces
-$ts-bg:        #0e0e0d; // page
-$ts-appbar:    #141312; // top bar / sub nav
-$ts-panel:     #1a1a18; // cards, tables, modals
-$ts-panel-2:   #232320; // inputs, inner boxes, hover
-$ts-line:      #33322e; // every border / divider
+$ts-bg:        #0e0e0d !default; // page
+$ts-appbar:    #141312 !default; // top bar / sub nav
+$ts-panel:     #1a1a18 !default; // cards, tables, modals
+$ts-panel-2:   #232320 !default; // inputs, inner boxes, hover
+$ts-line:      #33322e !default; // every border / divider
 
 // Text
-$ts-ink:       #f4f4ee; // primary
-$ts-ink-2:     #b9b8ad; // secondary
-$ts-ink-3:     #7d7c72; // muted / captions
+$ts-ink:       #f4f4ee !default; // primary
+$ts-ink-2:     #b9b8ad !default; // secondary
+$ts-ink-3:     #7d7c72 !default; // muted / captions
 
 // Accent
-$ts-orange:    #f58220;
-$ts-orange-2:  #ff9d4d; // hover
-$ts-on-accent: #1a1205; // text on orange
+$ts-orange:    #f58220 !default;
+$ts-orange-2:  #ff9d4d !default; // hover
+$ts-on-accent: #1a1205 !default; // text on orange
 
 // Status
-$ts-good:      #3ec46d;
-$ts-amber:     #fab219;
-$ts-serious:   #ec835a;
-$ts-red:       #e0483f;
-$ts-blue:      #5aa9e6;
-$ts-violet:    #9085e9;
-$ts-neutral:   #9b9a90;
+$ts-good:      #3ec46d !default;
+$ts-amber:     #fab219 !default;
+$ts-serious:   #ec835a !default;
+$ts-red:       #e0483f !default;
+$ts-blue:      #5aa9e6 !default;
+$ts-violet:    #9085e9 !default;
+$ts-neutral:   #9b9a90 !default;
 
 // Tint strengths used for soft backgrounds
 $ts-tint-row:    8%;  // highlighted table row
@@ -68,6 +71,8 @@ $ts-num-xl: ts-rem(52);
 
 $ts-fw-title: 650;
 $ts-ls-tight: -.02em;
+
+$ts-swatch-size: ts-rem(12); // colour dot in tables
 $ts-ls-wide:  .06em;
 $ts-ls-wider: .1em;
 
@@ -89,10 +94,13 @@ $ts-radius-xl:   ts-rem(14);
 $ts-radius-xxl:  ts-rem(16);
 $ts-radius-pill: 999px;
 
+// Light themes override the tokens marked !default (see _tokens-light.scss)
+$ts-color-scheme: dark !default; // native controls / scrollbars
+
 // Shadows (borders do most of the work — shadows only on hover / overlays)
-$ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .35);
-$ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .45);
-$ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .5);
+$ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .35) !default;
+$ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .45) !default;
+$ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .5) !default;
 
 // Layout
 $ts-appbar-height: ts-rem(56);
@@ -109,7 +117,7 @@ $ts-sidebar-transition: .22s ease;
 $ts-sidebar-icon-size:  ts-rem(17);
 $ts-sidebar-toggle-icon: ts-rem(22);
 $ts-sidebar-sub-indent: ts-rem(19); // aligns the submenu guide line under the parent icon
-$ts-backdrop-opacity: .55;
+$ts-backdrop-opacity: .55 !default;
 
 // Toasts (see utils/toast.js — durations live in constants/app.js TOAST_DEFAULTS)
 $ts-toast-width:  ts-rem(360);
@@ -119,6 +127,9 @@ $ts-toast-shift:  ts-rem(16);
 
 // Field help popover (components/common/InfoTooltip.jsx)
 $ts-help-width:   ts-rem(300);
+
+// Table pagination "Go to page" input (components/common/TablePagination.jsx)
+$ts-page-jump-width: ts-rem(64);
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
 
@@ -157,7 +168,7 @@ $ts-tokens: (
 // 2. Bootstrap — colors
 // -----------------------------------------------------------------------------
 
-$enable-dark-mode: false; // the product is dark by design
+$enable-dark-mode: false; // themes are separate builds (theme.scss dark, theme-light.scss light)
 $enable-shadows:   false;
 $enable-gradients: false;
 $enable-negative-margins: true;
@@ -165,15 +176,15 @@ $enable-negative-margins: true;
 $white: #fff;
 $black: #000;
 
-$gray-100: $ts-ink;
-$gray-200: #dcdbd2;
-$gray-300: $ts-ink-2;
-$gray-400: $ts-neutral;
-$gray-500: $ts-ink-3;
-$gray-600: #55544d;
-$gray-700: $ts-line;
-$gray-800: $ts-panel-2;
-$gray-900: $ts-panel;
+$gray-100: $ts-ink !default;
+$gray-200: #dcdbd2 !default;
+$gray-300: $ts-ink-2 !default;
+$gray-400: $ts-neutral !default;
+$gray-500: $ts-ink-3 !default;
+$gray-600: #55544d !default;
+$gray-700: $ts-line !default;
+$gray-800: $ts-panel-2 !default;
+$gray-900: $ts-panel !default;
 
 $primary:   $ts-orange;
 $secondary: $ts-neutral;
@@ -181,8 +192,8 @@ $success:   $ts-good;
 $info:      $ts-blue;
 $warning:   $ts-amber;
 $danger:    $ts-red;
-$light:     $ts-ink;
-$dark:      $ts-panel;
+$light:     $ts-ink !default;
+$dark:      $ts-panel !default;
 
 $theme-colors: (
   "primary":   $primary,
@@ -227,7 +238,7 @@ $primary-border-subtle: mix($ts-orange, $ts-panel, $ts-tint-border);
 
 $min-contrast-ratio:   4.5;
 $color-contrast-dark:  $ts-on-accent;
-$color-contrast-light: $ts-ink;
+$color-contrast-light: $ts-ink !default;
 
 // -----------------------------------------------------------------------------
 // 3. Bootstrap — body, links, typography
@@ -239,7 +250,7 @@ $body-secondary-color: $ts-ink-2;
 $body-secondary-bg:    $ts-panel;
 $body-tertiary-color:  $ts-ink-3;
 $body-tertiary-bg:     $ts-panel-2;
-$body-emphasis-color:  $white;
+$body-emphasis-color:  $white !default;
 
 $link-color:            $ts-orange;
 $link-hover-color:      $ts-orange-2;
@@ -336,9 +347,9 @@ $border-radius-xxl:  $ts-radius-xxl;
 $border-radius-pill: $ts-radius-pill;
 
 $box-shadow:       $ts-shadow-hover;
-$box-shadow-sm:    0 1px 2px rgba(0, 0, 0, .3);
+$box-shadow-sm:    0 1px 2px rgba(0, 0, 0, .3) !default;
 $box-shadow-lg:    $ts-shadow-overlay;
-$box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .3);
+$box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .3) !default;
 
 // -----------------------------------------------------------------------------
 // 5. Bootstrap — buttons & forms

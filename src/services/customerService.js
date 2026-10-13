@@ -1,38 +1,24 @@
-import apiClient from './apiClient'
-import env from '@/config/env'
+import apiClient, { sharedGet } from './apiClient'
 
-const MOCK_LATENCY_MS = 600
+// Paths are relative to VITE_API_BASE_URL (…/api/v1).
+// Every response is { statusCode, success, message, data }; these functions return `data`.
+const USERS_PATH = '/users'
 
-// Mock data used while VITE_USE_MOCK_API=true (no backend yet)
-const MOCK_BRANCHES = [
-  { id: 1, name: 'Pune — Head Office' },
-  { id: 2, name: 'Bengaluru' },
-  { id: 3, name: 'Chennai' },
-  { id: 4, name: 'Ahmedabad' },
-]
+// The server omits `data` for an empty list, so lists fall back to [].
+const unwrap = (response) => response.data.data
+const unwrapList = (response) => unwrap(response) ?? []
 
-const mockResponse = (data) =>
-  new Promise((resolve) => {
-    setTimeout(() => resolve(data), MOCK_LATENCY_MS)
-  })
+export const getUsers = async () => unwrapList(await sharedGet(USERS_PATH))
 
-export const getBranches = async () => {
-  if (env.useMockApi) return mockResponse(MOCK_BRANCHES)
-  const { data } = await apiClient.get('/branches')
-  return data
-}
+export const getUserById = async (id) => unwrap(await sharedGet(`${USERS_PATH}/${id}`))
 
-// Sends multipart/form-data because of the optional company logo.
-export const createCustomer = async (customer) => {
-  if (env.useMockApi) return mockResponse({ id: Date.now(), ...customer, logo: undefined })
+// The logged-in user with its profile (theme, …)
+export const getCurrentUser = async () => unwrap(await sharedGet('/me'))
 
-  const formData = new FormData()
-  Object.entries(customer).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') formData.append(key, value)
-  })
+export const createUser = async (user) => unwrap(await apiClient.post(USERS_PATH, user))
 
-  const { data } = await apiClient.post('/customers', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
-  return data
+export const updateUser = async (id, user) => unwrap(await apiClient.put(`${USERS_PATH}/${id}`, user))
+
+export const deleteUser = async (id) => {
+  await apiClient.delete(`${USERS_PATH}/${id}`)
 }

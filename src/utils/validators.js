@@ -2,13 +2,15 @@
 
 export const PATTERNS = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
-  username: /^[a-zA-Z0-9._-]{3,30}$/,
+  username: /^[a-zA-Z0-9_.]{3,50}$/, // same rule as the users API
   phone: /^\+?[0-9][0-9\s-]{6,14}$/,
   gstin: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
   pan: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
   pinIndia: /^[1-9][0-9]{5}$/,
   postalCode: /^[A-Za-z0-9\s-]{3,10}$/,
   url: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/i,
+  branchCode: /^[A-Z0-9]{2,20}$/, // same rule as the branches API
+  hexColor: /^#[0-9A-Fa-f]{6}$/,
 }
 
 export const PASSWORD_MIN_LENGTH = 8

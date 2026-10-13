@@ -12,7 +12,7 @@
   @each $name, $value in $ts-tokens {
     --ts-#{$name}: #{$value};
   }
-  color-scheme: dark;
+  color-scheme: $ts-color-scheme;
 }
 
 body {
@@ -784,6 +784,13 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   font-size: $ts-fs-md;
 }
 
+// Colour dot (fill set on the SVG, e.g. branch colour)
+.ts-swatch {
+  flex: none;
+  width: $ts-swatch-size;
+  height: $ts-swatch-size;
+}
+
 // Sticky save bar at the bottom of long forms
 .ts-form-actions {
   position: sticky;
@@ -811,6 +818,24 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   color: $ts-ink-3;
 
   @include media-breakpoint-down(sm) { width: 100%; }
+}
+
+// List footer: entries count · pagination · go-to-page (components/common/TablePagination.jsx)
+.ts-table-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ts-space-3;
+  margin-top: $ts-space-3;
+}
+
+.ts-page-jump {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+
+  .form-control { width: $ts-page-jump-width; }
 }
 
 // Read-only form block (role-gated settings)

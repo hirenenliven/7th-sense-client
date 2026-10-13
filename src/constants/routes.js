@@ -16,12 +16,28 @@ export const ROUTES = {
   // Masters
   CUSTOMERS: '/masters/customers',
   CUSTOMER_ADD: '/masters/customers/add',
+  CUSTOMER_EDIT: '/masters/customers/:id/edit',
+  CUSTOMER_VIEW: '/masters/customers/:id',
+  BRANCHES: '/masters/branches',
+  BRANCH_ADD: '/masters/branches/add',
+  BRANCH_EDIT: '/masters/branches/:id/edit',
   PARTS: '/masters/parts',
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',
   HOLIDAYS: '/masters/holidays',
   USERS: '/masters/users',
   ROLES: '/masters/roles',
+
+  // Masters › Country … Supervisor: independent screens, one per level (pages/Organization/<Level>/)
+  ORG_COUNTRIES: '/organization/countries',
+  ORG_STATES: '/organization/states',
+  ORG_CITIES: '/organization/cities',
+  ORG_BRANCHES: '/organization/branches',
+  ORG_LOCATIONS: '/organization/locations',
+  ORG_SHOPS: '/organization/shops',
+  ORG_LINES: '/organization/lines',
+  ORG_CELLS: '/organization/cells',
+  ORG_SUPERVISORS: '/organization/supervisors',
 
   // System
   ACCOUNT: '/account',

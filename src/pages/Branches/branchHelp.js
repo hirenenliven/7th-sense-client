@@ -1,0 +1,20 @@
+// Help popovers for fields whose meaning or format is not obvious from the label.
+// Shown by <FieldLabel help={…}> on the form — keep in sync with branchSchema (branchForm.js).
+export const FIELD_HELP = {
+  code: {
+    title: 'Code',
+    content: 'Short unique code for the branch, used in lists and reports.',
+    example: 'PUNE01',
+    rules: ['2–20 characters', 'Capital letters and digits only; letters are capitalised for you', 'Must be unique'],
+  },
+  customerId: {
+    title: 'Customer',
+    content: 'Customer account that owns this branch. Leave blank for a branch that is not tied to one customer.',
+  },
+  colorCode: {
+    title: 'Colour',
+    content: 'Colour used to tell this branch apart in lists and charts.',
+    example: '#F58220',
+    rules: ['# followed by 6 hex digits', 'Pick one with the swatch or type it'],
+  },
+}

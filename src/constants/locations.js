@@ -1,56 +1,25 @@
-// Countries offered in address forms. `states` empty → the State field becomes free text.
+// Countries and their states / regions come from `country-region-data` (ISO 3166 codes);
+// each entry is [countryName, countryCode, [[stateName, stateCode], …]].
+// Dialling codes come from `libphonenumber-js` (Google's phone metadata).
+//
+// Only the countries in ENABLED_COUNTRIES are offered in forms. To enable another country,
+// import it by its ISO code below and add it to the list — only imported countries are bundled.
+import { AE, DE, GB, IN, JP, US } from 'country-region-data'
+import { getCountryCallingCode } from 'libphonenumber-js/min'
+
+const ENABLED_COUNTRIES = [IN, AE, DE, JP, GB, US]
+
 export const INDIA = 'IN'
-
-export const INDIAN_STATES = [
-  'Andaman and Nicobar Islands',
-  'Andhra Pradesh',
-  'Arunachal Pradesh',
-  'Assam',
-  'Bihar',
-  'Chandigarh',
-  'Chhattisgarh',
-  'Dadra and Nagar Haveli and Daman and Diu',
-  'Delhi',
-  'Goa',
-  'Gujarat',
-  'Haryana',
-  'Himachal Pradesh',
-  'Jammu and Kashmir',
-  'Jharkhand',
-  'Karnataka',
-  'Kerala',
-  'Ladakh',
-  'Lakshadweep',
-  'Madhya Pradesh',
-  'Maharashtra',
-  'Manipur',
-  'Meghalaya',
-  'Mizoram',
-  'Nagaland',
-  'Odisha',
-  'Puducherry',
-  'Punjab',
-  'Rajasthan',
-  'Sikkim',
-  'Tamil Nadu',
-  'Telangana',
-  'Tripura',
-  'Uttar Pradesh',
-  'Uttarakhand',
-  'West Bengal',
-]
-
-export const COUNTRIES = [
-  { code: INDIA, name: 'India', states: INDIAN_STATES },
-  { code: 'AE', name: 'United Arab Emirates', states: [] },
-  { code: 'DE', name: 'Germany', states: [] },
-  { code: 'JP', name: 'Japan', states: [] },
-  { code: 'GB', name: 'United Kingdom', states: [] },
-  { code: 'US', name: 'United States', states: [] },
-]
-
 export const DEFAULT_COUNTRY = INDIA
 export const DEFAULT_TIME_ZONE = 'Asia/Kolkata'
+
+// { code, name, dialCode: '+91', states: [{ code, name }] } — `states` empty → State becomes free text
+export const COUNTRIES = ENABLED_COUNTRIES.map(([name, code, regions]) => ({
+  code,
+  name,
+  dialCode: `+${getCountryCallingCode(code)}`,
+  states: regions.map(([stateName, stateCode]) => ({ code: stateCode, name: stateName })),
+}))
 
 // IANA time zones from the browser; small fallback for older browsers.
 export const TIME_ZONES =
@@ -58,5 +27,30 @@ export const TIME_ZONES =
     ? Intl.supportedValuesOf('timeZone')
     : [DEFAULT_TIME_ZONE, 'Asia/Dubai', 'Europe/Berlin', 'Europe/London', 'America/New_York', 'Asia/Tokyo', 'UTC']
 
+export const isEnabledCountry = (countryCode) => COUNTRIES.some((country) => country.code === countryCode)
+
 export const getStates = (countryCode) =>
   COUNTRIES.find((country) => country.code === countryCode)?.states ?? []
+
+export const getDialCode = (countryCode) =>
+  COUNTRIES.find((country) => country.code === countryCode)?.dialCode ?? ''
+
+export const getCountryName = (countryCode) =>
+  COUNTRIES.find((country) => country.code === countryCode)?.name ?? ''
+
+export const getStateName = (countryCode, stateCode) => {
+  const country = COUNTRIES.find((c) => c.code === countryCode)
+  if (!country) return ''
+  return country.states.find((state) => state.code === stateCode)?.name ?? ''
+}
+
+// Reverse lookup: get country code from name
+export const getCountryCode = (countryName) =>
+  COUNTRIES.find((country) => country.name === countryName)?.code ?? ''
+
+// Reverse lookup: get state code from country code and state name
+export const getStateCode = (countryCode, stateName) => {
+  const country = COUNTRIES.find((c) => c.code === countryCode)
+  if (!country) return ''
+  return country.states.find((state) => state.name === stateName)?.code ?? ''
+}

@@ -18,7 +18,7 @@ export const FIELD_HELP = {
     title: 'User Name',
     content: 'Login name for the customer’s account. Pick something the customer will recognise, such as a short company name.',
     example: 'acme.pune',
-    rules: ['3–30 characters', 'Letters, numbers, dot, dash or underscore', 'No spaces'],
+    rules: ['3–50 characters', 'Letters, numbers, dot or underscore', 'No spaces'],
   },
   zipCode: {
     title: 'Zip Code',
@@ -36,5 +36,10 @@ export const FIELD_HELP = {
     content: 'Time at which the customer’s production day begins. Output before this time is counted toward the previous production day.',
     example: '06:00 — a night shift ending at 05:30 counts toward the day before',
     rules: ['Usually the start time of the first shift'],
+  },
+  filters: {
+    title: 'Filters',
+    content: 'Filters offered to this customer on their dashboards and reports. Only the ticked filters are shown.',
+    rules: ['Optional — tick none to hide all filters', 'Can be changed later by editing the customer'],
   },
 }

@@ -17,6 +17,16 @@ const MODULE_PURPOSE = {
   tools: 'Cutting-tool inventory and tool-life tracking.',
   reports: 'OEE, downtime and production reports.',
   customers: 'Customer accounts and their logins.',
+  branches: 'Branches, their tax details and owning customers.',
+  countries: 'Countries you work in.',
+  states: 'States within each country.',
+  cities: 'Cities within each state.',
+  'org-branches': 'Branches within each city.',
+  locations: 'Locations within each branch.',
+  shops: 'Shops within each location.',
+  lines: 'Production lines within each shop.',
+  cells: 'Cells within each line.',
+  supervisors: 'Supervisors assigned to each cell.',
   parts: 'Parts and the operations performed on them.',
   shifts: 'Shift timings and company holidays.',
   users: 'System users, roles and permissions.',
@@ -37,7 +47,7 @@ const ADD_CUSTOMER_STEPS = [
 const COUNTRY_RULES = [
   { field: 'GST No.', india: 'Required · 15 characters', other: 'Optional' },
   { field: 'PAN No.', india: 'Required · 10 characters', other: 'Optional' },
-  { field: 'State', india: 'Pick from the list', other: 'Type it in' },
+  { field: 'State', india: 'Pick from the list', other: 'Pick from the list' },
   { field: 'Zip Code', india: '6-digit PIN code', other: '3–10 letters, digits, spaces or dashes' },
 ]
 

@@ -12,7 +12,23 @@ Live sample: **`/theme`** (`src/pages/ThemeShowcase/ThemeShowcase.jsx`).
 | `src/assets/scss/theme.scss` | Entry point: Bootstrap + tokens + components + extra utilities |
 
 - **App:** `main.jsx` imports `theme.scss`, and Vite compiles it with hot reload.
-- **Standalone CSS:** `npm run build:theme` writes `dist-theme/theme.css` and `theme.min.css`.
+- **Standalone CSS:** `npm run build:theme` writes `dist-theme/theme.css`, `theme.min.css` and the light `theme-light.css` / `theme-light.min.css`.
+
+## Light theme
+
+Dark is the default. Each user can choose Dark or Light (`user_profiles.theme`: `dark_version` / `light_version`,
+set on the customer form). The light theme is the **same SCSS built again with light tokens**:
+
+| File | Purpose |
+|---|---|
+| `src/assets/scss/_tokens-light.scss` | Light values of the colour tokens (surfaces, ink, accent, status, greys, shadows) |
+| `src/assets/scss/theme-light.scss` | Imports `tokens-light`, then `theme` |
+| `src/utils/theme.js` | `applyTheme()` loads `theme-light.scss?inline` on demand and adds it after the dark stylesheet; `refreshUserTheme()` applies the logged-in user's theme (`GET /me`) |
+
+The colour tokens in `_variables.scss` are `!default`, so the light file sets them first. Bootstrap bakes colours
+into SVG icons and `to-rgb()` values at compile time, which is why this is a second build and not CSS variables.
+Pages need nothing special: use the tokens and Bootstrap classes as usual and both themes follow.
+A new colour token must get a light value in `_tokens-light.scss` (and `!default` in `_variables.scss`).
 
 ## Rules
 

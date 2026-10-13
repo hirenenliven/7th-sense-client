@@ -1,0 +1,60 @@
+// =============================================================================
+// 7thSense light theme — colour tokens
+// Set before _variables.scss (see theme-light.scss), so its `!default` dark values
+// are skipped and every Bootstrap override and ts-* component is built from these.
+// Same roles as the dark tokens: border-led surfaces, orange as the precise accent.
+// =============================================================================
+
+$ts-color-scheme: light;
+
+// Surfaces
+$ts-bg:        #f3f2ee; // page
+$ts-appbar:    #ffffff; // top bar / sub nav / sidebar
+$ts-panel:     #ffffff; // cards, tables, modals
+$ts-panel-2:   #f1f0eb; // inputs, inner boxes, hover
+$ts-line:      #dddbd3; // every border / divider
+
+// Text
+$ts-ink:       #1d1c19; // primary
+$ts-ink-2:     #4f4d46; // secondary
+$ts-ink-3:     #6f6d65; // muted / captions (≥ 4.5:1 on panels)
+
+// Accent (a touch deeper than the dark theme's, for contrast on white)
+$ts-orange:    #e0700f;
+$ts-orange-2:  #c45f08; // hover
+$ts-on-accent: #1a1205; // text on orange
+
+// Status (deeper for contrast on white)
+$ts-good:      #1e9e4f;
+$ts-amber:     #c58a00;
+$ts-serious:   #cf5f36;
+$ts-red:       #cf362d;
+$ts-blue:      #2b7bbf;
+$ts-violet:    #6a5cd0;
+$ts-neutral:   #77756c;
+
+// Shadows and overlays are lighter on a light page
+$ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .08);
+$ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .12);
+$ts-shadow-overlay: 0 20px 60px rgba(0, 0, 0, .18);
+$ts-backdrop-opacity: .35;
+
+// Bootstrap greys run light → dark here (the dark theme maps them dark → light)
+$gray-100: #f7f6f2;
+$gray-200: #edece6;
+$gray-300: #dddbd3;
+$gray-400: #bdbbb1;
+$gray-500: #8f8d84;
+$gray-600: #6f6d65;
+$gray-700: #4f4d46;
+$gray-800: #33322e;
+$gray-900: #1d1c19;
+
+$light: $gray-100;
+$dark:  $gray-900;
+
+$body-emphasis-color:  #000;
+$color-contrast-light: #fff; // text on dark fills (danger, info, …)
+
+$box-shadow-sm:    0 1px 2px rgba(0, 0, 0, .06);
+$box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .06);

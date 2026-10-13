@@ -1,24 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
-import { COUNTRIES, TIME_ZONES, getStates } from '@/constants/locations'
+import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { THEMES } from '@/constants/app'
+import { COUNTRIES, TIME_ZONES, getDialCode, getStates } from '@/constants/locations'
 import { ROUTES } from '@/constants/routes'
-import { createCustomer, getBranches } from '@/services/customerService'
+import { getBranches } from '@/services/branchService'
+import { createUser, getUserById, updateUser } from '@/services/customerService'
 import { formatFileSize } from '@/utils/helpers'
+import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
+import Loader from '@/components/common/Loader'
 import {
+  FILTER_NAMES,
+  FILTER_OPTIONS,
   INITIAL_VALUES,
-  customerSchema,
+  getCustomerSchema,
   isFieldRequired,
+  savedLogoPath,
+  toFormValues,
+  toUserPayload,
 } from './customerForm'
 import { FIELD_HELP } from './customerHelp'
 
+// Add and edit share this form: /masters/customers/add and /masters/customers/:id/edit
 function AddCustomer() {
   const navigate = useNavigate()
+  const { id } = useParams()
+  const isEdit = Boolean(id)
   const logoInputRef = useRef(null)
+
+  const schema = useMemo(() => getCustomerSchema(isEdit), [isEdit])
 
   const {
     register,
@@ -28,7 +42,7 @@ function AddCustomer() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(customerSchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
@@ -38,11 +52,19 @@ function AddCustomer() {
   const [branchesLoading, setBranchesLoading] = useState(true)
   const [branchesError, setBranchesError] = useState('')
 
+  // Customer being edited (null when adding)
+  const [existing, setExisting] = useState(null)
+  const [customerLoading, setCustomerLoading] = useState(isEdit)
+  const [customerError, setCustomerError] = useState('')
+
   // Watch specific fields for conditional logic
   const country = watch('country')
   const logo = watch('logo')
+  const filters = watch('filters') ?? []
+  const allFiltersChosen = filters.length === FILTER_NAMES.length
 
   const states = getStates(country)
+  const dialCode = getDialCode(country)
 
   // Load branch options
   useEffect(() => {
@@ -59,6 +81,24 @@ function AddCustomer() {
       active = false
     }
   }, [])
+
+  // Edit: load the customer and fill the form (reset() also makes these the Reset values)
+  useEffect(() => {
+    if (!isEdit) return undefined
+    let active = true
+    setCustomerLoading(true)
+    getUserById(id)
+      .then((customer) => {
+        if (!active) return
+        setExisting(customer)
+        reset(toFormValues(customer))
+      })
+      .catch((error) => active && setCustomerError(error.message))
+      .finally(() => active && setCustomerLoading(false))
+    return () => {
+      active = false
+    }
+  }, [id, isEdit, reset])
 
   // Logo preview URL (revoked when replaced/unmounted)
   const logoPreview = useMemo(
@@ -86,39 +126,71 @@ function AddCustomer() {
     setValue('logo', null)
   }
 
-  // Add required class to label for visual indication
-  const labelClass = (name) => (isFieldRequired(name, country) ? 'required' : undefined)
+  // Required marker (*) — GST / PAN depend on the country, password only when adding
+  const isRequired = (name) => isFieldRequired(name, country, isEdit)
+  const labelClass = (name) => (isRequired(name) ? 'required' : undefined)
 
   const onSubmit = async (values) => {
     try {
-      await createCustomer(values)
-      toast.success(`${values.companyName} has been added.`, { title: 'Customer created' })
-      reset()
-      if (logoInputRef.current) logoInputRef.current.value = ''
-    } catch (error) {
-      if (error.message) {
-        toast.error(error.message, { title: 'Could not save customer' })
+      const payload = toUserPayload(values, existing)
+      if (isEdit) {
+        await updateUser(id, payload)
+        toast.success(`${values.companyName} has been updated.`, { title: 'Customer updated' })
+      } else {
+        await createUser(payload)
+        toast.success(`${values.companyName} has been added.`, { title: 'Customer created' })
       }
+      // Re-apply the logged-in user's theme in case this was their own account
+      refreshUserTheme()
+      navigate(ROUTES.CUSTOMERS)
+    } catch (error) {
+      toast.error(error.message, { title: 'Could not save customer' })
     }
+  }
+
+  const header = (
+    <header className="ts-page-header">
+      <div>
+        <div className="ts-eyebrow">Masters · Customers</div>
+        <h1>{isEdit ? 'Edit Customer' : 'Add Customer'}</h1>
+        <p className="ts-page-subtitle">
+          {isEdit ? 'Update the customer account and its login.' : 'Create a customer account and its login.'}
+        </p>
+      </div>
+      <div className="ts-page-actions">
+        <Button as={Link} to={ROUTES.CUSTOMERS} variant="ghost">
+          <i className="bi bi-arrow-left me-2" aria-hidden="true" />
+          Customer list
+        </Button>
+      </div>
+    </header>
+  )
+
+  if (customerLoading) {
+    return (
+      <>
+        {header}
+        <Loader text="Loading customer…" />
+      </>
+    )
+  }
+
+  if (customerError) {
+    return (
+      <>
+        {header}
+        <Alert variant="danger">
+          <b>Could not load this customer.</b> {customerError}
+        </Alert>
+      </>
+    )
   }
 
   return (
     <>
-      <header className="ts-page-header">
-        <div>
-          <div className="ts-eyebrow">Masters · Customers</div>
-          <h1>Add Customer</h1>
-          <p className="ts-page-subtitle">Create a customer account and its login.</p>
-        </div>
-        <div className="ts-page-actions">
-          <Button as={Link} to={ROUTES.CUSTOMERS} variant="ghost">
-            <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-            Customer list
-          </Button>
-        </div>
-      </header>
+      {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add customer">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit customer' : 'Add customer'}>
         {/* Company */}
         <Card className="mb-3">
           <Card.Header>
@@ -154,13 +226,13 @@ function AddCustomer() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="gstNo">
-                <FieldLabel required={isFieldRequired('gstNo', country)} help={FIELD_HELP.gstNo}>GST No.</FieldLabel>
+                <FieldLabel required={isRequired('gstNo')} help={FIELD_HELP.gstNo}>GST No.</FieldLabel>
                 <Form.Control {...register('gstNo', { onChange: handleChange })} autoComplete="off" maxLength={15} placeholder="22ABCDE1234F1Z5" isInvalid={Boolean(errors.gstNo)} />
                 <Form.Control.Feedback type="invalid">{errors.gstNo?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="panNo">
-                <FieldLabel required={isFieldRequired('panNo', country)} help={FIELD_HELP.panNo}>PAN No.</FieldLabel>
+                <FieldLabel required={isRequired('panNo')} help={FIELD_HELP.panNo}>PAN No.</FieldLabel>
                 <Form.Control {...register('panNo', { onChange: handleChange })} autoComplete="off" maxLength={10} placeholder="ABCDE1234F" isInvalid={Boolean(errors.panNo)} />
                 <Form.Control.Feedback type="invalid">{errors.panNo?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -177,10 +249,16 @@ function AddCustomer() {
                   ref={logoInputRef}
                   type="file"
                   accept=".png,.jpg,.jpeg,.svg,.webp"
-                  {...register('logo')}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null
+                    setValue('logo', file)
+                  }}
                   isInvalid={Boolean(errors.logo)}
                 />
                 <Form.Control.Feedback type="invalid">{errors.logo?.message}</Form.Control.Feedback>
+                {!errors.logo && savedLogoPath(existing) && !logo && (
+                  <Form.Text className="d-block text-truncate">Current: {savedLogoPath(existing)}</Form.Text>
+                )}
                 {!errors.logo && (
                   <Form.Text>PNG, JPG, SVG or WEBP · max {formatFileSize(2 * 1024 * 1024)}</Form.Text>
                 )}
@@ -216,31 +294,34 @@ function AddCustomer() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="username">
-                <FieldLabel required={isFieldRequired('username', country)} help={FIELD_HELP.username}>User Name</FieldLabel>
+                <FieldLabel required={isRequired('username')} help={FIELD_HELP.username}>User Name</FieldLabel>
                 <Form.Control {...register('username')} autoComplete="off" isInvalid={Boolean(errors.username)} />
                 <Form.Control.Feedback type="invalid">{errors.username?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId="password">
-                <Form.Label className={labelClass('password')}>Password</Form.Label>
-                <InputGroup hasValidation>
-                  <Form.Control
-                    {...register('password')}
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    isInvalid={Boolean(errors.password)}
-                  />
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowPassword((show) => !show)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    aria-pressed={showPassword}
-                  >
-                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
-                  </Button>
-                  <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              {/* Only when adding: an existing customer's password is not changed here */}
+              {!isEdit && (
+                <Form.Group as={Col} md={6} xxl={4} controlId="password">
+                  <Form.Label className={labelClass('password')}>Password</Form.Label>
+                  <InputGroup hasValidation>
+                    <Form.Control
+                      {...register('password')}
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      isInvalid={Boolean(errors.password)}
+                    />
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowPassword((show) => !show)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-pressed={showPassword}
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
+                    </Button>
+                    <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+              )}
             </Row>
           </Card.Body>
         </Card>
@@ -282,8 +363,8 @@ function AddCustomer() {
                   <Form.Select {...register('state')} isInvalid={Boolean(errors.state)}>
                     <option value="">Select state</option>
                     {states.map((state) => (
-                      <option key={state} value={state}>
-                        {state}
+                      <option key={state.code} value={state.code}>
+                        {state.name}
                       </option>
                     ))}
                   </Form.Select>
@@ -300,7 +381,7 @@ function AddCustomer() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={3} controlId="zipCode">
-                <FieldLabel required={isFieldRequired('zipCode', country)} help={FIELD_HELP.zipCode}>Zip Code</FieldLabel>
+                <FieldLabel required={isRequired('zipCode')} help={FIELD_HELP.zipCode}>Zip Code</FieldLabel>
                 <Form.Control {...register('zipCode')} autoComplete="postal-code" inputMode="numeric" maxLength={10} isInvalid={Boolean(errors.zipCode)} />
                 <Form.Control.Feedback type="invalid">{errors.zipCode?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -324,18 +405,24 @@ function AddCustomer() {
 
               <Form.Group as={Col} md={6} xxl={4} controlId="primaryPhone">
                 <Form.Label className={labelClass('primaryPhone')}>Primary Phone</Form.Label>
-                <Form.Control {...register('primaryPhone')} type="tel" autoComplete="tel" placeholder="+91 98765 43210" isInvalid={Boolean(errors.primaryPhone)} />
-                <Form.Control.Feedback type="invalid">{errors.primaryPhone?.message}</Form.Control.Feedback>
+                <InputGroup hasValidation>
+                  <InputGroup.Text>{dialCode}</InputGroup.Text>
+                  <Form.Control {...register('primaryPhone')} type="tel" autoComplete="tel-national" placeholder="98765 43210" isInvalid={Boolean(errors.primaryPhone)} />
+                  <Form.Control.Feedback type="invalid">{errors.primaryPhone?.message}</Form.Control.Feedback>
+                </InputGroup>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="secondaryPhone">
                 <Form.Label>Secondary Phone</Form.Label>
-                <Form.Control {...register('secondaryPhone')} type="tel" autoComplete="tel" isInvalid={Boolean(errors.secondaryPhone)} />
-                <Form.Control.Feedback type="invalid">{errors.secondaryPhone?.message}</Form.Control.Feedback>
+                <InputGroup hasValidation>
+                  <InputGroup.Text>{dialCode}</InputGroup.Text>
+                  <Form.Control {...register('secondaryPhone')} type="tel" autoComplete="tel-national" isInvalid={Boolean(errors.secondaryPhone)} />
+                  <Form.Control.Feedback type="invalid">{errors.secondaryPhone?.message}</Form.Control.Feedback>
+                </InputGroup>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="timeZone">
-                <FieldLabel required={isFieldRequired('timeZone', country)} help={FIELD_HELP.timeZone}>Time Zone</FieldLabel>
+                <FieldLabel required={isRequired('timeZone')} help={FIELD_HELP.timeZone}>Time Zone</FieldLabel>
                 <Form.Select {...register('timeZone')} isInvalid={Boolean(errors.timeZone)}>
                   {TIME_ZONES.map((zone) => (
                     <option key={zone} value={zone}>
@@ -347,12 +434,63 @@ function AddCustomer() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="dayStartFrom">
-                <FieldLabel required={isFieldRequired('dayStartFrom', country)} help={FIELD_HELP.dayStartFrom}>Day Start From</FieldLabel>
+                <FieldLabel required={isRequired('dayStartFrom')} help={FIELD_HELP.dayStartFrom}>Day Start From</FieldLabel>
                 <Form.Control {...register('dayStartFrom')} type="time" isInvalid={Boolean(errors.dayStartFrom)} />
                 <Form.Control.Feedback type="invalid">{errors.dayStartFrom?.message}</Form.Control.Feedback>
                 {!errors.dayStartFrom && <Form.Text>Production day begins at this time.</Form.Text>}
               </Form.Group>
+
+              <Form.Group as={Col} md={6} xxl={4} controlId="theme">
+                <Form.Label className={labelClass('theme')}>Theme</Form.Label>
+                <Form.Select {...register('theme')} isInvalid={Boolean(errors.theme)}>
+                  {THEMES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">{errors.theme?.message}</Form.Control.Feedback>
+                {!errors.theme && <Form.Text>Colour scheme the customer sees after signing in.</Form.Text>}
+              </Form.Group>
             </Row>
+          </Card.Body>
+        </Card>
+
+        {/* Filters */}
+        <Card className="mb-3">
+          <Card.Header>
+            <i className="bi bi-funnel text-primary" aria-hidden="true" />
+            Filters
+            <span className="ms-auto d-flex gap-1">
+              <Button variant="link" size="sm" onClick={() => setValue('filters', FILTER_NAMES, { shouldDirty: true })} disabled={allFiltersChosen}>
+                Select all
+              </Button>
+              <Button variant="link" size="sm" onClick={() => setValue('filters', [], { shouldDirty: true })} disabled={!filters.length}>
+                Clear
+              </Button>
+            </span>
+          </Card.Header>
+          <Card.Body>
+            <fieldset aria-describedby="filters-hint">
+              <legend className="visually-hidden">Filters</legend>
+              <FieldLabel help={FIELD_HELP.filters}>Filters available to this customer</FieldLabel>
+              <div className="d-flex flex-wrap gap-3 mt-1">
+                {FILTER_OPTIONS.map((option) => (
+                  <Form.Check
+                    key={option.value}
+                    id={`filter-${option.value}`}
+                    type="checkbox"
+                    label={option.label}
+                    value={option.value}
+                    {...register('filters')}
+                    isInvalid={Boolean(errors.filters)}
+                  />
+                ))}
+              </div>
+              <Form.Text id="filters-hint" className={errors.filters ? 'text-danger' : undefined}>
+                {errors.filters?.message || `${filters.length} of ${FILTER_OPTIONS.length} selected`}
+              </Form.Text>
+            </fieldset>
           </Card.Body>
         </Card>
 
@@ -376,7 +514,7 @@ function AddCustomer() {
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                Save Customer
+                {isEdit ? 'Update Customer' : 'Save Customer'}
               </>
             )}
           </Button>

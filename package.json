@@ -8,13 +8,15 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:theme": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme.scss dist-theme/theme.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme.scss dist-theme/theme.min.css"
+    "build:theme": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme.scss dist-theme/theme.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme.scss dist-theme/theme.min.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme-light.scss dist-theme/theme-light.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme-light.scss dist-theme/theme-light.min.css"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "country-region-data": "^4.1.0",
+    "libphonenumber-js": "^1.13.13",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",

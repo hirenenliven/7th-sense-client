@@ -17,7 +17,7 @@ npm run build:theme  # standalone dist-theme/theme.css
 
 ## Environment
 
-Copy `.env.example` to `.env`. `VITE_USE_MOCK_API=true` makes services return mock data until the backend is ready. Only `VITE_`-prefixed variables are exposed; read them through `src/config/env.js`.
+Copy `.env.example` to `.env`. The app calls the Go API (`7th-sense-server`) at `VITE_API_BASE_URL=/api/v1`; in dev, Vite proxies `/api` to `API_PROXY_TARGET` (default `http://localhost:8080`) because the API sends no CORS headers. Start the server before `npm run dev`. Only `VITE_`-prefixed variables reach the browser; read them through `src/config/env.js`.
 
 ## Structure
 

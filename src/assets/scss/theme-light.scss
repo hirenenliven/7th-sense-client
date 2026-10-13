@@ -1,0 +1,9 @@
+// =============================================================================
+// 7thSense light theme — the whole theme rebuilt with the light tokens
+// App:        loaded on demand by src/utils/theme.js when the user's theme is light,
+//             placed after theme.scss so it overrides it
+// Standalone: `npm run build:theme` → dist-theme/theme-light.css
+// =============================================================================
+
+@import "tokens-light";
+@import "theme";
