@@ -95,7 +95,7 @@ Text and background colours have Bootstrap classes:
 - **Menu button** toggles `sidebar-open`. On screens `lg` and wider the sidebar pushes the content aside and its open/closed state is remembered. Below `lg` it slides over the content with a backdrop, and closes on a link click, a backdrop click or Esc.
 - **Adding a menu item:** add the path to `constants/routes.js` and the item to `constants/navigation.js`.
   The item has `{ key, label, icon: 'bi-…', path }`, or `children: [{ key, label, path }]` for a submenu.
-  The route appears automatically with a *Coming soon* page. Once the screen is built, add it to `PAGES` in `routes/AppRoutes.jsx`.
+  The route appears automatically with a *Coming soon* page. Once the screen is built, add it to `PAGES` in `routes/pages.jsx`.
 - **State:** `useSidebar()` returns `{ isOpen, isDesktop, toggle, closeOnMobile }`.
 - **Icons:** [Bootstrap Icons](https://icons.getbootstrap.com), e.g. `<i className="bi bi-cpu" aria-hidden="true" />`.
 - **Tokens:** `$ts-sidebar-width`, `$ts-sidebar-bg`, `$ts-sidebar-transition`, `$ts-sidebar-icon-size`, `$ts-sidebar-sub-indent`.

@@ -667,6 +667,97 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   box-shadow: 0 0 0 100vmax $ts-panel-2 inset, $input-focus-box-shadow;
 }
 
+// Label row with a help trigger: <FieldLabel help={…}> → label, *, (i)
+.ts-field-label {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-1;
+  margin-bottom: $form-label-margin-bottom;
+
+  .form-label { margin-bottom: 0; }
+}
+
+// Field help: (i) trigger + popover with title, description, example and rules
+.ts-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: $ts-ink-3;
+  font-size: $ts-fs-base;
+  line-height: 1;
+  cursor: help;
+  transition: color $ts-transition;
+
+  &:hover,
+  &[aria-expanded="true"] { color: $ts-orange; }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba($ts-orange, .3);
+  }
+}
+
+.ts-help {
+  --bs-popover-max-width: #{$ts-help-width};
+
+  .popover-header {
+    display: flex;
+    align-items: center;
+    gap: $ts-space-2;
+    font-size: $ts-fs-base;
+    font-weight: $ts-fw-title;
+
+    .bi { color: $ts-orange; }
+  }
+
+  .popover-body {
+    display: grid;
+    gap: ts-rem(10);
+    line-height: 1.5;
+  }
+}
+
+.ts-help-label {
+  margin-bottom: ts-rem(2);
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  letter-spacing: $ts-ls-wide;
+  text-transform: uppercase;
+  color: $ts-ink-3;
+}
+
+.ts-help-example {
+  display: block;
+  padding: ts-rem(5) $ts-space-2;
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-sm;
+  color: $ts-ink;
+  overflow-wrap: anywhere;
+}
+
+.ts-help-rules {
+  display: grid;
+  gap: ts-rem(3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: ts-rem(6);
+  }
+
+  .bi {
+    flex: none;
+    color: $ts-good;
+  }
+}
+
 // Selected-file preview (logo upload)
 .ts-file-preview {
   display: flex;

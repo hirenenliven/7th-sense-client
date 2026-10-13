@@ -100,6 +100,7 @@ export const NAV_SECTIONS = [
     items: [
       { key: 'account', label: 'Account Center', icon: 'bi-shield-lock', path: ROUTES.ACCOUNT },
       { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME },
+      { key: 'user-guide', label: 'User Guide', icon: 'bi-book', path: ROUTES.USER_GUIDE },
       { key: 'about', label: 'About', icon: 'bi-info-circle', path: ROUTES.ABOUT },
     ],
   },

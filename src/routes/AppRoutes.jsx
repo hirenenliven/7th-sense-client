@@ -4,24 +4,12 @@ import MainLayout from '@/components/layout/MainLayout'
 import Loader from '@/components/common/Loader'
 import { NAV_SECTIONS } from '@/constants/navigation'
 import { ROUTES } from '@/constants/routes'
+import { BUILT_PATHS, PAGES } from '@/routes/pages'
 import { flattenNav } from '@/utils/navigation'
 
-const Home = lazy(() => import('@/pages/Home/Home'))
-const About = lazy(() => import('@/pages/About/About'))
-const ThemeShowcase = lazy(() => import('@/pages/ThemeShowcase/ThemeShowcase'))
-const AddCustomer = lazy(() => import('@/pages/Customers/AddCustomer'))
 const ComingSoon = lazy(() => import('@/pages/ComingSoon/ComingSoon'))
 const NotFound = lazy(() => import('@/pages/NotFound/NotFound'))
 
-// Screens that exist. Every other sidebar link renders <ComingSoon /> until it is built.
-const PAGES = [
-  { path: ROUTES.HOME, element: <Home /> },
-  { path: ROUTES.ABOUT, element: <About /> },
-  { path: ROUTES.THEME, element: <ThemeShowcase /> },
-  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer /> },
-]
-
-const BUILT_PATHS = new Set(PAGES.map((page) => page.path))
 const PLACEHOLDERS = flattenNav(NAV_SECTIONS).filter((link) => !BUILT_PATHS.has(link.path))
 
 function AppRoutes() {

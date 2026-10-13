@@ -27,6 +27,7 @@ export const ROUTES = {
   ACCOUNT: '/account',
   THEME: '/theme',
   ABOUT: '/about',
+  USER_GUIDE: '/user-guide',
 
   NOT_FOUND: '*',
 }

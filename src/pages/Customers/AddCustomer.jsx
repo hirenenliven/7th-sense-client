@@ -8,16 +8,13 @@ import { ROUTES } from '@/constants/routes'
 import { createCustomer, getBranches } from '@/services/customerService'
 import { formatFileSize } from '@/utils/helpers'
 import { toast } from '@/utils/toast'
+import FieldLabel from '@/components/common/FieldLabel'
 import {
-  FIELD_ID_PREFIX,
   INITIAL_VALUES,
-  LOGO_RULES,
-  UPPERCASE_FIELDS,
   customerSchema,
   isFieldRequired,
 } from './customerForm'
-
-const fieldId = (name) => `${FIELD_ID_PREFIX}${name}`
+import { FIELD_HELP } from './customerHelp'
 
 function AddCustomer() {
   const navigate = useNavigate()
@@ -65,7 +62,7 @@ function AddCustomer() {
 
   // Logo preview URL (revoked when replaced/unmounted)
   const logoPreview = useMemo(
-    () => (logo && LOGO_RULES.types.includes(logo.type) ? URL.createObjectURL(logo) : ''),
+    () => (logo && ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(logo.type) ? URL.createObjectURL(logo) : ''),
     [logo],
   )
   useEffect(() => () => logoPreview && URL.revokeObjectURL(logoPreview), [logoPreview])
@@ -79,7 +76,7 @@ function AddCustomer() {
   // Handle uppercase fields
   const handleChange = (event) => {
     const { name, value } = event.target
-    if (UPPERCASE_FIELDS.has(name)) {
+    if (name === 'gstNo' || name === 'panNo') {
       setValue(name, value.toUpperCase())
     }
   }
@@ -130,7 +127,7 @@ function AddCustomer() {
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('branchId')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="branchId">
                 <Form.Label className={labelClass('branchId')}>Branch</Form.Label>
                 <Form.Select {...register('branchId')} disabled={branchesLoading || Boolean(branchesError)} isInvalid={Boolean(errors.branchId)}>
                   <option value="">
@@ -145,47 +142,47 @@ function AddCustomer() {
                 <Form.Control.Feedback type="invalid">{errors.branchId?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('companyName')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="companyName">
                 <Form.Label className={labelClass('companyName')}>Company Name</Form.Label>
                 <Form.Control {...register('companyName')} autoComplete="organization" maxLength={150} isInvalid={Boolean(errors.companyName)} />
                 <Form.Control.Feedback type="invalid">{errors.companyName?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('finixId')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="finixId">
                 <Form.Label>Finix ID</Form.Label>
                 <Form.Control {...register('finixId')} autoComplete="off" />
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('gstNo')}>
-                <Form.Label className={labelClass('gstNo')}>GST No.</Form.Label>
+              <Form.Group as={Col} md={6} xxl={4} controlId="gstNo">
+                <FieldLabel required={isFieldRequired('gstNo', country)} help={FIELD_HELP.gstNo}>GST No.</FieldLabel>
                 <Form.Control {...register('gstNo', { onChange: handleChange })} autoComplete="off" maxLength={15} placeholder="22ABCDE1234F1Z5" isInvalid={Boolean(errors.gstNo)} />
                 <Form.Control.Feedback type="invalid">{errors.gstNo?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('panNo')}>
-                <Form.Label className={labelClass('panNo')}>PAN No.</Form.Label>
+              <Form.Group as={Col} md={6} xxl={4} controlId="panNo">
+                <FieldLabel required={isFieldRequired('panNo', country)} help={FIELD_HELP.panNo}>PAN No.</FieldLabel>
                 <Form.Control {...register('panNo', { onChange: handleChange })} autoComplete="off" maxLength={10} placeholder="ABCDE1234F" isInvalid={Boolean(errors.panNo)} />
                 <Form.Control.Feedback type="invalid">{errors.panNo?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('website')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="website">
                 <Form.Label>Website</Form.Label>
                 <Form.Control {...register('website')} type="url" autoComplete="url" placeholder="www.example.com" isInvalid={Boolean(errors.website)} />
                 <Form.Control.Feedback type="invalid">{errors.website?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('logo')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="logo">
                 <Form.Label>Company Logo</Form.Label>
                 <Form.Control
                   ref={logoInputRef}
                   type="file"
-                  accept={LOGO_RULES.accept}
+                  accept=".png,.jpg,.jpeg,.svg,.webp"
                   {...register('logo')}
                   isInvalid={Boolean(errors.logo)}
                 />
                 <Form.Control.Feedback type="invalid">{errors.logo?.message}</Form.Control.Feedback>
                 {!errors.logo && (
-                  <Form.Text>PNG, JPG, SVG or WEBP · max {formatFileSize(LOGO_RULES.maxBytes)}</Form.Text>
+                  <Form.Text>PNG, JPG, SVG or WEBP · max {formatFileSize(2 * 1024 * 1024)}</Form.Text>
                 )}
                 {logo && (
                   <div className="ts-file-preview mt-2">
@@ -212,19 +209,19 @@ function AddCustomer() {
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('email')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="email">
                 <Form.Label className={labelClass('email')}>Email</Form.Label>
                 <Form.Control {...register('email')} type="email" autoComplete="off" isInvalid={Boolean(errors.email)} />
                 <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('username')}>
-                <Form.Label className={labelClass('username')}>User Name</Form.Label>
+              <Form.Group as={Col} md={6} xxl={4} controlId="username">
+                <FieldLabel required={isFieldRequired('username', country)} help={FIELD_HELP.username}>User Name</FieldLabel>
                 <Form.Control {...register('username')} autoComplete="off" isInvalid={Boolean(errors.username)} />
                 <Form.Control.Feedback type="invalid">{errors.username?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('password')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="password">
                 <Form.Label className={labelClass('password')}>Password</Form.Label>
                 <InputGroup hasValidation>
                   <Form.Control
@@ -256,18 +253,18 @@ function AddCustomer() {
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Form.Group as={Col} md={6} controlId={fieldId('address1')}>
+              <Form.Group as={Col} md={6} controlId="address1">
                 <Form.Label className={labelClass('address1')}>Address - 1</Form.Label>
                 <Form.Control {...register('address1')} autoComplete="address-line1" isInvalid={Boolean(errors.address1)} />
                 <Form.Control.Feedback type="invalid">{errors.address1?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} controlId={fieldId('address2')}>
+              <Form.Group as={Col} md={6} controlId="address2">
                 <Form.Label>Address - 2</Form.Label>
                 <Form.Control {...register('address2')} autoComplete="address-line2" />
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={3} controlId={fieldId('country')}>
+              <Form.Group as={Col} md={6} xxl={3} controlId="country">
                 <Form.Label className={labelClass('country')}>Country</Form.Label>
                 <Form.Select {...register('country', { onChange: handleCountryChange })} autoComplete="country" isInvalid={Boolean(errors.country)}>
                   {COUNTRIES.map((country) => (
@@ -279,7 +276,7 @@ function AddCustomer() {
                 <Form.Control.Feedback type="invalid">{errors.country?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={3} controlId={fieldId('state')}>
+              <Form.Group as={Col} md={6} xxl={3} controlId="state">
                 <Form.Label className={labelClass('state')}>State</Form.Label>
                 {states.length ? (
                   <Form.Select {...register('state')} isInvalid={Boolean(errors.state)}>
@@ -296,14 +293,14 @@ function AddCustomer() {
                 <Form.Control.Feedback type="invalid">{errors.state?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={3} controlId={fieldId('city')}>
+              <Form.Group as={Col} md={6} xxl={3} controlId="city">
                 <Form.Label className={labelClass('city')}>City</Form.Label>
                 <Form.Control {...register('city')} autoComplete="address-level2" isInvalid={Boolean(errors.city)} />
                 <Form.Control.Feedback type="invalid">{errors.city?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={3} controlId={fieldId('zipCode')}>
-                <Form.Label className={labelClass('zipCode')}>Zip Code</Form.Label>
+              <Form.Group as={Col} md={6} xxl={3} controlId="zipCode">
+                <FieldLabel required={isFieldRequired('zipCode', country)} help={FIELD_HELP.zipCode}>Zip Code</FieldLabel>
                 <Form.Control {...register('zipCode')} autoComplete="postal-code" inputMode="numeric" maxLength={10} isInvalid={Boolean(errors.zipCode)} />
                 <Form.Control.Feedback type="invalid">{errors.zipCode?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -319,26 +316,26 @@ function AddCustomer() {
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('contactPerson')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="contactPerson">
                 <Form.Label className={labelClass('contactPerson')}>Contact Person</Form.Label>
                 <Form.Control {...register('contactPerson')} autoComplete="name" isInvalid={Boolean(errors.contactPerson)} />
                 <Form.Control.Feedback type="invalid">{errors.contactPerson?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('primaryPhone')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="primaryPhone">
                 <Form.Label className={labelClass('primaryPhone')}>Primary Phone</Form.Label>
                 <Form.Control {...register('primaryPhone')} type="tel" autoComplete="tel" placeholder="+91 98765 43210" isInvalid={Boolean(errors.primaryPhone)} />
                 <Form.Control.Feedback type="invalid">{errors.primaryPhone?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('secondaryPhone')}>
+              <Form.Group as={Col} md={6} xxl={4} controlId="secondaryPhone">
                 <Form.Label>Secondary Phone</Form.Label>
                 <Form.Control {...register('secondaryPhone')} type="tel" autoComplete="tel" isInvalid={Boolean(errors.secondaryPhone)} />
                 <Form.Control.Feedback type="invalid">{errors.secondaryPhone?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('timeZone')}>
-                <Form.Label className={labelClass('timeZone')}>Time Zone</Form.Label>
+              <Form.Group as={Col} md={6} xxl={4} controlId="timeZone">
+                <FieldLabel required={isFieldRequired('timeZone', country)} help={FIELD_HELP.timeZone}>Time Zone</FieldLabel>
                 <Form.Select {...register('timeZone')} isInvalid={Boolean(errors.timeZone)}>
                   {TIME_ZONES.map((zone) => (
                     <option key={zone} value={zone}>
@@ -349,8 +346,8 @@ function AddCustomer() {
                 <Form.Control.Feedback type="invalid">{errors.timeZone?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId={fieldId('dayStartFrom')}>
-                <Form.Label className={labelClass('dayStartFrom')}>Day Start From</Form.Label>
+              <Form.Group as={Col} md={6} xxl={4} controlId="dayStartFrom">
+                <FieldLabel required={isFieldRequired('dayStartFrom', country)} help={FIELD_HELP.dayStartFrom}>Day Start From</FieldLabel>
                 <Form.Control {...register('dayStartFrom')} type="time" isInvalid={Boolean(errors.dayStartFrom)} />
                 <Form.Control.Feedback type="invalid">{errors.dayStartFrom?.message}</Form.Control.Feedback>
                 {!errors.dayStartFrom && <Form.Text>Production day begins at this time.</Form.Text>}

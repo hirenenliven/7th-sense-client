@@ -116,6 +116,9 @@ $ts-toast-width:  ts-rem(360);
 $ts-toast-enter:  .25s;
 $ts-toast-exit:   .2s; // keep in sync with TOAST_DEFAULTS.exitMs
 $ts-toast-shift:  ts-rem(16);
+
+// Field help popover (components/common/InfoTooltip.jsx)
+$ts-help-width:   ts-rem(300);
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
 

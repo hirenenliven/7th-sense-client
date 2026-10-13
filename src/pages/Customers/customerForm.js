@@ -2,14 +2,6 @@ import { DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, INDIA } from '@/constants/locations
 import { PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
 
-export const FIELD_ID_PREFIX = 'customer-'
-
-export const LOGO_RULES = {
-  accept: '.png,.jpg,.jpeg,.svg,.webp',
-  types: ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'],
-  maxBytes: 2 * 1024 * 1024,
-}
-
 export const INITIAL_VALUES = {
   branchId: '',
   companyName: '',
@@ -34,8 +26,7 @@ export const INITIAL_VALUES = {
   dayStartFrom: '',
 }
 
-// Inputs typed in capitals (tax IDs)
-export const UPPERCASE_FIELDS = new Set(['gstNo', 'panNo'])
+
 
 // Fields that are always required (excluding conditional country-specific fields)
 export const REQUIRED_FIELDS = new Set([
@@ -74,8 +65,8 @@ export const customerSchema = z
     logo: z
       .any()
       .refine((file) => !file || file instanceof File, 'Invalid file')
-      .refine((file) => !file || LOGO_RULES.types.includes(file.type), 'Unsupported file type')
-      .refine((file) => !file || file.size <= LOGO_RULES.maxBytes, `File must be smaller than ${Math.round(LOGO_RULES.maxBytes / (1024 * 1024))} MB`)
+      .refine((file) => !file || ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type), 'Unsupported file type')
+      .refine((file) => !file || file.size <= 2 * 1024 * 1024, 'File must be smaller than 2 MB')
       .nullable()
       .optional(),
     email: z.string().min(1, 'Email is required').regex(PATTERNS.email, 'Enter a valid email address'),
