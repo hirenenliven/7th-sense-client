@@ -6,6 +6,7 @@ import {
   ButtonGroup,
   Card,
   Col,
+  Dropdown,
   Form,
   Modal,
   Nav,
@@ -244,6 +245,41 @@ function ThemeShowcase() {
                           <option>Surface</option>
                         </Form.Select>
                       </Form.Group>
+                    </Col>
+                    <Col xs={6}>
+                      <Form.Group controlId="ts-date">
+                        <Form.Label>Date</Form.Label>
+                        <Form.Control type="date" />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={6}>
+                      <Form.Group controlId="ts-time">
+                        <Form.Label>Shift start</Form.Label>
+                        <Form.Control type="time" />
+                      </Form.Group>
+                    </Col>
+                    <Col xs={12}>
+                      <Dropdown>
+                        <Dropdown.Toggle variant="ghost" size="sm">
+                          Actions
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Header>Machine NX-3222</Dropdown.Header>
+                          <Dropdown.Item as="button" type="button">
+                            <i className="bi bi-pencil" aria-hidden="true" />
+                            Edit
+                          </Dropdown.Item>
+                          <Dropdown.Item as="button" type="button" active>
+                            <i className="bi bi-pin-angle" aria-hidden="true" />
+                            Pinned
+                          </Dropdown.Item>
+                          <Dropdown.Divider />
+                          <Dropdown.Item as="button" type="button" disabled>
+                            <i className="bi bi-trash" aria-hidden="true" />
+                            Delete
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
                     </Col>
                     <Col xs={12}>
                       <Form.Group controlId="ts-note">

@@ -1235,15 +1235,6 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   border-color: $ts-line;
 }
 
-// Dropdown with a scrolling checkbox list (pages/Machines/HealthSensorPicker.jsx)
-.ts-check-menu {
-  max-height: $ts-check-menu-max-height;
-  overflow-y: auto;
-}
-
-// Dropdown toggle styled as a .form-select: the select arrow replaces the toggle caret
-.ts-select-toggle::after { display: none; }
-
 // Rounded status chip with optional dot: <span class="ts-chip text-success"><i class="ts-dot ts-dot-live"></i>Live</span>
 .ts-chip {
   display: inline-flex;
@@ -1446,11 +1437,279 @@ $ts-toast-colors: (
   to { opacity: 0; transform: translateX($ts-toast-shift); }
 }
 
-.dropdown-menu { padding: $ts-space-1; }
+// -----------------------------------------------------------------------------
+// Dropdowns & pickers
+// One look for every list that opens from a control: Bootstrap dropdown menus,
+// native <select> lists and the multi-select checkbox menu. Panel surface,
+// rounded corners, float shadow, inset rows and a soft orange tint on the
+// selected row. The controls stay native, so forms, keyboard and mobile
+// pickers behave exactly as before.
+// -----------------------------------------------------------------------------
+
+@keyframes ts-picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(-$ts-picker-shift);
+  }
+}
+
+// Bootstrap dropdown menu (top-bar user menu, HealthSensorPicker)
+.dropdown-menu {
+  padding: $ts-space-1;
+
+  &.show { animation: ts-picker-in $ts-picker-enter ease-out; }
+}
 
 .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
   border-radius: $ts-radius-sm;
   font-weight: 500;
+  transition: background-color $ts-transition, color $ts-transition;
+
+  > .bi {
+    color: $ts-ink-3;
+    transition: color $ts-transition;
+  }
+
+  &:hover > .bi,
+  &:focus-visible > .bi,
+  &.active > .bi { color: $ts-orange; }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 $border-width $ts-orange;
+  }
+}
+
+.dropdown-header { font-size: $ts-fs-sm; }
+
+.dropdown-divider { margin-inline: -$ts-space-1; }
+
+// Toggle caret: thin chevron (bi-chevron-down) that turns while the menu is open
+.dropdown-toggle::after {
+  width: $ts-picker-caret-size;
+  height: $ts-picker-caret-size;
+  margin-left: $ts-space-2;
+  vertical-align: middle;
+  border: 0;
+  background-color: currentColor;
+  mask: escape-svg($form-select-indicator) center / contain no-repeat;
+  opacity: .7;
+  transition: transform $ts-transition;
+}
+
+.dropdown-toggle.show::after { transform: rotate(180deg); }
+
+// Dropdown toggle styled as a .form-select: the select chevron replaces the toggle caret
+.ts-select-toggle {
+  &::after { display: none; }
+
+  // Open = focused, like a native select
+  &.show:not(.is-invalid) {
+    border-color: $input-focus-border-color;
+    box-shadow: $input-focus-box-shadow;
+  }
+}
+
+// Dropdown with a scrolling checkbox list (pages/Machines/HealthSensorPicker.jsx):
+// each option is a full-width row with a hover tint, like a select list
+.ts-check-menu {
+  max-height: $ts-check-menu-max-height;
+  overflow-y: auto;
+
+  .form-check {
+    min-height: 0;
+    margin: 0;
+    padding: $ts-picker-option-py $ts-picker-option-px;
+    padding-left: calc(#{$form-check-padding-start} + #{$ts-picker-option-px});
+    border-radius: $ts-radius-sm;
+    transition: background-color $ts-transition;
+
+    &:hover { background: $dropdown-link-hover-bg; }
+  }
+
+  .form-check-label {
+    display: block;
+    cursor: pointer;
+  }
+
+  .form-check-input { cursor: pointer; }
+
+  .form-check-input:checked + .form-check-label { color: $ts-ink; }
+}
+
+// "All" row above the list
+.ts-check-menu-all {
+  padding-bottom: $ts-space-1;
+  margin-bottom: $ts-space-1;
+  border-bottom: $border-width solid $ts-line;
+
+  .form-check-label { font-weight: 600; }
+}
+
+// Native <select>: themed option colours (Firefox and older browsers paint these)
+.form-select {
+  text-overflow: ellipsis;
+
+  option,
+  optgroup {
+    background-color: $ts-panel;
+    color: $ts-ink;
+  }
+}
+
+// Customizable <select> (Chromium): the open list gets the dropdown-menu look.
+// Other browsers skip this block and keep their native list.
+@supports (appearance: base-select) {
+  select.form-select,
+  select.form-select::picker(select) { appearance: base-select; }
+
+  select.form-select {
+    display: flex;
+    align-items: center;
+
+    // Bootstrap's background chevron stays; hide the built-in one
+    &::picker-icon { display: none; }
+
+    &:open:not(.is-invalid):not(.is-valid) {
+      border-color: $input-focus-border-color;
+      box-shadow: $input-focus-box-shadow;
+    }
+
+    &::picker(select) {
+      max-height: $ts-picker-max-height;
+      margin-block: $ts-picker-offset;
+      padding: $ts-space-1;
+      overflow-y: auto;
+      border: $border-width solid $ts-line;
+      border-radius: $dropdown-border-radius;
+      background: $ts-panel;
+      color: $ts-ink;
+      font-size: $ts-fs-base;
+      box-shadow: $ts-shadow-float;
+    }
+
+    &:open::picker(select) { animation: ts-picker-in $ts-picker-enter ease-out; }
+
+    option {
+      display: flex;
+      align-items: center;
+      gap: $ts-space-2;
+      min-height: 0;
+      padding: $ts-picker-option-py $ts-picker-option-px;
+      border-radius: $ts-radius-sm;
+      background: transparent;
+      color: $ts-ink-2;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color $ts-transition, color $ts-transition;
+
+      // Tick at the end of the row, in the accent colour
+      &::checkmark {
+        order: 1;
+        margin-left: auto;
+        color: $ts-orange;
+      }
+
+      &:hover,
+      &:focus-visible {
+        outline: 0;
+        background: $dropdown-link-hover-bg;
+        color: $ts-ink;
+      }
+
+      &:checked {
+        background: $dropdown-link-active-bg;
+        color: $ts-ink;
+        font-weight: 600;
+      }
+
+      &:disabled {
+        background: transparent;
+        color: $ts-ink-3;
+        cursor: not-allowed;
+      }
+    }
+
+    // Group heading (e.g. brands in the controller select): small muted eyebrow
+    optgroup {
+      padding-top: $ts-space-1;
+      background: transparent;
+      color: $ts-ink-3;
+      font-size: $ts-fs-xs;
+      font-weight: 600;
+      letter-spacing: $ts-ls-wide;
+      text-transform: uppercase;
+
+      + optgroup {
+        margin-top: $ts-space-1;
+        border-top: $border-width solid $ts-line;
+      }
+
+      option {
+        font-size: $ts-fs-base;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+    }
+  }
+}
+
+// Native date / time fields: calendar or clock icon in the select chevron's
+// place and colour, accent tint on the focused segment. The browser's own
+// calendar / clock popup follows the theme through `color-scheme` on :root.
+.form-control {
+  &[type="date"],
+  &[type="datetime-local"],
+  &[type="month"],
+  &[type="week"],
+  &[type="time"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  // WebKit / Blink: the indicator is the button that opens the picker
+  &::-webkit-calendar-picker-indicator {
+    width: $ts-picker-icon-size;
+    height: $ts-picker-icon-size;
+    margin-left: $ts-space-2;
+    padding: 0;
+    background: escape-svg($ts-date-indicator) center / contain no-repeat;
+    opacity: .85;
+    cursor: pointer;
+    transition: opacity $ts-transition;
+  }
+
+  &[type="time"]::-webkit-calendar-picker-indicator { background-image: escape-svg($ts-time-indicator); }
+
+  &:hover::-webkit-calendar-picker-indicator { opacity: 1; }
+  &:focus::-webkit-calendar-picker-indicator { opacity: 1; }
+
+  &::-webkit-datetime-edit-text { color: $ts-ink-3; }
+}
+
+// One rule per segment: an unknown pseudo-element would drop a whole selector list
+@each $segment in (day, month, year, week, hour, minute, second, millisecond, ampm) {
+  .form-control::-webkit-datetime-edit-#{$segment}-field {
+    border-radius: $ts-radius-xs;
+  }
+
+  .form-control::-webkit-datetime-edit-#{$segment}-field:focus {
+    background-color: rgba($ts-orange, $ts-picker-segment-alpha);
+    color: $ts-ink;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-menu.show { animation: none; }
+  .dropdown-toggle::after { transition: none; }
+}
+
+@supports (appearance: base-select) {
+  @media (prefers-reduced-motion: reduce) {
+    select.form-select:open::picker(select) { animation: none; }
+  }
 }
 
 .list-group-item-action { transition: background-color $ts-transition, color $ts-transition; }

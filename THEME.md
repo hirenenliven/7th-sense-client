@@ -160,6 +160,15 @@ Write forms with plain react-bootstrap markup, without wrapper components:
 - Group fields into `Card`s with a `Card.Header` that has an icon and a title.
 - Put the buttons in a `.ts-form-actions` bar, which sticks to the bottom of the screen. Include a `.ts-form-actions-note`.
 - `.ts-file-preview` shows the selected file: thumbnail, name, size and a remove button.
+- **Dropdowns & pickers** are styled globally ("Dropdowns & pickers" in `_components.scss`, `$ts-picker-*` tokens);
+  just use the native controls:
+  - `Form.Select`: thin chevron; in Chromium the open list matches `Dropdown.Menu` (panel, rounded rows,
+    orange tick and tint on the selected option, `optgroup` as a muted heading). Other browsers keep their native list.
+  - `Form.Control type="date" | "time"`: themed calendar / clock icon and an accent tint on the focused segment.
+    The browser's popup follows the theme via `color-scheme`.
+  - `Dropdown`: chevron caret that turns when open; put a `bi-*` icon first in a `Dropdown.Item` (no `me-*`, the gap is built in).
+  - Multi-select: `Dropdown` + `Dropdown.Toggle className="form-select ts-select-toggle"` + `Dropdown.Menu.ts-check-menu`
+    with `Form.Check` rows (optional `.ts-check-menu-all` row on top), see `pages/Machines/HealthSensorPicker.jsx`.
 - Shared validation rules are in `utils/validators.js`. Each form's own rules go next to the page, as in `pages/Customers/customerForm.js`.
 
 ## Example

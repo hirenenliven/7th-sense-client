@@ -112,11 +112,11 @@ function Topbar() {
             </Dropdown.Header>
             <Dropdown.Divider />
             <Dropdown.Item as={Link} to={ROUTES.ACCOUNT}>
-              <i className="bi bi-shield-lock me-2" aria-hidden="true" />
+              <i className="bi bi-shield-lock" aria-hidden="true" />
               Account Center
             </Dropdown.Item>
             <Dropdown.Item as="button" onClick={handleSignOut} disabled={signingOut}>
-              <i className="bi bi-box-arrow-right me-2" aria-hidden="true" />
+              <i className="bi bi-box-arrow-right" aria-hidden="true" />
               Sign out
             </Dropdown.Item>
           </Dropdown.Menu>

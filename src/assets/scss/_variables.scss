@@ -74,6 +74,18 @@ $ts-ls-tight: -.02em;
 
 $ts-swatch-size: ts-rem(12); // colour dot in tables
 $ts-check-menu-max-height: ts-rem(280); // scrolling checkbox list in a dropdown
+
+// Dropdowns, selects and date / time pickers ("Dropdowns & pickers" in _components.scss)
+$ts-picker-max-height:  ts-rem(320); // open select list before it scrolls
+$ts-picker-offset:      ts-rem(4);   // gap between a field and its open list
+$ts-picker-option-py:   ts-rem(7);
+$ts-picker-option-px:   ts-rem(10);
+$ts-picker-icon-size:   ts-rem(14);  // chevron, calendar and clock icons
+$ts-picker-caret-size:  ts-rem(10);  // chevron after a dropdown toggle
+$ts-picker-enter:       .14s;        // open animation
+$ts-picker-shift:       ts-rem(4);   // open animation slide
+$ts-picker-selected-alpha: .12;      // orange tint behind the selected option
+$ts-picker-segment-alpha:  .22;      // orange tint behind the focused date segment
 $ts-ls-wide:  .06em;
 $ts-ls-wider: .1em;
 
@@ -436,6 +448,13 @@ $form-text-color:          $ts-ink-3;
 $form-select-indicator-color: $ts-ink-2;
 $form-select-bg:              $ts-panel-2;
 $form-select-disabled-bg:     $ts-panel;
+$form-select-bg-size:         $ts-picker-icon-size $ts-picker-icon-size;
+// Thin Bootstrap Icons chevron (bi-chevron-down) instead of Bootstrap's heavy default
+$form-select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2.5 5.5 5.5 5.5 5.5-5.5'/></svg>");
+
+// Date / time field icons (bi-calendar3, bi-clock), same colour as the select chevron
+$ts-date-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-select-indicator-color}'><path d='M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z'/><path d='M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2'/></svg>");
+$ts-time-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-select-indicator-color}'><path d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z'/><path d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0'/></svg>");
 
 $form-check-input-bg:             $ts-panel-2;
 $form-check-input-border:         1px solid $ts-line;
@@ -548,12 +567,12 @@ $dropdown-font-size:        $ts-fs-base;
 $dropdown-link-color:       $ts-ink-2;
 $dropdown-link-hover-color: $ts-ink;
 $dropdown-link-hover-bg:    $ts-panel-2;
-$dropdown-link-active-color: $ts-on-accent;
-$dropdown-link-active-bg:   $ts-orange;
+$dropdown-link-active-color: $ts-ink; // soft accent tint, same as a selected select option
+$dropdown-link-active-bg:   rgba($ts-orange, $ts-picker-selected-alpha);
 $dropdown-link-disabled-color: $ts-ink-3;
 $dropdown-header-color:     $ts-ink-3;
-$dropdown-item-padding-y:   ts-rem(6);
-$dropdown-item-padding-x:   ts-rem(12);
+$dropdown-item-padding-y:   $ts-picker-option-py;
+$dropdown-item-padding-x:   $ts-picker-option-px;
 
 // Pagination
 $pagination-padding-y:       ts-rem(5);

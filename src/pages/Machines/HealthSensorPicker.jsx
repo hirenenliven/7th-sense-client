@@ -32,7 +32,7 @@ function HealthSensorPicker({ id, value, onChange, isInvalid = false }) {
         {summary(picked.size)}
       </Dropdown.Toggle>
       <Dropdown.Menu className="ts-check-menu w-100">
-        <div className="px-3 py-2 border-bottom">
+        <div className="ts-check-menu-all">
           <Form.Check
             id={`${id}-all`}
             label="All sensors"
@@ -40,7 +40,7 @@ function HealthSensorPicker({ id, value, onChange, isInvalid = false }) {
             onChange={() => onChange(allPicked ? [] : ALL_IDS)}
           />
         </div>
-        <div className="px-3 py-2">
+        <div>
           {MACHINE_HEALTH_SENSORS.map((sensor) => (
             <Form.Check
               key={sensor.id}
