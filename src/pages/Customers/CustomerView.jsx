@@ -93,7 +93,7 @@ function CustomerView() {
         </Button>
         {customer && (
           <Button as={Link} to={generatePath(ROUTES.CUSTOMER_EDIT, { id: String(customer.id) })}>
-            <i className="bi bi-pencil-square me-2" aria-hidden="true" />
+            <i className="bi bi-pencil me-2" aria-hidden="true" />
             Edit
           </Button>
         )}

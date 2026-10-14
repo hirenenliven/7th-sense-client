@@ -1,21 +1,9 @@
 import { memo } from 'react'
-import { Button, Form } from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import IconAction from '@/components/common/IconAction'
+import { ACTION_ICONS } from '@/constants/icons'
 import { BRANCH_STATUS } from '@/constants/app'
-
-function IconAction({ icon, label, onClick }) {
-  return (
-    <Button variant="plain" size="sm" className="btn-icon text-primary" onClick={onClick} aria-label={label} title={label}>
-      <i className={`bi ${icon}`} aria-hidden="true" />
-    </Button>
-  )
-}
-
-IconAction.propTypes = {
-  icon: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-}
 
 function BranchRow({ branch, statusBusy, onToggleStatus, onEdit, onDelete }) {
   const isActive = branch.status !== BRANCH_STATUS.INACTIVE
@@ -52,8 +40,8 @@ function BranchRow({ branch, statusBusy, onToggleStatus, onEdit, onDelete }) {
       </td>
       <td className="border-start">
         <div className="d-flex gap-1">
-          <IconAction icon="bi-pencil-square" label={`Edit ${branch.name}`} onClick={() => onEdit(branch)} />
-          <IconAction icon="bi-trash3" label={`Delete ${branch.name}`} onClick={() => onDelete(branch)} />
+          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${branch.name}`} onClick={() => onEdit(branch)} />
+          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${branch.name}`} onClick={() => onDelete(branch)} />
         </div>
       </td>
     </tr>

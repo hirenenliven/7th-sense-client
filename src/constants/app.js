@@ -11,7 +11,6 @@ export const STORAGE_KEYS = {
   SIDEBAR_OPEN: 'ts.sidebar.open',
   LANGUAGE: 'ts.language',
   THEME: 'ts.theme', // theme on screen, applied before the first render
-  THEME_CHOICES: 'ts.theme.choices', // { [userId]: theme } picked in the top bar
   REMEMBERED_USERNAME: 'ts.login.username', // set when "Remember" is ticked on the login screen
 }
 

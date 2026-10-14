@@ -1,22 +1,30 @@
-import { useState } from 'react'
-import { Button, Form, Pagination } from 'react-bootstrap'
+import { useId, useState } from 'react'
+import { Form, Pagination } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { PAGE_SIZES } from '@/constants/app'
 
-const MAX_PAGE_BUTTONS = 5
+// Up to this many pages every number is shown; above it, first · … · neighbours · … · last
+const MAX_PLAIN_PAGES = 7
 
-// Page numbers to show: a window of MAX_PAGE_BUTTONS around the current page
-const pageWindow = (page, pageCount) => {
-  const start = Math.max(1, Math.min(page - Math.floor(MAX_PAGE_BUTTONS / 2), pageCount - MAX_PAGE_BUTTONS + 1))
-  const end = Math.min(pageCount, start + MAX_PAGE_BUTTONS - 1)
-  return Array.from({ length: end - start + 1 }, (_, index) => start + index)
+// Page numbers to show, with 'gap' where pages are skipped: 1 … 4 5 6 … 12
+const pageItems = (page, pageCount) => {
+  if (pageCount <= MAX_PLAIN_PAGES) return Array.from({ length: pageCount }, (_, index) => index + 1)
+
+  // Always 7 slots, so the bar keeps its width while paging
+  const range = (from, to) => Array.from({ length: to - from + 1 }, (_, index) => from + index)
+  if (page <= 4) return [...range(1, 5), 'gap-end', pageCount]
+  if (page >= pageCount - 3) return [1, 'gap-start', ...range(pageCount - 4, pageCount)]
+  return [1, 'gap-start', page - 1, page, page + 1, 'gap-end', pageCount]
 }
 
-// List footer: "Showing 1 to 10 of 42 entries" · page buttons · "Go to page"
-function TablePagination({ page, pageSize, totalCount, onPageChange }) {
+// Footer for a .ts-table-panel, placed right after the <Table>:
+// rows per page · "1–10 of 42" | ‹ 1 … 4 5 6 … 12 › · go to page
+function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeChange, pageSizes = PAGE_SIZES }) {
   const pageCount = Math.max(1, Math.ceil(totalCount / pageSize))
   const first = totalCount ? (page - 1) * pageSize + 1 : 0
   const last = Math.min(page * pageSize, totalCount)
   const [jumpTo, setJumpTo] = useState('')
+  const id = useId()
 
   const goTo = (target) => onPageChange(Math.min(Math.max(1, target), pageCount))
 
@@ -29,38 +37,87 @@ function TablePagination({ page, pageSize, totalCount, onPageChange }) {
 
   return (
     <div className="ts-table-footer">
-      <span className="fs-sm text-body-secondary">
-        Showing {first} to {last} of {totalCount} entries
-      </span>
+      <div className="ts-table-footer-info">
+        {onPageSizeChange && (
+          <div className="ts-page-size">
+            <Form.Label htmlFor={`${id}-size`} className="mb-0 d-none d-sm-inline">
+              Rows per page
+            </Form.Label>
+            <Form.Select
+              id={`${id}-size`}
+              size="sm"
+              value={pageSize}
+              onChange={(event) => onPageSizeChange(Number(event.target.value))}
+              aria-label="Rows per page"
+            >
+              {pageSizes.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </Form.Select>
+          </div>
+        )}
+        <span className="font-tabular" aria-live="polite">
+          <span className="text-body">
+            {first}–{last}
+          </span>{' '}
+          of {totalCount}
+        </span>
+      </div>
 
-      <Pagination size="sm" className="mb-0">
-        <Pagination.Prev onClick={() => goTo(page - 1)} disabled={page === 1} aria-label="Previous page" />
-        {pageWindow(page, pageCount).map((number) => (
-          <Pagination.Item key={number} active={number === page} onClick={() => goTo(number)}>
-            {number}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next onClick={() => goTo(page + 1)} disabled={page === pageCount} aria-label="Next page" />
-      </Pagination>
+      {pageCount > 1 && (
+        <div className="ts-table-footer-nav">
+          <nav aria-label="Pagination">
+            <Pagination size="sm" className="ts-pager">
+              <Pagination.Prev onClick={() => goTo(page - 1)} disabled={page === 1} aria-label="Previous page">
+                <i className="bi bi-chevron-left" aria-hidden="true" />
+              </Pagination.Prev>
+              {pageItems(page, pageCount).map((item) =>
+                typeof item === 'number' ? (
+                  <Pagination.Item
+                    key={item}
+                    className="d-none d-sm-block"
+                    active={item === page}
+                    onClick={() => goTo(item)}
+                    aria-label={`Page ${item}`}
+                  >
+                    {item}
+                  </Pagination.Item>
+                ) : (
+                  <Pagination.Ellipsis key={item} className="d-none d-sm-block" disabled />
+                ),
+              )}
+              <li className="ts-pager-status d-sm-none font-tabular">
+                Page {page} of {pageCount}
+              </li>
+              <Pagination.Next onClick={() => goTo(page + 1)} disabled={page === pageCount} aria-label="Next page">
+                <i className="bi bi-chevron-right" aria-hidden="true" />
+              </Pagination.Next>
+            </Pagination>
+          </nav>
 
-      <Form className="ts-page-jump" onSubmit={handleJump}>
-        <Form.Label htmlFor="ts-page-jump" className="mb-0 fs-sm text-body-secondary text-nowrap">
-          Go to page
-        </Form.Label>
-        <Form.Control
-          id="ts-page-jump"
-          size="sm"
-          type="number"
-          min={1}
-          max={pageCount}
-          placeholder={String(page)}
-          value={jumpTo}
-          onChange={(event) => setJumpTo(event.target.value)}
-        />
-        <Button type="submit" variant="plain" size="sm" className="btn-icon" aria-label="Go to page">
-          <i className="bi bi-caret-right-fill" aria-hidden="true" />
-        </Button>
-      </Form>
+          {pageCount > MAX_PLAIN_PAGES && (
+            <Form className="ts-page-jump d-none d-md-flex" onSubmit={handleJump}>
+              <Form.Label htmlFor={`${id}-jump`} className="mb-0 text-nowrap">
+                Go to
+              </Form.Label>
+              <Form.Control
+                id={`${id}-jump`}
+                size="sm"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={pageCount}
+                placeholder={String(page)}
+                value={jumpTo}
+                onChange={(event) => setJumpTo(event.target.value)}
+                aria-label={`Go to page (1 to ${pageCount})`}
+              />
+            </Form>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -70,6 +127,9 @@ TablePagination.propTypes = {
   pageSize: PropTypes.number.isRequired,
   totalCount: PropTypes.number.isRequired,
   onPageChange: PropTypes.func.isRequired,
+  // Shows the rows-per-page select when given
+  onPageSizeChange: PropTypes.func,
+  pageSizes: PropTypes.arrayOf(PropTypes.number),
 }
 
 export default TablePagination

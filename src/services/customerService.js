@@ -15,6 +15,9 @@ export const getUserById = async (id) => unwrap(await sharedGet(`${USERS_PATH}/$
 // The logged-in user with its profile (theme, …)
 export const getCurrentUser = async () => unwrap(await sharedGet('/me'))
 
+// Saves the logged-in user's theme (THEME.DARK / THEME.LIGHT) in their profile; returns { theme }
+export const saveMyTheme = async (theme) => unwrap(await apiClient.put('/me/theme', { theme }))
+
 export const createUser = async (user) => unwrap(await apiClient.post(USERS_PATH, user))
 
 export const updateUser = async (id, user) => unwrap(await apiClient.put(`${USERS_PATH}/${id}`, user))

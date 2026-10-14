@@ -595,6 +595,31 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   }
 }
 
+// Row action (components/common/IconAction.jsx): accent icon, soft tint on hover;
+// .btn-action-danger turns red for destructive actions
+.btn-action {
+  --bs-btn-color: #{$ts-orange};
+  --bs-btn-hover-color: #{$ts-orange};
+  --bs-btn-hover-bg: #{mix($ts-orange, $ts-panel, $ts-tint-soft)};
+  --bs-btn-active-color: #{$ts-orange};
+  --bs-btn-active-bg: #{mix($ts-orange, $ts-panel, $ts-tint-strong)};
+
+  .bi { transition: transform .15s ease; }
+  &:hover .bi { transform: scale(1.08); }
+}
+
+.btn-action-danger {
+  --bs-btn-hover-color: #{$ts-red};
+  --bs-btn-hover-bg: #{mix($ts-red, $ts-panel, $ts-tint-soft)};
+  --bs-btn-active-color: #{$ts-red};
+  --bs-btn-active-bg: #{mix($ts-red, $ts-panel, $ts-tint-strong)};
+  --bs-btn-focus-shadow-rgb: #{to-rgb($ts-red)};
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-action .bi { transition: none; }
+}
+
 // Segmented control: <ButtonGroup><Button variant="ghost" active>…
 .btn-group > .btn-ghost {
   border-color: $ts-line;
@@ -814,22 +839,106 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   @include media-breakpoint-down(sm) { width: 100%; }
 }
 
-// List footer: entries count · pagination · go-to-page (components/common/TablePagination.jsx)
+// Table footer inside .ts-table-panel (components/common/TablePagination.jsx):
+// rows per page · "1–10 of 42" on the left, pager · go-to on the right
 .ts-table-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: $ts-space-3;
-  margin-top: $ts-space-3;
+  gap: $ts-space-2 $ts-space-4;
+  padding: ts-rem(10) $ts-table-edge-x;
+  border-top: 1px solid $ts-line;
+  background: $ts-table-band;
+  font-size: $ts-fs-md;
+  color: $ts-ink-3;
+
+  // Controls sit on the band, so give them the panel colour to stand out
+  .form-select,
+  .form-control { background-color: $ts-panel; }
 }
 
+.ts-table-footer-info,
+.ts-table-footer-nav,
+.ts-page-size,
 .ts-page-jump {
   display: flex;
   align-items: center;
   gap: $ts-space-2;
+}
 
-  .form-control { width: $ts-page-jump-width; }
+.ts-table-footer-info { gap: $ts-space-4; }
+.ts-table-footer-nav {
+  gap: $ts-space-3;
+  margin-left: auto;
+}
+
+.ts-page-size .form-select { width: $ts-page-size-width; }
+.ts-page-jump .form-control { width: $ts-page-jump-width; }
+
+// Pager: ghost page numbers, outlined prev / next, soft accent tint on the current page
+.ts-pager {
+  --bs-pagination-color: #{$ts-ink-2};
+  --bs-pagination-bg: transparent;
+  --bs-pagination-border-width: 1px;
+  --bs-pagination-border-color: transparent;
+  --bs-pagination-hover-color: #{$ts-ink};
+  --bs-pagination-hover-bg: #{$ts-panel-2};
+  --bs-pagination-hover-border-color: transparent;
+  --bs-pagination-focus-color: #{$ts-ink};
+  --bs-pagination-focus-bg: #{$ts-panel-2};
+  --bs-pagination-focus-box-shadow: 0 0 0 .2rem #{rgba($ts-orange, .25)};
+  --bs-pagination-active-color: #{$ts-pager-active-ink};
+  --bs-pagination-active-bg: #{mix($ts-orange, $ts-panel, $ts-tint-soft)};
+  --bs-pagination-active-border-color: #{mix($ts-orange, $ts-panel, $ts-tint-border)};
+  --bs-pagination-disabled-color: #{$ts-ink-3};
+  --bs-pagination-disabled-bg: transparent;
+  --bs-pagination-disabled-border-color: transparent;
+  align-items: center;
+  gap: ts-rem(2);
+  margin-bottom: 0;
+
+  .page-item .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: $ts-pager-size;
+    height: $ts-pager-size;
+    margin-left: 0;
+    padding: 0 $ts-space-2;
+    border-radius: $ts-radius;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    transition: background-color $ts-transition, border-color $ts-transition, color $ts-transition;
+  }
+
+  .page-item.active .page-link { font-weight: 700; }
+
+  // Prev / next: outlined, so the pager has clear ends
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    border-color: $ts-line;
+    background: $ts-panel;
+  }
+
+  .page-item:first-child:not(.disabled) .page-link:hover,
+  .page-item:last-child:not(.disabled) .page-link:hover { background: $ts-panel-2; }
+
+  .page-item:first-child.disabled .page-link,
+  .page-item:last-child.disabled .page-link { opacity: .45; }
+
+  // Ellipsis is a gap, not a control
+  .page-item.disabled:not(:first-child):not(:last-child) .page-link {
+    min-width: ts-rem(18);
+    padding: 0;
+    letter-spacing: ts-rem(1);
+  }
+}
+
+.ts-pager-status {
+  padding: 0 $ts-space-2;
+  color: $ts-ink-2;
+  white-space: nowrap;
 }
 
 // Read-only form block (role-gated settings)
@@ -904,6 +1013,7 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   overflow: hidden;
 }
 
+// List table in a bordered panel; TablePagination goes inside, after the table
 .ts-table-panel {
   background: $ts-panel;
   border: 1px solid $ts-line;
@@ -911,6 +1021,16 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   overflow: hidden;
 
   .table { margin-bottom: 0; }
+
+  // Header band (same tint as the footer, so the panel reads as one framed block)
+  .table > thead > tr > * {
+    --bs-table-bg: #{$ts-table-band};
+    padding-block: ts-rem(10);
+  }
+
+  // Breathing room at the panel edges
+  .table > :not(caption) > tr > :first-child { padding-left: $ts-table-edge-x; }
+  .table > :not(caption) > tr > :last-child { padding-right: $ts-table-edge-x; }
 }
 
 // -----------------------------------------------------------------------------

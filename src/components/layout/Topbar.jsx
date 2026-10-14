@@ -30,7 +30,10 @@ function Topbar() {
   }
 
   const isLight = theme === THEME.LIGHT
-  const handleThemeToggle = () => chooseTheme(isLight ? THEME.DARK : THEME.LIGHT, user?.id)
+  const handleThemeToggle = () =>
+    chooseTheme(isLight ? THEME.DARK : THEME.LIGHT).catch((error) =>
+      toast.error(error.message, { title: 'Could not save theme' }),
+    )
 
   const handleSignOut = async () => {
     setSigningOut(true)

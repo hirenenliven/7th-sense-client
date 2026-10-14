@@ -1,21 +1,8 @@
 import { memo } from 'react'
-import { Button } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import IconAction from '@/components/common/IconAction'
+import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
-
-function IconAction({ icon, label, onClick }) {
-  return (
-    <Button variant="plain" size="sm" className="btn-icon text-primary" onClick={onClick} aria-label={label} title={label}>
-      <i className={`bi ${icon}`} aria-hidden="true" />
-    </Button>
-  )
-}
-
-IconAction.propTypes = {
-  icon: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-}
 
 function ShopRow({ shop, onEdit, onDelete }) {
   return (
@@ -26,8 +13,8 @@ function ShopRow({ shop, onEdit, onDelete }) {
       <td className="text-body-secondary text-nowrap">{formatDate(shop.updatedAt)}</td>
       <td className="border-start">
         <div className="d-flex gap-1">
-          <IconAction icon="bi-pencil-square" label={`Edit ${shop.name}`} onClick={() => onEdit(shop)} />
-          <IconAction icon="bi-trash3" label={`Delete ${shop.name}`} onClick={() => onDelete(shop)} />
+          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${shop.name}`} onClick={() => onEdit(shop)} />
+          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${shop.name}`} onClick={() => onDelete(shop)} />
         </div>
       </td>
     </tr>

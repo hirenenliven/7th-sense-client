@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Form, Spinner } from 'react-bootstrap'
@@ -5,10 +6,11 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import BrandLogo from '@/components/common/BrandLogo'
 import Loader from '@/components/common/Loader'
 import env from '@/config/env'
-import { STORAGE_KEYS } from '@/constants/app'
+import { STORAGE_KEYS, THEME } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { readStorage, writeStorage } from '@/utils/storage'
+import { forceTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 import LoginBackdrop from './LoginBackdrop'
 import LoginClock from './LoginClock'
@@ -25,6 +27,15 @@ function Login() {
   const { user, isChecking, login } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+
+  // The login screen is always dark, whatever theme the user chose; leaving it shows their theme
+  // again. Layout effect: switches before paint, so a light user never sees a light login flash.
+  useLayoutEffect(() => {
+    forceTheme(THEME.DARK)
+    return () => {
+      forceTheme(null)
+    }
+  }, [])
 
   const rememberedUsername = readStorage(STORAGE_KEYS.REMEMBERED_USERNAME, '')
 

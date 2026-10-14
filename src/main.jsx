@@ -7,10 +7,15 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import '@/assets/scss/theme.scss'
 
 import App from '@/App'
-import { applyTheme, getStoredTheme } from '@/utils/theme'
+import { THEME } from '@/constants/app'
+import { ROUTES } from '@/constants/routes'
+import { applyTheme, forceTheme, getStoredTheme } from '@/utils/theme'
 
 // Last used theme before the first render (no dark flash for light users);
-// App then applies the user's theme once the session is known
+// App then applies the user's theme once the session is known.
+// The login screen is always dark (Login forces it too, and releases it on leaving).
+if (window.location.pathname === ROUTES.LOGIN) forceTheme(THEME.DARK)
+
 applyTheme(getStoredTheme()).finally(() =>
   createRoot(document.getElementById('root')).render(
     <StrictMode>

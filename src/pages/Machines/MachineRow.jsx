@@ -1,22 +1,10 @@
 import { memo } from 'react'
-import { Badge, Button } from 'react-bootstrap'
+import { Badge } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import IconAction from '@/components/common/IconAction'
+import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
-
-function IconAction({ icon, label, onClick }) {
-  return (
-    <Button variant="plain" size="sm" className="btn-icon text-primary" onClick={onClick} aria-label={label} title={label}>
-      <i className={`bi ${icon}`} aria-hidden="true" />
-    </Button>
-  )
-}
-
-IconAction.propTypes = {
-  icon: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-}
 
 // `canManage` (admins): shows the customer column and the edit / delete actions
 function MachineRow({ machine, canManage, onEdit, onDelete }) {
@@ -50,8 +38,8 @@ function MachineRow({ machine, canManage, onEdit, onDelete }) {
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon="bi-pencil-square" label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
-            <IconAction icon="bi-trash3" label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
           </div>
         </td>
       )}

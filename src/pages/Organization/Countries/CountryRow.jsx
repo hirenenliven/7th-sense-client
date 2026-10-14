@@ -1,21 +1,18 @@
 import { memo } from 'react'
-import { Button } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import IconAction from '@/components/common/IconAction'
+import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 // A country is only added and removed, so the row has a delete action only
 function CountryRow({ country, onDelete }) {
-  const label = `Delete ${country.name}`
-
   return (
     <tr>
       <td className="font-tabular">{country.id}</td>
       <td className="fw-semibold">{country.name}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(country.updatedAt)}</td>
       <td className="border-start">
-        <Button variant="plain" size="sm" className="btn-icon text-primary" onClick={() => onDelete(country)} aria-label={label} title={label}>
-          <i className="bi bi-trash3" aria-hidden="true" />
-        </Button>
+        <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${country.name}`} onClick={() => onDelete(country)} />
       </td>
     </tr>
   )

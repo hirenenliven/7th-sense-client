@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { THEMES } from '@/constants/app'
+import { ACTION_ICONS } from '@/constants/icons'
 import { COUNTRIES, TIME_ZONES, getDialCode, getStates } from '@/constants/locations'
 import { ROUTES } from '@/constants/routes'
 import { getBranches } from '@/services/branchService'
@@ -12,6 +13,7 @@ import { formatFileSize } from '@/utils/helpers'
 import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
+import IconAction from '@/components/common/IconAction'
 import Loader from '@/components/common/Loader'
 import {
   FILTER_NAMES,
@@ -269,9 +271,7 @@ function AddCustomer() {
                       <div className="text-truncate">{logo.name}</div>
                       <div className="fs-xs text-body-tertiary">{formatFileSize(logo.size)}</div>
                     </div>
-                    <Button variant="plain" size="sm" className="btn-icon" onClick={removeLogo} aria-label="Remove logo">
-                      <i className="bi bi-trash3" aria-hidden="true" />
-                    </Button>
+                    <IconAction danger icon={ACTION_ICONS.remove} label="Remove logo" onClick={removeLogo} />
                   </div>
                 )}
               </Form.Group>

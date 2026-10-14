@@ -167,21 +167,6 @@ function ModelList() {
             <option value="">All controllers</option>
             <ControllerOptions controllers={controllers} />
           </Form.Select>
-          <Form.Select
-            className="w-auto"
-            value={pageSize}
-            onChange={(event) => {
-              setPageSize(Number(event.target.value))
-              setPage(1)
-            }}
-            aria-label="Rows per page"
-          >
-            {PAGE_SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </Form.Select>
         </div>
 
         {filtered.length ? (
@@ -203,12 +188,20 @@ function ModelList() {
                 ))}
               </tbody>
             </Table>
+            <TablePagination
+              page={currentPage}
+              pageSize={pageSize}
+              totalCount={filtered.length}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
           </div>
         ) : (
           <div className="ts-empty">No models match these filters.</div>
         )}
-
-        <TablePagination page={currentPage} pageSize={pageSize} totalCount={filtered.length} onPageChange={setPage} />
       </>
     )
   }

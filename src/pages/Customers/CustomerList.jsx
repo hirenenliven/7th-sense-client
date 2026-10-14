@@ -163,21 +163,6 @@ function CustomerList() {
               <i className="bi bi-search" aria-hidden="true" />
             </InputGroup.Text>
           </InputGroup>
-          <Form.Select
-            className="w-auto"
-            value={pageSize}
-            onChange={(event) => {
-              setPageSize(Number(event.target.value))
-              setPage(1)
-            }}
-            aria-label="Rows per page"
-          >
-            {PAGE_SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </Form.Select>
         </div>
 
         {filtered.length ? (
@@ -207,12 +192,20 @@ function CustomerList() {
                 ))}
               </tbody>
             </Table>
+            <TablePagination
+              page={currentPage}
+              pageSize={pageSize}
+              totalCount={filtered.length}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size)
+                setPage(1)
+              }}
+            />
           </div>
         ) : (
           <div className="ts-empty">No customers match “{search.trim()}”.</div>
         )}
-
-        <TablePagination page={currentPage} pageSize={pageSize} totalCount={filtered.length} onPageChange={setPage} />
       </>
     )
   }

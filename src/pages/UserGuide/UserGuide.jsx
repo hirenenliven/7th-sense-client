@@ -2,6 +2,7 @@ import { Accordion, Badge, Button, Card, Col, Row, Table } from 'react-bootstrap
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import InfoTooltip from '@/components/common/InfoTooltip'
+import { ACTION_ICONS } from '@/constants/icons'
 import { NAV_SECTIONS } from '@/constants/navigation'
 import { ROUTES } from '@/constants/routes'
 import { BUILT_PATHS } from '@/routes/pages'
@@ -77,10 +78,10 @@ const COUNTRY_RULES = [
 const REPORTING_FIELDS = [FIELD_HELP.timeZone, FIELD_HELP.dayStartFrom, FIELD_HELP.filters]
 
 const CUSTOMER_LIST_ACTIONS = [
-  { icon: 'bi-toggle-on', title: 'Status', text: 'Switch a customer active or inactive straight from the list.' },
-  { icon: 'bi-eye', title: 'View', text: 'Open every detail of the customer: company, login, address, settings and filters.' },
-  { icon: 'bi-pencil-square', title: 'Edit', text: 'Change any detail. The password is not shown or changed here.' },
-  { icon: 'bi-trash3', title: 'Delete', text: 'Removes the customer and their login after you confirm.' },
+  { icon: ACTION_ICONS.status, title: 'Status', text: 'Switch a customer active or inactive straight from the list.' },
+  { icon: ACTION_ICONS.view, title: 'View', text: 'Open every detail of the customer: company, login, address, settings and filters.' },
+  { icon: ACTION_ICONS.edit, title: 'Edit', text: 'Change any detail. The password is not shown or changed here.' },
+  { icon: ACTION_ICONS.delete, title: 'Delete', text: 'Removes the customer and their login after you confirm.' },
 ]
 
 const ADD_BRANCH_STEPS = [

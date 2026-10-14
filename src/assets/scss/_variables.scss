@@ -129,8 +129,13 @@ $ts-toast-shift:  ts-rem(16);
 // Field help popover (components/common/InfoTooltip.jsx)
 $ts-help-width:   ts-rem(300);
 
-// Table pagination "Go to page" input (components/common/TablePagination.jsx)
-$ts-page-jump-width: ts-rem(64);
+// Table pagination footer (components/common/TablePagination.jsx)
+$ts-page-jump-width: ts-rem(64);  // "Go to" input
+$ts-page-size-width: ts-rem(72);  // rows-per-page select
+$ts-pager-size:      ts-rem(30);  // square page button
+$ts-table-edge-x:    ts-rem(16);  // first / last cell padding inside a table panel
+$ts-table-band:      mix($ts-panel-2, $ts-panel, 55%); // table head + footer band
+$ts-pager-active-ink: if($ts-color-scheme == light, $ts-orange-2, $ts-orange); // current page number
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
 
