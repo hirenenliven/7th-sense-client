@@ -31,7 +31,11 @@ export const ROUTES = {
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',
   HOLIDAYS: '/masters/holidays',
+  // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)
   USERS: '/masters/users',
+  USER_ADD: '/masters/users/add',
+  USER_EDIT: '/masters/users/:id/edit',
+  USER_VIEW: '/masters/users/:id',
   ROLES: '/masters/roles',
 
   // Masters › Country … Supervisor: independent screens, one per level (pages/Organization/<Level>/)

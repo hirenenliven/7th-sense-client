@@ -2,11 +2,13 @@ import { Fragment, useEffect, useState } from 'react'
 import { Alert, Badge, Button, Card, Col, Row } from 'react-bootstrap'
 import { Link, generatePath, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { THEMES, USER_STATUS } from '@/constants/app'
-import { ROUTES } from '@/constants/routes'
+import { ALL_MACHINE_ROLES, ROLE_LABELS, SUPERADMIN_ONLY, THEMES, USER_STATUS } from '@/constants/app'
+import useAuth from '@/hooks/useAuth'
 import { getBranchById } from '@/services/branchService'
 import { getUserById } from '@/services/customerService'
+import { getMachines } from '@/services/machineService'
 import Loader from '@/components/common/Loader'
+import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
 import { FILTER_OPTIONS } from './customerForm'
 import { customerName } from './customerFormat'
 
@@ -47,13 +49,19 @@ DetailCard.propTypes = {
   items: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)).isRequired,
 }
 
-// Masters › Customers › View: everything GET /users/{id} returns for a customer.
-// profile, companyProfile and address may each be null.
-function CustomerView() {
+// Masters › Customers › View and Masters › Users › View (kind): everything GET /users/{id} returns.
+// profile, companyProfile and address may each be null. Users also show their role and machines.
+function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const account = ACCOUNT_PAGES[kind]
+  const isUser = kind === ACCOUNT_KIND.USER
   const { id } = useParams()
+  const { hasRole } = useAuth()
+  const isSuperadmin = hasRole(SUPERADMIN_ONLY)
 
   const [customer, setCustomer] = useState(null)
   const [branchName, setBranchName] = useState('')
+  // Names of the user's assigned machines (the company's machines, looked up by id)
+  const [machineNames, setMachineNames] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -71,28 +79,35 @@ function CustomerView() {
             .then((branch) => active && setBranchName(branch?.name ?? ''))
             .catch(() => {})
         }
+        // Machine names are a nice-to-have too; the count is shown if they cannot be loaded
+        if (isUser && data.machineIds?.length) {
+          const assigned = new Set(data.machineIds)
+          getMachines(isSuperadmin ? data.companyId : undefined)
+            .then((machines) => active && setMachineNames(machines.filter((machine) => assigned.has(machine.id)).map((machine) => machine.name)))
+            .catch(() => {})
+        }
       })
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false))
     return () => {
       active = false
     }
-  }, [id])
+  }, [id, isUser, isSuperadmin])
 
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">Masters · Customers</div>
-        <h1>{customer ? customerName({ ...customer, ...customer.companyProfile }) : 'Customer'}</h1>
-        <p className="ts-page-subtitle">Customer account, company, address and settings.</p>
+        <div className="ts-eyebrow">{account.section}</div>
+        <h1>{customer ? customerName({ ...customer, ...customer.companyProfile }) : account.title}</h1>
+        <p className="ts-page-subtitle">{account.viewSubtitle}</p>
       </div>
       <div className="ts-page-actions">
-        <Button as={Link} to={ROUTES.CUSTOMERS} variant="ghost">
+        <Button as={Link} to={account.routes.list} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          Customer list
+          {account.title} list
         </Button>
         {customer && (
-          <Button as={Link} to={generatePath(ROUTES.CUSTOMER_EDIT, { id: String(customer.id) })}>
+          <Button as={Link} to={generatePath(account.routes.edit, { id: String(customer.id) })}>
             <i className="bi bi-pencil me-2" aria-hidden="true" />
             Edit
           </Button>
@@ -105,7 +120,7 @@ function CustomerView() {
     return (
       <>
         {header}
-        <Loader text="Loading customer…" />
+        <Loader text={`Loading ${account.noun}…`} />
       </>
     )
   }
@@ -115,7 +130,7 @@ function CustomerView() {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this customer.</b> {error}
+          <b>Could not load this {account.noun}.</b> {error}
         </Alert>
       </>
     )
@@ -128,12 +143,31 @@ function CustomerView() {
   const themeLabel = THEMES.find((option) => option.value === profile.theme)?.label ?? profile.theme
   const chosenFilters = new Set(profile.filters ?? [])
   const filterLabels = FILTER_OPTIONS.filter((option) => chosenFilters.has(option.value))
+  const seesAllMachines = ALL_MACHINE_ROLES.includes(customer.role)
+  const assignedCount = customer.machineIds?.length ?? 0
+  const machinesValue = seesAllMachines
+    ? 'All company machines'
+    : machineNames.length
+      ? machineNames.join(', ')
+      : `${assignedCount} assigned`
 
   return (
     <>
       {header}
 
       <Row className="g-3 mb-3">
+        {isUser && (
+          <Col lg={12}>
+            <DetailCard
+              icon="bi-shield-check"
+              title="Access"
+              items={[
+                ['Role', ROLE_LABELS[customer.role] ?? customer.role],
+                ['Machines', machinesValue],
+              ]}
+            />
+          </Col>
+        )}
         <Col lg={6}>
           <DetailCard
             icon="bi-building"
@@ -216,6 +250,10 @@ function CustomerView() {
       </Card>
     </>
   )
+}
+
+CustomerView.propTypes = {
+  kind: PropTypes.oneOf(Object.values(ACCOUNT_KIND)),
 }
 
 export default CustomerView

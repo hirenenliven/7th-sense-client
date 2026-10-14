@@ -2,8 +2,9 @@ import apiClient, { sharedGet, withQuery } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
-// Admins see every customer's machines (userId narrows to one customer); other users
-// only get their own. Only admins may create, update and delete.
+// The superadmin sees every customer's machines (userId narrows to one customer). A customer and
+// its admins see all of the company's machines; other users only the machines assigned to them.
+// Only the superadmin may create, update and delete.
 const PATH = '/machines'
 
 // The server omits `data` for an empty list, so lists fall back to [].

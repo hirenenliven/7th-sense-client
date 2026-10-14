@@ -164,9 +164,17 @@ Write forms with plain react-bootstrap markup, without wrapper components:
   just use the native controls:
   - `Form.Select`: thin chevron; in Chromium the open list matches `Dropdown.Menu` (panel, rounded rows,
     orange tick and tint on the selected option, `optgroup` as a muted heading). Other browsers keep their native list.
-  - `Form.Control type="date" | "time"`: themed calendar / clock icon and an accent tint on the focused segment.
-    The browser's popup follows the theme via `color-scheme`.
+  - Dates and times: use `<DatePicker>` / `<TimePicker>` (`components/common`), never `type="date" | "time"`.
+    Same values as the native inputs (`"YYYY-MM-DD"`, 24 h `"HH:mm"`), so with React Hook Form wrap them in a
+    `<Controller render={({ field }) => <DatePicker {...field} isInvalid={…} />} />` (see `AddMachine.jsx`).
+    The field accepts typing (DD-MM-YYYY / HH:MM, separators added) and opens a themed popup: calendar with month and
+    year views, Today / Clear; or hour + minute columns with Now / Clear / Done. Keyboard: Alt+↓ opens, arrows /
+    PageUp / PageDown / Home / End move, Enter picks, Esc closes. `DatePicker` takes optional `min` / `max`.
+    Styles: "Date & time pickers" in `_components.scss`, `$ts-picker-*` / `$ts-time-*` tokens.
   - `Dropdown`: chevron caret that turns when open; put a `bi-*` icon first in a `Dropdown.Item` (no `me-*`, the gap is built in).
+  - Radio: every `Form.Check type="radio"` shows an orange ring and dot when picked. For a short set of options,
+    wrap inline radios in `<div role="radiogroup" className="ts-radio-group">`: each option becomes a field-height chip
+    (orange border + soft tint when picked, whole chip clickable), see "Controller Ver." in `pages/Machines/AddMachine.jsx`.
   - Multi-select: `Dropdown` + `Dropdown.Toggle className="form-select ts-select-toggle"` + `Dropdown.Menu.ts-check-menu`
     with `Form.Check` rows (optional `.ts-check-menu-all` row on top), see `pages/Machines/HealthSensorPicker.jsx`.
 - Shared validation rules are in `utils/validators.js`. Each form's own rules go next to the page, as in `pages/Customers/customerForm.js`.

@@ -1,6 +1,7 @@
 import { lazy } from 'react'
-import { ADMIN_ONLY, SUPERADMIN_ONLY } from '@/constants/app'
+import { SUPERADMIN_ONLY, USER_MANAGERS } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
+import { ACCOUNT_KIND } from '@/pages/Customers/accountPages'
 
 const Home = lazy(() => import('@/pages/Home/Home'))
 const About = lazy(() => import('@/pages/About/About'))
@@ -33,16 +34,21 @@ export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase /> },
-  { path: ROUTES.CUSTOMERS, element: <CustomerList />, roles: ADMIN_ONLY },
-  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer />, roles: ADMIN_ONLY },
-  { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: ADMIN_ONLY },
-  { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView />, roles: ADMIN_ONLY },
+  { path: ROUTES.CUSTOMERS, element: <CustomerList />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView />, roles: SUPERADMIN_ONLY },
+  // Users reuse the Customer pages (`kind`); the server limits each manager to their company
+  { path: ROUTES.USERS, element: <CustomerList kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
+  { path: ROUTES.USER_ADD, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
+  { path: ROUTES.USER_EDIT, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
+  { path: ROUTES.USER_VIEW, element: <CustomerView kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
   { path: ROUTES.BRANCHES, element: <BranchList /> },
   { path: ROUTES.BRANCH_ADD, element: <AddBranch /> },
   { path: ROUTES.BRANCH_EDIT, element: <AddBranch /> },
   { path: ROUTES.MACHINES, element: <MachineList /> },
-  { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: ADMIN_ONLY },
-  { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: ADMIN_ONLY },
+  { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },

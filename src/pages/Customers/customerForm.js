@@ -1,6 +1,7 @@
 import { CUSTOMER_ROLE_ID, DEFAULT_THEME, THEMES, USER_STATUS } from '@/constants/app'
 import { DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, INDIA, getCountryCode, getCountryName, getDialCode, getStateCode, getStateName } from '@/constants/locations'
 import { normalizeTheme } from '@/utils/theme'
+import { ACCOUNT_KIND } from './accountPages'
 import { PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
 
@@ -21,6 +22,10 @@ export const FILTER_OPTIONS = [
 export const FILTER_NAMES = FILTER_OPTIONS.map((option) => option.value)
 
 export const INITIAL_VALUES = {
+  // Access (users only): role, company (superadmin picks it) and assigned machines
+  roleId: '',
+  companyId: '',
+  machineIds: [],
   branchId: '',
   companyName: '',
   finixId: '',
@@ -48,6 +53,8 @@ export const INITIAL_VALUES = {
 
 // Fields that are always required (excluding conditional country-specific fields)
 export const REQUIRED_FIELDS = new Set([
+  'roleId', // users only
+  'companyId', // users, when the superadmin adds them
   'branchId',
   'companyName',
   'email',
@@ -74,9 +81,13 @@ export const isFieldRequired = (fieldName, country, isEdit = false) => {
   return false
 }
 
-// Zod schema for customer form validation (isEdit → no password field)
-export const getCustomerSchema = (isEdit = false) => z
+// Zod schema for customer form validation (isEdit → no password field).
+// kind USER also needs a role, and the company when needsCompany (the superadmin adds the user).
+export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER, needsCompany = false } = {}) => z
   .object({
+    roleId: z.string(),
+    companyId: z.string(),
+    machineIds: z.array(z.string()),
     branchId: z.string().min(1, 'Branch is required'),
     companyName: z.string().min(1, 'Company name is required').max(150, 'Company name is too long'),
     finixId: z.string().regex(/^\d*$/, 'Finix ID must be a number').optional().or(z.literal('')),
@@ -108,6 +119,13 @@ export const getCustomerSchema = (isEdit = false) => z
     filters: z.array(z.enum(FILTER_NAMES)),
   })
   .superRefine((data, ctx) => {
+    if (kind === ACCOUNT_KIND.USER && !data.roleId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Role is required', path: ['roleId'] })
+    }
+    if (kind === ACCOUNT_KIND.USER && needsCompany && !data.companyId) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Customer is required', path: ['companyId'] })
+    }
+
     if (!isEdit && data.password.length < PASSWORD_MIN_LENGTH) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -201,13 +219,17 @@ const splitName = (fullName) => {
 
 // `existing` = the loaded customer (GET /users/{id}) when editing: keeps status, company and logo.
 // A newly picked logo file cannot travel in JSON, so the current logo path is kept.
-export const toUserPayload = (values, existing = null) => {
+// kind USER sends the chosen role, company and machines; the server checks the logged-in user may
+// give them (a customer's or admin's own company is used whatever companyId says).
+export const toUserPayload = (values, existing = null, kind = ACCOUNT_KIND.CUSTOMER) => {
+  const isUser = kind === ACCOUNT_KIND.USER
   const payload = {
     username: values.username.trim(),
     email: values.email.trim(),
     ...splitName(values.contactPerson),
-    roleId: CUSTOMER_ROLE_ID,
-    companyId: existing?.companyId ?? null,
+    roleId: isUser ? toId(values.roleId) : CUSTOMER_ROLE_ID,
+    companyId: (isUser && toId(values.companyId)) || existing?.companyId || null,
+    machineIds: isUser ? values.machineIds.map(Number) : [],
     branchId: toId(values.branchId),
     companyName: values.companyName.trim(),
     finixId: toId(values.finixId),
@@ -251,6 +273,9 @@ export const toFormValues = (customer) => {
 
   return {
     ...INITIAL_VALUES,
+    roleId: customer.roleId ? String(customer.roleId) : '',
+    companyId: customer.companyId ? String(customer.companyId) : '',
+    machineIds: (customer.machineIds ?? []).map(String),
     branchId: customer.branchId ? String(customer.branchId) : '',
     companyName: company.companyName ?? '',
     finixId: company.finixId != null ? String(company.finixId) : '',

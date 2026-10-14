@@ -18,6 +18,7 @@ import { createMachine, getMachineById, updateMachine } from '@/services/machine
 import { getUserLines } from '@/services/userLineService'
 import { formatDate } from '@/utils/helpers'
 import { toast } from '@/utils/toast'
+import DatePicker from '@/components/common/DatePicker'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
 import { customerName } from '@/pages/Customers/customerFormat'
@@ -379,15 +380,27 @@ function AddMachine() {
               </Field>
 
               <Field name="installationDate" label="Installation Date" md={3} {...fieldProps}>
-                <Form.Control {...register('installationDate')} type="date" isInvalid={Boolean(errors.installationDate)} />
+                <Controller
+                  name="installationDate"
+                  control={control}
+                  render={({ field }) => <DatePicker {...field} isInvalid={Boolean(errors.installationDate)} />}
+                />
               </Field>
 
               <Field name="billDate" label="Bill Date" md={3} {...fieldProps}>
-                <Form.Control {...register('billDate')} type="date" isInvalid={Boolean(errors.billDate)} />
+                <Controller
+                  name="billDate"
+                  control={control}
+                  render={({ field }) => <DatePicker {...field} isInvalid={Boolean(errors.billDate)} />}
+                />
               </Field>
 
               <Field name="warrantyDate" label="Warranty End Date" {...fieldProps}>
-                <Form.Control {...register('warrantyDate')} type="date" isInvalid={Boolean(errors.warrantyDate)} />
+                <Controller
+                  name="warrantyDate"
+                  control={control}
+                  render={({ field }) => <DatePicker {...field} isInvalid={Boolean(errors.warrantyDate)} />}
+                />
               </Field>
 
               <Field name="hourlyCost" label="Machine Hourly Cost" {...fieldProps}>
@@ -475,7 +488,7 @@ function AddMachine() {
                 <Form.Label as="span" className="required d-block" id="controllerVersionType-label">
                   Controller Ver.
                 </Form.Label>
-                <div role="radiogroup" aria-labelledby="controllerVersionType-label">
+                <div role="radiogroup" className="ts-radio-group" aria-labelledby="controllerVersionType-label">
                   {CONTROLLER_VERSION_TYPES.map((option) => (
                     <Form.Check
                       key={option.id}

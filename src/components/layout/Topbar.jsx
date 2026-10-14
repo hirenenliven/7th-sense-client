@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Dropdown, Form } from 'react-bootstrap'
+import { Button, Dropdown, Form, Spinner } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import BrandLogo from '@/components/common/BrandLogo'
 import LiveClock from '@/components/common/LiveClock'
@@ -99,10 +99,16 @@ function Topbar() {
         </Button>
 
         <Dropdown align="end">
-          <Dropdown.Toggle variant="plain" className="ts-user-toggle" aria-label="User menu">
-            <span className="d-none d-md-inline">{displayName(user)}</span>
+          <Dropdown.Toggle
+            variant="plain"
+            className="ts-user-toggle"
+            aria-label={signingOut ? 'Signing out' : 'User menu'}
+            aria-busy={signingOut}
+            disabled={signingOut}
+          >
+            <span className="d-none d-md-inline">{signingOut ? 'Signing out…' : displayName(user)}</span>
             <span className="ts-avatar" aria-hidden="true">
-              <i className="bi bi-person-fill" />
+              {signingOut ? <Spinner animation="border" size="sm" /> : <i className="bi bi-person-fill" />}
             </span>
           </Dropdown.Toggle>
           <Dropdown.Menu>

@@ -57,11 +57,18 @@ export const ROLE_LABELS = {
   [ROLES.SHOP_HEAD]: 'Shop Head',
 }
 
-// `roles` of admin-only pages and menu items (same rule as the server's admin-only routes)
-export const ADMIN_ONLY = [ROLES.SUPERADMIN, ROLES.ADMIN]
+// A customer is a company; the users it and its admins add are members of it (users API `companyId`).
+// Only the superadmin works across companies.
 
-// `roles` of superadmin-only pages and menu items (machine catalog: controllers, models)
+// `roles` of superadmin-only pages and menu items (customers, machine catalog, adding machines)
 export const SUPERADMIN_ONLY = [ROLES.SUPERADMIN]
+
+// `roles` of the Users pages (server: `userManagersOnly`). The server limits each to their own
+// company's users and to the roles GET /roles returns.
+export const USER_MANAGERS = [ROLES.SUPERADMIN, ROLES.CUSTOMER, ROLES.ADMIN]
+
+// Member roles that see every machine of their company; other members only their assigned machines
+export const ALL_MACHINE_ROLES = [ROLES.ADMIN]
 
 // Toast notifications (see utils/toast.js)
 export const TOAST_DEFAULTS = {

@@ -16,6 +16,8 @@ import {
   Table,
 } from 'react-bootstrap'
 import { toast } from '@/utils/toast'
+import DatePicker from '@/components/common/DatePicker'
+import TimePicker from '@/components/common/TimePicker'
 
 // Sample data — pages should receive this from services/hooks.
 const KPIS = [
@@ -50,6 +52,8 @@ function ThemeShowcase() {
   const [tab, setTab] = useState(TABS[0])
   const [filter, setFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
+  const [sampleDate, setSampleDate] = useState('')
+  const [sampleTime, setSampleTime] = useState('06:00')
 
   return (
     <>
@@ -249,13 +253,13 @@ function ThemeShowcase() {
                     <Col xs={6}>
                       <Form.Group controlId="ts-date">
                         <Form.Label>Date</Form.Label>
-                        <Form.Control type="date" />
+                        <DatePicker value={sampleDate} onChange={setSampleDate} />
                       </Form.Group>
                     </Col>
                     <Col xs={6}>
                       <Form.Group controlId="ts-time">
                         <Form.Label>Shift start</Form.Label>
-                        <Form.Control type="time" />
+                        <TimePicker value={sampleTime} onChange={setSampleTime} />
                       </Form.Group>
                     </Col>
                     <Col xs={12}>
@@ -287,6 +291,20 @@ function ThemeShowcase() {
                         <Form.Control as="textarea" rows={2} placeholder="Optional" />
                         <Form.Text>Visible to the shift supervisor.</Form.Text>
                       </Form.Group>
+                    </Col>
+                    <Col xs={12}>
+                      <Form.Label as="span" className="d-block" id="ts-severity-label">
+                        Severity
+                      </Form.Label>
+                      <div role="radiogroup" className="ts-radio-group" aria-labelledby="ts-severity-label">
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-minor" label="Minor" defaultChecked />
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-major" label="Major" />
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-critical" label="Critical" disabled />
+                      </div>
+                    </Col>
+                    <Col xs={12}>
+                      <Form.Check type="radio" name="ts-scope" id="ts-scope-line" label="This line only" defaultChecked />
+                      <Form.Check type="radio" name="ts-scope" id="ts-scope-shop" label="Whole shop" />
                     </Col>
                     <Col xs={12}>
                       <Form.Check type="switch" id="ts-notify" label="Notify maintenance" defaultChecked />

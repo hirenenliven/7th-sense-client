@@ -1,4 +1,4 @@
-import { ADMIN_ONLY, SUPERADMIN_ONLY } from './app'
+import { SUPERADMIN_ONLY, USER_MANAGERS } from './app'
 import { ROUTES } from './routes'
 
 // Sidebar menu. An item has either a `path` (link) or `children` (submenu).
@@ -62,7 +62,7 @@ export const NAV_SECTIONS = [
         key: 'customers',
         label: 'Customers',
         icon: 'bi-building',
-        roles: ADMIN_ONLY,
+        roles: SUPERADMIN_ONLY,
         children: [
           { key: 'customer-list', label: 'Customer List', path: ROUTES.CUSTOMERS },
           { key: 'customer-add', label: 'Add Customer', path: ROUTES.CUSTOMER_ADD },
@@ -117,9 +117,10 @@ export const NAV_SECTIONS = [
         key: 'users',
         label: 'Users',
         icon: 'bi-people',
-        roles: ADMIN_ONLY,
+        roles: USER_MANAGERS,
         children: [
           { key: 'user-list', label: 'User List', path: ROUTES.USERS },
+          { key: 'user-add', label: 'Add User', path: ROUTES.USER_ADD },
           { key: 'roles', label: 'Roles & Permissions', path: ROUTES.ROLES },
         ],
       },

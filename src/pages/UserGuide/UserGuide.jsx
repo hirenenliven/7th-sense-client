@@ -303,7 +303,7 @@ function UserGuide() {
                     <thead>
                       <tr>
                         <th scope="col">Level</th>
-                        <th scope="col">Belongs to</th>
+                        <th scope="col">Belongs To</th>
                         <th scope="col">Edit</th>
                       </tr>
                     </thead>
@@ -387,7 +387,7 @@ function UserGuide() {
                         <tr>
                           <th scope="col">Field</th>
                           <th scope="col">India</th>
-                          <th scope="col">Other countries</th>
+                          <th scope="col">Other Countries</th>
                         </tr>
                       </thead>
                       <tbody>

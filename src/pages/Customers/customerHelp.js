@@ -42,4 +42,15 @@ export const FIELD_HELP = {
     content: 'Filters offered to this customer on their dashboards and reports. Only the ticked filters are shown.',
     rules: ['Optional — tick none to hide all filters', 'Can be changed later by editing the customer'],
   },
+  // Users only (Access card)
+  roleId: {
+    title: 'Role',
+    content: 'What the user can do. Administrators see every machine of the company and can add users; other roles see only the machines ticked below.',
+    rules: ['Customers can give every role but Customer', 'Administrators cannot give the Administrator role'],
+  },
+  machineIds: {
+    title: 'Machines',
+    content: 'The company machines this user can see. Machines that are not ticked are hidden from the user everywhere.',
+    rules: ['Optional — tick none and the user sees no machines', 'Not needed for Administrators: they see every machine'],
+  },
 }

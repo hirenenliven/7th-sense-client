@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ADMIN_ONLY, BRANCH_STATUS } from '@/constants/app'
+import { BRANCH_STATUS, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { createBranch, getBranchById, updateBranch } from '@/services/branchService'
@@ -32,9 +32,9 @@ function AddBranch() {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
-  // The customer list (GET /users) is admin-only; other users keep the branch's customer as is
+  // Only the superadmin works across customers; other users keep the branch's customer as is
   const { hasRole } = useAuth()
-  const canPickCustomer = hasRole(ADMIN_ONLY)
+  const canPickCustomer = hasRole(SUPERADMIN_ONLY)
 
   const {
     register,

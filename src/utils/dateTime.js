@@ -1,0 +1,83 @@
+// Date / time helpers for DatePicker and TimePicker (components/common).
+// Form values keep the native input formats: dates "YYYY-MM-DD", times "HH:mm" (24 h).
+// The fields show and accept dates as DD-MM-YYYY and times as HH:MM.
+
+export const PICKER_LOCALE = 'en-GB'
+export const DATE_PLACEHOLDER = 'DD-MM-YYYY'
+export const TIME_PLACEHOLDER = 'HH:MM'
+export const DATE_TEXT_LENGTH = DATE_PLACEHOLDER.length
+export const TIME_TEXT_LENGTH = TIME_PLACEHOLDER.length
+
+export const pad2 = (value) => String(value).padStart(2, '0')
+
+// Date at local midnight → "YYYY-MM-DD"
+export const toIsoDate = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+
+// Real calendar date only (no 31-02), else null
+const buildDate = (year, month, day) => {
+  const date = new Date(year, month - 1, day)
+  date.setFullYear(year) // years below 100 would otherwise map to 19xx
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null
+}
+
+// "YYYY-MM-DD" → Date (local midnight) or null
+export const parseIsoDate = (value) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value ?? '')
+  return match ? buildDate(Number(match[1]), Number(match[2]), Number(match[3])) : null
+}
+
+// "YYYY-MM-DD" → "DD-MM-YYYY" ('' when empty or invalid)
+export const isoToDateText = (value) => {
+  const date = parseIsoDate(value)
+  return date ? `${pad2(date.getDate())}-${pad2(date.getMonth() + 1)}-${date.getFullYear()}` : ''
+}
+
+// "DD-MM-YYYY" → "YYYY-MM-DD" ('' until it is a complete, real date — like a native date input)
+export const dateTextToIso = (text) => {
+  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(text ?? '')
+  const date = match && buildDate(Number(match[3]), Number(match[2]), Number(match[1]))
+  return date ? toIsoDate(date) : ''
+}
+
+// Typing aid: keeps digits and adds the dashes → "14-10-2026"
+export const maskDateText = (text) => {
+  const digits = String(text ?? '').replace(/\D/g, '').slice(0, 8)
+  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('-')
+}
+
+// Typing aid: keeps digits and adds the colon → "06:30"
+export const maskTimeText = (text) => {
+  const digits = String(text ?? '').replace(/\D/g, '').slice(0, 4)
+  return digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits
+}
+
+// "HH:mm" → { hours, minutes } or null
+export const parseTime = (value) => {
+  const match = /^(\d{2}):(\d{2})$/.exec(value ?? '')
+  if (!match) return null
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+  return hours < 24 && minutes < 60 ? { hours, minutes } : null
+}
+
+export const toTimeValue = (hours, minutes) => `${pad2(hours)}:${pad2(minutes)}`
+
+// "HH:MM" typed text → "HH:mm" value ('' until complete and valid)
+export const timeTextToValue = (text) => (parseTime(text) ? text : '')
+
+export const isSameDay = (a, b) =>
+  Boolean(a && b) && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+
+export const addDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)
+
+// Same day in another month, clamped to that month's length (31 Jan + 1 month → 28/29 Feb)
+export const addMonths = (date, months) => {
+  const first = new Date(date.getFullYear(), date.getMonth() + months, 1)
+  const lastDay = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate()
+  return new Date(first.getFullYear(), first.getMonth(), Math.min(date.getDate(), lastDay))
+}
+
+export const startOfToday = () => {
+  const now = new Date()
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+}

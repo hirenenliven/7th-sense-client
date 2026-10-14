@@ -1,24 +1,30 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { PAGE_SIZES, USER_STATUS } from '@/constants/app'
-import { ROUTES } from '@/constants/routes'
+import { PAGE_SIZES, ROLE_LABELS, USER_STATUS } from '@/constants/app'
 import { deleteUser, getUserById, getUsers, updateUser } from '@/services/customerService'
 import { toast } from '@/utils/toast'
+import { ACCOUNT_KIND, ACCOUNT_PAGES, isAccountOfKind } from './accountPages'
 import CustomerRow from './CustomerRow'
 import { toFormValues, toUserPayload } from './customerForm'
 import { customerMobile, customerName } from './customerFormat'
 
-const COLUMNS = ['ID', 'User Name', 'Customer Name', 'Email', 'Mobile Number', 'Status', 'Statement', 'View', 'Actions']
+const COLUMNS = {
+  [ACCOUNT_KIND.CUSTOMER]: ['ID', 'User Name', 'Customer Name', 'Email', 'Mobile Number', 'Status', 'Statement', 'View', 'Actions'],
+  [ACCOUNT_KIND.USER]: ['ID', 'User Name', 'Name', 'Role', 'Email', 'Mobile Number', 'Status', 'View', 'Actions'],
+}
 
 const matchesSearch = (customer, term) =>
-  [customer.id, customer.username, customerName(customer), customer.email, customerMobile(customer)]
+  [customer.id, customer.username, customerName(customer), ROLE_LABELS[customer.role], customer.email, customerMobile(customer)]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
-function CustomerList() {
+// Masters › Customers and Masters › Users (kind): the same list, on each kind's accounts
+function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const account = ACCOUNT_PAGES[kind]
   const navigate = useNavigate()
 
   const [customers, setCustomers] = useState([])
@@ -34,19 +40,19 @@ function CustomerList() {
   const [pendingDelete, setPendingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
-  // Load all users on open (and on Retry)
+  // Load the kind's accounts on open (and on Retry)
   useEffect(() => {
     let active = true
     setLoading(true)
     setError('')
-    getUsers()
-      .then((list) => active && setCustomers(list))
+    getUsers(ACCOUNT_PAGES[kind].listQuery)
+      .then((list) => active && setCustomers(list.filter((account) => isAccountOfKind(account, kind))))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false))
     return () => {
       active = false
     }
-  }, [reloadKey])
+  }, [reloadKey, kind])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -71,31 +77,34 @@ function CustomerList() {
 
   // PUT replaces every field, so read the full customer and send it all back with the new status.
   // The switch flips immediately and reverts if the update fails.
-  const handleToggleStatus = useCallback(async (customer) => {
-    const previous = customer.status
-    const status = previous === USER_STATUS.INACTIVE ? USER_STATUS.ACTIVE : USER_STATUS.INACTIVE
-    setCustomerStatus(customer.id, status)
-    setStatusBusy(customer.id, true)
-    try {
-      const current = await getUserById(customer.id)
-      await updateUser(customer.id, { ...toUserPayload(toFormValues(current), current), status })
-      toast.success(`${customerName(customer)} is now ${status}.`, { title: 'Status updated' })
-    } catch (err) {
-      setCustomerStatus(customer.id, previous)
-      toast.error(err.message, { title: 'Could not update status' })
-    } finally {
-      setStatusBusy(customer.id, false)
-    }
-  }, [])
+  const handleToggleStatus = useCallback(
+    async (customer) => {
+      const previous = customer.status
+      const status = previous === USER_STATUS.INACTIVE ? USER_STATUS.ACTIVE : USER_STATUS.INACTIVE
+      setCustomerStatus(customer.id, status)
+      setStatusBusy(customer.id, true)
+      try {
+        const current = await getUserById(customer.id)
+        await updateUser(customer.id, { ...toUserPayload(toFormValues(current), current, kind), status })
+        toast.success(`${customerName(customer)} is now ${status}.`, { title: 'Status updated' })
+      } catch (err) {
+        setCustomerStatus(customer.id, previous)
+        toast.error(err.message, { title: 'Could not update status' })
+      } finally {
+        setStatusBusy(customer.id, false)
+      }
+    },
+    [kind],
+  )
 
   const handleView = useCallback(
-    (customer) => navigate(generatePath(ROUTES.CUSTOMER_VIEW, { id: String(customer.id) })),
-    [navigate],
+    (customer) => navigate(generatePath(ACCOUNT_PAGES[kind].routes.view, { id: String(customer.id) })),
+    [navigate, kind],
   )
 
   const handleEdit = useCallback(
-    (customer) => navigate(generatePath(ROUTES.CUSTOMER_EDIT, { id: String(customer.id) })),
-    [navigate],
+    (customer) => navigate(generatePath(ACCOUNT_PAGES[kind].routes.edit, { id: String(customer.id) })),
+    [navigate, kind],
   )
 
   const handleUnavailable = useCallback((feature) => {
@@ -107,23 +116,23 @@ function CustomerList() {
     try {
       await deleteUser(pendingDelete.id)
       setCustomers((list) => list.filter((customer) => customer.id !== pendingDelete.id))
-      toast.success(`${customerName(pendingDelete)} has been deleted.`, { title: 'Customer deleted' })
+      toast.success(`${customerName(pendingDelete)} has been deleted.`, { title: `${account.title} deleted` })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete customer' })
+      toast.error(err.message, { title: `Could not delete ${account.noun}` })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading customers…" />
+    if (loading) return <Loader text={`Loading ${account.noun}s…`} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load customers.</b> {error}
+            <b>Could not load {account.noun}s.</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
@@ -136,10 +145,10 @@ function CustomerList() {
     if (!customers.length) {
       return (
         <div className="ts-empty">
-          <i className="bi bi-building ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No customers yet.</p>
-          <Button as={Link} to={ROUTES.CUSTOMER_ADD} size="sm">
-            Add the first customer
+          <i className={`bi ${account.icon} ts-empty-icon`} aria-hidden="true" />
+          <p className="mb-2">No {account.noun}s yet.</p>
+          <Button as={Link} to={account.routes.add} size="sm">
+            Add the first {account.noun}
           </Button>
         </div>
       )
@@ -151,13 +160,13 @@ function CustomerList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, user name, customer, email, mobile…"
+              placeholder={`Search ID, user name, ${kind === ACCOUNT_KIND.USER ? 'name, role' : 'customer'}, email, mobile…`}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search customers"
+              aria-label={`Search ${account.noun}s`}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -170,7 +179,7 @@ function CustomerList() {
             <Table hover responsive className="mb-0">
               <thead>
                 <tr>
-                  {COLUMNS.map((column) => (
+                  {COLUMNS[kind].map((column) => (
                     <th key={column} scope="col">
                       {column}
                     </th>
@@ -181,6 +190,7 @@ function CustomerList() {
                 {pageRows.map((customer) => (
                   <CustomerRow
                     key={customer.id}
+                    kind={kind}
                     customer={customer}
                     statusBusy={statusBusyIds.has(customer.id)}
                     onToggleStatus={handleToggleStatus}
@@ -204,7 +214,9 @@ function CustomerList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No customers match “{search.trim()}”.</div>
+          <div className="ts-empty">
+            No {account.noun}s match “{search.trim()}”.
+          </div>
         )}
       </>
     )
@@ -214,12 +226,12 @@ function CustomerList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Customers</div>
-          <h1>Manage Customer</h1>
-          <p className="ts-page-subtitle">All customer accounts and their logins.</p>
+          <div className="ts-eyebrow">{account.section}</div>
+          <h1>{account.listTitle}</h1>
+          <p className="ts-page-subtitle">{account.listSubtitle}</p>
         </div>
         <div className="ts-page-actions">
-          <Button as={Link} to={ROUTES.CUSTOMER_ADD}>
+          <Button as={Link} to={account.routes.add}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
             Add New
           </Button>
@@ -232,7 +244,7 @@ function CustomerList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete customer"
+        title={`Delete ${account.noun}`}
         confirmLabel="Delete"
         busy={deleting}
         onConfirm={confirmDelete}
@@ -242,6 +254,10 @@ function CustomerList() {
       </ConfirmModal>
     </>
   )
+}
+
+CustomerList.propTypes = {
+  kind: PropTypes.oneOf(Object.values(ACCOUNT_KIND)),
 }
 
 export default CustomerList

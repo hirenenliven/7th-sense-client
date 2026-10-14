@@ -4,7 +4,7 @@ import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { ADMIN_ONLY, PAGE_SIZES } from '@/constants/app'
+import { PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { deleteMachine, getMachines } from '@/services/machineService'
@@ -20,7 +20,8 @@ const matchesSearch = (machine, term) =>
 function MachineList() {
   const navigate = useNavigate()
   const { hasRole } = useAuth()
-  const canManage = hasRole(ADMIN_ONLY)
+  // Only the superadmin adds and changes machines; everyone else reads the machines they may access
+  const canManage = hasRole(SUPERADMIN_ONLY)
 
   const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(true)

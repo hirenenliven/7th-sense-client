@@ -86,6 +86,14 @@ $ts-picker-enter:       .14s;        // open animation
 $ts-picker-shift:       ts-rem(4);   // open animation slide
 $ts-picker-selected-alpha: .12;      // orange tint behind the selected option
 $ts-picker-segment-alpha:  .22;      // orange tint behind the focused date segment
+$ts-picker-today-alpha:    .55;      // ring around today in the calendar
+$ts-picker-toggle-size:  ts-rem(26);  // calendar / clock button inside the field
+$ts-picker-day-size:     ts-rem(34);  // calendar day cell, time option height
+$ts-picker-day-gap:      ts-rem(1);   // space around each calendar day
+$ts-picker-ring-width:   ts-rem(2);   // keyboard focus ring on popup cells
+$ts-picker-option-height: ts-rem(38); // month / year cell
+$ts-time-column-width:   ts-rem(64);
+$ts-time-column-height:  ts-rem(238); // 7 options visible
 $ts-ls-wide:  .06em;
 $ts-ls-wider: .1em;
 
@@ -462,6 +470,9 @@ $form-check-input-checked-color:  $ts-on-accent;
 $form-check-input-checked-bg-color: $ts-orange;
 $form-check-input-checked-border-color: $ts-orange;
 $form-check-input-focus-border:   $ts-orange;
+// Radio: orange ring + orange dot on the input surface (styles in "Radio buttons", _components.scss)
+$form-check-radio-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$ts-orange}'/></svg>");
+$ts-radio-chip-gap: $ts-space-2; // space between radio chips in a .ts-radio-group
 $form-switch-color:               $ts-ink-3;
 $form-switch-focus-color:         $ts-orange;
 $form-switch-checked-color:       $ts-on-accent;

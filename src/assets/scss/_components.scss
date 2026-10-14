@@ -666,6 +666,75 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   border-color: $ts-orange;
 }
 
+// Radio buttons: orange ring with an orange dot on the input surface, hover
+// border and a brighter label once picked (every <Form.Check type="radio">)
+.form-check-input[type="radio"] {
+  cursor: pointer;
+  transition: border-color $ts-transition, box-shadow $ts-transition, background-color $ts-transition;
+
+  &:hover:not(:disabled):not(:checked) { border-color: $ts-ink-3; }
+
+  &:checked { background-color: $form-check-input-bg; }
+
+  &:checked:not(.is-invalid) + .form-check-label { color: $ts-ink; }
+
+  &:not(:disabled) + .form-check-label { cursor: pointer; }
+}
+
+// Radio group as chips: <div role="radiogroup" className="ts-radio-group"> + inline
+// <Form.Check type="radio">. Each option is a field-height box; the whole box is clickable.
+.ts-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-radio-chip-gap;
+
+  .form-check {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: $ts-space-2;
+    min-height: $input-height;
+    margin: 0;
+    padding: 0 $input-padding-x;
+    border: $input-border-width solid $ts-line;
+    border-radius: $input-border-radius;
+    background: $input-bg;
+    transition: border-color $ts-transition, background-color $ts-transition, box-shadow $ts-transition;
+
+    &:hover { border-color: $ts-ink-3; }
+
+    &:has(.form-check-input:checked) {
+      border-color: $ts-orange;
+      background: rgba($ts-orange, $ts-picker-selected-alpha);
+    }
+
+    &:has(.form-check-input:focus-visible) { box-shadow: $input-focus-box-shadow; }
+
+    &:has(.form-check-input.is-invalid) { border-color: $form-invalid-border-color; }
+
+    // Bootstrap already dims a disabled input and its label
+    &:has(.form-check-input:disabled):hover { border-color: $ts-line; }
+  }
+
+  .form-check-input {
+    float: none;
+    flex-shrink: 0;
+    margin: 0;
+
+    // The chip already shows focus
+    &:focus { box-shadow: none; }
+  }
+
+  // Stretch the label over the chip so the padding is clickable too
+  .form-check-label::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .form-check-label { font-weight: 500; }
+}
+
 // Required field marker: <Form.Label className="required">
 .form-label.required::after {
   content: " *";
@@ -971,10 +1040,9 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 
   > thead th,
   > thead td {
-    font-size: $ts-fs-xs;
+    // Labels show as written (Title Case), not forced to capitals
+    font-size: $ts-fs-sm;
     font-weight: 600;
-    letter-spacing: $ts-ls-wide;
-    text-transform: uppercase;
     color: $ts-ink-3;
     white-space: nowrap;
     border-bottom-color: $ts-line;
@@ -1447,9 +1515,10 @@ $ts-toast-colors: (
 // -----------------------------------------------------------------------------
 
 @keyframes ts-picker-in {
+  // `translate`, not `transform`: Popper places menus with transform
   from {
     opacity: 0;
-    transform: translateY(-$ts-picker-shift);
+    translate: 0 (-$ts-picker-shift);
   }
 }
 
@@ -1655,6 +1724,270 @@ $ts-toast-colors: (
       }
     }
   }
+}
+
+// Date & time pickers (components/common/DatePicker.jsx, TimePicker.jsx on PickerField.jsx):
+// a text field with an icon button, and a popup in the dropdown-menu look —
+// calendar (days / months / years) or hour + minute columns.
+.ts-picker {
+  position: relative;
+
+  .form-control {
+    padding-right: calc(#{$input-padding-x} + #{$ts-picker-toggle-size});
+    font-variant-numeric: tabular-nums;
+
+    // The icon button sits where Bootstrap draws its error icon
+    &.is-invalid {
+      padding-right: calc(#{$input-padding-x} + #{$ts-picker-toggle-size});
+      background-image: none;
+    }
+  }
+
+  // Open = focused, also while focus is inside the popup
+  &.is-open .form-control:not(.is-invalid) {
+    border-color: $input-focus-border-color;
+    box-shadow: $input-focus-box-shadow;
+  }
+}
+
+.ts-picker-toggle {
+  position: absolute;
+  top: 50%;
+  right: $ts-space-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $ts-picker-toggle-size;
+  height: $ts-picker-toggle-size;
+  padding: 0;
+  border: 0;
+  border-radius: $ts-radius-sm;
+  background: transparent;
+  color: $ts-ink-2;
+  transform: translateY(-50%);
+  transition: color $ts-transition, background-color $ts-transition, box-shadow $ts-transition;
+
+  &:hover:not(:disabled),
+  .ts-picker.is-open & {
+    background: rgba($ts-orange, $ts-picker-selected-alpha);
+    color: $ts-orange;
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 $border-width $ts-orange;
+  }
+
+  &:disabled { color: $ts-ink-3; }
+}
+
+.ts-picker-pop {
+  z-index: $zindex-popover;
+  padding: $ts-space-2;
+  border: $border-width solid $ts-line;
+  border-radius: $dropdown-border-radius;
+  background: $ts-panel;
+  color: $ts-ink;
+  box-shadow: $ts-shadow-float;
+  opacity: 0; // hidden until Popper has placed it
+
+  &.is-ready {
+    opacity: 1;
+    animation: ts-picker-in $ts-picker-enter ease-out;
+  }
+}
+
+// Shared button reset for every clickable cell in a popup
+%ts-picker-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: $ts-radius-sm;
+  background: transparent;
+  color: $ts-ink;
+  font-variant-numeric: tabular-nums;
+  transition: background-color $ts-transition, color $ts-transition, box-shadow $ts-transition;
+
+  &:hover:not(:disabled):not(.is-selected) { background: $ts-panel-2; }
+
+  &:focus-visible {
+    position: relative;
+    outline: 0;
+    box-shadow: 0 0 0 $ts-picker-ring-width $ts-orange;
+  }
+
+  // Picked: solid accent, like a primary button
+  &.is-selected {
+    background: $ts-orange;
+    color: $ts-on-accent;
+    font-weight: 600;
+  }
+
+  &:disabled {
+    color: $ts-ink-3;
+    text-decoration: line-through;
+    cursor: not-allowed;
+    opacity: .6;
+  }
+}
+
+.ts-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ts-space-2;
+  margin-top: $ts-space-2;
+  padding-top: $ts-space-2;
+  border-top: $border-width solid $ts-line;
+}
+
+// Calendar
+.ts-calendar { width: calc(7 * #{$ts-picker-day-size}); }
+
+.ts-calendar-header {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-1;
+  margin-bottom: $ts-space-2;
+}
+
+.ts-calendar-nav {
+  @extend %ts-picker-cell;
+  flex-shrink: 0;
+  width: $ts-picker-day-size;
+  height: $ts-picker-day-size;
+  color: $ts-ink-2;
+
+  &:hover { color: $ts-ink; }
+}
+
+.ts-calendar-title {
+  @extend %ts-picker-cell;
+  flex: 1;
+  gap: $ts-space-1;
+  height: $ts-picker-day-size;
+  font-size: $ts-fs-base;
+  font-weight: $ts-fw-title;
+
+  .bi {
+    font-size: $ts-fs-2xs;
+    color: $ts-ink-3;
+  }
+
+  &:disabled {
+    text-decoration: none;
+    color: $ts-ink;
+    cursor: default;
+    opacity: 1;
+  }
+}
+
+.ts-calendar-grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th {
+    padding-bottom: $ts-space-1;
+    font-size: $ts-fs-xs;
+    font-weight: 600;
+    color: $ts-ink-3;
+    text-align: center;
+  }
+
+  td {
+    padding: $ts-picker-day-gap;
+    text-align: center;
+  }
+}
+
+.ts-calendar-day {
+  @extend %ts-picker-cell;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: $ts-fs-md;
+
+  &.is-outside { color: $ts-ink-3; }
+
+  // Today: accent ring and text until it is the picked day
+  &.is-today:not(.is-selected) {
+    box-shadow: inset 0 0 0 $border-width rgba($ts-orange, $ts-picker-today-alpha);
+    color: $ts-orange;
+    font-weight: 600;
+  }
+
+  &.is-today:not(.is-selected):focus-visible { box-shadow: 0 0 0 $ts-picker-ring-width $ts-orange; }
+}
+
+.ts-calendar-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $ts-space-1;
+}
+
+.ts-calendar-option {
+  @extend %ts-picker-cell;
+  height: $ts-picker-option-height;
+  font-size: $ts-fs-md;
+  font-weight: 500;
+
+  &.is-today:not(.is-selected) {
+    box-shadow: inset 0 0 0 $border-width rgba($ts-orange, $ts-picker-today-alpha);
+    color: $ts-orange;
+  }
+}
+
+// Time: hour and minute columns
+.ts-time-columns {
+  display: flex;
+  align-items: stretch;
+  gap: $ts-space-1;
+}
+
+.ts-time-column {
+  display: flex;
+  flex-direction: column;
+  width: $ts-time-column-width;
+}
+
+.ts-time-column-label {
+  padding-bottom: $ts-space-1;
+  font-size: $ts-fs-xs;
+  font-weight: 600;
+  color: $ts-ink-3;
+  text-align: center;
+}
+
+.ts-time-list {
+  display: flex;
+  flex-direction: column;
+  gap: $ts-picker-day-gap;
+  height: $ts-time-column-height;
+  padding: $ts-picker-ring-width;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.ts-time-option {
+  @extend %ts-picker-cell;
+  flex-shrink: 0;
+  height: $ts-picker-day-size;
+  font-size: $ts-fs-md;
+}
+
+.ts-time-separator {
+  align-self: center;
+  font-size: $ts-fs-lg;
+  font-weight: 600;
+  color: $ts-ink-3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-picker-pop.is-ready { animation: none; }
 }
 
 // Native date / time fields: calendar or clock icon in the select chevron's

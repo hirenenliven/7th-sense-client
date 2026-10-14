@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { THEMES } from '@/constants/app'
+import PropTypes from 'prop-types'
+import { ALL_MACHINE_ROLES, ROLE_LABELS, ROLES, SUPERADMIN_ONLY, THEMES } from '@/constants/app'
 import { ACTION_ICONS } from '@/constants/icons'
 import { COUNTRIES, TIME_ZONES, getDialCode, getStates } from '@/constants/locations'
-import { ROUTES } from '@/constants/routes'
 import { getBranches } from '@/services/branchService'
-import { createUser, getUserById, updateUser } from '@/services/customerService'
+import { createUser, getUserById, getUsers, updateUser } from '@/services/customerService'
+import { getMachines } from '@/services/machineService'
+import { getAssignableRoles } from '@/services/roleService'
+import useAuth from '@/hooks/useAuth'
 import { formatFileSize } from '@/utils/helpers'
 import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
+import TimePicker from '@/components/common/TimePicker'
 import IconAction from '@/components/common/IconAction'
 import Loader from '@/components/common/Loader'
 import {
@@ -25,18 +29,29 @@ import {
   toFormValues,
   toUserPayload,
 } from './customerForm'
+import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
+import { customerName } from './customerFormat'
 import { FIELD_HELP } from './customerHelp'
 
-// Add and edit share this form: /masters/customers/add and /masters/customers/:id/edit
-function AddCustomer() {
+// Customers and users share this form (add and edit): /masters/customers/add, /masters/customers/:id/edit,
+// /masters/users/add and /masters/users/:id/edit. Users also get the Access card: role, company
+// (the superadmin picks it) and the machines they may access.
+function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const page = ACCOUNT_PAGES[kind]
+  const isUser = kind === ACCOUNT_KIND.USER
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
   const logoInputRef = useRef(null)
 
-  const schema = useMemo(() => getCustomerSchema(isEdit), [isEdit])
+  // Only the superadmin works across companies, so only it picks the user's company
+  const { hasRole } = useAuth()
+  const needsCompany = isUser && hasRole(SUPERADMIN_ONLY)
+
+  const schema = useMemo(() => getCustomerSchema(isEdit, { kind, needsCompany }), [isEdit, kind, needsCompany])
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -59,7 +74,20 @@ function AddCustomer() {
   const [customerLoading, setCustomerLoading] = useState(isEdit)
   const [customerError, setCustomerError] = useState('')
 
+  // Access options (users only)
+  const [roles, setRoles] = useState([])
+  const [companies, setCompanies] = useState([])
+  const [machines, setMachines] = useState([])
+  const [machinesLoading, setMachinesLoading] = useState(false)
+  const [accessError, setAccessError] = useState('')
+
   // Watch specific fields for conditional logic
+  const roleId = watch('roleId')
+  const companyId = watch('companyId')
+  const machineIds = watch('machineIds') ?? []
+  const roleName = roles.find((role) => String(role.id) === roleId)?.name
+  // Admins see every machine of their company, so only other roles get machines assigned
+  const assignsMachines = isUser && Boolean(roleName) && !ALL_MACHINE_ROLES.includes(roleName)
   const country = watch('country')
   const logo = watch('logo')
   const filters = watch('filters') ?? []
@@ -83,6 +111,48 @@ function AddCustomer() {
       active = false
     }
   }, [])
+
+  // Users: the roles the logged-in user may give, and (superadmin) the customers to pick from
+  useEffect(() => {
+    if (!isUser) return undefined
+    let active = true
+    Promise.all([getAssignableRoles(), needsCompany ? getUsers({ filterRole: ROLES.CUSTOMER }) : []])
+      .then(([roleList, customerList]) => {
+        if (!active) return
+        // Customers are added on the Customers page
+        setRoles(roleList.filter((role) => role.name !== ROLES.CUSTOMER))
+        setCompanies(customerList)
+      })
+      .catch((error) => {
+        if (!active) return
+        setAccessError(error.message)
+        toast.error(error.message, { title: 'Could not load roles' })
+      })
+    return () => {
+      active = false
+    }
+  }, [isUser, needsCompany])
+
+  // Users: the company's machines to assign. The server returns a customer's or admin's own
+  // company machines; the superadmin asks for the picked customer's.
+  useEffect(() => {
+    if (!isUser || (needsCompany && !companyId)) {
+      setMachines([])
+      return undefined
+    }
+    let active = true
+    setMachinesLoading(true)
+    getMachines(needsCompany ? companyId : undefined)
+      .then((list) => active && setMachines(list))
+      .catch((error) => active && toast.error(error.message, { title: 'Could not load machines' }))
+      .finally(() => active && setMachinesLoading(false))
+    return () => {
+      active = false
+    }
+  }, [isUser, needsCompany, companyId])
+
+  // Another company has other machines, so a new pick clears the chosen ones
+  const handleCompanyChange = () => setValue('machineIds', [])
 
   // Edit: load the customer and fill the form (reset() also makes these the Reset values)
   useEffect(() => {
@@ -134,35 +204,36 @@ function AddCustomer() {
 
   const onSubmit = async (values) => {
     try {
-      const payload = toUserPayload(values, existing)
+      // Admins get no assigned machines (they see them all)
+      const payload = toUserPayload(assignsMachines ? values : { ...values, machineIds: [] }, existing, kind)
       if (isEdit) {
         await updateUser(id, payload)
-        toast.success(`${values.companyName} has been updated.`, { title: 'Customer updated' })
+        toast.success(`${values.companyName} has been updated.`, { title: `${page.title} updated` })
       } else {
         await createUser(payload)
-        toast.success(`${values.companyName} has been added.`, { title: 'Customer created' })
+        toast.success(`${values.companyName} has been added.`, { title: `${page.title} created` })
       }
       // Re-apply the logged-in user's theme in case this was their own account
       refreshUserTheme()
-      navigate(ROUTES.CUSTOMERS)
+      navigate(page.routes.list)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save customer' })
+      toast.error(error.message, { title: `Could not save ${page.noun}` })
     }
   }
 
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">Masters · Customers</div>
-        <h1>{isEdit ? 'Edit Customer' : 'Add Customer'}</h1>
+        <div className="ts-eyebrow">{page.section}</div>
+        <h1>{isEdit ? `Edit ${page.title}` : `Add ${page.title}`}</h1>
         <p className="ts-page-subtitle">
-          {isEdit ? 'Update the customer account and its login.' : 'Create a customer account and its login.'}
+          {isEdit ? `Update the ${page.noun} account and its login.` : `Create a ${page.noun} account and its login.`}
         </p>
       </div>
       <div className="ts-page-actions">
-        <Button as={Link} to={ROUTES.CUSTOMERS} variant="ghost">
+        <Button as={Link} to={page.routes.list} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          Customer list
+          {page.title} list
         </Button>
       </div>
     </header>
@@ -172,7 +243,7 @@ function AddCustomer() {
     return (
       <>
         {header}
-        <Loader text="Loading customer…" />
+        <Loader text={`Loading ${page.noun}…`} />
       </>
     )
   }
@@ -182,7 +253,7 @@ function AddCustomer() {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this customer.</b> {customerError}
+          <b>Could not load this {page.noun}.</b> {customerError}
         </Alert>
       </>
     )
@@ -192,7 +263,101 @@ function AddCustomer() {
     <>
       {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit customer' : 'Add customer'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? `Edit ${page.noun}` : `Add ${page.noun}`}>
+        {/* Access: role, company and machines (users only) */}
+        {isUser && (
+          <Card className="mb-3">
+            <Card.Header>
+              <i className="bi bi-shield-check text-primary" aria-hidden="true" />
+              Access
+              {assignsMachines && (
+                <span className="ms-auto d-flex gap-1">
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => setValue('machineIds', machines.map((machine) => String(machine.id)), { shouldDirty: true })}
+                    disabled={!machines.length || machineIds.length === machines.length}
+                  >
+                    Select all
+                  </Button>
+                  <Button variant="link" size="sm" onClick={() => setValue('machineIds', [], { shouldDirty: true })} disabled={!machineIds.length}>
+                    Clear
+                  </Button>
+                </span>
+              )}
+            </Card.Header>
+            <Card.Body>
+              <Row className="g-3">
+                <Form.Group as={Col} md={6} xxl={4} controlId="roleId">
+                  <FieldLabel required help={FIELD_HELP.roleId}>Role</FieldLabel>
+                  {/* key: re-mount once the options arrive, so a saved role loaded earlier shows */}
+                  <Form.Select key={roles.length} {...register('roleId')} disabled={Boolean(accessError)} isInvalid={Boolean(errors.roleId)}>
+                    <option value="">{accessError ? 'Roles unavailable' : 'Select role'}</option>
+                    {roles.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {ROLE_LABELS[role.name] ?? role.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">{errors.roleId?.message}</Form.Control.Feedback>
+                </Form.Group>
+
+                {needsCompany && (
+                  <Form.Group as={Col} md={6} xxl={4} controlId="companyId">
+                    <Form.Label className={labelClass('companyId')}>Customer</Form.Label>
+                    <Form.Select key={companies.length} {...register('companyId', { onChange: handleCompanyChange })} isInvalid={Boolean(errors.companyId)}>
+                      <option value="">Select customer</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.id}>
+                          {customerName(company) === '—' ? company.username : `${customerName(company)} (${company.username})`}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">{errors.companyId?.message}</Form.Control.Feedback>
+                    {!errors.companyId && <Form.Text>Company the user belongs to.</Form.Text>}
+                  </Form.Group>
+                )}
+              </Row>
+
+              {roleName && !assignsMachines && (
+                <Alert variant="info" className="mt-3 mb-0">
+                  {ROLE_LABELS[roleName] ?? roleName} users see every machine of the company.
+                </Alert>
+              )}
+
+              {assignsMachines && (
+                <fieldset className="mt-3" aria-describedby="machines-hint">
+                  <legend className="visually-hidden">Machines</legend>
+                  <FieldLabel help={FIELD_HELP.machineIds}>Machines this user can access</FieldLabel>
+                  {machinesLoading ? (
+                    <Loader text="Loading machines…" />
+                  ) : machines.length ? (
+                    <div className="d-flex flex-wrap gap-3 mt-1">
+                      {machines.map((machine) => (
+                        <Form.Check
+                          key={machine.id}
+                          id={`machine-${machine.id}`}
+                          type="checkbox"
+                          label={machine.lineName ? `${machine.name} (${machine.lineName})` : machine.name}
+                          value={String(machine.id)}
+                          {...register('machineIds')}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-body-secondary mt-1">
+                      {needsCompany && !companyId ? 'Select a customer to see its machines.' : 'This company has no machines yet.'}
+                    </div>
+                  )}
+                  <Form.Text id="machines-hint">
+                    {`${machineIds.length} of ${machines.length} selected · the user sees only these machines`}
+                  </Form.Text>
+                </fieldset>
+              )}
+            </Card.Body>
+          </Card>
+        )}
+
         {/* Company */}
         <Card className="mb-3">
           <Card.Header>
@@ -435,7 +600,11 @@ function AddCustomer() {
 
               <Form.Group as={Col} md={6} xxl={4} controlId="dayStartFrom">
                 <FieldLabel required={isRequired('dayStartFrom')} help={FIELD_HELP.dayStartFrom}>Day Start From</FieldLabel>
-                <Form.Control {...register('dayStartFrom')} type="time" isInvalid={Boolean(errors.dayStartFrom)} />
+                <Controller
+                  name="dayStartFrom"
+                  control={control}
+                  render={({ field }) => <TimePicker {...field} isInvalid={Boolean(errors.dayStartFrom)} />}
+                />
                 <Form.Control.Feedback type="invalid">{errors.dayStartFrom?.message}</Form.Control.Feedback>
                 {!errors.dayStartFrom && <Form.Text>Production day begins at this time.</Form.Text>}
               </Form.Group>
@@ -450,7 +619,7 @@ function AddCustomer() {
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.theme?.message}</Form.Control.Feedback>
-                {!errors.theme && <Form.Text>Colour scheme the customer sees after signing in.</Form.Text>}
+                {!errors.theme && <Form.Text>Colour scheme the {page.noun} sees after signing in.</Form.Text>}
               </Form.Group>
             </Row>
           </Card.Body>
@@ -473,7 +642,7 @@ function AddCustomer() {
           <Card.Body>
             <fieldset aria-describedby="filters-hint">
               <legend className="visually-hidden">Filters</legend>
-              <FieldLabel help={FIELD_HELP.filters}>Filters available to this customer</FieldLabel>
+              <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
               <div className="d-flex flex-wrap gap-3 mt-1">
                 {FILTER_OPTIONS.map((option) => (
                   <Form.Check
@@ -499,7 +668,7 @@ function AddCustomer() {
           <span className="ts-form-actions-note">
             Fields marked <span className="text-danger">*</span> are required.
           </span>
-          <Button variant="ghost" onClick={() => navigate(ROUTES.CUSTOMERS)} disabled={isSubmitting}>
+          <Button variant="ghost" onClick={() => navigate(page.routes.list)} disabled={isSubmitting}>
             Cancel
           </Button>
           <Button variant="ghost" onClick={() => reset()} disabled={isSubmitting}>
@@ -514,7 +683,7 @@ function AddCustomer() {
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Customer' : 'Save Customer'}
+                {isEdit ? `Update ${page.title}` : `Save ${page.title}`}
               </>
             )}
           </Button>
@@ -522,6 +691,10 @@ function AddCustomer() {
       </Form>
     </>
   )
+}
+
+AddCustomer.propTypes = {
+  kind: PropTypes.oneOf(Object.values(ACCOUNT_KIND)),
 }
 
 export default AddCustomer
