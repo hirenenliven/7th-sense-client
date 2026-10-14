@@ -5,7 +5,8 @@ import IconAction from '@/components/common/IconAction'
 import { ACTION_ICONS } from '@/constants/icons'
 import { BRANCH_STATUS } from '@/constants/app'
 
-function BranchRow({ branch, statusBusy, onToggleStatus, onEdit, onDelete }) {
+// canManage (superadmin): the status switch works and the edit / delete actions show
+function BranchRow({ branch, canManage, statusBusy, onToggleStatus, onEdit, onDelete }) {
   const isActive = branch.status !== BRANCH_STATUS.INACTIVE
 
   return (
@@ -33,17 +34,19 @@ function BranchRow({ branch, statusBusy, onToggleStatus, onEdit, onDelete }) {
           type="switch"
           id={`branch-status-${branch.id}`}
           checked={isActive}
-          disabled={statusBusy}
+          disabled={!canManage || statusBusy}
           onChange={() => onToggleStatus(branch)}
           aria-label={`${branch.name} is ${isActive ? 'active' : 'inactive'}`}
         />
       </td>
-      <td className="border-start">
-        <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${branch.name}`} onClick={() => onEdit(branch)} />
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${branch.name}`} onClick={() => onDelete(branch)} />
-        </div>
-      </td>
+      {canManage && (
+        <td className="border-start">
+          <div className="d-flex gap-1">
+            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${branch.name}`} onClick={() => onEdit(branch)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${branch.name}`} onClick={() => onDelete(branch)} />
+          </div>
+        </td>
+      )}
     </tr>
   )
 }
@@ -58,6 +61,7 @@ BranchRow.propTypes = {
     colorCode: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
+  canManage: PropTypes.bool.isRequired,
   statusBusy: PropTypes.bool.isRequired,
   onToggleStatus: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,

@@ -23,8 +23,8 @@ function CountryList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
-  const { userId } = useOrgUser()
+  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
+  const { userId, canEdit } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
@@ -99,9 +99,11 @@ function CountryList() {
         <div className="ts-empty">
           <i className="bi bi-globe2 ts-empty-icon" aria-hidden="true" />
           <p className="mb-2">No countries yet.</p>
-          <Button size="sm" onClick={() => setAdding(true)}>
-            Add the first country
-          </Button>
+          {canEdit && (
+            <Button size="sm" onClick={() => setAdding(true)}>
+              Add the first country
+            </Button>
+          )}
         </div>
       )
     }
@@ -134,7 +136,7 @@ function CountryList() {
                   <th scope="col">ID</th>
                   <th scope="col">Country</th>
                   <th scope="col">Updated</th>
-                  <th scope="col">Actions</th>
+                  {canEdit && <th scope="col">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -177,10 +179,12 @@ function CountryList() {
               setPage(1)
             }}
           />
-          <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add Country
-          </Button>
+          {canEdit && (
+            <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
+              <i className="bi bi-plus-lg me-2" aria-hidden="true" />
+              Add Country
+            </Button>
+          )}
         </div>
       </header>
 

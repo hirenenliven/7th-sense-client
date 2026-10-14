@@ -1,22 +1,26 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
 import IconAction from '@/components/common/IconAction'
+import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function LocationRow({ location, onEdit, onDelete }) {
+  const { canEdit } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{location.id}</td>
       <td className="fw-semibold">{location.name}</td>
       <td className="text-body-secondary">{location.branchName || '—'}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(location.updatedAt)}</td>
-      <td className="border-start">
-        <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${location.name}`} onClick={() => onEdit(location)} />
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${location.name}`} onClick={() => onDelete(location)} />
-        </div>
-      </td>
+      {canEdit && (
+        <td className="border-start">
+          <div className="d-flex gap-1">
+            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${location.name}`} onClick={() => onEdit(location)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${location.name}`} onClick={() => onDelete(location)} />
+          </div>
+        </td>
+      )}
     </tr>
   )
 }

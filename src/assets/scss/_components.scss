@@ -2291,3 +2291,23 @@ $ts-toast-colors: (
   .ts-toast,
   .ts-toast.is-leaving { animation: none; }
 }
+
+// Add / Edit Part: one block per process, divided like the old screen; the part details column
+// gets a divider beside the processes on large screens
+.ts-part-process {
+  padding-bottom: $ts-space-4;
+  margin-bottom: $ts-space-4;
+  border-bottom: 1px solid $ts-line;
+}
+
+.ts-part-subprogram {
+  padding-top: $ts-space-3;
+  margin-top: $ts-space-3;
+  border-top: 1px dashed $ts-line;
+}
+
+.ts-part-details {
+  @include media-breakpoint-up(lg) {
+    border-right: 1px solid $ts-line;
+  }
+}

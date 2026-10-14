@@ -4,21 +4,26 @@ import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { BRANCH_STATUS, PAGE_SIZES } from '@/constants/app'
+import { BRANCH_STATUS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
+import useAuth from '@/hooks/useAuth'
 import { deleteBranch, getBranches, updateBranch } from '@/services/branchService'
 import { toast } from '@/utils/toast'
 import BranchRow from './BranchRow'
 import { toBranchPayload, toFormValues } from './branchForm'
 
-const COLUMNS = ['ID', 'Code', 'Name', 'Email', 'City', 'Colour', 'Status', 'Actions']
+const COLUMNS = ['ID', 'Code', 'Name', 'Email', 'City', 'Colour', 'Status']
 
 const matchesSearch = (branch, term) =>
   [branch.id, branch.code, branch.name, branch.email, branch.city]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
+// Branches are shared by every company: everyone reads them, only the superadmin changes them
 function BranchList() {
   const navigate = useNavigate()
+  const { hasRole } = useAuth()
+  const canManage = hasRole(SUPERADMIN_ONLY)
+  const columns = canManage ? [...COLUMNS, 'Actions'] : COLUMNS
 
   const [branches, setBranches] = useState([])
   const [loading, setLoading] = useState(true)
@@ -127,9 +132,11 @@ function BranchList() {
         <div className="ts-empty">
           <i className="bi bi-diagram-3 ts-empty-icon" aria-hidden="true" />
           <p className="mb-2">No branches yet.</p>
-          <Button as={Link} to={ROUTES.BRANCH_ADD} size="sm">
-            Add the first branch
-          </Button>
+          {canManage && (
+            <Button as={Link} to={ROUTES.BRANCH_ADD} size="sm">
+              Add the first branch
+            </Button>
+          )}
         </div>
       )
     }
@@ -159,7 +166,7 @@ function BranchList() {
             <Table hover responsive className="mb-0">
               <thead>
                 <tr>
-                  {COLUMNS.map((column) => (
+                  {columns.map((column) => (
                     <th key={column} scope="col">
                       {column}
                     </th>
@@ -171,6 +178,7 @@ function BranchList() {
                   <BranchRow
                     key={branch.id}
                     branch={branch}
+                    canManage={canManage}
                     statusBusy={statusBusyIds.has(branch.id)}
                     onToggleStatus={handleToggleStatus}
                     onEdit={handleEdit}
@@ -205,12 +213,14 @@ function BranchList() {
           <h1>Manage Branch</h1>
           <p className="ts-page-subtitle">All branches, their tax details and owning customers.</p>
         </div>
-        <div className="ts-page-actions">
-          <Button as={Link} to={ROUTES.BRANCH_ADD}>
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add New
-          </Button>
-        </div>
+        {canManage && (
+          <div className="ts-page-actions">
+            <Button as={Link} to={ROUTES.BRANCH_ADD}>
+              <i className="bi bi-plus-lg me-2" aria-hidden="true" />
+              Add New
+            </Button>
+          </div>
+        )}
       </header>
 
       <Card>

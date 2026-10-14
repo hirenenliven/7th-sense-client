@@ -1,4 +1,4 @@
-import { SUPERADMIN_ONLY, USER_MANAGERS } from './app'
+import { SUPERADMIN_ONLY, MANAGERS } from './app'
 import { ROUTES } from './routes'
 
 // Sidebar menu. An item has either a `path` (link) or `children` (submenu).
@@ -87,7 +87,7 @@ export const NAV_SECTIONS = [
         icon: 'bi-diagram-3',
         children: [
           { key: 'branch-list', label: 'Branch List', path: ROUTES.BRANCHES },
-          { key: 'branch-add', label: 'Add Branch', path: ROUTES.BRANCH_ADD },
+          { key: 'branch-add', label: 'Add Branch', path: ROUTES.BRANCH_ADD, roles: SUPERADMIN_ONLY },
         ],
       },
       { key: 'locations', label: 'Location', icon: 'bi-geo-alt', path: ROUTES.ORG_LOCATIONS },
@@ -101,7 +101,7 @@ export const NAV_SECTIONS = [
         icon: 'bi-rocket-takeoff',
         children: [
           { key: 'part-list', label: 'Part List', path: ROUTES.PARTS },
-          { key: 'operations', label: 'Operations', path: ROUTES.OPERATIONS },
+          { key: 'part-add', label: 'Add Part', path: ROUTES.PART_ADD, roles: MANAGERS },
         ],
       },
       {
@@ -117,7 +117,7 @@ export const NAV_SECTIONS = [
         key: 'users',
         label: 'Users',
         icon: 'bi-people',
-        roles: USER_MANAGERS,
+        roles: MANAGERS,
         children: [
           { key: 'user-list', label: 'User List', path: ROUTES.USERS },
           { key: 'user-add', label: 'Add User', path: ROUTES.USER_ADD },

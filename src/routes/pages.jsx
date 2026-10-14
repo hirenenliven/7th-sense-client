@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { SUPERADMIN_ONLY, USER_MANAGERS } from '@/constants/app'
+import { SUPERADMIN_ONLY, MANAGERS } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { ACCOUNT_KIND } from '@/pages/Customers/accountPages'
 
@@ -13,6 +13,8 @@ const BranchList = lazy(() => import('@/pages/Branches/BranchList'))
 const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
 const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
 const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
+const PartList = lazy(() => import('@/pages/Parts/PartList'))
+const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
@@ -39,16 +41,20 @@ export const PAGES = [
   { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView />, roles: SUPERADMIN_ONLY },
   // Users reuse the Customer pages (`kind`); the server limits each manager to their company
-  { path: ROUTES.USERS, element: <CustomerList kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
-  { path: ROUTES.USER_ADD, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
-  { path: ROUTES.USER_EDIT, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
-  { path: ROUTES.USER_VIEW, element: <CustomerView kind={ACCOUNT_KIND.USER} />, roles: USER_MANAGERS },
+  { path: ROUTES.USERS, element: <CustomerList kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
+  { path: ROUTES.USER_ADD, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
+  { path: ROUTES.USER_EDIT, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
+  { path: ROUTES.USER_VIEW, element: <CustomerView kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
   { path: ROUTES.BRANCHES, element: <BranchList /> },
-  { path: ROUTES.BRANCH_ADD, element: <AddBranch /> },
-  { path: ROUTES.BRANCH_EDIT, element: <AddBranch /> },
+  { path: ROUTES.BRANCH_ADD, element: <AddBranch />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.BRANCH_EDIT, element: <AddBranch />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MACHINES, element: <MachineList /> },
-  { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: SUPERADMIN_ONLY },
-  { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
+  { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
+  // Parts: everyone reads their company's; managers add, edit and delete
+  { path: ROUTES.PARTS, element: <PartList /> },
+  { path: ROUTES.PART_ADD, element: <AddPart />, roles: MANAGERS },
+  { path: ROUTES.PART_EDIT, element: <AddPart />, roles: MANAGERS },
   { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },

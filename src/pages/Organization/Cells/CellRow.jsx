@@ -1,22 +1,26 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
 import IconAction from '@/components/common/IconAction'
+import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function CellRow({ cell, onEdit, onDelete }) {
+  const { canEdit } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{cell.id}</td>
       <td className="fw-semibold">{cell.name}</td>
       <td className="text-body-secondary">{cell.lineName || '—'}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(cell.updatedAt)}</td>
-      <td className="border-start">
-        <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${cell.name}`} onClick={() => onEdit(cell)} />
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${cell.name}`} onClick={() => onDelete(cell)} />
-        </div>
-      </td>
+      {canEdit && (
+        <td className="border-start">
+          <div className="d-flex gap-1">
+            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${cell.name}`} onClick={() => onEdit(cell)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${cell.name}`} onClick={() => onDelete(cell)} />
+          </div>
+        </td>
+      )}
     </tr>
   )
 }

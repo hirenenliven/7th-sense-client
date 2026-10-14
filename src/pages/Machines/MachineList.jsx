@@ -4,7 +4,7 @@ import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
+import { MANAGERS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { deleteMachine, getMachines } from '@/services/machineService'
@@ -15,13 +15,14 @@ const matchesSearch = (machine, term) =>
   [machine.id, machine.name, machine.serialNumber, machine.customerName, machine.modelName, machine.brandName, machine.controllerName, machine.lineName]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
-// Operations › All Machines. Admins see every customer's machines (filter by customer) and
-// add / edit / delete them; other users see their own machines, read-only.
+// Operations › All Machines. The superadmin sees every customer's machines (filter by customer)
+// and deletes them; managers (superadmin, customer, admin) add and edit; everyone else only
+// reads the machines the server returns for them.
 function MachineList() {
   const navigate = useNavigate()
   const { hasRole } = useAuth()
-  // Only the superadmin adds and changes machines; everyone else reads the machines they may access
-  const canManage = hasRole(SUPERADMIN_ONLY)
+  const isSuperadmin = hasRole(SUPERADMIN_ONLY)
+  const canManage = hasRole(MANAGERS)
 
   const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(true)
@@ -91,7 +92,7 @@ function MachineList() {
     }
   }
 
-  const columns = ['ID', 'Machine', ...(canManage ? ['Customer'] : []), 'Model', 'Brand / Controller', 'Line', 'Installed', 'Connection', 'Status', ...(canManage ? ['Actions'] : [])]
+  const columns = ['ID', 'Machine', ...(isSuperadmin ? ['Customer'] : []), 'Model', 'Brand / Controller', 'Line', 'Installed', 'Connection', 'Status', ...(canManage ? ['Actions'] : [])]
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading machines…" />
@@ -142,7 +143,7 @@ function MachineList() {
               <i className="bi bi-search" aria-hidden="true" />
             </InputGroup.Text>
           </InputGroup>
-          {canManage && (
+          {isSuperadmin && (
             <Form.Select
               className="w-auto"
               value={customerFilter}
@@ -176,7 +177,15 @@ function MachineList() {
               </thead>
               <tbody>
                 {pageRows.map((machine) => (
-                  <MachineRow key={machine.id} machine={machine} canManage={canManage} onEdit={handleEdit} onDelete={setPendingDelete} />
+                  <MachineRow
+                    key={machine.id}
+                    machine={machine}
+                    showCustomer={isSuperadmin}
+                    canEdit={canManage}
+                    canDelete={isSuperadmin}
+                    onEdit={handleEdit}
+                    onDelete={setPendingDelete}
+                  />
                 ))}
               </tbody>
             </Table>
@@ -205,7 +214,7 @@ function MachineList() {
           <div className="ts-eyebrow">Operations · Machines</div>
           <h1>All Machines</h1>
           <p className="ts-page-subtitle">
-            {canManage ? 'Every customer’s machines, their model, controller and line.' : 'Your machines, their model, controller and line.'}
+            {isSuperadmin ? 'Every customer’s machines, their model, controller and line.' : 'Your machines, their model, controller and line.'}
           </p>
         </div>
         {canManage && (

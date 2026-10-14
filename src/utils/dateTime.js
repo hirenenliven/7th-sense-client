@@ -81,3 +81,23 @@ export const startOfToday = () => {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())
 }
+
+// Durations (part setup / cycle / loading times): shown as "H:MM:SS", stored as whole seconds.
+// Hours go up to 999 (the parts API limit, dto/part_dto.go).
+export const DURATION_PLACEHOLDER = 'H:MM:SS'
+export const DURATION_ZERO = '0:00:00'
+export const DURATION_PATTERN = /^\d{1,3}:[0-5]\d:[0-5]\d$/
+
+// 5400 → "1:30:00"
+export const secondsToDuration = (seconds) => {
+  const total = Math.max(0, Math.floor(Number(seconds) || 0))
+  return `${Math.floor(total / 3600)}:${pad2(Math.floor((total % 3600) / 60))}:${pad2(total % 60)}`
+}
+
+// "1:30:00" → 5400; null when the text is not H:MM:SS
+export const durationToSeconds = (text) => {
+  const value = String(text ?? '').trim()
+  if (!DURATION_PATTERN.test(value)) return null
+  const [hours, minutes, seconds] = value.split(':').map(Number)
+  return hours * 3600 + minutes * 60 + seconds
+}

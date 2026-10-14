@@ -6,8 +6,8 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
 
-// `canManage` (admins): shows the customer column and the edit / delete actions
-function MachineRow({ machine, canManage, onEdit, onDelete }) {
+// showCustomer (superadmin): the customer column; canEdit (managers) / canDelete (superadmin): the actions
+function MachineRow({ machine, showCustomer, canEdit, canDelete, onEdit, onDelete }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -17,7 +17,7 @@ function MachineRow({ machine, canManage, onEdit, onDelete }) {
         <div className="fw-semibold">{machine.name}</div>
         <div className="small text-body-secondary font-tabular">{machine.serialNumber}</div>
       </td>
-      {canManage && <td>{machine.customerName || '—'}</td>}
+      {showCustomer && <td>{machine.customerName || '—'}</td>}
       <td className="text-body-secondary">{machine.modelName || '—'}</td>
       <td className="text-body-secondary">
         {machine.brandName || '—'}
@@ -35,11 +35,13 @@ function MachineRow({ machine, canManage, onEdit, onDelete }) {
           {isActive ? 'Active' : 'Inactive'}
         </Badge>
       </td>
-      {canManage && (
+      {canEdit && (
         <td className="border-start">
           <div className="d-flex gap-1">
             <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+            {canDelete && (
+              <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+            )}
           </div>
         </td>
       )}
@@ -61,7 +63,9 @@ MachineRow.propTypes = {
     onlineStatus: PropTypes.bool,
     status: PropTypes.string,
   }).isRequired,
-  canManage: PropTypes.bool.isRequired,
+  showCustomer: PropTypes.bool.isRequired,
+  canEdit: PropTypes.bool.isRequired,
+  canDelete: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }

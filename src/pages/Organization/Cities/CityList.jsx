@@ -27,8 +27,8 @@ function CityList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
-  const { userId } = useOrgUser()
+  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
+  const { userId, canEdit } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState('')
@@ -122,9 +122,11 @@ function CityList() {
           {canAdd ? (
             <>
               <p className="mb-2">No cities yet.</p>
-              <Button size="sm" onClick={openAdd}>
-                Add the first city
-              </Button>
+              {canEdit && (
+                <Button size="sm" onClick={openAdd}>
+                  Add the first city
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -183,7 +185,7 @@ function CityList() {
                   <th scope="col">City</th>
                   <th scope="col">State</th>
                   <th scope="col">Updated</th>
-                  <th scope="col">Actions</th>
+                  {canEdit && <th scope="col">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -232,10 +234,12 @@ function CityList() {
               setPage(1)
             }}
           />
-          <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add City
-          </Button>
+          {canEdit && (
+            <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
+              <i className="bi bi-plus-lg me-2" aria-hidden="true" />
+              Add City
+            </Button>
+          )}
         </div>
       </header>
 

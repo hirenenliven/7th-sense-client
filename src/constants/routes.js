@@ -28,6 +28,8 @@ export const ROUTES = {
   CONTROLLERS: '/masters/controllers',
   MODELS: '/masters/models',
   PARTS: '/masters/parts',
+  PART_ADD: '/masters/parts/add',
+  PART_EDIT: '/masters/parts/:id/edit',
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',
   HOLIDAYS: '/masters/holidays',

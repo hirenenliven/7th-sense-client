@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import OrgUserContext from './OrgUserContext'
 import useAuth from '@/hooks/useAuth'
 import { getUsers } from '@/services/customerService'
-import { SUPERADMIN_ONLY } from '@/constants/app'
+import { MANAGERS, SUPERADMIN_ONLY } from '@/constants/app'
 
 // Whose organization (Masters › Countries … Supervisors) the screens show and change.
 // Every user works on their own; an admin can pick another user, and that choice stays
@@ -12,6 +12,8 @@ import { SUPERADMIN_ONLY } from '@/constants/app'
 function OrgUserProvider({ children }) {
   const { user, hasRole } = useAuth()
   const isAdmin = Boolean(user) && hasRole(SUPERADMIN_ONLY)
+  // Members read their company's organization; only managers change it (server: managersOnly)
+  const canEdit = Boolean(user) && hasRole(MANAGERS)
 
   const [selection, setSelection] = useState({ ownerId: null, userId: '' })
   const [users, setUsers] = useState([])
@@ -40,6 +42,7 @@ function OrgUserProvider({ children }) {
   const value = useMemo(
     () => ({
       canPickUser: isAdmin,
+      canEdit,
       userId,
       setUserId,
       users: isAdmin ? users : [],
@@ -47,7 +50,7 @@ function OrgUserProvider({ children }) {
       // The picked user's record; null while working on the logged-in user's own organization
       selectedUser: (userId && users.find((option) => String(option.id) === userId)) || null,
     }),
-    [isAdmin, userId, setUserId, users, usersError],
+    [isAdmin, canEdit, userId, setUserId, users, usersError],
   )
 
   return <OrgUserContext.Provider value={value}>{children}</OrgUserContext.Provider>

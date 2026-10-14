@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { CUSTOMER_ROLE_ID } from '@/constants/app'
+import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import {
   CONTROLLER_VERSION_TYPES,
   MACHINE_ACCURACIES,
@@ -16,6 +16,7 @@ import { getBrands, getControllers, getModels } from '@/services/catalogService'
 import { getUsers } from '@/services/customerService'
 import { createMachine, getMachineById, updateMachine } from '@/services/machineService'
 import { getUserLines } from '@/services/userLineService'
+import useAuth from '@/hooks/useAuth'
 import { formatDate } from '@/utils/helpers'
 import { toast } from '@/utils/toast'
 import DatePicker from '@/components/common/DatePicker'
@@ -96,11 +97,15 @@ const loadBrands = () => getBrands().then((list) => [...list].sort(byName))
 const loadControllers = () => getControllers().then((list) => [...list].sort(byName))
 const loadModels = () => getModels().then((list) => [...list].sort(byName))
 
-// Add and edit share this form: /machines/add and /machines/:id/edit (admin only)
+// Add and edit share this form: /machines/add and /machines/:id/edit (managers only). The superadmin
+// picks the customer; a customer or admin always adds to their own company (the server enforces it).
 function AddMachine() {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
+  const { user, hasRole } = useAuth()
+  const canPickCustomer = hasRole(SUPERADMIN_ONLY)
+  const ownCompanyId = user?.role === ROLES.CUSTOMER ? user.id : user?.companyId
 
   const schema = useMemo(() => machineSchema(isEdit), [isEdit])
   const {
@@ -113,7 +118,7 @@ function AddMachine() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: INITIAL_VALUES,
+    defaultValues: canPickCustomer ? INITIAL_VALUES : { ...INITIAL_VALUES, userId: ownCompanyId ? String(ownCompanyId) : '' },
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -123,7 +128,7 @@ function AddMachine() {
   const [machineLoading, setMachineLoading] = useState(isEdit)
   const [machineError, setMachineError] = useState('')
 
-  const customers = useOptions(loadCustomers, 'customers')
+  const customers = useOptions(canPickCustomer ? loadCustomers : null, 'customers')
   const brands = useOptions(loadBrands, 'brands')
   const controllers = useOptions(loadControllers, 'controllers')
   const models = useOptions(loadModels, 'models')
@@ -245,20 +250,22 @@ function AddMachine() {
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Field name="userId" label="Customer" help={FIELD_HELP.userId} {...fieldProps}>
-                <Form.Select
-                  {...register('userId', { onChange: clearLine })}
-                  disabled={customers.loading || Boolean(customers.error)}
-                  isInvalid={Boolean(errors.userId)}
-                >
-                  <option value="">{placeholder(customers, 'Customer', { empty: 'No customers yet' })}</option>
-                  {customers.items.map((customer) => (
-                    <option key={customer.id} value={customer.id}>
-                      {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Field>
+              {canPickCustomer && (
+                <Field name="userId" label="Customer" help={FIELD_HELP.userId} {...fieldProps}>
+                  <Form.Select
+                    {...register('userId', { onChange: clearLine })}
+                    disabled={customers.loading || Boolean(customers.error)}
+                    isInvalid={Boolean(errors.userId)}
+                  >
+                    <option value="">{placeholder(customers, 'Customer', { empty: 'No customers yet' })}</option>
+                    {customers.items.map((customer) => (
+                      <option key={customer.id} value={customer.id}>
+                        {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Field>
+              )}
 
               <Form.Group as={Col} md={6} controlId="addedDate">
                 <Form.Label>Machine Added Date</Form.Label>

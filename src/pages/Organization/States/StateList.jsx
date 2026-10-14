@@ -27,8 +27,8 @@ function StateList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user; an admin can pick another user (OrgUserSelect)
-  const { userId } = useOrgUser()
+  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
+  const { userId, canEdit } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [countryFilter, setCountryFilter] = useState('')
@@ -120,9 +120,11 @@ function StateList() {
           {canAdd ? (
             <>
               <p className="mb-2">No states yet.</p>
-              <Button size="sm" onClick={openAdd}>
-                Add the first state
-              </Button>
+              {canEdit && (
+                <Button size="sm" onClick={openAdd}>
+                  Add the first state
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -181,7 +183,7 @@ function StateList() {
                   <th scope="col">State</th>
                   <th scope="col">Country</th>
                   <th scope="col">Updated</th>
-                  <th scope="col">Actions</th>
+                  {canEdit && <th scope="col">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -229,10 +231,12 @@ function StateList() {
               setPage(1)
             }}
           />
-          <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add State
-          </Button>
+          {canEdit && (
+            <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
+              <i className="bi bi-plus-lg me-2" aria-hidden="true" />
+              Add State
+            </Button>
+          )}
         </div>
       </header>
 

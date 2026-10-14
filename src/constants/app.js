@@ -60,12 +60,12 @@ export const ROLE_LABELS = {
 // A customer is a company; the users it and its admins add are members of it (users API `companyId`).
 // Only the superadmin works across companies.
 
-// `roles` of superadmin-only pages and menu items (customers, machine catalog, adding machines)
+// `roles` of superadmin-only pages and menu items (customers, branches, machine catalog, deleting machines)
 export const SUPERADMIN_ONLY = [ROLES.SUPERADMIN]
 
-// `roles` of the Users pages (server: `userManagersOnly`). The server limits each to their own
-// company's users and to the roles GET /roles returns.
-export const USER_MANAGERS = [ROLES.SUPERADMIN, ROLES.CUSTOMER, ROLES.ADMIN]
+// Roles that manage a company — its users, machines and organization (server: `managersOnly`).
+// The server limits a customer or admin to their own company and to the roles GET /roles returns.
+export const MANAGERS = [ROLES.SUPERADMIN, ROLES.CUSTOMER, ROLES.ADMIN]
 
 // Member roles that see every machine of their company; other members only their assigned machines
 export const ALL_MACHINE_ROLES = [ROLES.ADMIN]
