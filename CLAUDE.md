@@ -32,3 +32,6 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 
 ## Masters (organization) screens
 - Countries … Supervisors act on one user's organization. Admins pick the user with `<OrgUserSelect>` in the page actions; read it with `useOrgUser()` (`context/OrgUserProvider.jsx`) and pass `userId` to every `user*Service` call (sent as `?userId=`; `''` = the logged-in user). Form modals show `<OrgUserNote />`.
+
+## Machine catalog
+- Brand → Controller → Model (`services/catalogService.js`). Masters › Machine Catalog (Controllers, Models) is superadmin-only: `roles: SUPERADMIN_ONLY` on the pages and menu item (server: `superAdminOnly` routes). Every user reads the lists for the machine form, which filters controllers by brand and models by controller.

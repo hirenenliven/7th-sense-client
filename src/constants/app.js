@@ -10,7 +10,8 @@ export const BREAKPOINTS = {
 export const STORAGE_KEYS = {
   SIDEBAR_OPEN: 'ts.sidebar.open',
   LANGUAGE: 'ts.language',
-  THEME: 'ts.theme',
+  THEME: 'ts.theme', // theme on screen, applied before the first render
+  THEME_CHOICES: 'ts.theme.choices', // { [userId]: theme } picked in the top bar
   REMEMBERED_USERNAME: 'ts.login.username', // set when "Remember" is ticked on the login screen
 }
 
@@ -38,6 +39,7 @@ export const CLOCK_TICK_MS = 1000
 
 // Role names (backend roles.name). The server enforces access; the UI only hides what a role cannot use.
 export const ROLES = {
+  SUPERADMIN: 'superadmin',
   ADMIN: 'admin',
   SUPERVISOR: 'supervisor',
   OPERATOR: 'operator',
@@ -47,6 +49,7 @@ export const ROLES = {
 }
 
 export const ROLE_LABELS = {
+  [ROLES.SUPERADMIN]: 'Super Administrator',
   [ROLES.ADMIN]: 'Administrator',
   [ROLES.SUPERVISOR]: 'Supervisor',
   [ROLES.OPERATOR]: 'Operator',
@@ -56,7 +59,10 @@ export const ROLE_LABELS = {
 }
 
 // `roles` of admin-only pages and menu items (same rule as the server's admin-only routes)
-export const ADMIN_ONLY = [ROLES.ADMIN]
+export const ADMIN_ONLY = [ROLES.SUPERADMIN, ROLES.ADMIN]
+
+// `roles` of superadmin-only pages and menu items (machine catalog: controllers, models)
+export const SUPERADMIN_ONLY = [ROLES.SUPERADMIN]
 
 // Toast notifications (see utils/toast.js)
 export const TOAST_DEFAULTS = {
@@ -76,8 +82,8 @@ export const TOAST_DEFAULTS = {
   },
 }
 
-// Users API (backend roles table seed: admin 1, supervisor 2, operator 3, customer 4)
-export const CUSTOMER_ROLE_ID = 4
+// Users API (backend roles table seed: superadmin 1, admin 2, supervisor 3, operator 4, customer 5)
+export const CUSTOMER_ROLE_ID = 5
 
 export const USER_STATUS = {
   ACTIVE: 'active',

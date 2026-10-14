@@ -11,6 +11,7 @@
     "build:theme": "sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme.scss dist-theme/theme.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme.scss dist-theme/theme.min.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map src/assets/scss/theme-light.scss dist-theme/theme-light.css && sass --load-path=node_modules --quiet-deps --silence-deprecation=import --silence-deprecation=global-builtin --silence-deprecation=color-functions --silence-deprecation=mixed-decls --no-source-map --style=compressed src/assets/scss/theme-light.scss dist-theme/theme-light.min.css"
   },
   "dependencies": {
+    "@fontsource-variable/roboto": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",

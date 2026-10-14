@@ -24,9 +24,14 @@ set on the customer form). The light theme is the **same SCSS built again with l
 | `src/assets/scss/_tokens-light.scss` | Light values of the colour tokens (surfaces, ink, accent, status, greys, shadows) |
 | `src/assets/scss/theme-light.scss` | Imports `tokens-light`, then `theme` |
 | `src/utils/theme.js` | `applyTheme()` loads `theme-light.scss?inline` on demand and adds it after the dark stylesheet; `refreshUserTheme()` applies the logged-in user's theme (`GET /me`, called by `AuthProvider` after login / session restore) |
+| `src/hooks/useTheme.js` | The theme on screen; re-renders when it changes |
 
 The colour tokens in `_variables.scss` are `!default`, so the light file sets them first. Bootstrap bakes colours
 into SVG icons and `to-rgb()` values at compile time, which is why this is a second build and not CSS variables.
+**Switching:** the sun / moon button in the top bar calls `chooseTheme(theme, userId)`. The choice is saved per user
+in `localStorage` (`ts.theme.choices`) and wins over the profile theme; users with no choice get their profile theme.
+`main.jsx` applies the last theme (`ts.theme`) before the first render, so reloads do not flash the other theme.
+
 Pages need nothing special: use the tokens and Bootstrap classes as usual and both themes follow.
 A new colour token must get a light value in `_tokens-light.scss` (and `!default` in `_variables.scss`).
 

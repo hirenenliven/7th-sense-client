@@ -4,6 +4,8 @@ export const ROUTES = {
 
   // Operations
   MACHINES: '/machines',
+  MACHINE_ADD: '/machines/add',
+  MACHINE_EDIT: '/machines/:id/edit',
   MACHINE_HEALTH: '/machines/health',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
@@ -22,6 +24,9 @@ export const ROUTES = {
   BRANCHES: '/masters/branches',
   BRANCH_ADD: '/masters/branches/add',
   BRANCH_EDIT: '/masters/branches/:id/edit',
+  // Machine catalog (superadmin): Brand → Controller → Model
+  CONTROLLERS: '/masters/controllers',
+  MODELS: '/masters/models',
   PARTS: '/masters/parts',
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',

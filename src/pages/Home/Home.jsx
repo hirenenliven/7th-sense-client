@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes'
 function Home() {
   return (
     <>
-      <div className="p-5 mb-4 bg-white rounded-3 shadow-sm">
+      <div className="p-5 mb-4 bg-body-secondary rounded-3 shadow-sm">
         <h1 className="display-5 fw-bold">Welcome to {env.appName}</h1>
         <p className="fs-5 text-muted">
           React + Vite + Bootstrap starter. Start building in <code>src/pages</code>.

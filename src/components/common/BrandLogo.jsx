@@ -1,24 +1,20 @@
 import PropTypes from 'prop-types'
+import logoSvg from '@/assets/images/7thSlogologin.svg?raw'
 import env from '@/config/env'
 
-// 7th Sense wordmark: the orange line-drawn "7" with "th", and "SENSE".
-// Colours come from the theme (.ts-logo-* in _components.scss), so it follows dark / light.
+// 7th Sense logo (assets/images/7thSlogologin.svg), inlined so the white "SENSE" wordmark
+// follows the text colour (.ts-logo) and stays visible in the light theme.
+const LOGO_MARKUP = logoSvg.replace('fill="#fff"', 'fill="currentColor"')
+
+// Size it with a class that sets a width (e.g. .ts-brand-mark, .ts-login-logo).
 function BrandLogo({ className = '' }) {
   return (
-    <svg className={`ts-logo ${className}`} viewBox="0 0 150 64" role="img" aria-label={env.appName}>
-      <g className="ts-logo-mark">
-        <path d="M6 7 H45 L22 58" />
-        <path d="M14 14 H35 L16 57" />
-        <path d="M4 14 H8" />
-        <path d="M27 22 L31 22" />
-      </g>
-      <text className="ts-logo-sup" x="61" y="16">
-        th
-      </text>
-      <text className="ts-logo-word" x="60" y="40">
-        SENSE
-      </text>
-    </svg>
+    <span
+      className={`ts-logo ${className}`}
+      role="img"
+      aria-label={env.appName}
+      dangerouslySetInnerHTML={{ __html: LOGO_MARKUP }}
+    />
   )
 }
 

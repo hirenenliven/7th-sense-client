@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { Button, Dropdown, Form } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
+import BrandLogo from '@/components/common/BrandLogo'
 import LiveClock from '@/components/common/LiveClock'
 import env from '@/config/env'
-import { LANGUAGES, ROLE_LABELS, STORAGE_KEYS } from '@/constants/app'
+import { LANGUAGES, ROLE_LABELS, STORAGE_KEYS, THEME } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import useSidebar from '@/hooks/useSidebar'
+import useTheme from '@/hooks/useTheme'
 import { readStorage, writeStorage } from '@/utils/storage'
+import { chooseTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 
 // "First Last", else the username
@@ -17,6 +20,7 @@ function Topbar() {
   const { isOpen, toggle } = useSidebar()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const theme = useTheme()
   const [signingOut, setSigningOut] = useState(false)
   const [language, setLanguage] = useState(() => readStorage(STORAGE_KEYS.LANGUAGE, LANGUAGES[0].code))
 
@@ -24,6 +28,9 @@ function Topbar() {
     setLanguage(event.target.value)
     writeStorage(STORAGE_KEYS.LANGUAGE, event.target.value)
   }
+
+  const isLight = theme === THEME.LIGHT
+  const handleThemeToggle = () => chooseTheme(isLight ? THEME.DARK : THEME.LIGHT, user?.id)
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -41,10 +48,7 @@ function Topbar() {
   return (
     <header className="ts-topbar">
       <Link to={ROUTES.HOME} className="ts-brand" aria-label={`${env.appName} home`}>
-        <span className="ts-brand-mark" aria-hidden="true">
-          7
-        </span>
-        <span className="ts-brand-name d-none d-sm-inline">{env.appName}</span>
+        <BrandLogo className="ts-brand-mark" />
       </Link>
 
       <Button
@@ -75,6 +79,16 @@ function Topbar() {
             </option>
           ))}
         </Form.Select>
+
+        <Button
+          variant="plain"
+          className="btn-icon"
+          onClick={handleThemeToggle}
+          aria-label={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
+          title={isLight ? 'Dark theme' : 'Light theme'}
+        >
+          <i className={`bi ${isLight ? 'bi-moon-stars' : 'bi-sun'}`} aria-hidden="true" />
+        </Button>
 
         <Button variant="plain" className="btn-icon position-relative" aria-label="Notifications">
           <i className="bi bi-bell" aria-hidden="true" />

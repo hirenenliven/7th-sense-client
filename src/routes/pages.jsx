@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { ADMIN_ONLY } from '@/constants/app'
+import { ADMIN_ONLY, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 
 const Home = lazy(() => import('@/pages/Home/Home'))
@@ -10,6 +10,10 @@ const AddCustomer = lazy(() => import('@/pages/Customers/AddCustomer'))
 const CustomerView = lazy(() => import('@/pages/Customers/CustomerView'))
 const BranchList = lazy(() => import('@/pages/Branches/BranchList'))
 const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
+const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
+const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
+const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
+const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
 // Masters › Country … Supervisor (Org prefix keeps them apart from Masters › Branches)
 const OrgCountryList = lazy(() => import('@/pages/Organization/Countries/CountryList'))
@@ -36,6 +40,11 @@ export const PAGES = [
   { path: ROUTES.BRANCHES, element: <BranchList /> },
   { path: ROUTES.BRANCH_ADD, element: <AddBranch /> },
   { path: ROUTES.BRANCH_EDIT, element: <AddBranch /> },
+  { path: ROUTES.MACHINES, element: <MachineList /> },
+  { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: ADMIN_ONLY },
+  { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: ADMIN_ONLY },
+  { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },
   { path: ROUTES.ORG_COUNTRIES, element: <OrgCountryList /> },
   { path: ROUTES.ORG_STATES, element: <OrgStateList /> },

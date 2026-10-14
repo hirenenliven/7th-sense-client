@@ -11,6 +11,15 @@ export const PATTERNS = {
   url: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/i,
   branchCode: /^[A-Z0-9]{2,20}$/, // same rule as the branches API
   hexColor: /^#[0-9A-Fa-f]{6}$/,
+  catalogCode: /^[A-Z0-9_-]{2,50}$/, // brands, categories, products (dto/catalog_dto.go)
+  // Machines API (dto/machine_dto.go)
+  ipv4: /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/,
+  machineName: /^[a-zA-Z0-9 _./()#-]{1,50}$/,
+  serialNumber: /^[a-zA-Z0-9/_-]{1,50}$/,
+  controllerVersion: /^[a-zA-Z0-9._-]{1,10}$/,
+  machineUsername: /^[a-zA-Z0-9_.]{1,15}$/,
+  money: /^\d{1,8}(\.\d{1,2})?$/, // NUMERIC(10,2)
+  decimal: /^-?\d+(\.\d+)?$/,
 }
 
 export const PASSWORD_MIN_LENGTH = 8

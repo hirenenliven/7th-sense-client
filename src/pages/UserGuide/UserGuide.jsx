@@ -18,6 +18,7 @@ const MODULE_PURPOSE = {
   tools: 'Cutting-tool inventory and tool-life tracking.',
   reports: 'OEE, downtime and production reports.',
   customers: 'Customer accounts, their logins, company details and filters.',
+  catalog: 'Machine controllers of each brand and the machine models of each controller (super administrator only).',
   branches: 'Branches with their city, tax details, colour and owning customer.',
   countries: 'Countries you work in — the top of your organisation.',
   states: 'States within each country.',

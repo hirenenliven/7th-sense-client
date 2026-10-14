@@ -23,7 +23,7 @@ function AuthProvider({ children }) {
       .then((sessionUser) => {
         if (!active) return
         setUser(sessionUser)
-        refreshUserTheme()
+        refreshUserTheme(sessionUser?.id)
       })
       .catch(() => active && setUser(null))
       .finally(() => active && setIsChecking(false))
@@ -50,7 +50,7 @@ function AuthProvider({ children }) {
   const login = useCallback(async (credentials) => {
     const loggedIn = await authService.login(credentials)
     setUser(loggedIn)
-    refreshUserTheme()
+    refreshUserTheme(loggedIn?.id)
     return loggedIn
   }, [])
 

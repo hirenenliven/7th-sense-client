@@ -149,16 +149,10 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   }
 }
 
+// Logo mark (BrandLogo)
 .ts-brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: ts-rem(32);
-  height: ts-rem(32);
-  border: 2px solid $ts-orange;
-  border-radius: $ts-radius;
-  color: $ts-orange;
-  line-height: 1;
+  flex-shrink: 0;
+  width: $ts-brand-logo-width;
 }
 
 .ts-menu-toggle {
@@ -1121,6 +1115,15 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   border-color: $ts-line;
 }
 
+// Dropdown with a scrolling checkbox list (pages/Machines/HealthSensorPicker.jsx)
+.ts-check-menu {
+  max-height: $ts-check-menu-max-height;
+  overflow-y: auto;
+}
+
+// Dropdown toggle styled as a .form-select: the select arrow replaces the toggle caret
+.ts-select-toggle::after { display: none; }
+
 // Rounded status chip with optional dot: <span class="ts-chip text-success"><i class="ts-dot ts-dot-live"></i>Live</span>
 .ts-chip {
   display: inline-flex;
@@ -1390,34 +1393,16 @@ $ts-toast-colors: (
 // Brand logo (components/common/BrandLogo.jsx)
 // -----------------------------------------------------------------------------
 
+// Width comes from the className passed in; the "SENSE" wordmark uses the text colour
 .ts-logo {
   display: block;
-  overflow: visible;
-}
+  color: $ts-ink;
 
-.ts-logo-mark {
-  fill: none;
-  stroke: $ts-orange;
-  stroke-width: $ts-logo-stroke;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.ts-logo-word,
-.ts-logo-sup {
-  font-family: $ts-font-sans;
-  font-weight: 600;
-}
-
-.ts-logo-word {
-  fill: $ts-ink;
-  font-size: $ts-logo-word-size;
-  letter-spacing: .04em;
-}
-
-.ts-logo-sup {
-  fill: $ts-orange;
-  font-size: $ts-logo-sup-size;
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 }
 
 // -----------------------------------------------------------------------------
