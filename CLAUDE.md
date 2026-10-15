@@ -32,16 +32,17 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 - Built screen: add to `PAGES` in `src/routes/pages.jsx` (not `AppRoutes.jsx`). User Guide reads `BUILT_PATHS` for status.
 
 ## Masters (organization) screens
-- Countries … Supervisors act on one user's organization. The superadmin picks the user with `<OrgUserSelect>` in the page actions; read it with `useOrgUser()` (`context/OrgUserProvider.jsx`) and pass `userId` to every `user*Service` call (sent as `?userId=`; `''` = the logged-in user). Form modals show `<OrgUserNote />`.
+- Countries … Supervisors: the superadmin's lists show every customer's rows (Customer column, `useOrgUser().customerLabel`); there is no page-level customer picker. The add / edit modals have `<OrgCustomerField>` (superadmin only; locked on edit): the schema gets `customerId` via `withCustomer`, parent options are the picked customer's (`ownedBy`, branches by `customerId`), and saves / deletes send that customer as `userId` (`?userId=`). Other users always work on their own company (`''`). Helpers: `utils/orgCustomer.js`.
 
 ## Customers and users
 - A customer is a company; Masters › Users manages its members (admin, supervisor, operator, QC, shop head). Customers are superadmin-only (`SUPERADMIN_ONLY`); Users are for `USER_MANAGERS` (superadmin, customer, admin) and the server limits each to their own company.
 - Users reuse the Customer pages: `<CustomerList|AddCustomer|CustomerView kind={ACCOUNT_KIND.USER} />` (`pages/Customers/accountPages.js` holds the per-kind wording and routes). The user form adds an Access card: Role (`GET /roles` — only the roles the logged-in user may give), Customer (superadmin only) and Machines (`machineIds`; hidden for admins, who see every company machine).
 - Role and company come from the session (`useAuth().user`), never from a request parameter; the server enforces every rule, the UI only hides what a role cannot use.
 - Machines: managers (`MANAGERS`: superadmin, customer, admin) add and edit — a customer or admin always on its own company (no Customer field); only the superadmin deletes and sees the Customer column. Everyone else only reads the machines the server returns (customer/admin: the company's; other roles: their assigned ones).
-- Branches are shared master data: everyone reads, only the superadmin adds / edits / deletes.
+- Branches are shared master data: everyone reads, only the superadmin adds / edits / deletes. A branch needs a customer; its City list is that customer's cities (cleared when the customer changes).
+- Country, City and Branch tables show a Customer column: `useOrgUser().customerLabel(userId | customerId)`.
 - Masters › Country … Supervisor: members work on their company's organization; only managers see Add / Edit / Delete (`useOrgUser().canEdit`).
-- Countries and states are added customer-wise by the superadmin only (`useOrgUser().canAssign`; server `superAdminOnly`). Add Countries: a `MultiSelectPicker` of every library country not yet added. Add States: one of the user's countries, then a `MultiSelectPicker` of its states. Each pick is its own `POST /user-country` / `/user-state` row; the States table shows the country name. Customers and their users only read what is added.
+- Countries and states are added customer-wise by the superadmin only (`useOrgUser().canAssign`; server `superAdminOnly`). Add Countries: a `MultiSelectPicker` of every library country not yet added. Add States: a `MultiSelectPicker` of the user's countries, then one of their states grouped by country (keys `"<userCountryId>:<name>"`, `stateForm.js`). Each pick is its own `POST /user-country` / `/user-state` row; the States table shows the country name. Customers and their users only read what is added.
 
 ## Machine catalog
 - Brand → Controller → Model (`services/catalogService.js`). Masters › Machine Catalog (Controllers, Models) is superadmin-only: `roles: SUPERADMIN_ONLY` on the pages and menu item (server: `superAdminOnly` routes). Every user reads the lists for the machine form, which filters controllers by brand and models by controller.

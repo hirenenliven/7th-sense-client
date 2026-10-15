@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function CellRow({ cell, onEdit, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{cell.id}</td>
       <td className="fw-semibold">{cell.name}</td>
       <td className="text-body-secondary">{cell.lineName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(cell.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(cell.updatedAt)}</td>
       {canEdit && (
         <td className="border-start">
@@ -30,6 +31,7 @@ CellRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     lineName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,

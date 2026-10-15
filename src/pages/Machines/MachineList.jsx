@@ -10,6 +10,9 @@ import useAuth from '@/hooks/useAuth'
 import { deleteMachine, getMachines } from '@/services/machineService'
 import { toast } from '@/utils/toast'
 import MachineRow from './MachineRow'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (machine, term) =>
   [machine.id, machine.name, machine.serialNumber, machine.customerName, machine.modelName, machine.brandName, machine.controllerName, machine.lineName]
@@ -60,18 +63,33 @@ function MachineList() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [machines])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return machines.filter(
       (machine) =>
         (!customerFilter || String(machine.userId) === customerFilter) && (!term || matchesSearch(machine, term)),
     )
   }, [machines, search, customerFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Machine', sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
+    { label: 'Model', sort: (row) => row.modelName },
+    { label: 'Brand / Controller', sort: (row) => [row.brandName, row.controllerName].filter(Boolean).join(' ') },
+    { label: 'Line', sort: (row) => row.lineName },
+    { label: 'Installed', sort: (row) => row.installationDate },
+    { label: 'Connection', sort: (row) => (row.onlineStatus ? 1 : 0) },
+    { label: 'Status', sort: (row) => row.status },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleEdit = useCallback(
     (machine) => navigate(generatePath(ROUTES.MACHINE_EDIT, { id: String(machine.id) })),
@@ -92,7 +110,6 @@ function MachineList() {
     }
   }
 
-  const columns = ['ID', 'Machine', ...(isSuperadmin ? ['Customer'] : []), 'Model', 'Brand / Controller', 'Line', 'Installed', 'Connection', 'Status', ...(canManage ? ['Actions'] : [])]
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading machines…" />
@@ -166,15 +183,7 @@ function MachineList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((machine) => (
                   <MachineRow

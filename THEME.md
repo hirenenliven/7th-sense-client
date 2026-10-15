@@ -103,9 +103,10 @@ track that widens on hover (`$ts-scrollbar-*`). Don't give an element its own `s
 | Clickable card | `.card-clickable` (with `.ts-drill` hint) |
 | Status edge on a card | `.card-status-{status}`, or `.card-accent` for orange |
 | Inner box | `.card-inset` |
-| Table in a rounded panel | wrap it in `.ts-table-panel` |
+| Table in a rounded panel | wrap it in `.ts-table-panel`. With a `TablePagination` footer inside, the panel fits its rows up to a maximum height (`$ts-table-panel-height`): the footer sits right under the last row, and rows beyond the maximum scroll inside under a sticky header |
+| Sortable columns | `columns = [{ label, sort: (row) => value }, 'Actions']` → `const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))`, page `sortedRows`, and `<SortableHead columns sort onSort />` as the `<thead>`. A plain string column (Actions, View) is not sortable |
 | Status edge on a table row | `<tr className="row-status-{status}">`, add `table-danger` to tint the row |
-| Active / Inactive | `<StatusBadge active={…} />` (`components/common/StatusBadge.jsx`): green pill with a glowing dot, or neutral with a hollow dot. Use it for every Active / Inactive status |
+| Active / Inactive | `<StatusBadge active={…} />` (`components/common/StatusBadge.jsx`): green pill with a glowing dot, or red for inactive. Use it for every Active / Inactive status (a status switch in a table is green / red too) |
 | Status pill | `<Badge bg="" className="badge-outline-{status}">`, or `badge-outline-muted` |
 | Soft chip | `<Badge bg="" className="badge-soft-{status}">` |
 | Live chip | `<span className="ts-chip text-success"><i className="ts-dot ts-dot-live" />Live</span>` |

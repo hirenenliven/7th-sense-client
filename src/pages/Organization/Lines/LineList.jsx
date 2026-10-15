@@ -3,16 +3,18 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
-import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserLine, getUserLines } from '@/services/userLineService'
 import { getUserShops } from '@/services/userShopService'
 import useOrgUser from '@/hooks/useOrgUser'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
 import { toast } from '@/utils/toast'
 import LineFormModal from './LineFormModal'
 import LineRow from './LineRow'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (line, term) =>
   [line.id, line.name, line.shopName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -27,8 +29,8 @@ function LineList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canEdit } = useOrgUser()
+  // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
+  const { userId, canEdit, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [shopFilter, setShopFilter] = useState('')
@@ -58,17 +60,28 @@ function LineList() {
     }
   }, [reloadKey, userId])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return lines.filter(
       (line) => (!shopFilter || String(line.userShopId) === shopFilter) && (!term || matchesSearch(line, term)),
     )
   }, [lines, search, shopFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Line', sort: (row) => row.name },
+    { label: 'Shop', sort: (row) => row.shopName },
+    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    ...(canEdit ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Every line belongs to a shop
   const canAdd = shops.length > 0
@@ -77,6 +90,7 @@ function LineList() {
   const handleEdit = useCallback((line) => setEditing({ line }), [])
 
   const handleSaved = (saved) => {
+    if (!lines.some((row) => row.id === saved.id)) setPage(1) // a new row is on top of page 1
     setLines((list) => {
       const exists = list.some((line) => line.id === saved.id)
       return (exists ? list.map((line) => (line.id === saved.id ? saved : line)) : [...list, saved]).sort(byName)
@@ -87,7 +101,7 @@ function LineList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserLine(pendingDelete.id, userId)
+      await deleteUserLine(pendingDelete.id, pendingDelete.userId)
       setLines((list) => list.filter((line) => line.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Line deleted' })
       setPendingDelete(null)
@@ -179,15 +193,7 @@ function LineList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Line</th>
-                  <th scope="col">Shop</th>
-                  <th scope="col">Updated</th>
-                  {canEdit && <th scope="col">Actions</th>}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((line) => (
                   <LineRow
@@ -226,14 +232,6 @@ function LineList() {
           <p className="ts-page-subtitle">Your lines and the shop each belongs to.</p>
         </div>
         <div className="ts-page-actions">
-          <OrgUserSelect
-            disabled={loading}
-            onChange={() => {
-              setShopFilter('')
-              setSearch('')
-              setPage(1)
-            }}
-          />
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />

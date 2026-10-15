@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserCell, updateUserCell } from '@/services/userCellService'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, cellSchema, toCellPayload, toFormValues } from './cellForm'
 
@@ -13,27 +14,41 @@ import { INITIAL_VALUES, NAME_MAX_LENGTH, cellSchema, toCellPayload, toFormValue
 function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
   const isEdit = Boolean(cell)
 
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(cellSchema, canPickUser), [canPickUser])
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(cellSchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(cell ? toFormValues(cell) : { ...INITIAL_VALUES, userLineId: defaultLineId })
-  }, [show, cell, defaultLineId, reset])
+    if (!show) return
+    reset(
+      cell
+        ? { ...toFormValues(cell), customerId: String(cell.userId) }
+        : { ...INITIAL_VALUES, customerId: ownerOf(lines, defaultLineId, 'userId'), userLineId: defaultLineId },
+    )
+  }, [show, cell, defaultLineId, lines, reset])
+
+  // Parents of the picked customer only; a new customer clears the picked parent
+  const customerId = watch('customerId')
+  const parentOptions = useMemo(() => ownedBy(lines, canPickUser, customerId, 'userId'), [lines, canPickUser, customerId])
 
   const onSubmit = async (values) => {
     try {
+      const ownerId = canPickUser ? values.customerId : userId
       const payload = toCellPayload(values)
-      const saved = isEdit ? await updateUserCell(cell.id, payload, userId) : await createUserCell(payload, userId)
+      const saved = isEdit ? await updateUserCell(cell.id, payload, ownerId) : await createUserCell(payload, ownerId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Cell updated' : 'Cell added' })
       onSaved(saved)
     } catch (error) {
@@ -49,12 +64,18 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
+          <OrgCustomerField
+            id="cell-customer"
+            registration={register('customerId', { onChange: () => setValue('userLineId', '') })}
+            locked={isEdit}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
           <Form.Group controlId="cell-line" className="mb-3">
             <Form.Label className="required">Line</Form.Label>
             <Form.Select {...register('userLineId')} isInvalid={Boolean(errors.userLineId)}>
               <option value="">Select line</option>
-              {lines.map((option) => (
+              {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.shopName ? `${option.name} · ${option.shopName}` : option.name}
                 </option>

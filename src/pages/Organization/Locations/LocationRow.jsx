@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function LocationRow({ location, onEdit, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{location.id}</td>
       <td className="fw-semibold">{location.name}</td>
       <td className="text-body-secondary">{location.branchName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(location.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(location.updatedAt)}</td>
       {canEdit && (
         <td className="border-start">
@@ -30,6 +31,7 @@ LocationRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     branchName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,

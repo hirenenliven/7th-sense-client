@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
-import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { deleteUserCountry, getUserCountries } from '@/services/userCountryService'
 import useOrgUser from '@/hooks/useOrgUser'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
 import { toast } from '@/utils/toast'
 import CountryFormModal from './CountryFormModal'
 import CountryRow from './CountryRow'
+import { newestFirst } from '@/utils/helpers'
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 
@@ -23,8 +25,8 @@ function CountryList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canAssign } = useOrgUser()
+  // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
+  const { userId, canAssign, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
@@ -48,17 +50,28 @@ function CountryList() {
     }
   }, [reloadKey, userId])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return term ? countries.filter((country) => matchesSearch(country, term)) : countries
   }, [countries, search])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Country', sort: (row) => row.name },
+    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    ...(canAssign ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleSaved = (added) => {
+    setPage(1) // the new rows are on top of page 1
     setCountries((list) => [...list, ...added].sort(byName))
     setAdding(false)
   }
@@ -66,7 +79,7 @@ function CountryList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserCountry(pendingDelete.id, userId)
+      await deleteUserCountry(pendingDelete.id, pendingDelete.userId)
       setCountries((list) => list.filter((country) => country.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Country deleted' })
       setPendingDelete(null)
@@ -131,14 +144,7 @@ function CountryList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Country</th>
-                  <th scope="col">Updated</th>
-                  {canAssign && <th scope="col">Actions</th>}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((country) => (
                   <CountryRow key={country.id} country={country} onDelete={setPendingDelete} />
@@ -172,13 +178,6 @@ function CountryList() {
           <p className="ts-page-subtitle">The countries assigned to your organization.</p>
         </div>
         <div className="ts-page-actions">
-          <OrgUserSelect
-            disabled={loading}
-            onChange={() => {
-              setSearch('')
-              setPage(1)
-            }}
-          />
           {canAssign && (
             <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />

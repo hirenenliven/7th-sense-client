@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function StateRow({ state, onDelete }) {
-  const { canAssign } = useOrgUser()
+  const { canAssign, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{state.id}</td>
       <td className="fw-semibold">{state.name}</td>
       <td className="text-body-secondary">{state.countryName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(state.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(state.updatedAt)}</td>
       {canAssign && (
         <td className="border-start">
@@ -29,6 +30,7 @@ StateRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     countryName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onDelete: PropTypes.func.isRequired,

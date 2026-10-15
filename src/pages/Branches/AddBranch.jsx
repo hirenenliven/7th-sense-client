@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { BRANCH_STATUS, SUPERADMIN_ONLY } from '@/constants/app'
+import { BRANCH_STATUS, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { createBranch, getBranchById, updateBranch } from '@/services/branchService'
@@ -54,7 +54,7 @@ function AddBranch() {
   const [customersError, setCustomersError] = useState('')
 
   const [cities, setCities] = useState([])
-  const [citiesLoading, setCitiesLoading] = useState(true)
+  const [citiesLoading, setCitiesLoading] = useState(false)
   const [citiesError, setCitiesError] = useState('')
 
   // Branch being edited (null when adding)
@@ -63,12 +63,13 @@ function AddBranch() {
   const [branchError, setBranchError] = useState('')
 
   const colorCode = watch('colorCode')
+  const customerId = watch('customerId')
 
   // Load customer options
   useEffect(() => {
     if (!canPickCustomer) return undefined
     let active = true
-    getUsers()
+    getUsers({ filterRole: ROLES.CUSTOMER })
       .then((list) => active && setCustomers(list))
       .catch((error) => {
         if (!active) return
@@ -81,10 +82,14 @@ function AddBranch() {
     }
   }, [canPickCustomer])
 
-  // Load city options (Masters › City)
+  // City options: the picked customer's cities (Masters › City), loaded once the customer is known
   useEffect(() => {
+    setCities([])
+    setCitiesError('')
+    if (!customerId) return undefined
     let active = true
-    getUserCities()
+    setCitiesLoading(true)
+    getUserCities(undefined, customerId)
       .then((list) => active && setCities(list))
       .catch((error) => {
         if (!active) return
@@ -95,7 +100,10 @@ function AddBranch() {
     return () => {
       active = false
     }
-  }, [])
+  }, [customerId])
+
+  // Another customer has other cities, so a new pick clears the chosen one
+  const handleCustomerChange = () => setValue('userCityId', '')
 
   // Edit: load the branch and fill the form (reset() also makes these the Reset values)
   useEffect(() => {
@@ -123,7 +131,7 @@ function AddBranch() {
 
   const onSubmit = async (values) => {
     try {
-      const payload = toBranchPayload(values, existing, cities)
+      const payload = toBranchPayload(values, existing)
       if (isEdit) {
         await updateBranch(id, payload)
         toast.success(`${payload.name} has been updated.`, { title: 'Branch updated' })
@@ -206,10 +214,10 @@ function AddBranch() {
 
               {canPickCustomer && (
                 <Form.Group as={Col} md={6} xxl={4} controlId="customerId">
-                  <FieldLabel help={FIELD_HELP.customerId}>Customer</FieldLabel>
-                  <Form.Select {...register('customerId')} disabled={customersLoading || Boolean(customersError)} isInvalid={Boolean(errors.customerId)}>
+                  <FieldLabel required help={FIELD_HELP.customerId}>Customer</FieldLabel>
+                  <Form.Select {...register('customerId', { onChange: handleCustomerChange })} disabled={customersLoading || Boolean(customersError)} isInvalid={Boolean(errors.customerId)}>
                     <option value="">
-                      {customersLoading ? 'Loading customers…' : customersError ? 'Customers unavailable' : 'No customer'}
+                      {customersLoading ? 'Loading customers…' : customersError ? 'Customers unavailable' : 'Select customer'}
                     </option>
                     {customers.map((customer) => (
                       <option key={customer.id} value={customer.id}>
@@ -267,9 +275,23 @@ function AddBranch() {
 
               <Form.Group as={Col} md={4} controlId="userCityId">
                 <FieldLabel help={FIELD_HELP.userCityId}>City</FieldLabel>
-                <Form.Select {...register('userCityId')} disabled={citiesLoading || Boolean(citiesError)} isInvalid={Boolean(errors.userCityId)}>
+                {/* key: re-mount once the options arrive, so a saved city loaded earlier shows */}
+                <Form.Select
+                  key={cities.length}
+                  {...register('userCityId')}
+                  disabled={!customerId || citiesLoading || Boolean(citiesError)}
+                  isInvalid={Boolean(errors.userCityId)}
+                >
                   <option value="">
-                    {citiesLoading ? 'Loading cities…' : citiesError ? 'Cities unavailable' : cities.length ? 'Select city' : 'No cities yet'}
+                    {!customerId
+                      ? 'Select a customer first'
+                      : citiesLoading
+                        ? 'Loading cities…'
+                        : citiesError
+                          ? 'Cities unavailable'
+                          : cities.length
+                            ? 'Select city'
+                            : 'No cities yet'}
                   </option>
                   {cities.map((city) => (
                     <option key={city.id} value={city.id}>
@@ -278,13 +300,10 @@ function AddBranch() {
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.userCityId?.message}</Form.Control.Feedback>
-                {!citiesLoading && !citiesError && !cities.length && (
+                {customerId && !citiesLoading && !citiesError && !cities.length && (
                   <Form.Text>
-                    Add cities under <Link to={ROUTES.ORG_CITIES}>Masters › City</Link>.
+                    This customer has no cities. Add them under <Link to={ROUTES.ORG_CITIES}>Masters › City</Link>.
                   </Form.Text>
-                )}
-                {existing?.city && !existing.userCityId && (
-                  <Form.Text className="d-block">Saved as text: {existing.city}. Pick it from the list to link it.</Form.Text>
                 )}
               </Form.Group>
 

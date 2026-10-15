@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserLine, updateUserLine } from '@/services/userLineService'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, lineSchema, toLinePayload, toFormValues } from './lineForm'
 
@@ -13,27 +14,41 @@ import { INITIAL_VALUES, NAME_MAX_LENGTH, lineSchema, toLinePayload, toFormValue
 function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
   const isEdit = Boolean(line)
 
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(lineSchema, canPickUser), [canPickUser])
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(lineSchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(line ? toFormValues(line) : { ...INITIAL_VALUES, userShopId: defaultShopId })
-  }, [show, line, defaultShopId, reset])
+    if (!show) return
+    reset(
+      line
+        ? { ...toFormValues(line), customerId: String(line.userId) }
+        : { ...INITIAL_VALUES, customerId: ownerOf(shops, defaultShopId, 'userId'), userShopId: defaultShopId },
+    )
+  }, [show, line, defaultShopId, shops, reset])
+
+  // Parents of the picked customer only; a new customer clears the picked parent
+  const customerId = watch('customerId')
+  const parentOptions = useMemo(() => ownedBy(shops, canPickUser, customerId, 'userId'), [shops, canPickUser, customerId])
 
   const onSubmit = async (values) => {
     try {
+      const ownerId = canPickUser ? values.customerId : userId
       const payload = toLinePayload(values)
-      const saved = isEdit ? await updateUserLine(line.id, payload, userId) : await createUserLine(payload, userId)
+      const saved = isEdit ? await updateUserLine(line.id, payload, ownerId) : await createUserLine(payload, ownerId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Line updated' : 'Line added' })
       onSaved(saved)
     } catch (error) {
@@ -49,12 +64,18 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
+          <OrgCustomerField
+            id="line-customer"
+            registration={register('customerId', { onChange: () => setValue('userShopId', '') })}
+            locked={isEdit}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
           <Form.Group controlId="line-shop" className="mb-3">
             <Form.Label className="required">Shop</Form.Label>
             <Form.Select {...register('userShopId')} isInvalid={Boolean(errors.userShopId)}>
               <option value="">Select shop</option>
-              {shops.map((option) => (
+              {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.locationName ? `${option.name} · ${option.locationName}` : option.name}
                 </option>

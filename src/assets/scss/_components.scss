@@ -800,6 +800,25 @@ fieldset:disabled .btn {
   border-color: $ts-orange;
 }
 
+// Status switch in a table (Branches, Customers, Users): the StatusBadge colours —
+// green when active, red (tinted track, red knob) when inactive
+.table .form-switch .form-check-input {
+  &:checked {
+    background-color: $ts-good;
+    border-color: $ts-good;
+  }
+
+  &:not(:checked) {
+    --bs-form-switch-bg: #{escape-svg($ts-status-switch-off-knob)};
+    background-color: rgba($ts-red, $ts-tint-soft);
+    border-color: rgba($ts-red, $ts-tint-strong * 2);
+  }
+
+  &:focus { box-shadow: 0 0 0 $input-btn-focus-width rgba($ts-good, $input-btn-focus-color-opacity); }
+
+  &:not(:checked):focus { box-shadow: 0 0 0 $input-btn-focus-width rgba($ts-red, $input-btn-focus-color-opacity); }
+}
+
 // Radio buttons: orange ring with an orange dot on the input surface, hover
 // border and a brighter label once picked (every <Form.Check type="radio">)
 .form-check-input[type="radio"] {
@@ -1185,6 +1204,53 @@ fieldset:disabled .btn {
   > tbody > tr:last-child > * { border-bottom-width: 0; }
 
   > :not(caption) > * > * { border-bottom-color: $ts-line; }
+
+  // The sorted column's header reads in ink
+  > thead th[aria-sort="ascending"],
+  > thead th[aria-sort="descending"] { color: $ts-ink; }
+}
+
+// Sortable column header (components/common/SortableHead.jsx): the label is a button with a
+// sort arrow — hidden until the header is hovered (↓, the first sort), orange ↓ / ↑ on the sorted column.
+// The arrow keeps its space so the header does not shift.
+.ts-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-1;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: $ts-radius-xs;
+  transition: color $ts-transition;
+
+  th:hover > & { color: $ts-ink; }
+
+  // The whole header cell takes the click, not only the label
+  th:has(> &) { position: relative; cursor: pointer; }
+  &::after { content: ""; position: absolute; inset: 0; }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 $input-btn-focus-width $input-btn-focus-color;
+  }
+}
+
+.ts-sort-icon {
+  font-size: $ts-sort-icon-size;
+  opacity: 0;
+  transition: opacity $ts-transition, color $ts-transition;
+
+  th:hover > .ts-sort-btn &,
+  .ts-sort-btn:focus-visible & { opacity: 1; }
+
+  .ts-sort-btn.is-active & {
+    color: $ts-orange;
+    opacity: 1;
+  }
 }
 
 .table-hover > tbody > tr {
@@ -1233,6 +1299,33 @@ fieldset:disabled .btn {
   // Breathing room at the panel edges
   .table > :not(caption) > tr > :first-child { padding-left: $ts-table-edge-x; }
   .table > :not(caption) > tr > :last-child { padding-right: $ts-table-edge-x; }
+}
+
+// List table with pagination (every list page: <Table responsive> + TablePagination): the panel
+// fits its rows (footer right under the last one, no empty band), up to a maximum height; rows
+// beyond it scroll inside the table under a header that stays on top, with the footer kept in view.
+.ts-table-panel:has(> .ts-table-footer) {
+  display: flex;
+  flex-direction: column;
+  max-height: $ts-table-panel-height;
+
+  > .table-responsive {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  > .ts-table-footer { flex-shrink: 0; }
+
+  // Sticky header; its bottom rule is drawn on the cell (a collapsed border would scroll away)
+  .table > thead > tr > * {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-image: linear-gradient(to top, #{$ts-line} #{$border-width}, transparent #{$border-width});
+    border-bottom-width: 0;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -1438,7 +1531,7 @@ fieldset:disabled .btn {
 }
 
 // Active / Inactive (components/common/StatusBadge.jsx): soft pill with a status dot.
-// Active is green with a glowing dot; inactive is neutral with a hollow dot.
+// Active is green and inactive red, each a tinted pill with a glowing dot.
 .ts-status {
   display: inline-flex;
   align-items: center;
@@ -1458,9 +1551,9 @@ fieldset:disabled .btn {
   }
 
   &.is-inactive {
-    color: $ts-ink-3;
-    background-color: $ts-panel-2;
-    border-color: $ts-line;
+    color: $ts-red;
+    background-color: rgba($ts-red, $ts-tint-soft);
+    border-color: rgba($ts-red, $ts-tint-strong * 2);
   }
 }
 
@@ -1477,8 +1570,8 @@ fieldset:disabled .btn {
   }
 
   .ts-status.is-inactive > & {
-    background-color: transparent;
-    box-shadow: inset 0 0 0 $ts-status-ring currentColor;
+    background-color: currentColor;
+    box-shadow: 0 0 0 $ts-status-halo rgba($ts-red, $ts-tint-strong + 4%);
   }
 }
 
@@ -1532,11 +1625,11 @@ fieldset:disabled .btn {
   }
 
   &.is-inactive:has(.ts-status-input:checked) {
-    color: $ts-ink-2;
-    background-color: $ts-panel;
-    border-color: $ts-line;
+    color: $ts-red;
+    background-color: rgba($ts-red, $ts-tint-soft);
+    border-color: rgba($ts-red, $ts-tint-strong * 2);
 
-    > .ts-status-dot { box-shadow: none; }
+    > .ts-status-dot { box-shadow: 0 0 0 $ts-status-halo rgba($ts-red, $ts-tint-strong + 4%); }
   }
 
   &:has(.ts-status-input:focus-visible) { box-shadow: $input-focus-box-shadow; }
@@ -1828,9 +1921,34 @@ $ts-toast-colors: (
 
 // Dropdown toggle styled as a .form-select: the select chevron replaces the toggle caret.
 // It is a .btn underneath: keep it a field (block, left-aligned text that truncates, no press motion)
+// .btn comes after .form-select in Bootstrap, so its variables are pointed back at the field values
+// (surface, border, weight, padding that leaves room for the chevron).
 .ts-select-toggle {
+  --bs-btn-color: #{$input-color};
+  --bs-btn-bg: #{$input-bg};
+  --bs-btn-border-color: #{$input-border-color};
+  --bs-btn-hover-color: #{$input-color};
+  --bs-btn-hover-bg: #{$input-bg};
+  --bs-btn-hover-border-color: #{$input-border-color};
+  --bs-btn-active-color: #{$input-color};
+  --bs-btn-active-bg: #{$input-bg};
+  --bs-btn-active-border-color: #{$input-focus-border-color};
+  --bs-btn-disabled-color: #{$ts-ink-3};
+  --bs-btn-disabled-bg: #{$input-disabled-bg};
+  --bs-btn-disabled-border-color: #{$input-disabled-border-color};
+  --bs-btn-disabled-opacity: 1;
+  --bs-btn-focus-box-shadow: #{$input-focus-box-shadow};
+  --bs-btn-font-size: #{$input-font-size};
+  --bs-btn-font-weight: #{$input-font-weight};
+  --bs-btn-line-height: #{$input-line-height};
+  --bs-btn-border-radius: #{$input-border-radius};
+
   display: block;
+  padding: $form-select-padding-y $form-select-indicator-padding $form-select-padding-y $form-select-padding-x;
   letter-spacing: normal;
+  box-shadow: none;
+
+  &:focus-visible { border-color: $input-focus-border-color; }
 
   &:active:not(:disabled, .disabled) { transform: none; }
 
@@ -2874,34 +2992,28 @@ $ts-toast-colors: (
   transition: opacity $ts-transition, transform $ts-transition;
 }
 
-// Searchable multi-select (components/common/MultiSelectPicker.jsx): a .ts-check-menu with a search
-// box that stays on top while the list scrolls, group headings (a state's country) and the picked
-// options as removable chips under the field.
-.ts-multi-menu {
-  padding-top: 0;
-}
+// Searchable multi-select (components/common/MultiSelectPicker.jsx)
+// Field: the picked labels (truncated) + a count pill. Open list: a fixed search on top, a scrolling
+// list ("All" row with a running n/total, group headings, option rows) and a fixed footer with the
+// count and Clear. Under the field: the picked options as neutral chips in a quiet inset panel.
+// Orange marks only the active things (focus, ticks, counts); chips stay neutral so they never
+// outshout the primary button.
 
-.ts-multi-menu-search {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: $ts-space-2 0;
-  background-color: var(--bs-dropdown-bg);
-}
-
-.ts-multi-menu-group {
-  padding: $ts-space-2 $ts-picker-option-px $ts-space-1;
+// Count pill: in the field and in the "Selected" header
+.ts-multi-count {
+  flex-shrink: 0;
+  min-width: $ts-multi-count-size;
+  padding: 0 $ts-space-1;
   font-size: $ts-fs-2xs;
   font-weight: 600;
-  color: $ts-ink-3;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.ts-multi-menu-empty {
-  padding: $ts-space-2 $ts-picker-option-px;
-  font-size: $ts-fs-sm;
-  color: $ts-ink-3;
+  line-height: $ts-multi-count-size;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  letter-spacing: normal;
+  text-transform: none;
+  color: $ts-orange;
+  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+  border-radius: $ts-radius-pill;
 }
 
 .ts-multi-toggle {
@@ -2913,17 +3025,166 @@ $ts-toast-colors: (
   > .text-truncate { flex: 1 1 auto; min-width: 0; }
 }
 
-// A checked option: accent tint and bold, so the picked ones stand out while scrolling
-.ts-multi-menu .form-check.is-checked {
-  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+// The open list: header / scrolling list / footer. Flex only while shown (.show): a plain
+// display here would beat Bootstrap's .dropdown-menu { display: none } and keep a closed list on screen.
+.ts-multi-menu {
+  flex-direction: column;
+  max-height: $ts-multi-menu-max-height;
+  padding: 0;
+  overflow: hidden;
 
-  .form-check-label { font-weight: 600; color: $ts-ink; }
+  &.show { display: flex; }
 }
 
-// The picked options under the field: a count + Clear all, then the chips in a soft inset panel
+.ts-multi-menu-search {
+  position: relative;
+  flex-shrink: 0;
+  padding: $ts-space-2;
+  border-bottom: $border-width solid $ts-line;
+
+  > .bi {
+    position: absolute;
+    top: 50%;
+    left: calc(#{$ts-space-2} + #{$ts-space-3});
+    font-size: $ts-fs-sm;
+    color: $ts-ink-3;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .form-control { padding-left: calc(#{$ts-space-3} * 2 + #{$ts-fs-sm}); }
+}
+
+.ts-multi-menu-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: $ts-space-1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: $ts-space-2;
+    min-height: $ts-multi-option-height;
+    margin: 0;
+    padding: 0 $ts-picker-option-px;
+    border-radius: $ts-radius-sm;
+    transition: background-color $ts-transition;
+
+    &:hover { background-color: $dropdown-link-hover-bg; }
+  }
+
+  .form-check-input {
+    flex-shrink: 0;
+    float: none;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .form-check-label {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: $ts-space-2;
+    min-width: 0;
+    padding: $ts-space-1 0;
+    color: $ts-ink-2;
+    cursor: pointer;
+  }
+
+  // Keyboard focus shows on the row, not only on the small box
+  .form-check:has(.form-check-input:focus-visible) {
+    background-color: $dropdown-link-hover-bg;
+    box-shadow: inset 0 0 0 $border-width $ts-orange;
+  }
+
+  .form-check-input:focus { box-shadow: none; }
+}
+
+// "All" row: bold label, running n/total on the right, a divider under it
+.ts-multi-menu-list .ts-multi-menu-all {
+  margin-bottom: $ts-space-1;
+  border-bottom: $border-width solid $ts-line;
+  border-radius: $ts-radius-sm $ts-radius-sm 0 0;
+
+  .form-check-label {
+    font-weight: 600;
+    color: $ts-ink;
+  }
+}
+
+.ts-multi-menu-meta {
+  margin-left: auto;
+  font-size: $ts-fs-xs;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: $ts-ink-3;
+}
+
+// Group heading (a state's country) between option rows
+.ts-multi-menu-group {
+  padding: $ts-space-3 $ts-picker-option-px $ts-space-1;
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: $ts-ink-3;
+}
+
+// A picked option: soft accent tint, label in ink (weight unchanged, so names do not jump)
+.ts-multi-menu-list .ts-multi-option.is-checked {
+  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+
+  .form-check-label { color: $ts-ink; }
+
+  &:hover { background-color: rgba($ts-orange, $ts-picker-selected-alpha * 1.5); }
+}
+
+.ts-multi-menu-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $ts-space-2;
+  padding: $ts-space-5 $ts-space-3;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+  text-align: center;
+
+  > .bi { font-size: $ts-fs-xl; opacity: .6; }
+}
+
+.ts-multi-menu-foot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ts-space-2;
+  padding: $ts-space-2 $ts-space-3;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+  background-color: $ts-table-band;
+  border-top: $border-width solid $ts-line;
+}
+
+// Clear / Clear all: muted until hovered, then red (it removes picks)
+.btn-link.ts-multi-clear {
+  padding: 0;
+  font-size: $ts-fs-sm;
+  font-weight: 500;
+  color: $ts-ink-3;
+
+  &:hover:not(:disabled) {
+    color: $ts-red;
+    text-decoration: none;
+  }
+
+  &:disabled { opacity: .5; }
+}
+
+// The picked options under the field
 .ts-multi-picked {
   margin-top: $ts-space-2;
-  padding: $ts-space-2;
   background-color: $ts-panel-2;
   border: $border-width solid $ts-line;
   border-radius: $ts-radius-md;
@@ -2934,20 +3195,65 @@ $ts-toast-colors: (
   align-items: center;
   justify-content: space-between;
   gap: $ts-space-2;
-  margin-bottom: $ts-space-2;
+  min-height: $ts-multi-head-height;
+  padding: 0 $ts-space-3;
+  border-bottom: $border-width solid $ts-line;
+}
+
+.ts-multi-picked-title {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-2;
   font-size: $ts-fs-xs;
   font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: $ts-ink-3;
+}
+
+.ts-multi-picked-body {
+  display: flex;
+  flex-direction: column;
+  gap: $ts-space-3;
+  max-height: $ts-check-menu-max-height;
+  padding: $ts-space-3;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ts-multi-picked-group-label {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+  margin-bottom: $ts-space-2;
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: $ts-ink-2;
+
+  // A hairline runs from the heading to the edge
+  &::after {
+    content: "";
+    flex: 1 1 auto;
+    height: $border-width;
+    background-color: $ts-line;
+  }
+}
+
+.ts-multi-picked-group-count {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
   color: $ts-ink-3;
 }
 
 .ts-multi-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: $ts-space-1;
-  max-height: $ts-check-menu-max-height;
+  gap: $ts-space-2;
   padding: 0;
   margin: 0;
-  overflow-y: auto;
   list-style: none;
 }
 
@@ -2955,17 +3261,31 @@ $ts-toast-colors: (
   display: inline-flex;
   align-items: center;
   gap: $ts-space-1;
-  max-width: $ts-multi-chip-max-width;
-  padding: $ts-space-1 $ts-space-1 $ts-space-1 $ts-space-2;
-  font-size: $ts-fs-xs;
-  font-weight: 600;
-  line-height: 1.2;
+  // Never wider than the panel on a phone; long names truncate (full name on hover)
+  max-width: min(#{$ts-multi-chip-max-width}, 100%);
+  height: $ts-multi-chip-height;
+  padding: 0 $ts-space-1 0 $ts-space-3;
+  font-size: $ts-fs-md;
+  font-weight: 500;
   color: $ts-ink;
-  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
-  border: $border-width solid rgba($ts-orange, $ts-multi-chip-border-alpha);
-  border-radius: $ts-radius-pill;
+  background-color: $ts-panel;
+  border: $border-width solid $ts-line;
+  border-radius: $ts-radius-sm;
+  box-shadow: 0 1px 0 rgba($black, $ts-btn-shadow-alpha * .4);
+  transition: border-color $ts-transition, background-color $ts-transition;
+  animation: ts-multi-chip-in $ts-picker-enter ease-out;
+
+  &:hover,
+  &:focus-within { border-color: $ts-ink-3; }
+
+  // About to be removed: the chip warns along with its remove button
+  &:has(.ts-multi-chip-remove:hover:not(:disabled)) {
+    border-color: rgba($ts-red, $ts-tint-border);
+    background-color: rgba($ts-red, $ts-tint-row);
+  }
 }
 
+// Remove: a 24px target (WCAG 2.5.8) drawn as a small rounded square inside the chip
 .ts-multi-chip-remove {
   display: inline-flex;
   flex-shrink: 0;
@@ -2975,16 +3295,31 @@ $ts-toast-colors: (
   height: $ts-multi-chip-remove-size;
   min-height: 0;
   padding: 0;
-  font-size: $ts-fs-2xs;
+  font-size: $ts-fs-lg;
   color: $ts-ink-3;
   border: 0;
-  border-radius: 50%;
+  border-radius: $ts-radius-xs;
   transition: background-color $ts-transition, color $ts-transition;
 
+  > .bi { font-size: 1em; }
+
   &:hover:not(:disabled) {
-    color: $ts-on-accent;
-    background-color: $ts-orange;
+    color: $ts-red;
+    background-color: rgba($ts-red, $ts-tint-soft);
   }
 
+  &:active:not(:disabled) { transform: none; }
+
   &:focus-visible { box-shadow: 0 0 0 $input-btn-focus-width $input-btn-focus-color; }
+}
+
+@keyframes ts-multi-chip-in {
+  from {
+    opacity: 0;
+    transform: scale(.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-multi-chip { animation: none; }
 }

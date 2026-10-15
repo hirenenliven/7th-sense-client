@@ -8,6 +8,9 @@ import { deleteController, getBrands, getControllers } from '@/services/catalogS
 import { toast } from '@/utils/toast'
 import ControllerFormModal from './ControllerFormModal'
 import ControllerRow from './ControllerRow'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (controller, term) =>
   [controller.id, controller.name, controller.brandName, controller.description].some((value) =>
@@ -55,18 +58,28 @@ function ControllerList() {
     }
   }, [reloadKey])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return controllers.filter(
       (controller) =>
         (!brandFilter || String(controller.brandId) === brandFilter) && (!term || matchesSearch(controller, term)),
     )
   }, [controllers, search, brandFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Controller', sort: (row) => row.name },
+    { label: 'Brand', sort: (row) => row.brandName },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    'Actions',
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Every controller belongs to a brand
   const canAdd = brands.length > 0
@@ -75,6 +88,7 @@ function ControllerList() {
   const handleEdit = useCallback((controller) => setEditing({ controller }), [])
 
   const handleSaved = (saved) => {
+    if (!controllers.some((row) => row.id === saved.id)) setPage(1) // a new row is on top of page 1
     setControllers((list) => {
       const exists = list.some((controller) => controller.id === saved.id)
       return (exists ? list.map((controller) => (controller.id === saved.id ? saved : controller)) : [...list, saved]).sort(
@@ -172,15 +186,7 @@ function ControllerList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Controller</th>
-                  <th scope="col">Brand</th>
-                  <th scope="col">Updated</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((controller) => (
                   <ControllerRow key={controller.id} controller={controller} onEdit={handleEdit} onDelete={setPendingDelete} />

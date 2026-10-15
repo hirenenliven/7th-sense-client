@@ -7,15 +7,17 @@ import TablePagination from '@/components/common/TablePagination'
 import { BRANCH_STATUS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
+import useOrgUser from '@/hooks/useOrgUser'
 import { deleteBranch, getBranches, updateBranch } from '@/services/branchService'
 import { toast } from '@/utils/toast'
 import BranchRow from './BranchRow'
 import { toBranchPayload, toFormValues } from './branchForm'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
-const COLUMNS = ['ID', 'Code', 'Name', 'Email', 'City', 'Colour', 'Status']
-
-const matchesSearch = (branch, term) =>
-  [branch.id, branch.code, branch.name, branch.email, branch.city]
+const matchesSearch = (branch, term, customerLabel) =>
+  [branch.id, branch.code, branch.name, customerLabel(branch.customerId), branch.email, branch.cityName]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
 // Branches are shared by every company: everyone reads them, only the superadmin changes them
@@ -23,7 +25,7 @@ function BranchList() {
   const navigate = useNavigate()
   const { hasRole } = useAuth()
   const canManage = hasRole(SUPERADMIN_ONLY)
-  const columns = canManage ? [...COLUMNS, 'Actions'] : COLUMNS
+  const { customerLabel } = useOrgUser()
 
   const [branches, setBranches] = useState([])
   const [loading, setLoading] = useState(true)
@@ -52,15 +54,29 @@ function BranchList() {
     }
   }, [reloadKey])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
-    return term ? branches.filter((branch) => matchesSearch(branch, term)) : branches
-  }, [branches, search])
+    return term ? branches.filter((branch) => matchesSearch(branch, term, customerLabel)) : branches
+  }, [branches, search, customerLabel])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Code', sort: (row) => row.code },
+    { label: 'Name', sort: (row) => row.name },
+    { label: 'Customer', sort: (row) => customerLabel(row.customerId) },
+    { label: 'Email', sort: (row) => row.email },
+    { label: 'City', sort: (row) => row.cityName },
+    'Colour',
+    { label: 'Status', sort: (row) => row.status },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const setBranchStatus = (id, status) =>
     setBranches((list) => list.map((branch) => (branch.id === id ? { ...branch, status } : branch)))
@@ -147,7 +163,7 @@ function BranchList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, code, name, email, city…"
+              placeholder="Search ID, code, name, customer, email, city…"
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
@@ -164,15 +180,7 @@ function BranchList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((branch) => (
                   <BranchRow

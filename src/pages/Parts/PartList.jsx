@@ -10,6 +10,9 @@ import useAuth from '@/hooks/useAuth'
 import { deletePart, getParts } from '@/services/partService'
 import { toast } from '@/utils/toast'
 import PartRow from './PartRow'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (part, term) =>
   [part.id, part.partNo, part.partName, part.clienteleName, part.customerName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -55,17 +58,32 @@ function PartList() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [parts])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return parts.filter(
       (part) => (!customerFilter || String(part.userId) === customerFilter) && (!term || matchesSearch(part, term)),
     )
   }, [parts, search, customerFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Part No.', sort: (row) => row.partNo },
+    { label: 'Part Name', sort: (row) => row.partName },
+    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
+    { label: 'Processes', sort: (row) => row.processCount },
+    { label: 'Part Count', sort: (row) => row.partCount },
+    { label: 'Production Time', sort: (row) => row.productionTime },
+    { label: 'Status', sort: (row) => row.status },
+    { label: 'Created', sort: (row) => row.createdAt },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleEdit = useCallback((part) => navigate(generatePath(ROUTES.PART_EDIT, { id: String(part.id) })), [navigate])
 
@@ -82,19 +100,6 @@ function PartList() {
       setDeleting(false)
     }
   }
-
-  const columns = [
-    'ID',
-    'Part No.',
-    'Part Name',
-    ...(isSuperadmin ? ['Customer'] : []),
-    'Processes',
-    'Part Count',
-    'Production Time',
-    'Status',
-    'Created',
-    ...(canManage ? ['Actions'] : []),
-  ]
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading parts…" />
@@ -168,15 +173,7 @@ function PartList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((part) => (
                   <PartRow

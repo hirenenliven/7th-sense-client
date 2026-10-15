@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserLocation, updateUserLocation } from '@/services/userLocationService'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, locationSchema, toLocationPayload, toFormValues } from './locationForm'
 
@@ -13,27 +14,41 @@ import { INITIAL_VALUES, NAME_MAX_LENGTH, locationSchema, toLocationPayload, toF
 function LocationFormModal({ show, location, branches, defaultBranchId, onSaved, onHide }) {
   const isEdit = Boolean(location)
 
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(locationSchema, canPickUser), [canPickUser])
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(locationSchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(location ? toFormValues(location) : { ...INITIAL_VALUES, branchId: defaultBranchId })
-  }, [show, location, defaultBranchId, reset])
+    if (!show) return
+    reset(
+      location
+        ? { ...toFormValues(location), customerId: String(location.userId) }
+        : { ...INITIAL_VALUES, customerId: ownerOf(branches, defaultBranchId, 'customerId'), branchId: defaultBranchId },
+    )
+  }, [show, location, defaultBranchId, branches, reset])
+
+  // Parents of the picked customer only; a new customer clears the picked parent
+  const customerId = watch('customerId')
+  const parentOptions = useMemo(() => ownedBy(branches, canPickUser, customerId, 'customerId'), [branches, canPickUser, customerId])
 
   const onSubmit = async (values) => {
     try {
+      const ownerId = canPickUser ? values.customerId : userId
       const payload = toLocationPayload(values)
-      const saved = isEdit ? await updateUserLocation(location.id, payload, userId) : await createUserLocation(payload, userId)
+      const saved = isEdit ? await updateUserLocation(location.id, payload, ownerId) : await createUserLocation(payload, ownerId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Location updated' : 'Location added' })
       onSaved(saved)
     } catch (error) {
@@ -49,12 +64,18 @@ function LocationFormModal({ show, location, branches, defaultBranchId, onSaved,
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
+          <OrgCustomerField
+            id="location-customer"
+            registration={register('customerId', { onChange: () => setValue('branchId', '') })}
+            locked={isEdit}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
           <Form.Group controlId="location-branch" className="mb-3">
             <Form.Label className="required">Branch</Form.Label>
             <Form.Select {...register('branchId')} isInvalid={Boolean(errors.branchId)}>
               <option value="">Select branch</option>
-              {branches.map((option) => (
+              {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.city ? `${option.name} · ${option.city}` : option.name}
                 </option>

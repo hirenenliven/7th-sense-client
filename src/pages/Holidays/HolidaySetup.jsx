@@ -11,6 +11,9 @@ import { deleteHoliday, getHolidays } from '@/services/holidayService'
 import { toast } from '@/utils/toast'
 import HolidayFormModal from './HolidayFormModal'
 import HolidayRow from './HolidayRow'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const TYPE_FILTERS = [
   { value: '', label: 'Holidays and week offs' },
@@ -87,7 +90,7 @@ function HolidaySetup() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [holidays])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return holidays.filter(
       (holiday) =>
@@ -96,14 +99,29 @@ function HolidaySetup() {
         (!term || matchesSearch(holiday, term)),
     )
   }, [holidays, search, typeFilter, customerFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const firstIndex = (currentPage - 1) * pageSize
-  const pageRows = filtered.slice(firstIndex, firstIndex + pageSize)
+  const columns = [
+    'Sr. No.',
+    { label: 'Type', sort: (row) => row.holidayType },
+    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
+    { label: 'Name', sort: (row) => row.name },
+    { label: 'Start Date', sort: (row) => row.startDate },
+    { label: 'End Date', sort: (row) => row.endDate },
+    { label: 'Day', sort: (row) => row.weekDay },
+    { label: 'Status', sort: (row) => row.status },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
 
   const handleSaved = useCallback((saved, wasEdit) => {
+    if (!wasEdit) setPage(1) // a new row is on top of page 1
     setHolidays((list) => (wasEdit ? list.map((holiday) => (holiday.id === saved.id ? saved : holiday)) : [...list, saved]))
     setShowForm(false)
   }, [])
@@ -138,7 +156,6 @@ function HolidaySetup() {
     }
   }
 
-  const columns = ['Sr. No.', 'Type', ...(isSuperadmin ? ['Customer'] : []), 'Name', 'Start Date', 'End Date', 'Day', 'Status', ...(canManage ? ['Actions'] : [])]
 
   const renderList = () => {
     if (loading) return <Loader text="Loading holidays…" />
@@ -203,15 +220,7 @@ function HolidaySetup() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((holiday, index) => (
                   <HolidayRow

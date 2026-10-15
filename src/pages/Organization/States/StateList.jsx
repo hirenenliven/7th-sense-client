@@ -2,15 +2,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
-import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { deleteUserState, getUserStates } from '@/services/userStateService'
 import { getUserCountries } from '@/services/userCountryService'
 import useOrgUser from '@/hooks/useOrgUser'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
 import { toast } from '@/utils/toast'
 import StateFormModal from './StateFormModal'
 import StateRow from './StateRow'
+import { newestFirst } from '@/utils/helpers'
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 
@@ -25,8 +27,8 @@ function StateList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canAssign } = useOrgUser()
+  // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
+  const { userId, canAssign, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [countryFilter, setCountryFilter] = useState('')
@@ -56,21 +58,33 @@ function StateList() {
     }
   }, [reloadKey, userId])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return states.filter(
       (state) => (!countryFilter || String(state.userCountryId) === countryFilter) && (!term || matchesSearch(state, term)),
     )
   }, [states, search, countryFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'State', sort: (row) => row.name },
+    { label: 'Country', sort: (row) => row.countryName },
+    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    ...(canAssign ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const openAdd = () => setAdding(true)
 
   const handleSaved = (added) => {
+    setPage(1) // the new rows are on top of page 1
     setStates((list) => [...list, ...added].sort(byName))
     setAdding(false)
   }
@@ -78,7 +92,7 @@ function StateList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserState(pendingDelete.id, userId)
+      await deleteUserState(pendingDelete.id, pendingDelete.userId)
       setStates((list) => list.filter((state) => state.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'State deleted' })
       setPendingDelete(null)
@@ -165,15 +179,7 @@ function StateList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">State</th>
-                  <th scope="col">Country</th>
-                  <th scope="col">Updated</th>
-                  {canAssign && <th scope="col">Actions</th>}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((state) => (
                   <StateRow
@@ -211,14 +217,6 @@ function StateList() {
           <p className="ts-page-subtitle">The states assigned to your organization and the country each belongs to.</p>
         </div>
         <div className="ts-page-actions">
-          <OrgUserSelect
-            disabled={loading}
-            onChange={() => {
-              setCountryFilter('')
-              setSearch('')
-              setPage(1)
-            }}
-          />
           {canAssign && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !countries.length}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />

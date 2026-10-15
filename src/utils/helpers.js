@@ -46,3 +46,6 @@ export const formatOrdinalDate = (date, locale = 'en-GB') =>
 
 // "Tuesday"
 export const formatWeekday = (date, locale = 'en-US') => date.toLocaleDateString(locale, { weekday: 'long' })
+
+// Table order: the latest entry first (highest id = added last), so a row just added shows on top
+export const newestFirst = (rows) => [...rows].sort((a, b) => b.id - a.id)

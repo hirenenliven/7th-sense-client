@@ -18,7 +18,7 @@ export const INITIAL_VALUES = {
   status: BRANCH_STATUS.ACTIVE,
 }
 
-export const REQUIRED_FIELDS = new Set(['code', 'name', 'status'])
+export const REQUIRED_FIELDS = new Set(['code', 'name', 'customerId', 'status'])
 
 // Fields typed in capitals (codes and tax IDs)
 export const UPPERCASE_FIELDS = new Set(['code', 'gstNumber', 'panNumber'])
@@ -30,7 +30,7 @@ export const branchSchema = z.object({
   code: z.string().min(1, 'Code is required').regex(PATTERNS.branchCode, 'Use 2–20 capital letters or digits'),
   name: z.string().trim().min(1, 'Name is required').max(200, 'Name is too long'),
   email: optional(PATTERNS.email, 'Enter a valid email address'),
-  customerId: z.string().optional(),
+  customerId: z.string().min(1, 'Customer is required'),
   address: z.string().max(500, 'Address is too long').optional(),
   userCityId: z.string().optional(),
   gstNumber: optional(PATTERNS.gstin, 'Enter a valid 15-character GSTIN'),
@@ -46,24 +46,14 @@ export const branchSchema = z.object({
 const toId = (value) => (value === '' || value === null || value === undefined ? null : Number(value))
 const trim = (value) => (value ?? '').trim()
 
-// City text saved with the branch (shown in the Branch List): the picked city's name.
-// When the city is unchanged and its name is not at hand (status toggle, or an older branch
-// saved with a typed city and no userCityId), the saved text is kept.
-const cityName = (userCityId, cities, existing) => {
-  const picked = cities.find((city) => city.id === userCityId)
-  if (picked) return picked.name
-  return userCityId === (existing?.userCityId ?? null) ? existing?.city ?? '' : ''
-}
-
 // `existing` = the loaded branch when editing: keeps stateId, which the form does not edit.
-// `cities` = GET /user-city records (the City dropdown options).
-export const toBranchPayload = (values, existing = null, cities = []) => ({
+// The city is sent as userCityId only; the server reads its name (cityName).
+export const toBranchPayload = (values, existing = null) => ({
   code: trim(values.code),
   name: trim(values.name),
   email: trim(values.email),
   address: trim(values.address),
   userCityId: toId(values.userCityId),
-  city: cityName(toId(values.userCityId), cities, existing),
   stateId: existing?.stateId ?? null,
   customerId: toId(values.customerId),
   gstNumber: trim(values.gstNumber),

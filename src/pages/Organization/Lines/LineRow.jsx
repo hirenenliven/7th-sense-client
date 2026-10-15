@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function LineRow({ line, onEdit, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{line.id}</td>
       <td className="fw-semibold">{line.name}</td>
       <td className="text-body-secondary">{line.shopName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(line.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(line.updatedAt)}</td>
       {canEdit && (
         <td className="border-start">
@@ -30,6 +31,7 @@ LineRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     shopName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,

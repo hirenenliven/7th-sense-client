@@ -6,56 +6,93 @@ import PropTypes from 'prop-types'
 import { getLibraryStateNames } from '@/constants/countryLibrary'
 import { createUserState } from '@/services/userStateService'
 import MultiSelectPicker from '@/components/common/MultiSelectPicker'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
-import { INITIAL_VALUES, stateSchema, toStatePayloads } from './stateForm'
+import { INITIAL_VALUES, keepStatesOf, stateSchema, toStateKey, toStatePayloads } from './stateForm'
 
 const NOUN = { one: 'state', many: 'states' }
+const COUNTRY_NOUN = { one: 'country', many: 'countries' }
 
 const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
-// Add states: pick one of the user's countries, then any number of its states from the country
-// library (constants/countryLibrary.js); each is saved as its own user_state row. States already
-// added to that country are hidden; a new country clears the picked states.
+// Add states: pick any of the user's countries, then any number of their states from the country
+// library (constants/countryLibrary.js), listed under a heading per country; each is saved as its
+// own user_state row. States already added are hidden; dropping a country drops its picked states.
 // onSaved(addedStates) gets the rows that were saved.
 function StateFormModal({ show, states, countries, defaultCountryId, onSaved, onHide }) {
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(stateSchema, canPickUser), [canPickUser])
 
   const {
     control,
     register,
     handleSubmit,
     reset,
+    getValues,
     setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(stateSchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset({ ...INITIAL_VALUES, userCountryId: defaultCountryId })
-  }, [show, defaultCountryId, reset])
+    if (!show) return
+    const owner = countries.find((country) => String(country.id) === defaultCountryId)?.userId
+    reset({
+      ...INITIAL_VALUES,
+      customerId: owner ? String(owner) : '',
+      userCountryIds: defaultCountryId ? [defaultCountryId] : [],
+    })
+  }, [show, defaultCountryId, countries, reset])
 
-  const userCountryId = watch('userCountryId')
+  const userCountryIds = watch('userCountryIds')
+  const customerId = watch('customerId')
+  // The picked customer's countries only
+  const customerCountries = useMemo(() => ownedBy(countries, canPickUser, customerId), [countries, canPickUser, customerId])
 
-  const options = useMemo(() => {
-    const countryName = countries.find((country) => String(country.id) === userCountryId)?.name ?? ''
-    const taken = states.filter((state) => String(state.userCountryId) === userCountryId)
-    return getLibraryStateNames(countryName)
-      .filter((name) => !taken.some((state) => sameName(state.name, name)))
-      .map((name) => ({ value: name, label: name }))
-  }, [countries, states, userCountryId])
+  const countryOptions = useMemo(
+    () => customerCountries.map((country) => ({ value: String(country.id), label: country.name })),
+    [customerCountries],
+  )
+
+  // The picked countries' library states not added yet, grouped by country (in country order)
+  const options = useMemo(
+    () =>
+      customerCountries
+        .filter((country) => userCountryIds.includes(String(country.id)))
+        .flatMap((country) => {
+          const taken = states.filter((state) => state.userCountryId === country.id)
+          return getLibraryStateNames(country.name)
+            .filter((name) => !taken.some((state) => sameName(state.name, name)))
+            .map((name) => ({ value: toStateKey(country.id, name), label: name, group: country.name }))
+        }),
+    [customerCountries, states, userCountryIds],
+  )
+
+  const handleCountriesChange = (next) => {
+    setValue('userCountryIds', next, { shouldValidate: true })
+    setValue('states', keepStatesOf(getValues('states'), next))
+  }
+
+  // A new customer has other countries: clear the picked countries and states
+  const handleCustomerChange = () => {
+    setValue('userCountryIds', [])
+    setValue('states', [])
+  }
 
   const onSubmit = async (values) => {
+    const ownerId = canPickUser ? values.customerId : userId
     // One request per state, in order, so a failure names the state it is about
     const added = []
     for (const payload of toStatePayloads(values)) {
       try {
-        added.push(await createUserState(payload, userId))
+        added.push(await createUserState(payload, ownerId))
       } catch (error) {
         toast.error(`${payload.name}: ${error.message}`, { title: 'Could not save state' })
       }
@@ -74,28 +111,39 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
-          <Form.Group controlId="state-country" className="mb-3">
-            <Form.Label className="required">Country</Form.Label>
-            <Form.Select
-              {...register('userCountryId', { onChange: () => setValue('names', []) })}
-              disabled={isSubmitting}
-              isInvalid={Boolean(errors.userCountryId)}
-            >
-              <option value="">Select country</option>
-              {countries.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">{errors.userCountryId?.message}</Form.Control.Feedback>
+          <OrgCustomerField
+            id="state-customer"
+            registration={register('customerId', { onChange: handleCustomerChange })}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
+          <Form.Group controlId="state-countries" className="mb-3">
+            <Form.Label className="required">Countries</Form.Label>
+            <Controller
+              name="userCountryIds"
+              control={control}
+              render={({ field }) => (
+                <MultiSelectPicker
+                  id="state-countries"
+                  options={countryOptions}
+                  value={field.value}
+                  onChange={handleCountriesChange}
+                  onBlur={field.onBlur}
+                  noun={COUNTRY_NOUN}
+                  placeholder="Select countries"
+                  emptyText="Add countries first"
+                  disabled={isSubmitting}
+                  isInvalid={Boolean(errors.userCountryIds)}
+                />
+              )}
+            />
+            {errors.userCountryIds && <div className="invalid-feedback d-block">{errors.userCountryIds.message}</div>}
           </Form.Group>
 
           <Form.Group controlId="state-names">
             <Form.Label className="required">States</Form.Label>
             <Controller
-              name="names"
+              name="states"
               control={control}
               render={({ field }) => (
                 <MultiSelectPicker
@@ -106,13 +154,13 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
                   onBlur={field.onBlur}
                   noun={NOUN}
                   placeholder="Select states"
-                  emptyText={userCountryId ? 'Every state is already added' : 'Select a country first'}
-                  disabled={isSubmitting || !userCountryId}
-                  isInvalid={Boolean(errors.names)}
+                  emptyText={userCountryIds.length ? 'Every state is already added' : 'Select a country first'}
+                  disabled={isSubmitting || !userCountryIds.length}
+                  isInvalid={Boolean(errors.states)}
                 />
               )}
             />
-            {errors.names && <div className="invalid-feedback d-block">{errors.names.message}</div>}
+            {errors.states && <div className="invalid-feedback d-block">{errors.states.message}</div>}
           </Form.Group>
         </Modal.Body>
 

@@ -9,6 +9,9 @@ import { deleteClientele, getClienteles } from '@/services/clienteleService'
 import { toast } from '@/utils/toast'
 import ClienteleFormModal from './ClienteleFormModal'
 import ClienteleRow from './ClienteleRow'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (clientele, term) =>
   [clientele.id, clientele.clientCode, clientele.name, clientele.email, clientele.contactNumber, clientele.city, clientele.stateName, clientele.countryName, clientele.customerName]
@@ -59,18 +62,31 @@ function ClienteleList() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [clienteles])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return clienteles.filter(
       (clientele) =>
         (!customerFilter || String(clientele.userId) === customerFilter) && (!term || matchesSearch(clientele, term)),
     )
   }, [clienteles, search, customerFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Client ID', sort: (row) => row.clientCode },
+    { label: 'Client Name', sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
+    { label: 'Contact', sort: (row) => row.contactNumber },
+    { label: 'City', sort: (row) => row.city },
+    { label: 'Status', sort: (row) => row.status },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleAdd = () => {
     setEditingId(null)
@@ -84,6 +100,7 @@ function ClienteleList() {
 
   // List rows carry names (customer, state, country) the save response doesn't: reload the list
   const handleSaved = () => {
+    if (!editingId) setPage(1) // a new row is on top of page 1
     setShowForm(false)
     setReloadKey((key) => key + 1)
   }
@@ -102,7 +119,6 @@ function ClienteleList() {
     }
   }
 
-  const columns = ['ID', 'Client ID', 'Client Name', ...(isSuperadmin ? ['Customer'] : []), 'Contact', 'City', 'Status', ...(canManage ? ['Actions'] : [])]
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading clienteles…" />
@@ -176,15 +192,7 @@ function ClienteleList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((clientele) => (
                   <ClienteleRow

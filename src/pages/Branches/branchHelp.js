@@ -9,11 +9,11 @@ export const FIELD_HELP = {
   },
   customerId: {
     title: 'Customer',
-    content: 'Customer account that owns this branch. Leave blank for a branch that is not tied to one customer.',
+    content: 'Customer account that owns this branch. The City list shows this customer’s cities.',
   },
   userCityId: {
     title: 'City',
-    content: 'City the branch is in, picked from your cities (Masters › City). Leave blank if it has none.',
+    content: 'City the branch is in, picked from the customer’s cities (Masters › City). Leave blank if it has none.',
   },
   colorCode: {
     title: 'Colour',

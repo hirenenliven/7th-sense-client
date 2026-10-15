@@ -12,11 +12,9 @@ import { ACCOUNT_KIND, ACCOUNT_PAGES, isAccountOfKind } from './accountPages'
 import CustomerRow from './CustomerRow'
 import { toFormValues, toUserPayload } from './customerForm'
 import { customerMobile, customerName } from './customerFormat'
-
-const COLUMNS = {
-  [ACCOUNT_KIND.CUSTOMER]: ['ID', 'User Name', 'Customer Name', 'Email', 'Mobile Number', 'Status', 'Statement', 'View', 'Actions'],
-  [ACCOUNT_KIND.USER]: ['ID', 'User Name', 'Name', 'Role', 'Email', 'Mobile Number', 'Status', 'View', 'Actions'],
-}
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (customer, term) =>
   [customer.id, customer.username, customerName(customer), ROLE_LABELS[customer.role], customer.email, customerMobile(customer)]
@@ -54,15 +52,30 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     }
   }, [reloadKey, kind])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return term ? customers.filter((customer) => matchesSearch(customer, term)) : customers
   }, [customers, search])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'User Name', sort: (row) => row.username },
+    { label: kind === ACCOUNT_KIND.USER ? 'Name' : 'Customer Name', sort: (row) => customerName(row) },
+    ...(kind === ACCOUNT_KIND.USER ? [{ label: 'Role', sort: (row) => ROLE_LABELS[row.role] ?? row.role }] : []),
+    { label: 'Email', sort: (row) => row.email },
+    { label: 'Mobile Number', sort: (row) => customerMobile(row) },
+    { label: 'Status', sort: (row) => row.status },
+    ...(kind === ACCOUNT_KIND.USER ? [] : ['Statement']),
+    'View',
+    'Actions',
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const setCustomerStatus = (id, status) =>
     setCustomers((list) => list.map((customer) => (customer.id === id ? { ...customer, status } : customer)))
@@ -177,15 +190,7 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {COLUMNS[kind].map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((customer) => (
                   <CustomerRow

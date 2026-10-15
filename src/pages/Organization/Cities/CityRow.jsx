@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function CityRow({ city, onEdit, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{city.id}</td>
       <td className="fw-semibold">{city.name}</td>
       <td className="text-body-secondary">{city.stateName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(city.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(city.updatedAt)}</td>
       {canEdit && (
         <td className="border-start">
@@ -30,6 +31,7 @@ CityRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     stateName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,

@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserCity, updateUserCity } from '@/services/userCityService'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, citySchema, toCityPayload, toFormValues } from './cityForm'
 
@@ -13,27 +14,41 @@ import { INITIAL_VALUES, NAME_MAX_LENGTH, citySchema, toCityPayload, toFormValue
 function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) {
   const isEdit = Boolean(city)
 
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(citySchema, canPickUser), [canPickUser])
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(citySchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(city ? toFormValues(city) : { ...INITIAL_VALUES, userStateId: defaultStateId })
-  }, [show, city, defaultStateId, reset])
+    if (!show) return
+    reset(
+      city
+        ? { ...toFormValues(city), customerId: String(city.userId) }
+        : { ...INITIAL_VALUES, customerId: ownerOf(states, defaultStateId, 'userId'), userStateId: defaultStateId },
+    )
+  }, [show, city, defaultStateId, states, reset])
+
+  // Parents of the picked customer only; a new customer clears the picked parent
+  const customerId = watch('customerId')
+  const parentOptions = useMemo(() => ownedBy(states, canPickUser, customerId, 'userId'), [states, canPickUser, customerId])
 
   const onSubmit = async (values) => {
     try {
+      const ownerId = canPickUser ? values.customerId : userId
       const payload = toCityPayload(values)
-      const saved = isEdit ? await updateUserCity(city.id, payload, userId) : await createUserCity(payload, userId)
+      const saved = isEdit ? await updateUserCity(city.id, payload, ownerId) : await createUserCity(payload, ownerId)
       toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'City updated' : 'City added' })
       onSaved(saved)
     } catch (error) {
@@ -49,12 +64,18 @@ function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) 
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
+          <OrgCustomerField
+            id="city-customer"
+            registration={register('customerId', { onChange: () => setValue('userStateId', '') })}
+            locked={isEdit}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
           <Form.Group controlId="city-state" className="mb-3">
             <Form.Label className="required">State</Form.Label>
             <Form.Select {...register('userStateId')} isInvalid={Boolean(errors.userStateId)}>
               <option value="">Select state</option>
-              {states.map((option) => (
+              {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.countryName ? `${option.name} · ${option.countryName}` : option.name}
                 </option>

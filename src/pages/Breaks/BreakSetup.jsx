@@ -10,6 +10,10 @@ import { getUsers } from '@/services/customerService'
 import { toast } from '@/utils/toast'
 import BreakFormModal from './BreakFormModal'
 import BreakRow from './BreakRow'
+import { minutesBetween } from '@/utils/dateTime'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (shiftBreak, term) =>
   [shiftBreak.id, shiftBreak.name, shiftBreak.shiftName, shiftBreak.customerName, shiftBreak.startTime, shiftBreak.endTime].some((value) =>
@@ -75,20 +79,35 @@ function BreakSetup() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
   }, [breaks])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return breaks.filter(
       (shiftBreak) =>
         (!customerFilter || String(shiftBreak.userId) === customerFilter) && (!term || matchesSearch(shiftBreak, term)),
     )
   }, [breaks, search, customerFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Break Name', sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: 'Customer Name', sort: (row) => row.customerName }] : []),
+    { label: 'Shift', sort: (row) => row.shiftName },
+    { label: 'Start Time', sort: (row) => row.startTime },
+    { label: 'End Time', sort: (row) => row.endTime },
+    { label: 'Length', sort: (row) => minutesBetween(row.startTime, row.endTime) },
+    { label: 'Status', sort: (row) => row.status },
+    ...(canManage ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleSaved = useCallback((saved, wasEdit) => {
+    if (!wasEdit) setPage(1) // a new row is on top of page 1
     setBreaks((list) => (wasEdit ? list.map((shiftBreak) => (shiftBreak.id === saved.id ? saved : shiftBreak)) : [...list, saved]))
     setShowForm(false)
   }, [])
@@ -117,7 +136,6 @@ function BreakSetup() {
     }
   }
 
-  const columns = ['ID', 'Break Name', ...(isSuperadmin ? ['Customer Name'] : []), 'Shift', 'Start Time', 'End Time', 'Length', 'Status', ...(canManage ? ['Actions'] : [])]
 
   const renderList = () => {
     if (loading) return <Loader text="Loading breaks…" />
@@ -186,15 +204,7 @@ function BreakSetup() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th key={column} scope="col">
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((shiftBreak) => (
                   <BreakRow

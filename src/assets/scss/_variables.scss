@@ -85,8 +85,12 @@ $ts-ls-tight: -.02em;
 $ts-swatch-size: ts-rem(12); // colour dot in tables
 $ts-check-menu-max-height: ts-rem(280); // scrolling checkbox list in a dropdown
 $ts-multi-chip-max-width: ts-rem(260); // a picked option chip under a MultiSelectPicker
-$ts-multi-chip-remove-size: ts-rem(20); // round remove button of a chip
-$ts-multi-chip-border-alpha: .35; // accent border of a picked chip
+$ts-multi-chip-remove-size: ts-rem(24); // remove button inside a chip (24px touch target)
+$ts-multi-menu-max-height: ts-rem(360); // open list: search + scrolling options + footer
+$ts-multi-option-height: ts-rem(32); // an option row in the open list
+$ts-multi-head-height: ts-rem(38); // "Selected n" header above the chips
+$ts-multi-chip-height: ts-rem(28); // a picked option chip
+$ts-multi-count-size: ts-rem(16); // "Selected n" count pill
 
 // Dropdowns, selects and date / time pickers ("Dropdowns & pickers" in _components.scss)
 $ts-picker-max-height:  ts-rem(320); // open select list before it scrolls
@@ -166,8 +170,12 @@ $ts-help-width:   ts-rem(300);
 $ts-page-jump-width: ts-rem(64);  // "Go to" input
 $ts-page-size-width: ts-rem(72);  // rows-per-page select
 $ts-pager-size:      ts-rem(30);  // square page button
+$ts-sort-icon-size:  ts-rem(11);  // sort arrow in a sortable column header
 $ts-table-edge-x:    ts-rem(16);  // first / last cell padding inside a table panel
 $ts-table-band:      mix($ts-panel-2, $ts-panel, 55%); // table head + footer band
+// List table panel (with pagination): its maximum height — the screen less the top bar, page header and
+// toolbar above it — kept between a floor (short screens / phones) and a ceiling (tall screens)
+$ts-table-panel-height: clamp(#{ts-rem(360)}, calc(100dvh - #{ts-rem(290)}), #{ts-rem(1100)});
 $ts-pager-active-ink: if($ts-color-scheme == light, $ts-orange-2, $ts-orange); // current page number
 $ts-edge-width:    3px; // coloured status edge on cards / rows / alerts
 $ts-control-h:     ts-rem(34);
@@ -514,6 +522,8 @@ $ts-radio-chip-gap: $ts-space-2; // space between radio chips in a .ts-radio-gro
 $form-switch-color:               $ts-ink-3;
 $form-switch-focus-color:         $ts-orange;
 $form-switch-checked-color:       $ts-on-accent;
+// Knob of an inactive status switch in a table (red, like the inactive StatusBadge)
+$ts-status-switch-off-knob: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$ts-red}'/></svg>");
 
 $form-file-button-color:    $ts-ink-2;
 $form-file-button-bg:       $ts-panel;

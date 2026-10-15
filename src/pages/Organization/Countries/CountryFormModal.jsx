@@ -6,8 +6,9 @@ import PropTypes from 'prop-types'
 import { ALL_COUNTRIES } from '@/constants/countryLibrary'
 import { createUserCountry } from '@/services/userCountryService'
 import MultiSelectPicker from '@/components/common/MultiSelectPicker'
-import OrgUserNote from '@/components/common/OrgUserNote'
+import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
+import { ownedBy, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, countrySchema, toCountryPayloads } from './countryForm'
 
@@ -19,38 +20,45 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 // each is saved as its own user_country row. Countries the user already added are hidden.
 // onSaved(addedCountries) gets the rows that were saved.
 function CountryFormModal({ show, countries, onSaved, onHide }) {
-  const { userId } = useOrgUser()
+  // The superadmin picks the customer on the form; others always save to their own company
+  const { canPickUser, userId } = useOrgUser()
+  const schema = useMemo(() => withCustomer(countrySchema, canPickUser), [canPickUser])
 
   const {
     control,
+    register,
     handleSubmit,
+    setValue,
+    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(countrySchema),
+    resolver: zodResolver(schema),
     defaultValues: INITIAL_VALUES,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
-    if (show) reset(INITIAL_VALUES)
+    if (show) reset({ ...INITIAL_VALUES, customerId: '' })
   }, [show, reset])
 
-  const options = useMemo(
-    () =>
-      ALL_COUNTRIES.filter((country) => !countries.some((saved) => sameName(saved.name, country.name))).map((country) => ({
-        value: country.name,
-        label: country.name,
-      })),
-    [countries],
-  )
+  // Library countries the picked customer has not added yet
+  const customerId = watch('customerId')
+  const options = useMemo(() => {
+    const taken = ownedBy(countries, canPickUser, customerId)
+    return ALL_COUNTRIES.filter((country) => !taken.some((saved) => sameName(saved.name, country.name))).map((country) => ({
+      value: country.name,
+      label: country.name,
+    }))
+  }, [countries, canPickUser, customerId])
 
   const onSubmit = async (values) => {
+    const ownerId = canPickUser ? values.customerId : userId
     // One request per country, in order, so a failure names the country it is about
     const added = []
     for (const payload of toCountryPayloads(values)) {
       try {
-        added.push(await createUserCountry(payload, userId))
+        added.push(await createUserCountry(payload, ownerId))
       } catch (error) {
         toast.error(`${payload.name}: ${error.message}`, { title: 'Could not save country' })
       }
@@ -69,7 +77,12 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
         </Modal.Header>
 
         <Modal.Body>
-          <OrgUserNote />
+          <OrgCustomerField
+            id="country-customer"
+            registration={register('customerId', { onChange: () => setValue('names', []) })}
+            disabled={isSubmitting}
+            error={errors.customerId?.message}
+          />
           <Form.Group controlId="country-names">
             <Form.Label className="required">Countries</Form.Label>
             <Controller

@@ -3,16 +3,18 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
-import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserCity, getUserCities } from '@/services/userCityService'
 import { getUserStates } from '@/services/userStateService'
 import useOrgUser from '@/hooks/useOrgUser'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
 import { toast } from '@/utils/toast'
 import CityFormModal from './CityFormModal'
 import CityRow from './CityRow'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (city, term) =>
   [city.id, city.name, city.stateName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -27,8 +29,8 @@ function CityList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canEdit } = useOrgUser()
+  // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
+  const { userId, canEdit, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState('')
@@ -58,17 +60,28 @@ function CityList() {
     }
   }, [reloadKey, userId])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return cities.filter(
       (city) => (!stateFilter || String(city.userStateId) === stateFilter) && (!term || matchesSearch(city, term)),
     )
   }, [cities, search, stateFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'City', sort: (row) => row.name },
+    { label: 'State', sort: (row) => row.stateName },
+    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    ...(canEdit ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Every city belongs to a state
   const canAdd = states.length > 0
@@ -77,6 +90,7 @@ function CityList() {
   const handleEdit = useCallback((city) => setEditing({ city }), [])
 
   const handleSaved = (saved) => {
+    if (!cities.some((row) => row.id === saved.id)) setPage(1) // a new row is on top of page 1
     setCities((list) => {
       const exists = list.some((city) => city.id === saved.id)
       return (exists ? list.map((city) => (city.id === saved.id ? saved : city)) : [...list, saved]).sort(byName)
@@ -87,7 +101,7 @@ function CityList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserCity(pendingDelete.id, userId)
+      await deleteUserCity(pendingDelete.id, pendingDelete.userId)
       setCities((list) => list.filter((city) => city.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'City deleted' })
       setPendingDelete(null)
@@ -179,15 +193,7 @@ function CityList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">City</th>
-                  <th scope="col">State</th>
-                  <th scope="col">Updated</th>
-                  {canEdit && <th scope="col">Actions</th>}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((city) => (
                   <CityRow
@@ -226,14 +232,6 @@ function CityList() {
           <p className="ts-page-subtitle">Your cities and the state each belongs to.</p>
         </div>
         <div className="ts-page-actions">
-          <OrgUserSelect
-            disabled={loading}
-            onChange={() => {
-              setStateFilter('')
-              setSearch('')
-              setPage(1)
-            }}
-          />
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />

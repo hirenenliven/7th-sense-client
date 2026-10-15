@@ -4,6 +4,7 @@ import OrgUserContext from './OrgUserContext'
 import useAuth from '@/hooks/useAuth'
 import { getUsers } from '@/services/customerService'
 import { MANAGERS, SUPERADMIN_ONLY } from '@/constants/app'
+import { customerName } from '@/pages/Customers/customerFormat'
 
 // Whose organization (Masters › Countries … Supervisors) the screens show and change.
 // Every user works on their own; an admin can pick another user, and that choice stays
@@ -39,8 +40,23 @@ function OrgUserProvider({ children }) {
     }
   }, [isAdmin])
 
+  // Customer column of the Masters tables: a row's owner (userId / customerId) → company name.
+  // The superadmin has every user; other users only see their own company's rows.
+  const customerLabel = useCallback(
+    (ownerId) => {
+      const owner = users.find((option) => option.id === ownerId)
+      if (owner) return customerName(owner) === '—' ? owner.username : customerName(owner)
+      if (user && (ownerId === user.id || ownerId === user.companyId)) {
+        return user.companyProfile?.companyName || user.companyName || user.username
+      }
+      return '—'
+    },
+    [users, user],
+  )
+
   const value = useMemo(
     () => ({
+      customerLabel,
       canPickUser: isAdmin,
       canEdit,
       // Countries and states are assigned customer-wise by the superadmin only (server: superAdminOnly)
@@ -52,7 +68,7 @@ function OrgUserProvider({ children }) {
       // The picked user's record; null while working on the logged-in user's own organization
       selectedUser: (userId && users.find((option) => String(option.id) === userId)) || null,
     }),
-    [isAdmin, canEdit, userId, setUserId, users, usersError],
+    [customerLabel, isAdmin, canEdit, userId, setUserId, users, usersError],
   )
 
   return <OrgUserContext.Provider value={value}>{children}</OrgUserContext.Provider>

@@ -6,12 +6,13 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function SupervisorRow({ supervisor, onEdit, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{supervisor.id}</td>
       <td className="fw-semibold">{supervisor.name}</td>
       <td className="text-body-secondary">{supervisor.cellName || '—'}</td>
+      <td className="text-body-secondary">{customerLabel(supervisor.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(supervisor.updatedAt)}</td>
       {canEdit && (
         <td className="border-start">
@@ -30,6 +31,7 @@ SupervisorRow.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     cellName: PropTypes.string,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,

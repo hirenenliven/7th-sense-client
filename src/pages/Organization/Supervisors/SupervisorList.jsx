@@ -3,16 +3,18 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
-import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserSupervisor, getUserSupervisors } from '@/services/userSupervisorService'
 import { getUserCells } from '@/services/userCellService'
 import useOrgUser from '@/hooks/useOrgUser'
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
 import { toast } from '@/utils/toast'
 import SupervisorFormModal from './SupervisorFormModal'
 import SupervisorRow from './SupervisorRow'
+import { newestFirst } from '@/utils/helpers'
 
 const matchesSearch = (supervisor, term) =>
   [supervisor.id, supervisor.name, supervisor.cellName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -27,8 +29,8 @@ function SupervisorList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canEdit } = useOrgUser()
+  // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
+  const { userId, canEdit, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [cellFilter, setCellFilter] = useState('')
@@ -58,17 +60,28 @@ function SupervisorList() {
     }
   }, [reloadKey, userId])
 
-  const filtered = useMemo(() => {
+  const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
     return supervisors.filter(
       (supervisor) => (!cellFilter || String(supervisor.userCellId) === cellFilter) && (!term || matchesSearch(supervisor, term)),
     )
   }, [supervisors, search, cellFilter])
+  // Latest entry first (a row just added shows on top)
+  const filtered = useMemo(() => newestFirst(matched), [matched])
 
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const columns = [
+    { label: 'ID', sort: (row) => row.id },
+    { label: 'Supervisor', sort: (row) => row.name },
+    { label: 'Cell', sort: (row) => row.cellName },
+    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
+    { label: 'Updated', sort: (row) => row.updatedAt },
+    ...(canEdit ? ['Actions'] : []),
+  ]
+  const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+  const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Every supervisor belongs to a cell
   const canAdd = cells.length > 0
@@ -77,6 +90,7 @@ function SupervisorList() {
   const handleEdit = useCallback((supervisor) => setEditing({ supervisor }), [])
 
   const handleSaved = (saved) => {
+    if (!supervisors.some((row) => row.id === saved.id)) setPage(1) // a new row is on top of page 1
     setSupervisors((list) => {
       const exists = list.some((supervisor) => supervisor.id === saved.id)
       return (exists ? list.map((supervisor) => (supervisor.id === saved.id ? saved : supervisor)) : [...list, saved]).sort(byName)
@@ -87,7 +101,7 @@ function SupervisorList() {
   const confirmDelete = async () => {
     setDeleting(true)
     try {
-      await deleteUserSupervisor(pendingDelete.id, userId)
+      await deleteUserSupervisor(pendingDelete.id, pendingDelete.userId)
       setSupervisors((list) => list.filter((supervisor) => supervisor.id !== pendingDelete.id))
       toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Supervisor deleted' })
       setPendingDelete(null)
@@ -179,15 +193,7 @@ function SupervisorList() {
         {filtered.length ? (
           <div className="ts-table-panel">
             <Table hover responsive className="mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Supervisor</th>
-                  <th scope="col">Cell</th>
-                  <th scope="col">Updated</th>
-                  {canEdit && <th scope="col">Actions</th>}
-                </tr>
-              </thead>
+              <SortableHead columns={columns} sort={sort} onSort={onSort} />
               <tbody>
                 {pageRows.map((supervisor) => (
                   <SupervisorRow
@@ -226,14 +232,6 @@ function SupervisorList() {
           <p className="ts-page-subtitle">Your supervisors and the cell each belongs to.</p>
         </div>
         <div className="ts-page-actions">
-          <OrgUserSelect
-            disabled={loading}
-            onChange={() => {
-              setCellFilter('')
-              setSearch('')
-              setPage(1)
-            }}
-          />
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />

@@ -7,11 +7,12 @@ import { formatDate } from '@/utils/helpers'
 
 // A country is only assigned and removed (superadmin), so the row has a delete action only
 function CountryRow({ country, onDelete }) {
-  const { canAssign } = useOrgUser()
+  const { canAssign, customerLabel } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{country.id}</td>
       <td className="fw-semibold">{country.name}</td>
+      <td className="text-body-secondary">{customerLabel(country.userId)}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(country.updatedAt)}</td>
       {canAssign && (
         <td className="border-start">
@@ -26,6 +27,7 @@ CountryRow.propTypes = {
   country: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
+    userId: PropTypes.number,
     updatedAt: PropTypes.string,
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
