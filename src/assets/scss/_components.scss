@@ -26,9 +26,40 @@ body {
   color: $ts-ink;
 }
 
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-thumb { background: $ts-line; border-radius: $ts-radius-xs; }
-::-webkit-scrollbar-track { background: transparent; }
+// Scrollbars: a slim rounded thumb on an invisible track. The thumb is inset by a transparent
+// border (background-clip), so it reads thin but keeps a comfortable grab area; it widens and
+// darkens on hover. Chromium / Safari use ::-webkit-scrollbar; Firefox only has the standard
+// properties (setting those in Chromium would switch off the custom look, hence the @supports).
+::-webkit-scrollbar {
+  width: $ts-scrollbar-size;
+  height: $ts-scrollbar-size;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba($ts-ink-3, $ts-scrollbar-alpha);
+  background-clip: padding-box;
+  border: $ts-scrollbar-inset solid transparent;
+  border-radius: $ts-radius-pill;
+
+  &:hover {
+    background-color: rgba($ts-ink-3, $ts-scrollbar-alpha-hover);
+    border-width: $ts-scrollbar-inset-hover;
+  }
+
+  &:active { background-color: $ts-ink-3; }
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner { background: transparent; }
+
+::-webkit-scrollbar-button { display: none; }
+
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba($ts-ink-3, $ts-scrollbar-alpha) transparent;
+  }
+}
 
 @keyframes ts-pulse {
   50% { opacity: .35; }
@@ -531,9 +562,59 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 // Buttons
 // -----------------------------------------------------------------------------
 
+// Every button: icon and text centred on one line, a soft press (scale) and a lift on hover.
+// Colours stay Bootstrap's / the variants' below; only depth and motion are added here.
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: .01em;
+  transition: $btn-transition, transform $ts-transition;
+
+  > .bi { line-height: 1; }
+
+  &:active:not(:disabled, .disabled),
+  &.active:active { transform: scale($ts-btn-press-scale); }
+
+  &:focus-visible { outline: 0; }
+}
+
 .btn:disabled,
 .btn.disabled {
-  cursor: default;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+// Solid buttons (primary, danger…): a faint top highlight and a soft drop shadow give them body;
+// on hover they lift and glow in their own colour.
+@each $name, $color in $theme-colors {
+  .btn-#{$name} {
+    box-shadow: inset 0 1px 0 rgba($white, $ts-btn-highlight-alpha), 0 1px 2px rgba($black, $ts-btn-shadow-alpha);
+
+    &:hover:not(:disabled, .disabled) {
+      box-shadow:
+        inset 0 1px 0 rgba($white, $ts-btn-highlight-alpha),
+        0 $ts-btn-glow-y $ts-btn-glow-blur (-$ts-btn-glow-spread) rgba($color, $ts-btn-glow-alpha);
+      transform: translateY(-$ts-btn-lift);
+    }
+
+    &:active:not(:disabled, .disabled) {
+      box-shadow: inset 0 1px 2px rgba($black, $ts-btn-shadow-alpha);
+      transform: translateY(0) scale($ts-btn-press-scale);
+    }
+
+    &:focus-visible {
+      box-shadow:
+        inset 0 1px 0 rgba($white, $ts-btn-highlight-alpha),
+        0 0 0 $input-btn-focus-width rgba($color, $input-btn-focus-color-opacity);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  [class*="btn-"]:hover:not(:disabled, .disabled),
+  [class*="btn-"]:active:not(:disabled, .disabled) { transform: none !important; }
 }
 
 // Ghost: the default secondary action in the reference
@@ -551,6 +632,10 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   --bs-btn-disabled-color: #{$ts-ink-3};
   --bs-btn-disabled-bg: #{$ts-panel-2};
   --bs-btn-disabled-border-color: #{$ts-line};
+
+  box-shadow: 0 1px 2px rgba($black, $ts-btn-shadow-alpha * .6);
+
+  &:hover:not(:disabled, .disabled) { box-shadow: 0 $ts-btn-glow-y $ts-btn-glow-blur (-$ts-btn-glow-spread) rgba($ts-orange, $ts-btn-glow-alpha * .5); }
 }
 
 // Plain: borderless top-bar / toolbar button
@@ -1303,6 +1388,118 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   border-color: $ts-line;
 }
 
+// Active / Inactive (components/common/StatusBadge.jsx): soft pill with a status dot.
+// Active is green with a glowing dot; inactive is neutral with a hollow dot.
+.ts-status {
+  display: inline-flex;
+  align-items: center;
+  gap: ts-rem(6);
+  padding: ts-rem(3) ts-rem(10) ts-rem(3) ts-rem(8);
+  font-size: $ts-fs-sm;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: $ts-radius-pill;
+
+  &.is-active {
+    color: $ts-good;
+    background-color: rgba($ts-good, $ts-tint-soft);
+    border-color: rgba($ts-good, $ts-tint-strong * 2);
+  }
+
+  &.is-inactive {
+    color: $ts-ink-3;
+    background-color: $ts-panel-2;
+    border-color: $ts-line;
+  }
+}
+
+.ts-status-dot {
+  flex: none;
+  width: $ts-status-dot-size;
+  height: $ts-status-dot-size;
+  border-radius: 50%;
+  transition: background-color $ts-transition, box-shadow $ts-transition;
+
+  .ts-status.is-active > & {
+    background-color: currentColor;
+    box-shadow: 0 0 0 $ts-status-halo rgba($ts-good, $ts-tint-strong + 4%);
+  }
+
+  .ts-status.is-inactive > & {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 $ts-status-ring currentColor;
+  }
+}
+
+// Active / Inactive segmented control (components/common/StatusToggle.jsx): two radios
+// styled as one field-height control; the picked side takes the badge colours.
+.ts-status-toggle {
+  display: inline-flex;
+  gap: ts-rem(2);
+  min-height: $input-height;
+  padding: ts-rem(3);
+  background-color: $input-bg;
+  border: $input-border-width solid $ts-line;
+  border-radius: $input-border-radius;
+
+  &.is-invalid { border-color: $form-invalid-border-color; }
+}
+
+.ts-status-input { @include visually-hidden; }
+
+.ts-status-option {
+  display: inline-flex;
+  align-items: center;
+  gap: ts-rem(7);
+  padding: 0 $ts-space-3;
+  margin: 0;
+  font-size: $ts-fs-md;
+  font-weight: 500;
+  color: $ts-ink-3;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: $ts-radius-sm;
+  transition: color $ts-transition, background-color $ts-transition, border-color $ts-transition, box-shadow $ts-transition;
+
+  &:hover { color: $ts-ink; }
+
+  // Unpicked: hollow dot
+  > .ts-status-dot { box-shadow: inset 0 0 0 $ts-status-ring currentColor; }
+
+  &:has(.ts-status-input:checked) {
+    font-weight: 600;
+
+    > .ts-status-dot { background-color: currentColor; }
+  }
+
+  &.is-active:has(.ts-status-input:checked) {
+    color: $ts-good;
+    background-color: rgba($ts-good, $ts-tint-soft);
+    border-color: rgba($ts-good, $ts-tint-strong * 2);
+
+    > .ts-status-dot { box-shadow: 0 0 0 $ts-status-halo rgba($ts-good, $ts-tint-strong + 4%); }
+  }
+
+  &.is-inactive:has(.ts-status-input:checked) {
+    color: $ts-ink-2;
+    background-color: $ts-panel;
+    border-color: $ts-line;
+
+    > .ts-status-dot { box-shadow: none; }
+  }
+
+  &:has(.ts-status-input:focus-visible) { box-shadow: $input-focus-box-shadow; }
+
+  &:has(.ts-status-input:disabled) {
+    cursor: not-allowed;
+    opacity: .6;
+
+    &:hover { color: $ts-ink-3; }
+  }
+}
+
 // Rounded status chip with optional dot: <span class="ts-chip text-success"><i class="ts-dot ts-dot-live"></i>Live</span>
 .ts-chip {
   display: inline-flex;
@@ -1395,6 +1592,15 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 }
 
 .modal-body { padding-bottom: ts-rem(22); }
+
+// A <Form> wrapping header, body and footer of a `scrollable` Modal sits between .modal-content
+// and .modal-body: pass the flex column through so the body scrolls between a fixed header and
+// footer. <Modal scrollable><Form className="ts-modal-form">…
+.ts-modal-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
 
 .toast {
   &.toast-danger  { border-color: $ts-red; }
@@ -1571,8 +1777,14 @@ $ts-toast-colors: (
 
 .dropdown-toggle.show::after { transform: rotate(180deg); }
 
-// Dropdown toggle styled as a .form-select: the select chevron replaces the toggle caret
+// Dropdown toggle styled as a .form-select: the select chevron replaces the toggle caret.
+// It is a .btn underneath: keep it a field (block, left-aligned text that truncates, no press motion)
 .ts-select-toggle {
+  display: block;
+  letter-spacing: normal;
+
+  &:active:not(:disabled, .disabled) { transform: none; }
+
   &::after { display: none; }
 
   // Open = focused, like a native select
@@ -1969,7 +2181,6 @@ $ts-toast-colors: (
   padding: $ts-picker-ring-width;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
 }
 
 .ts-time-option {
@@ -2310,4 +2521,236 @@ $ts-toast-colors: (
   @include media-breakpoint-up(lg) {
     border-right: 1px solid $ts-line;
   }
+}
+
+// Shift Setup (pages/Shifts): the shift cards (form: ShiftFormModal)
+.ts-shift-breaks {
+  padding-top: $ts-space-3;
+  margin-top: $ts-space-4;
+  border-top: 1px solid $ts-line;
+}
+
+// Shift card: header (type icon, name, actions) → start / end → hours → working days → breaks
+.ts-shift-card {
+  transition: border-color $ts-transition, box-shadow $ts-transition;
+
+  &:hover { border-color: rgba($ts-orange, $ts-tint-strong * 2); }
+
+  &.is-editing {
+    border-color: $ts-orange;
+    box-shadow: 0 0 0 $ts-picker-ring-width rgba($ts-orange, $ts-tint-strong);
+  }
+
+  &.is-inactive .ts-shift-card-hours,
+  &.is-inactive .ts-shift-card-stats { opacity: .6; }
+}
+
+.ts-shift-card-heading { min-width: 0; }
+
+.ts-shift-card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $ts-shift-icon-size;
+  height: $ts-shift-icon-size;
+  font-size: $ts-fs-lg;
+  border-radius: $ts-radius-md;
+
+  &.is-day {
+    color: $ts-amber;
+    background-color: rgba($ts-amber, $ts-tint-soft);
+  }
+
+  &.is-night {
+    color: $ts-violet;
+    background-color: rgba($ts-violet, $ts-tint-soft);
+  }
+}
+
+.ts-shift-card-name {
+  margin: 0;
+  font-size: $ts-fs-lg;
+  font-weight: 600;
+  color: $ts-ink;
+}
+
+.ts-shift-card-meta {
+  margin-top: ts-rem(2);
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+}
+
+.ts-shift-card-label {
+  margin-bottom: $ts-space-1;
+  font-size: $ts-fs-xs;
+  font-weight: 600;
+  color: $ts-ink-3;
+  letter-spacing: .04em;
+}
+
+// Start → end, on an inset strip
+.ts-shift-card-hours {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ts-space-3;
+  padding: $ts-space-3 $ts-space-4;
+  background-color: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+
+  > div:last-child { text-align: right; }
+}
+
+.ts-shift-card-clock {
+  font-size: $ts-num-sm;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: $ts-ink;
+}
+
+.ts-shift-card-period {
+  margin-left: ts-rem(3);
+  font-size: $ts-fs-sm;
+  font-weight: 500;
+  color: $ts-ink-3;
+}
+
+.ts-shift-card-next-day {
+  padding: 0 ts-rem(5);
+  margin-left: ts-rem(4);
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  color: $ts-violet;
+  vertical-align: super;
+  background-color: rgba($ts-violet, $ts-tint-soft);
+  border-radius: $ts-radius-pill;
+}
+
+.ts-shift-card-arrow {
+  font-size: $ts-fs-lg;
+  color: $ts-orange;
+}
+
+// Shift length · Breaks · Working time
+.ts-shift-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+
+  > div {
+    padding: 0 $ts-space-3;
+
+    &:first-child { padding-left: 0; }
+    + div { border-left: 1px solid $ts-line; }
+  }
+
+  dt {
+    font-size: $ts-fs-xs;
+    font-weight: 500;
+    color: $ts-ink-3;
+  }
+
+  dd {
+    margin: ts-rem(2) 0 0;
+    font-size: $ts-fs-lg;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: $ts-ink;
+  }
+
+  .is-accent dd { color: $ts-orange; }
+}
+
+.ts-shift-card-unit {
+  margin-left: ts-rem(2);
+  font-size: $ts-fs-sm;
+  font-weight: 500;
+  color: $ts-ink-3;
+}
+
+// Mon … Sun: working days tinted orange, days off muted and dashed
+.ts-shift-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: $ts-space-1;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: $ts-shift-day-height;
+    font-size: $ts-fs-sm;
+    color: $ts-ink-3;
+    border: 1px dashed $ts-line;
+    border-radius: $ts-radius-sm;
+
+    &.is-working {
+      font-weight: 600;
+      color: $ts-orange;
+      background-color: rgba($ts-orange, $ts-tint-soft);
+      border: 1px solid rgba($ts-orange, $ts-tint-strong * 2);
+    }
+  }
+}
+
+.ts-shift-breaks-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $ts-space-2;
+    height: $ts-shift-break-row-height;
+    font-size: $ts-fs-md;
+
+    + li { border-top: 1px solid $ts-line; }
+  }
+
+  // More than $ts-shift-breaks-visible breaks: show that many rows and scroll the rest
+  &.is-scrollable {
+    max-height: $ts-shift-break-row-height * $ts-shift-breaks-visible;
+    padding-right: $ts-space-2;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: $ts-radius-xs;
+
+    &:focus-visible {
+      outline: $ts-picker-ring-width solid rgba($ts-orange, $ts-tint-strong * 2);
+      outline-offset: $ts-space-1;
+    }
+  }
+}
+
+.ts-shift-break-icon { color: $ts-ink-3; }
+
+.ts-shift-break-name {
+  min-width: 0;
+  font-weight: 500;
+  color: $ts-ink;
+}
+
+.ts-shift-break-time {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: $ts-ink-2;
+  white-space: nowrap;
+}
+
+.ts-shift-break-length {
+  flex-shrink: 0;
+  padding: 0 $ts-space-2;
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  color: $ts-ink-2;
+  background-color: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-pill;
 }

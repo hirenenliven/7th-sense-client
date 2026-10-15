@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Badge } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import IconAction from '@/components/common/IconAction'
+import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
@@ -31,9 +32,7 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onEdit, onDelet
         </Badge>
       </td>
       <td>
-        <Badge bg="" className={isActive ? 'badge-outline-success' : 'badge-outline-muted'}>
-          {isActive ? 'Active' : 'Inactive'}
-        </Badge>
+        <StatusBadge active={isActive} />
       </td>
       {canEdit && (
         <td className="border-start">

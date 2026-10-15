@@ -1,7 +1,7 @@
 import { memo } from 'react'
-import { Badge } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import IconAction from '@/components/common/IconAction'
+import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 import { secondsToDuration } from '@/utils/dateTime'
@@ -15,7 +15,10 @@ function PartRow({ part, showCustomer, canManage, onEdit, onDelete }) {
     <tr>
       <td className="font-tabular">{part.id}</td>
       <td className="font-tabular">{part.partNo}</td>
-      <td className="fw-semibold">{part.partName}</td>
+      <td>
+        <div className="fw-semibold">{part.partName}</div>
+        {part.clienteleName && <div className="small text-body-secondary">{part.clienteleName}</div>}
+      </td>
       {showCustomer && <td>{part.customerName || '—'}</td>}
       <td className="font-tabular">{part.processCount}</td>
       <td className="font-tabular">{part.partCount}</td>
@@ -24,9 +27,7 @@ function PartRow({ part, showCustomer, canManage, onEdit, onDelete }) {
         <div className="small text-body-secondary">{part.productionTime} sec.</div>
       </td>
       <td>
-        <Badge bg="" className={isActive ? 'badge-outline-success' : 'badge-outline-muted'}>
-          {isActive ? 'Active' : 'Inactive'}
-        </Badge>
+        <StatusBadge active={isActive} />
       </td>
       <td className="text-body-secondary text-nowrap">{formatDate(part.createdAt)}</td>
       {canManage && (
@@ -47,6 +48,7 @@ PartRow.propTypes = {
     partNo: PropTypes.string.isRequired,
     partName: PropTypes.string.isRequired,
     customerName: PropTypes.string,
+    clienteleName: PropTypes.string,
     processCount: PropTypes.number,
     partCount: PropTypes.number,
     productionTime: PropTypes.number,

@@ -5,6 +5,10 @@ export const FIELD_HELP = {
     title: 'Customer',
     content: 'Customer that makes the part. Its machines are offered under Applicable Machine.',
   },
+  clienteleId: {
+    title: 'Clientele',
+    content: "The customer's client the part is made for (Masters › Clientele). Pick the customer first.",
+  },
   partCount: {
     title: 'Part Count',
     content: 'Number of parts produced in one cycle of the program.',

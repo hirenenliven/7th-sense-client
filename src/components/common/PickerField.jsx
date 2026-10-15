@@ -112,8 +112,10 @@ function PickerField({
         <i className={`bi ${icon}`} aria-hidden="true" />
       </button>
 
+      {/* Inside a Modal the popup renders into it: the Modal pulls focus that leaves it back in */}
       <Overlay
         target={wrapperRef}
+        container={() => wrapperRef.current?.closest('.modal') ?? document.body}
         show={open}
         placement="bottom-start"
         flip

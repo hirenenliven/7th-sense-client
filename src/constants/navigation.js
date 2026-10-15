@@ -95,6 +95,7 @@ export const NAV_SECTIONS = [
       { key: 'lines', label: 'Line', icon: 'bi-distribute-horizontal', path: ROUTES.ORG_LINES },
       { key: 'cells', label: 'Cell', icon: 'bi-grid-3x3-gap', path: ROUTES.ORG_CELLS },
       { key: 'supervisors', label: 'Supervisor', icon: 'bi-person-badge', path: ROUTES.ORG_SUPERVISORS },
+      { key: 'clientele', label: 'Clientele', icon: 'bi-person-vcard', path: ROUTES.CLIENTELES },
       {
         key: 'parts',
         label: 'Parts',
@@ -106,11 +107,12 @@ export const NAV_SECTIONS = [
       },
       {
         key: 'shifts',
-        label: 'Shifts',
+        label: 'Shift',
         icon: 'bi-calendar3',
         children: [
-          { key: 'shift-setup', label: 'Shift Setup', path: ROUTES.SHIFTS },
-          { key: 'holidays', label: 'Holidays', path: ROUTES.HOLIDAYS },
+          { key: 'shift-setup', label: 'Add / Manage Shift', path: ROUTES.SHIFTS },
+          { key: 'breaks', label: 'Breaks', path: ROUTES.BREAKS },
+          { key: 'holidays', label: 'Holiday / Week Off', path: ROUTES.HOLIDAYS },
         ],
       },
       {

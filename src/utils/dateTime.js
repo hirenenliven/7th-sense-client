@@ -101,3 +101,30 @@ export const durationToSeconds = (text) => {
   const [hours, minutes, seconds] = value.split(':').map(Number)
   return hours * 3600 + minutes * 60 + seconds
 }
+
+// Clock times of shifts and breaks: "HH:mm" (24 h), like TimePicker values.
+const MINUTES_PER_DAY = 24 * 60
+
+// "14:30" → minutes after midnight (870); null when not HH:mm
+export const clockToMinutes = (value) => {
+  const time = parseTime(value)
+  return time ? time.hours * 60 + time.minutes : null
+}
+
+// Minutes from start to end, past midnight when end is not after start: 22:00 → 06:00 = 480.
+// Same rule as the shifts API (dto.MinutesBetween); equal times give a whole day.
+export const minutesBetween = (start, end) => {
+  const minutes = (clockToMinutes(end) - clockToMinutes(start) + MINUTES_PER_DAY) % MINUTES_PER_DAY
+  return minutes === 0 ? MINUTES_PER_DAY : minutes
+}
+
+// "14:30" → "02:30 PM"
+export const formatClock12 = (value) => {
+  const time = parseTime(value)
+  if (!time) return value ?? ''
+  const hours12 = time.hours % 12 || 12
+  return `${pad2(hours12)}:${pad2(time.minutes)} ${time.hours < 12 ? 'AM' : 'PM'}`
+}
+
+// 480 → "08:00"
+export const formatHoursMinutes = (minutes) => `${pad2(Math.floor(minutes / 60))}:${pad2(minutes % 60)}`

@@ -76,6 +76,15 @@ Text and background colours have Bootstrap classes:
 
 ## Theme additions
 
+Every `.btn` is global and needs no extra classes. It centres its icon and text on one line, and
+pressing it scales it down slightly. Solid variants such as `primary` and `danger` add a faint top
+highlight, a soft shadow, and on hover a 1px lift with a glow in their own colour. `ghost` gets a light
+shadow and an orange glow on hover. Colours come only from the variants. Depth and motion use the
+`$ts-btn-*` tokens, and reduced motion turns the movement off. A dropdown toggle made to look like a
+field (`.ts-select-toggle`) opts out. Scrollbars are global too: a slim rounded thumb on a hidden
+track that widens on hover (`$ts-scrollbar-*`). Don't give an element its own `scrollbar-width` or
+`scrollbar-color`, because in Chromium that replaces the custom look.
+
 | Need | Use |
 |---|---|
 | Secondary button | `variant="ghost"` |
@@ -91,6 +100,7 @@ Text and background colours have Bootstrap classes:
 | Inner box | `.card-inset` |
 | Table in a rounded panel | wrap it in `.ts-table-panel` |
 | Status edge on a table row | `<tr className="row-status-{status}">`, add `table-danger` to tint the row |
+| Active / Inactive | `<StatusBadge active={…} />` (`components/common/StatusBadge.jsx`): green pill with a glowing dot, or neutral with a hollow dot. Use it for every Active / Inactive status |
 | Status pill | `<Badge bg="" className="badge-outline-{status}">`, or `badge-outline-muted` |
 | Soft chip | `<Badge bg="" className="badge-soft-{status}">` |
 | Live chip | `<span className="ts-chip text-success"><i className="ts-dot ts-dot-live" />Live</span>` |
@@ -175,6 +185,9 @@ Write forms with plain react-bootstrap markup, without wrapper components:
   - Radio: every `Form.Check type="radio"` shows an orange ring and dot when picked. For a short set of options,
     wrap inline radios in `<div role="radiogroup" className="ts-radio-group">`: each option becomes a field-height chip
     (orange border + soft tint when picked, whole chip clickable), see "Controller Ver." in `pages/Machines/AddMachine.jsx`.
+  - Active / Inactive field: `<StatusToggle id="x-status" {...register('status')} activeValue={X_STATUS.ACTIVE} inactiveValue={X_STATUS.INACTIVE} />`
+    (`components/common/StatusToggle.jsx`), a two-segment control that matches `StatusBadge`. Never a `Form.Select`. Its radios have
+    their own ids, so its `Form.Group` takes no `controlId`; pass `isInvalid` and render the message as `invalid-feedback d-block`.
   - Multi-select: `Dropdown` + `Dropdown.Toggle className="form-select ts-select-toggle"` + `Dropdown.Menu.ts-check-menu`
     with `Form.Check` rows (optional `.ts-check-menu-all` row on top), see `pages/Machines/HealthSensorPicker.jsx`.
 - Shared validation rules are in `utils/validators.js`. Each form's own rules go next to the page, as in `pages/Customers/customerForm.js`.

@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
+import { getClienteles } from '@/services/clienteleService'
 import { getUsers } from '@/services/customerService'
 import { getMachines } from '@/services/machineService'
-import { createPart, getPartById, partDrawingUrl, updatePart } from '@/services/partService'
+import { createPart, getPartById, partDrawingUrl, updatePart, uploadPartDrawing } from '@/services/partService'
 import useAuth from '@/hooks/useAuth'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
+import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import ProcessFields from './ProcessFields'
 import {
@@ -64,6 +66,7 @@ function AddPart() {
 
   const [customers, setCustomers] = useState({ items: [], loading: canPickCustomer })
   const [machines, setMachines] = useState({ items: [], loading: false })
+  const [clienteles, setClienteles] = useState({ items: [], loading: false })
 
   // Superadmin: the customers to pick from
   useEffect(() => {
@@ -101,6 +104,26 @@ function AddPart() {
     }
   }, [userId, canPickCustomer])
 
+  // The customer's clienteles (Masters › Clientele)
+  useEffect(() => {
+    if (!userId) {
+      setClienteles({ items: [], loading: false })
+      return undefined
+    }
+    let active = true
+    setClienteles((previous) => ({ ...previous, loading: true }))
+    getClienteles(canPickCustomer ? userId : undefined)
+      .then((list) => active && setClienteles({ items: [...list].sort(byName), loading: false }))
+      .catch((error) => {
+        if (!active) return
+        setClienteles({ items: [], loading: false })
+        toast.error(error.message, { title: 'Could not load clienteles' })
+      })
+    return () => {
+      active = false
+    }
+  }, [userId, canPickCustomer])
+
   // Edit: load the part and fill the form (reset() also makes these the Reset values)
   useEffect(() => {
     if (!isEdit) return undefined
@@ -119,16 +142,36 @@ function AddPart() {
     }
   }, [id, isEdit, reset])
 
-  // Machines belong to one customer: clear every process's pick when the customer changes
+  // Clienteles and machines belong to one customer: clear the picks when the customer changes
   const handleCustomerChange = () => {
+    setValue('clienteleId', '')
     getValues('processes').forEach((_, index) => setValue(`processes.${index}.machineIds`, []))
   }
 
   const drawingUrl = useCallback((processId) => partDrawingUrl(id, processId), [id])
 
+  // Uploads the drawings picked since the last save (POST /parts/drawings) and puts their stored
+  // names in the form, so a retry after a failed save does not upload them again
+  const uploadPendingDrawings = async (processList) => {
+    const uploaded = []
+    for (const [index, process] of processList.entries()) {
+      if (!process.drawingUpload) {
+        uploaded.push(process)
+        continue
+      }
+      const drawing = await uploadPartDrawing(process.drawingUpload)
+      setValue(`processes.${index}.drawingFile`, drawing.file)
+      setValue(`processes.${index}.drawingName`, drawing.name)
+      setValue(`processes.${index}.drawingUpload`, null)
+      uploaded.push({ ...process, drawingFile: drawing.file, drawingName: drawing.name, drawingUpload: null })
+    }
+    return uploaded
+  }
+
   const onSubmit = async (values) => {
     try {
-      const payload = toPartPayload(values, existing)
+      const processList = await uploadPendingDrawings(values.processes)
+      const payload = toPartPayload({ ...values, processes: processList }, existing)
       if (isEdit) {
         await updatePart(id, payload)
         toast.success(`${payload.partName} has been updated.`, { title: 'Part updated' })
@@ -146,6 +189,11 @@ function AddPart() {
   if (!userId) machinesPlaceholder = 'Select a customer first'
   else if (machines.loading) machinesPlaceholder = 'Loading machines…'
   else if (!machines.items.length) machinesPlaceholder = 'No machines for this customer'
+
+  let clientelePlaceholder = 'Select Clientele'
+  if (!userId) clientelePlaceholder = 'Select a customer first'
+  else if (clienteles.loading) clientelePlaceholder = 'Loading clienteles…'
+  else if (!clienteles.items.length) clientelePlaceholder = 'No clienteles for this customer'
 
   const header = (
     <header className="ts-page-header">
@@ -220,6 +268,28 @@ function AddPart() {
                     </Form.Group>
                   )}
 
+                  <Form.Group as={Col} xs={12} controlId="clienteleId">
+                    <FieldLabel required help={FIELD_HELP.clienteleId}>
+                      Clientele Name
+                    </FieldLabel>
+                    {/* Controlled: the options load after the customer is known */}
+                    <Controller
+                      name="clienteleId"
+                      control={control}
+                      render={({ field }) => (
+                        <Form.Select {...field} disabled={!userId || clienteles.loading} isInvalid={Boolean(errors.clienteleId)}>
+                          <option value="">{clientelePlaceholder}</option>
+                          {clienteles.items.map((clientele) => (
+                            <option key={clientele.id} value={clientele.id}>
+                              {`${clientele.name} (${clientele.clientCode})`}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      )}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.clienteleId?.message}</Form.Control.Feedback>
+                  </Form.Group>
+
                   <Form.Group as={Col} xs={12} controlId="partNo">
                     <Form.Label className="required">Part No.</Form.Label>
                     <Form.Control {...register('partNo')} autoComplete="off" maxLength={MAX_LENGTH.partNo} isInvalid={Boolean(errors.partNo)} />
@@ -253,12 +323,14 @@ function AddPart() {
                   </Form.Group>
 
                   {isEdit && (
-                    <Form.Group as={Col} xs={12} controlId="status">
+                    <Form.Group as={Col} xs={12}>
                       <Form.Label className="required">Status</Form.Label>
-                      <Form.Select {...register('status')}>
-                        <option value={PART_STATUS.ACTIVE}>Active</option>
-                        <option value={PART_STATUS.INACTIVE}>Inactive</option>
-                      </Form.Select>
+                      <StatusToggle
+                        id="status"
+                        {...register('status')}
+                        activeValue={PART_STATUS.ACTIVE}
+                        inactiveValue={PART_STATUS.INACTIVE}
+                      />
                     </Form.Group>
                   )}
                 </Row>

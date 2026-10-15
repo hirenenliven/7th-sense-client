@@ -154,12 +154,14 @@ function ProcessFields({ index, control, register, setValue, errors, machines, m
           <DrawingUpload
             id={`${prefix}.drawingFile`}
             file={process?.drawingFile ?? ''}
+            upload={process?.drawingUpload ?? null}
             name={process?.drawingName ?? ''}
             viewUrl={process?.processId ? drawingUrl(process.processId) : undefined}
             isInvalid={Boolean(errors?.drawingFile)}
-            onChange={({ file, name }) => {
-              setValue(`${prefix}.drawingFile`, file, { shouldDirty: true, shouldValidate: true })
+            onChange={({ file, upload, name }) => {
+              setValue(`${prefix}.drawingUpload`, upload, { shouldDirty: true })
               setValue(`${prefix}.drawingName`, name, { shouldDirty: true })
+              setValue(`${prefix}.drawingFile`, file, { shouldDirty: true, shouldValidate: true })
             }}
           />
         </Form.Group>

@@ -66,6 +66,16 @@ $ts-fs-xl:   ts-rem(20);   // page title
 // Display numbers (KPIs)
 $ts-num-sm: ts-rem(22);
 $ts-num-md: ts-rem(30);
+// Shift card: Day / Night icon tile, working-day chips
+$ts-shift-icon-size: ts-rem(38);
+$ts-shift-day-height: ts-rem(26);
+// Break rows on a shift card; past $ts-shift-breaks-visible rows the list scrolls (ShiftCard MAX_VISIBLE_BREAKS)
+$ts-shift-break-row-height: ts-rem(34);
+$ts-shift-breaks-visible: 4;
+// Active / Inactive badge + toggle (StatusBadge, StatusToggle): dot, its glow and its hollow ring
+$ts-status-dot-size: ts-rem(7);
+$ts-status-halo: ts-rem(3);
+$ts-status-ring: ts-rem(1.5);
 $ts-num-lg: ts-rem(40);
 $ts-num-xl: ts-rem(52);
 
@@ -411,7 +421,7 @@ $btn-padding-x:      ts-rem(13);
 $btn-font-size:      ts-rem(12.5);
 $btn-font-weight:    600;
 $btn-line-height:    1.4;
-$btn-border-radius:  ts-rem(7);
+$btn-border-radius:  $ts-radius;
 $btn-padding-y-sm:   ts-rem(4);
 $btn-padding-x-sm:   ts-rem(10);
 $btn-font-size-sm:   ts-rem(12);
@@ -429,6 +439,22 @@ $btn-link-color:       $ts-orange;
 $btn-link-hover-color: $ts-orange-2;
 $btn-link-disabled-color: $ts-ink-3;
 $btn-transition: color $ts-transition, background-color $ts-transition, border-color $ts-transition, box-shadow $ts-transition;
+// Button depth and motion (_components.scss › Buttons): top highlight, resting shadow, hover lift
+// + coloured glow, press scale. Colours come from the variants.
+$ts-btn-highlight-alpha: .14;
+$ts-btn-shadow-alpha:    .22;
+$ts-btn-lift:            ts-rem(1);
+$ts-btn-glow-y:          ts-rem(4);
+$ts-btn-glow-blur:       ts-rem(14);
+$ts-btn-glow-spread:     ts-rem(4);
+$ts-btn-glow-alpha:      .45;
+$ts-btn-press-scale:     .97;
+// Scrollbars: track size, the transparent inset that makes the thumb slim (wider on hover), thumb opacity
+$ts-scrollbar-size:        ts-rem(10);
+$ts-scrollbar-inset:       ts-rem(3);
+$ts-scrollbar-inset-hover: ts-rem(2);
+$ts-scrollbar-alpha:       .4;
+$ts-scrollbar-alpha-hover: .7;
 
 $input-bg:                  $ts-panel-2;
 $input-color:               $ts-ink;

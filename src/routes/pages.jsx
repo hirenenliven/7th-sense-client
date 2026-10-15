@@ -13,6 +13,10 @@ const BranchList = lazy(() => import('@/pages/Branches/BranchList'))
 const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
 const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
 const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
+const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
+const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
+const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
+const HolidaySetup = lazy(() => import('@/pages/Holidays/HolidaySetup'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
@@ -51,10 +55,16 @@ export const PAGES = [
   { path: ROUTES.MACHINES, element: <MachineList /> },
   { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
-  // Parts: everyone reads their company's; managers add, edit and delete
+  // Clientele and parts: everyone reads their company's; managers add, edit and delete
+  { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
   { path: ROUTES.PARTS, element: <PartList /> },
   { path: ROUTES.PART_ADD, element: <AddPart />, roles: MANAGERS },
   { path: ROUTES.PART_EDIT, element: <AddPart />, roles: MANAGERS },
+  // Shift › Add / Manage Shift, Breaks, Holiday / Week Off: everyone reads their company's;
+  // managers add, edit and delete (the pages hide the form)
+  { path: ROUTES.SHIFTS, element: <ShiftSetup /> },
+  { path: ROUTES.BREAKS, element: <BreakSetup /> },
+  { path: ROUTES.HOLIDAYS, element: <HolidaySetup /> },
   { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },

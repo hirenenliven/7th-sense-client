@@ -8,6 +8,7 @@ import { getBranchById } from '@/services/branchService'
 import { getUserById } from '@/services/customerService'
 import { getMachines } from '@/services/machineService'
 import Loader from '@/components/common/Loader'
+import StatusBadge from '@/components/common/StatusBadge'
 import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
 import { FILTER_OPTIONS } from './customerForm'
 import { customerName } from './customerFormat'
@@ -192,9 +193,7 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
               ['Email', customer.email],
               [
                 'Status',
-                <Badge key="status" bg={isActive ? 'success' : 'secondary'}>
-                  {isActive ? 'Active' : 'Inactive'}
-                </Badge>,
+                <StatusBadge key="status" active={isActive} />,
               ],
             ]}
           />

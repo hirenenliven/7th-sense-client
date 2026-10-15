@@ -28,8 +28,9 @@ export const EMPTY_PROCESS = {
   machineIds: [], // machine ids (numbers)
   drawingNo: '',
   drawingRevisionNo: '',
-  drawingFile: '', // stored name from the upload
+  drawingFile: '', // stored name of the saved drawing
   drawingName: '', // file name shown to the user
+  drawingUpload: null, // picked PDF (File), uploaded only when the part is saved
   accuracyId: '',
   setupTime: DURATION_ZERO,
   cycleTime: DURATION_ZERO,
@@ -40,6 +41,7 @@ export const EMPTY_PROCESS = {
 
 export const INITIAL_VALUES = {
   userId: '',
+  clienteleId: '',
   partNo: '',
   partName: '',
   partCount: '1',
@@ -66,8 +68,9 @@ const processSchema = z
       .trim()
       .min(1, 'Drawing revision no. is required')
       .max(MAX_LENGTH.processText, 'Revision no. is too long'),
-    drawingFile: z.string().min(1, 'Part drawing (PDF) is required'),
+    drawingFile: z.string(),
     drawingName: z.string(),
+    drawingUpload: z.custom((value) => value === null || value instanceof File).nullable(),
     accuracyId: z.string().min(1, 'Machine accuracy level is required'),
     setupTime: durationText('Setup time'),
     cycleTime: durationText('Cycle time').refine((value) => durationToSeconds(value) > 0, 'Cycle time must be more than 0:00:00'),
@@ -76,6 +79,9 @@ const processSchema = z
     subPrograms: z.array(subProgramSchema).max(MAX_SUB_PROGRAMS, `Up to ${MAX_SUB_PROGRAMS} sub programs`),
   })
   .superRefine((process, ctx) => {
+    if (!process.drawingFile && !process.drawingUpload) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Part drawing (PDF) is required', path: ['drawingFile'] })
+    }
     if (process.hasSubProgram && !process.subPrograms.length) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Add at least one sub program', path: ['subPrograms'] })
     }
@@ -84,6 +90,7 @@ const processSchema = z
 // Mirrors the parts API rules (dto/part_dto.go)
 export const partSchema = z.object({
   userId: z.string().min(1, 'Customer is required'),
+  clienteleId: z.string().min(1, 'Clientele is required'),
   partNo: z.string().trim().min(1, 'Part no. is required').max(MAX_LENGTH.partNo, 'Part no. is too long'),
   partName: z.string().trim().min(1, 'Part name is required').max(MAX_LENGTH.partName, 'Part name is too long'),
   partCount: z
@@ -114,10 +121,11 @@ export const partSeconds = (processes) => (processes ?? []).reduce((sum, process
 // API mapping — form values ⇄ parts API body (POST /parts, PUT /parts/{id})
 // ---------------------------------------------------------------------------
 
-// `existing` = the loaded part when editing: keeps its clientele (not on the form yet)
+// `existing` = the loaded part when editing (sends the status). Picked drawings must be uploaded
+// first (AddPart: uploadPendingDrawings) so drawingFile holds their stored names.
 export const toPartPayload = (values, existing) => ({
   userId: Number(values.userId),
-  clienteleId: existing?.clienteleId ?? null,
+  clienteleId: values.clienteleId ? Number(values.clienteleId) : null,
   partNo: values.partNo.trim(),
   partName: values.partName.trim(),
   partCount: Number(values.partCount),
@@ -145,6 +153,7 @@ export const toPartPayload = (values, existing) => ({
 // GET /parts/{id} → form values
 export const toFormValues = (part) => ({
   userId: String(part.userId ?? ''),
+  clienteleId: part.clienteleId ? String(part.clienteleId) : '',
   partNo: part.partNo ?? '',
   partName: part.partName ?? '',
   partCount: String(part.partCount ?? 1),
@@ -158,6 +167,7 @@ export const toFormValues = (part) => ({
     drawingRevisionNo: process.drawingRevisionNo ?? '',
     drawingFile: process.drawingFile ?? '',
     drawingName: process.drawingName ?? '',
+    drawingUpload: null,
     accuracyId: process.accuracyId ? String(process.accuracyId) : '',
     setupTime: secondsToDuration(process.setupTime),
     cycleTime: secondsToDuration(process.cycleTime),

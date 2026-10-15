@@ -27,11 +27,13 @@ export const ROUTES = {
   // Machine catalog (superadmin): Brand → Controller → Model
   CONTROLLERS: '/masters/controllers',
   MODELS: '/masters/models',
+  CLIENTELES: '/masters/clienteles',
   PARTS: '/masters/parts',
   PART_ADD: '/masters/parts/add',
   PART_EDIT: '/masters/parts/:id/edit',
   OPERATIONS: '/masters/operations',
   SHIFTS: '/masters/shifts',
+  BREAKS: '/masters/breaks',
   HOLIDAYS: '/masters/holidays',
   // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)
   USERS: '/masters/users',

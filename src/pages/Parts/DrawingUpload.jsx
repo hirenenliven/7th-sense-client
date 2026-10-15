@@ -1,22 +1,22 @@
-import { useRef, useState } from 'react'
-import { Button, Form, InputGroup, Spinner } from 'react-bootstrap'
+import { useRef } from 'react'
+import { Button, Form, InputGroup } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import IconAction from '@/components/common/IconAction'
 import { ACTION_ICONS } from '@/constants/icons'
-import { uploadPartDrawing } from '@/services/partService'
 import { fileRule } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import { DRAWING_RULES } from './partForm'
 
 const checkDrawing = fileRule(DRAWING_RULES)
 
-// Part drawing (PDF) of one process. Picking a file uploads it at once (POST /parts/drawings) and
-// hands { file, name } to onChange; the part saves only that reference. `viewUrl`: the saved drawing.
-function DrawingUpload({ id, file, name, viewUrl, onChange, isInvalid = false, disabled = false }) {
+// Part drawing (PDF) of one process. Picking a file only keeps it in the form ({ upload, name },
+// stored `file` cleared); AddPart uploads it when the part is saved, so files picked and replaced
+// before saving are never stored. `file`: the saved drawing's stored name, `viewUrl`: where to open it.
+function DrawingUpload({ id, file, upload = null, name, viewUrl, onChange, isInvalid = false, disabled = false }) {
   const inputRef = useRef(null)
-  const [uploading, setUploading] = useState(false)
+  const hasDrawing = Boolean(file || upload)
 
-  const handlePick = async (event) => {
+  const handlePick = (event) => {
     const picked = event.target.files?.[0]
     event.target.value = '' // the same file can be picked again
     if (!picked) return
@@ -25,15 +25,7 @@ function DrawingUpload({ id, file, name, viewUrl, onChange, isInvalid = false, d
       toast.error(problem === 'Unsupported file type' ? 'Choose a PDF file.' : problem, { title: 'Could not use this drawing' })
       return
     }
-    setUploading(true)
-    try {
-      const drawing = await uploadPartDrawing(picked)
-      onChange({ file: drawing.file, name: drawing.name })
-    } catch (error) {
-      toast.error(error.message, { title: 'Could not upload drawing' })
-    } finally {
-      setUploading(false)
-    }
+    onChange({ file: '', upload: picked, name: picked.name })
   }
 
   return (
@@ -42,12 +34,12 @@ function DrawingUpload({ id, file, name, viewUrl, onChange, isInvalid = false, d
         <Form.Control
           id={id}
           readOnly
-          value={uploading ? 'Uploading…' : name}
+          value={name}
           placeholder="Choose PDF"
-          onClick={() => !disabled && !uploading && inputRef.current?.click()}
+          onClick={() => !disabled && inputRef.current?.click()}
           isInvalid={isInvalid}
         />
-        {file && viewUrl && (
+        {file && !upload && viewUrl && (
           <Button as="a" variant="ghost" href={viewUrl} target="_blank" rel="noopener noreferrer" aria-label={`View ${name}`}>
             <i className="bi bi-file-earmark-pdf" aria-hidden="true" />
           </Button>
@@ -55,13 +47,18 @@ function DrawingUpload({ id, file, name, viewUrl, onChange, isInvalid = false, d
         <Button
           variant="ghost"
           onClick={() => inputRef.current?.click()}
-          disabled={disabled || uploading}
-          aria-label={file ? 'Replace part drawing' : 'Upload part drawing'}
+          disabled={disabled}
+          aria-label={hasDrawing ? 'Replace part drawing' : 'Choose part drawing'}
         >
-          {uploading ? <Spinner animation="border" size="sm" aria-hidden="true" /> : <i className="bi bi-plus-square" aria-hidden="true" />}
+          <i className="bi bi-plus-square" aria-hidden="true" />
         </Button>
-        {file && !uploading && (
-          <IconAction danger icon={ACTION_ICONS.remove} label="Remove part drawing" onClick={() => onChange({ file: '', name: '' })} />
+        {hasDrawing && (
+          <IconAction
+            danger
+            icon={ACTION_ICONS.remove}
+            label="Remove part drawing"
+            onClick={() => onChange({ file: '', upload: null, name: '' })}
+          />
         )}
         <Form.Control.Feedback type="invalid">Part drawing (PDF) is required</Form.Control.Feedback>
       </InputGroup>
@@ -73,6 +70,7 @@ function DrawingUpload({ id, file, name, viewUrl, onChange, isInvalid = false, d
 DrawingUpload.propTypes = {
   id: PropTypes.string.isRequired,
   file: PropTypes.string.isRequired,
+  upload: PropTypes.instanceOf(File),
   name: PropTypes.string.isRequired,
   viewUrl: PropTypes.string,
   onChange: PropTypes.func.isRequired,

@@ -43,3 +43,13 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 
 ## Machine catalog
 - Brand → Controller → Model (`services/catalogService.js`). Masters › Machine Catalog (Controllers, Models) is superadmin-only: `roles: SUPERADMIN_ONLY` on the pages and menu item (server: `superAdminOnly` routes). Every user reads the lists for the machine form, which filters controllers by brand and models by controller.
+
+## Clientele and parts
+- Both belong to a customer (company) and use the Machine page pattern (`pages/Clienteles/`, `pages/Parts/`): everyone reads their company's, `MANAGERS` add / edit / delete; the superadmin picks the customer on the form, others always save to their own company.
+- A part needs a clientele and applicable machines of its customer: both lists load after the customer is known (controlled selects) and are cleared when it changes. A clientele that parts use cannot be deleted.
+- Clientele stores country and state as names (`countryName` / `stateName`, e.g. "India" / "Gujarat"); the form picks them by ISO code (state list, dial code) and converts in `clienteleForm.js`. `contactNumber` is `+<code><number>` (typed without the dial code).
+
+## Shifts
+- Masters › Shift has three screens, each a form beside its list (Edit loads a row into the form, or opens the shift modal; same access as clientele and parts, form only for `MANAGERS`): Add / Manage Shift (`pages/Shifts/`, cards), Breaks (`pages/Breaks/`) and Holiday / Week Off (`pages/Holidays/`).
+- A break belongs to a customer and to at most one of its shifts (`breaks.shift_id`; `shiftId` / `shiftName` in the API, null = no shift). It is put on a shift from either side: the Shift select on Breaks, or the "Shift Break Type" rows of `ShiftFormModal` (sends `breakIds`; offers only breaks no other shift takes). Saving a shift releases the breaks left out; deleting it releases all. `shiftSchema(breaksById)` mirrors the server rules (inside the shift, no overlap).
+- Times are `"HH:mm"` (TimePicker); an end not after the start runs past midnight. `utils/dateTime.js` has `minutesBetween` / `formatClock12`. Holidays have a name and dates (DatePicker); week offs a weekday (`WEEKDAYS`, 1 = Mon).

@@ -12,7 +12,7 @@ import { toast } from '@/utils/toast'
 import PartRow from './PartRow'
 
 const matchesSearch = (part, term) =>
-  [part.id, part.partNo, part.partName, part.customerName].some((value) => String(value ?? '').toLowerCase().includes(term))
+  [part.id, part.partNo, part.partName, part.clienteleName, part.customerName].some((value) => String(value ?? '').toLowerCase().includes(term))
 
 // Masters › Parts › Part List. The superadmin sees every customer's parts (filter by customer);
 // everyone else their company's. Managers (superadmin, customer, admin) add, edit and delete.
@@ -133,7 +133,7 @@ function PartList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, part no., part name, customer…"
+              placeholder="Search ID, part no., part name, clientele, customer…"
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)

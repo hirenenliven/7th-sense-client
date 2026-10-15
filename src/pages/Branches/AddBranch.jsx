@@ -13,6 +13,7 @@ import { PATTERNS } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
+import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import {
   COLOR_PICKER_FALLBACK,
@@ -235,13 +236,16 @@ function AddBranch() {
                 </InputGroup>
               </Form.Group>
 
-              <Form.Group as={Col} md={6} xxl={4} controlId="status">
+              <Form.Group as={Col} md={6} xxl={4}>
                 <Form.Label className={labelClass('status')}>Status</Form.Label>
-                <Form.Select {...register('status')} isInvalid={Boolean(errors.status)}>
-                  <option value={BRANCH_STATUS.ACTIVE}>Active</option>
-                  <option value={BRANCH_STATUS.INACTIVE}>Inactive</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">{errors.status?.message}</Form.Control.Feedback>
+                <StatusToggle
+                  id="status"
+                  {...register('status')}
+                  activeValue={BRANCH_STATUS.ACTIVE}
+                  inactiveValue={BRANCH_STATUS.INACTIVE}
+                  isInvalid={Boolean(errors.status)}
+                />
+                {errors.status && <div className="invalid-feedback d-block">{errors.status.message}</div>}
               </Form.Group>
             </Row>
           </Card.Body>
