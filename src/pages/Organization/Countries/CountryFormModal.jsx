@@ -1,24 +1,28 @@
 import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { COUNTRIES } from '@/constants/locations'
+import { ALL_COUNTRIES } from '@/constants/countryLibrary'
 import { createUserCountry } from '@/services/userCountryService'
+import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import OrgUserNote from '@/components/common/OrgUserNote'
 import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
-import { INITIAL_VALUES, countrySchema, toCountryPayload } from './countryForm'
+import { INITIAL_VALUES, countrySchema, toCountryPayloads } from './countryForm'
+
+const NOUN = { one: 'country', many: 'countries' }
 
 const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
-// Add a country: pick one from the country library (constants/locations.js).
-// Countries the user already added are hidden.
+// Add countries: pick any number from the full country library (constants/countryLibrary.js);
+// each is saved as its own user_country row. Countries the user already added are hidden.
+// onSaved(addedCountries) gets the rows that were saved.
 function CountryFormModal({ show, countries, onSaved, onHide }) {
   const { userId } = useOrgUser()
 
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -33,40 +37,60 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
   }, [show, reset])
 
   const options = useMemo(
-    () => COUNTRIES.map((country) => country.name).filter((name) => !countries.some((saved) => sameName(saved.name, name))),
+    () =>
+      ALL_COUNTRIES.filter((country) => !countries.some((saved) => sameName(saved.name, country.name))).map((country) => ({
+        value: country.name,
+        label: country.name,
+      })),
     [countries],
   )
 
   const onSubmit = async (values) => {
-    try {
-      const saved = await createUserCountry(toCountryPayload(values), userId)
-      toast.success(`${saved.name} has been added.`, { title: 'Country added' })
-      onSaved(saved)
-    } catch (error) {
-      toast.error(error.message, { title: 'Could not save country' })
+    // One request per country, in order, so a failure names the country it is about
+    const added = []
+    for (const payload of toCountryPayloads(values)) {
+      try {
+        added.push(await createUserCountry(payload, userId))
+      } catch (error) {
+        toast.error(`${payload.name}: ${error.message}`, { title: 'Could not save country' })
+      }
     }
+    if (!added.length) return
+    const names = added.length === 1 ? `${added[0].name} has` : `${added.length} countries have`
+    toast.success(`${names} been added.`, { title: 'Countries added' })
+    onSaved(added)
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add country">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add countries">
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>Add Country</Modal.Title>
+          <Modal.Title>Add Countries</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <OrgUserNote />
-          <Form.Group controlId="country-name">
-            <Form.Label className="required">Country</Form.Label>
-            <Form.Select {...register('name')} isInvalid={Boolean(errors.name)}>
-              <option value="">{options.length ? 'Select country' : 'Every country is already added'}</option>
-              {options.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
+          <Form.Group controlId="country-names">
+            <Form.Label className="required">Countries</Form.Label>
+            <Controller
+              name="names"
+              control={control}
+              render={({ field }) => (
+                <MultiSelectPicker
+                  id="country-names"
+                  options={options}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  noun={NOUN}
+                  placeholder="Select countries"
+                  emptyText="Every country is already added"
+                  disabled={isSubmitting}
+                  isInvalid={Boolean(errors.names)}
+                />
+              )}
+            />
+            {errors.names && <div className="invalid-feedback d-block">{errors.names.message}</div>}
           </Form.Group>
         </Modal.Body>
 

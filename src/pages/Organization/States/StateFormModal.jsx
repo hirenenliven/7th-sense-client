@@ -1,24 +1,29 @@
 import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { getCountryCode, getStates } from '@/constants/locations'
+import { getLibraryStateNames } from '@/constants/countryLibrary'
 import { createUserState } from '@/services/userStateService'
+import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import OrgUserNote from '@/components/common/OrgUserNote'
 import useOrgUser from '@/hooks/useOrgUser'
 import { toast } from '@/utils/toast'
-import { INITIAL_VALUES, NAME_MAX_LENGTH, stateSchema, toStatePayload } from './stateForm'
+import { INITIAL_VALUES, stateSchema, toStatePayloads } from './stateForm'
+
+const NOUN = { one: 'state', many: 'states' }
 
 const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
-// Add a state: pick one of the user's countries, then a state of that country from the
-// country library (constants/locations.js). States already added to that country are hidden.
-// A country the library has no states for gets a free-text name.
+// Add states: pick one of the user's countries, then any number of its states from the country
+// library (constants/countryLibrary.js); each is saved as its own user_state row. States already
+// added to that country are hidden; a new country clears the picked states.
+// onSaved(addedStates) gets the rows that were saved.
 function StateFormModal({ show, states, countries, defaultCountryId, onSaved, onHide }) {
   const { userId } = useOrgUser()
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -37,39 +42,35 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
 
   const userCountryId = watch('userCountryId')
 
-  const libraryStates = useMemo(() => {
+  const options = useMemo(() => {
     const countryName = countries.find((country) => String(country.id) === userCountryId)?.name ?? ''
-    return getStates(getCountryCode(countryName)).map((state) => state.name)
-  }, [countries, userCountryId])
-
-  const stateOptions = useMemo(() => {
     const taken = states.filter((state) => String(state.userCountryId) === userCountryId)
-    return libraryStates.filter((name) => !taken.some((state) => sameName(state.name, name)))
-  }, [libraryStates, states, userCountryId])
-
-  const typeName = Boolean(userCountryId) && !libraryStates.length
+    return getLibraryStateNames(countryName)
+      .filter((name) => !taken.some((state) => sameName(state.name, name)))
+      .map((name) => ({ value: name, label: name }))
+  }, [countries, states, userCountryId])
 
   const onSubmit = async (values) => {
-    try {
-      const saved = await createUserState(toStatePayload(values), userId)
-      toast.success(`${saved.name} has been added.`, { title: 'State added' })
-      onSaved(saved)
-    } catch (error) {
-      toast.error(error.message, { title: 'Could not save state' })
+    // One request per state, in order, so a failure names the state it is about
+    const added = []
+    for (const payload of toStatePayloads(values)) {
+      try {
+        added.push(await createUserState(payload, userId))
+      } catch (error) {
+        toast.error(`${payload.name}: ${error.message}`, { title: 'Could not save state' })
+      }
     }
+    if (!added.length) return
+    const names = added.length === 1 ? `${added[0].name} has` : `${added.length} states have`
+    toast.success(`${names} been added.`, { title: 'States added' })
+    onSaved(added)
   }
-
-  const placeholder = !userCountryId
-    ? 'Select a country first'
-    : stateOptions.length
-      ? 'Select state'
-      : 'Every state is already added'
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add state">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add states">
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>Add State</Modal.Title>
+          <Modal.Title>Add States</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -77,7 +78,8 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
           <Form.Group controlId="state-country" className="mb-3">
             <Form.Label className="required">Country</Form.Label>
             <Form.Select
-              {...register('userCountryId', { onChange: () => setValue('name', '') })}
+              {...register('userCountryId', { onChange: () => setValue('names', []) })}
+              disabled={isSubmitting}
               isInvalid={Boolean(errors.userCountryId)}
             >
               <option value="">Select country</option>
@@ -90,21 +92,27 @@ function StateFormModal({ show, states, countries, defaultCountryId, onSaved, on
             <Form.Control.Feedback type="invalid">{errors.userCountryId?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group controlId="state-name">
-            <Form.Label className="required">State</Form.Label>
-            {typeName ? (
-              <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" isInvalid={Boolean(errors.name)} />
-            ) : (
-              <Form.Select {...register('name')} disabled={!userCountryId} isInvalid={Boolean(errors.name)}>
-                <option value="">{placeholder}</option>
-                {stateOptions.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </Form.Select>
-            )}
-            <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
+          <Form.Group controlId="state-names">
+            <Form.Label className="required">States</Form.Label>
+            <Controller
+              name="names"
+              control={control}
+              render={({ field }) => (
+                <MultiSelectPicker
+                  id="state-names"
+                  options={options}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  noun={NOUN}
+                  placeholder="Select states"
+                  emptyText={userCountryId ? 'Every state is already added' : 'Select a country first'}
+                  disabled={isSubmitting || !userCountryId}
+                  isInvalid={Boolean(errors.names)}
+                />
+              )}
+            />
+            {errors.names && <div className="invalid-feedback d-block">{errors.names.message}</div>}
           </Form.Group>
         </Modal.Body>
 

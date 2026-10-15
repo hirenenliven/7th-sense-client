@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import OrgUserSelect from '@/components/common/OrgUserSelect'
 import TablePagination from '@/components/common/TablePagination'
 import { PAGE_SIZES } from '@/constants/app'
-import { ROUTES } from '@/constants/routes'
 import { deleteUserState, getUserStates } from '@/services/userStateService'
 import { getUserCountries } from '@/services/userCountryService'
 import useOrgUser from '@/hooks/useOrgUser'
@@ -14,13 +12,13 @@ import { toast } from '@/utils/toast'
 import StateFormModal from './StateFormModal'
 import StateRow from './StateRow'
 
+const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+
 const matchesSearch = (state, term) =>
   [state.id, state.name, state.countryName].some((value) => String(value ?? '').toLowerCase().includes(term))
 
-const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-
-// Masters › States: the logged-in user's states with search, country filter,
-// paging, add and delete.
+// Masters › States: the states assigned to the company with search, country filter and
+// paging. The superadmin adds them customer-wise (a country, then several of its states) and deletes.
 function StateList() {
   const [states, setStates] = useState([])
   const [countries, setCountries] = useState([])
@@ -28,7 +26,7 @@ function StateList() {
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
   // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canEdit } = useOrgUser()
+  const { userId, canAssign } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [countryFilter, setCountryFilter] = useState('')
@@ -70,15 +68,10 @@ function StateList() {
   const currentPage = Math.min(page, pageCount)
   const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
-  // Every state belongs to a country
-  const canAdd = countries.length > 0
   const openAdd = () => setAdding(true)
 
-  const handleSaved = (saved) => {
-    setStates((list) => {
-      const exists = list.some((state) => state.id === saved.id)
-      return (exists ? list.map((state) => (state.id === saved.id ? saved : state)) : [...list, saved]).sort(byName)
-    })
+  const handleSaved = (added) => {
+    setStates((list) => [...list, ...added].sort(byName))
     setAdding(false)
   }
 
@@ -117,22 +110,17 @@ function StateList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-map ts-empty-icon" aria-hidden="true" />
-          {canAdd ? (
-            <>
-              <p className="mb-2">No states yet.</p>
-              {canEdit && (
-                <Button size="sm" onClick={openAdd}>
-                  Add the first state
-                </Button>
-              )}
-            </>
-          ) : (
-            <>
-              <p className="mb-2">Every state belongs to a country. Add a country first.</p>
-              <Button as={Link} to={ROUTES.ORG_COUNTRIES} size="sm" variant="ghost">
-                Go to Countries
-              </Button>
-            </>
+          <p className="mb-2">
+            {canAssign
+              ? countries.length
+                ? 'No states added yet.'
+                : 'Every state belongs to a country. Add a country first.'
+              : 'No states have been assigned to your company yet.'}
+          </p>
+          {canAssign && countries.length > 0 && (
+            <Button size="sm" onClick={openAdd}>
+              Add states
+            </Button>
           )}
         </div>
       )
@@ -183,7 +171,7 @@ function StateList() {
                   <th scope="col">State</th>
                   <th scope="col">Country</th>
                   <th scope="col">Updated</th>
-                  {canEdit && <th scope="col">Actions</th>}
+                  {canAssign && <th scope="col">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -220,7 +208,7 @@ function StateList() {
         <div>
           <div className="ts-eyebrow">Masters · States</div>
           <h1>States</h1>
-          <p className="ts-page-subtitle">Your states and the country each belongs to.</p>
+          <p className="ts-page-subtitle">The states assigned to your organization and the country each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           <OrgUserSelect
@@ -231,10 +219,10 @@ function StateList() {
               setPage(1)
             }}
           />
-          {canEdit && (
-            <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
+          {canAssign && (
+            <Button onClick={openAdd} disabled={loading || Boolean(error) || !countries.length}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add State
+              Add States
             </Button>
           )}
         </div>

@@ -630,6 +630,9 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <Card.Header>
             <i className="bi bi-funnel text-primary" aria-hidden="true" />
             Filters
+            <span className="ts-filter-count" aria-hidden="true">
+              {filters.length}/{FILTER_NAMES.length}
+            </span>
             <span className="ms-auto d-flex gap-1">
               <Button variant="link" size="sm" onClick={() => setValue('filters', FILTER_NAMES, { shouldDirty: true })} disabled={allFiltersChosen}>
                 Select all
@@ -642,23 +645,23 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <Card.Body>
             <fieldset aria-describedby="filters-hint">
               <legend className="visually-hidden">Filters</legend>
-              <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
-              <div className="d-flex flex-wrap gap-3 mt-1">
+              <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
+                <span id="filters-hint" className={`fs-sm ${errors.filters ? 'text-danger' : 'text-body-tertiary'}`}>
+                  {errors.filters?.message || `${filters.length} of ${FILTER_NAMES.length} selected · shown on dashboards and reports`}
+                </span>
+              </div>
+
+              <div className="ts-filter-chips">
                 {FILTER_OPTIONS.map((option) => (
-                  <Form.Check
-                    key={option.value}
-                    id={`filter-${option.value}`}
-                    type="checkbox"
-                    label={option.label}
-                    value={option.value}
-                    {...register('filters')}
-                    isInvalid={Boolean(errors.filters)}
-                  />
+                  <label key={option.value} className={`ts-filter-chip${errors.filters ? ' is-invalid' : ''}`} htmlFor={`filter-${option.value}`}>
+                    <input id={`filter-${option.value}`} type="checkbox" className="ts-filter-input" value={option.value} {...register('filters')} />
+                    <i className={`bi ${option.icon} ts-filter-icon`} aria-hidden="true" />
+                    {option.label}
+                    <i className="bi bi-check-lg ts-filter-check" aria-hidden="true" />
+                  </label>
                 ))}
               </div>
-              <Form.Text id="filters-hint" className={errors.filters ? 'text-danger' : undefined}>
-                {errors.filters?.message || `${filters.length} of ${FILTER_OPTIONS.length} selected`}
-              </Form.Text>
             </fieldset>
           </Card.Body>
         </Card>

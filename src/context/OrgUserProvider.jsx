@@ -43,6 +43,8 @@ function OrgUserProvider({ children }) {
     () => ({
       canPickUser: isAdmin,
       canEdit,
+      // Countries and states are assigned customer-wise by the superadmin only (server: superAdminOnly)
+      canAssign: isAdmin,
       userId,
       setUserId,
       users: isAdmin ? users : [],

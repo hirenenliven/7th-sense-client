@@ -564,14 +564,29 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
 
 // Every button: icon and text centred on one line, a soft press (scale) and a lift on hover.
 // Colours stay Bootstrap's / the variants' below; only depth and motion are added here.
+// Heights are fixed per size ($ts-btn-height*) so every button in a row, and a button beside a
+// field, is the same height whatever its content (text, icon, spinner, badge).
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: $ts-btn-height;
   letter-spacing: .01em;
   transition: $btn-transition, transform $ts-transition;
 
-  > .bi { line-height: 1; }
+  > .bi {
+    flex-shrink: 0;
+    font-size: #{$ts-btn-icon-scale}em;
+    line-height: 1;
+  }
+
+  // Saving… spinner: the size of the text, so the label does not jump
+  > .spinner-border-sm {
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    border-width: .15em;
+  }
 
   &:active:not(:disabled, .disabled),
   &.active:active { transform: scale($ts-btn-press-scale); }
@@ -579,10 +594,18 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   &:focus-visible { outline: 0; }
 }
 
+.btn-sm,
+.btn-group-sm > .btn { min-height: $ts-btn-height-sm; }
+
+.btn-lg,
+.btn-group-lg > .btn { min-height: $ts-btn-height-lg; }
+
 .btn:disabled,
-.btn.disabled {
+.btn.disabled,
+fieldset:disabled .btn {
   cursor: not-allowed;
   box-shadow: none;
+  transform: none;
 }
 
 // Solid buttons (primary, danger…): a faint top highlight and a soft drop shadow give them body;
@@ -617,13 +640,26 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   [class*="btn-"]:active:not(:disabled, .disabled) { transform: none !important; }
 }
 
+// Outline (outline-primary, outline-danger…): transparent, with a soft tint of its colour on hover
+// instead of Bootstrap's solid fill, so it stays a step below the solid button
+@each $name, $color in $theme-colors {
+  .btn-outline-#{$name} {
+    --bs-btn-hover-color: #{$color};
+    --bs-btn-hover-bg: #{rgba($color, $ts-btn-outline-hover-alpha)};
+    --bs-btn-hover-border-color: #{$color};
+    --bs-btn-active-color: #{$color};
+    --bs-btn-active-bg: #{rgba($color, $ts-btn-outline-active-alpha)};
+    --bs-btn-active-border-color: #{$color};
+  }
+}
+
 // Ghost: the default secondary action in the reference
 .btn-ghost {
   --bs-btn-color: #{$ts-ink-2};
   --bs-btn-bg: #{$ts-panel-2};
   --bs-btn-border-color: #{$ts-line};
   --bs-btn-hover-color: #{$ts-ink};
-  --bs-btn-hover-bg: #{$ts-panel-2};
+  --bs-btn-hover-bg: #{mix($ts-ink, $ts-panel-2, $ts-btn-hover-mix)};
   --bs-btn-hover-border-color: #{$ts-orange};
   --bs-btn-focus-shadow-rgb: #{to-rgb($ts-orange)};
   --bs-btn-active-color: #{$ts-on-accent};
@@ -655,29 +691,42 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   --bs-btn-disabled-border-color: transparent;
 }
 
+// Link: inline text action (card-header "Select all", "View"), so it keeps the text height
+// and gets a rounded focus ring instead of a box
 .btn-link {
+  min-height: 0;
   font-weight: 600;
   text-decoration: none;
+  text-underline-offset: .2em;
 
-  &:hover { text-decoration: underline; }
+  &:hover:not(:disabled, .disabled) { text-decoration: underline; }
+
+  &:focus-visible {
+    border-radius: $ts-radius-xs;
+    box-shadow: 0 0 0 $input-btn-focus-width $input-btn-focus-color;
+  }
 }
 
-// Square icon button (theme toggle, close, toolbar icons)
+// Square icon button (theme toggle, close, toolbar icons): same height as a button of its size
 .btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: $ts-control-h;
-  height: $ts-control-h;
+  width: $ts-btn-height;
+  height: $ts-btn-height;
   padding: 0;
   font-size: $ts-fs-lg;
-  border-radius: ts-rem(9);
+  border-radius: $btn-border-radius;
 
   &.btn-sm {
-    width: ts-rem(28);
-    height: ts-rem(28);
+    width: $ts-btn-height-sm;
+    height: $ts-btn-height-sm;
     font-size: $ts-fs-base;
+    border-radius: $btn-border-radius-sm;
   }
+
+  // The icon is the whole button: no extra scale
+  > .bi { font-size: 1em; }
 }
 
 // Row action (components/common/IconAction.jsx): accent icon, soft tint on hover;
@@ -2753,4 +2802,189 @@ $ts-toast-colors: (
   background-color: $ts-panel-2;
   border: 1px solid $ts-line;
   border-radius: $ts-radius-pill;
+}
+
+// Filter chips (customer / user form, pages/Customers/AddCustomer.jsx): one row of field-height
+// toggle chips, each a <label.ts-filter-chip> around a hidden checkbox, an icon, the name and a tick.
+.ts-filter-count {
+  padding: 0 $ts-space-2;
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: $ts-orange;
+  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+  border-radius: $ts-radius-pill;
+}
+
+.ts-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-2;
+}
+
+.ts-filter-input { @include visually-hidden; }
+
+.ts-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-2;
+  min-height: $input-height;
+  margin: 0;
+  padding: 0 $ts-space-3;
+  font-weight: 500;
+  color: $ts-ink-2;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  background-color: $input-bg;
+  border: $input-border-width solid $ts-line;
+  border-radius: $ts-radius-pill;
+  transition: border-color $ts-transition, background-color $ts-transition, color $ts-transition, box-shadow $ts-transition;
+
+  &:hover { border-color: $ts-ink-3; color: $ts-ink; }
+
+  &:has(.ts-filter-input:focus-visible) { box-shadow: $input-focus-box-shadow; }
+
+  &.is-invalid { border-color: $form-invalid-border-color; }
+
+  &:has(.ts-filter-input:checked) {
+    color: $ts-ink;
+    border-color: $ts-orange;
+    background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+
+    .ts-filter-icon { color: $ts-orange; }
+
+    .ts-filter-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.ts-filter-icon {
+  color: $ts-ink-3;
+  transition: color $ts-transition;
+}
+
+// Always takes its space, so ticking a chip does not move the others
+.ts-filter-check {
+  color: $ts-orange;
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity $ts-transition, transform $ts-transition;
+}
+
+// Searchable multi-select (components/common/MultiSelectPicker.jsx): a .ts-check-menu with a search
+// box that stays on top while the list scrolls, group headings (a state's country) and the picked
+// options as removable chips under the field.
+.ts-multi-menu {
+  padding-top: 0;
+}
+
+.ts-multi-menu-search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: $ts-space-2 0;
+  background-color: var(--bs-dropdown-bg);
+}
+
+.ts-multi-menu-group {
+  padding: $ts-space-2 $ts-picker-option-px $ts-space-1;
+  font-size: $ts-fs-2xs;
+  font-weight: 600;
+  color: $ts-ink-3;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.ts-multi-menu-empty {
+  padding: $ts-space-2 $ts-picker-option-px;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+}
+
+.ts-multi-toggle {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+  min-width: 0;
+
+  > .text-truncate { flex: 1 1 auto; min-width: 0; }
+}
+
+// A checked option: accent tint and bold, so the picked ones stand out while scrolling
+.ts-multi-menu .form-check.is-checked {
+  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+
+  .form-check-label { font-weight: 600; color: $ts-ink; }
+}
+
+// The picked options under the field: a count + Clear all, then the chips in a soft inset panel
+.ts-multi-picked {
+  margin-top: $ts-space-2;
+  padding: $ts-space-2;
+  background-color: $ts-panel-2;
+  border: $border-width solid $ts-line;
+  border-radius: $ts-radius-md;
+}
+
+.ts-multi-picked-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $ts-space-2;
+  margin-bottom: $ts-space-2;
+  font-size: $ts-fs-xs;
+  font-weight: 600;
+  color: $ts-ink-3;
+}
+
+.ts-multi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-1;
+  max-height: $ts-check-menu-max-height;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.ts-multi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-1;
+  max-width: $ts-multi-chip-max-width;
+  padding: $ts-space-1 $ts-space-1 $ts-space-1 $ts-space-2;
+  font-size: $ts-fs-xs;
+  font-weight: 600;
+  line-height: 1.2;
+  color: $ts-ink;
+  background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+  border: $border-width solid rgba($ts-orange, $ts-multi-chip-border-alpha);
+  border-radius: $ts-radius-pill;
+}
+
+.ts-multi-chip-remove {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $ts-multi-chip-remove-size;
+  height: $ts-multi-chip-remove-size;
+  min-height: 0;
+  padding: 0;
+  font-size: $ts-fs-2xs;
+  color: $ts-ink-3;
+  border: 0;
+  border-radius: 50%;
+  transition: background-color $ts-transition, color $ts-transition;
+
+  &:hover:not(:disabled) {
+    color: $ts-on-accent;
+    background-color: $ts-orange;
+  }
+
+  &:focus-visible { box-shadow: 0 0 0 $input-btn-focus-width $input-btn-focus-color; }
 }

@@ -84,6 +84,9 @@ $ts-ls-tight: -.02em;
 
 $ts-swatch-size: ts-rem(12); // colour dot in tables
 $ts-check-menu-max-height: ts-rem(280); // scrolling checkbox list in a dropdown
+$ts-multi-chip-max-width: ts-rem(260); // a picked option chip under a MultiSelectPicker
+$ts-multi-chip-remove-size: ts-rem(20); // round remove button of a chip
+$ts-multi-chip-border-alpha: .35; // accent border of a picked chip
 
 // Dropdowns, selects and date / time pickers ("Dropdowns & pickers" in _components.scss)
 $ts-picker-max-height:  ts-rem(320); // open select list before it scrolls
@@ -449,6 +452,15 @@ $ts-btn-glow-blur:       ts-rem(14);
 $ts-btn-glow-spread:     ts-rem(4);
 $ts-btn-glow-alpha:      .45;
 $ts-btn-press-scale:     .97;
+// Button heights: the default matches a form field (13px × 1.5 + 2 × 7px padding + border), so a
+// button lines up with the input beside it in toolbars and input groups; sm fits row actions.
+$ts-btn-height:    ts-rem(35.5);
+$ts-btn-height-sm: ts-rem(28);
+$ts-btn-height-lg: ts-rem(40);
+$ts-btn-icon-scale: 1.1;   // a .bi inside a button, relative to its text
+$ts-btn-hover-mix:  6%;    // ink mixed into the ghost button surface on hover
+$ts-btn-outline-hover-alpha:  .12; // tint behind an outline button on hover
+$ts-btn-outline-active-alpha: .2;  // … and while pressed / active
 // Scrollbars: track size, the transparent inset that makes the thumb slim (wider on hover), thumb opacity
 $ts-scrollbar-size:        ts-rem(10);
 $ts-scrollbar-inset:       ts-rem(3);

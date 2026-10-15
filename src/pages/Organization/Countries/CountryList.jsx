@@ -11,20 +11,20 @@ import { toast } from '@/utils/toast'
 import CountryFormModal from './CountryFormModal'
 import CountryRow from './CountryRow'
 
+const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+
 const matchesSearch = (country, term) =>
   [country.id, country.name].some((value) => String(value ?? '').toLowerCase().includes(term))
 
-const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-
-// Masters › Countries: the logged-in user's countries with search, paging,
-// add (picked from the country library) and delete.
+// Masters › Countries: the countries assigned to the company with search and paging.
+// The superadmin adds them customer-wise (several at once) and deletes.
 function CountryList() {
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
   // '' = the logged-in user's company; the superadmin can pick another user (OrgUserSelect)
-  const { userId, canEdit } = useOrgUser()
+  const { userId, canAssign } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
@@ -58,8 +58,8 @@ function CountryList() {
   const currentPage = Math.min(page, pageCount)
   const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
-  const handleSaved = (saved) => {
-    setCountries((list) => [...list, saved].sort(byName))
+  const handleSaved = (added) => {
+    setCountries((list) => [...list, ...added].sort(byName))
     setAdding(false)
   }
 
@@ -98,10 +98,10 @@ function CountryList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-globe2 ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No countries yet.</p>
-          {canEdit && (
+          <p className="mb-2">{canAssign ? 'No countries assigned yet.' : 'No countries have been assigned to your company yet.'}</p>
+          {canAssign && (
             <Button size="sm" onClick={() => setAdding(true)}>
-              Add the first country
+              Add countries
             </Button>
           )}
         </div>
@@ -136,7 +136,7 @@ function CountryList() {
                   <th scope="col">ID</th>
                   <th scope="col">Country</th>
                   <th scope="col">Updated</th>
-                  {canEdit && <th scope="col">Actions</th>}
+                  {canAssign && <th scope="col">Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -169,7 +169,7 @@ function CountryList() {
         <div>
           <div className="ts-eyebrow">Masters · Countries</div>
           <h1>Countries</h1>
-          <p className="ts-page-subtitle">The countries your organization works in.</p>
+          <p className="ts-page-subtitle">The countries assigned to your organization.</p>
         </div>
         <div className="ts-page-actions">
           <OrgUserSelect
@@ -179,10 +179,10 @@ function CountryList() {
               setPage(1)
             }}
           />
-          {canEdit && (
+          {canAssign && (
             <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Country
+              Add Countries
             </Button>
           )}
         </div>

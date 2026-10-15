@@ -80,7 +80,12 @@ Every `.btn` is global and needs no extra classes. It centres its icon and text 
 pressing it scales it down slightly. Solid variants such as `primary` and `danger` add a faint top
 highlight, a soft shadow, and on hover a 1px lift with a glow in their own colour. `ghost` gets a light
 shadow and an orange glow on hover. Colours come only from the variants. Depth and motion use the
-`$ts-btn-*` tokens, and reduced motion turns the movement off. A dropdown toggle made to look like a
+`$ts-btn-*` tokens, and reduced motion turns the movement off. Heights are fixed per size
+(`$ts-btn-height` 35.5px = a form field, `-sm` 28px, `-lg` 40px), so buttons in a row and a button beside an input
+line up; `btn-icon` is square at the same heights. Icons in a button use `me-2` and are scaled to the text
+(`$ts-btn-icon-scale`); a `Spinner size="sm"` is sized to the text. `outline-*` variants tint softly on hover
+instead of filling. `link` keeps the text height (no min height) and shows a rounded focus ring. Disabled buttons
+lose their shadow and motion. A dropdown toggle made to look like a
 field (`.ts-select-toggle`) opts out. Scrollbars are global too: a slim rounded thumb on a hidden
 track that widens on hover (`$ts-scrollbar-*`). Don't give an element its own `scrollbar-width` or
 `scrollbar-color`, because in Chromium that replaces the custom look.

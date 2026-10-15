@@ -7,16 +7,17 @@ import { z } from 'zod'
 
 // Filters the customer can use on their screens and reports (users API `filters`, user_filters table).
 // `value` is the filter name the API stores; this order is also the order they are sent in.
+// `icon` is the chip icon on the form.
 export const FILTER_OPTIONS = [
-  { value: 'country', label: 'Country' },
-  { value: 'state', label: 'State' },
-  { value: 'branch', label: 'Branch' },
-  { value: 'city', label: 'City' },
-  { value: 'location', label: 'Location' },
-  { value: 'shop', label: 'Shop' },
-  { value: 'line', label: 'Line' },
-  { value: 'cell', label: 'Cell' },
-  { value: 'supervisor', label: 'Supervisor' },
+  { value: 'country', label: 'Country', icon: 'bi-globe2' },
+  { value: 'state', label: 'State', icon: 'bi-map' },
+  { value: 'branch', label: 'Branch', icon: 'bi-diagram-3' },
+  { value: 'city', label: 'City', icon: 'bi-buildings' },
+  { value: 'location', label: 'Location', icon: 'bi-geo-alt' },
+  { value: 'shop', label: 'Shop', icon: 'bi-shop' },
+  { value: 'line', label: 'Line', icon: 'bi-distribute-vertical' },
+  { value: 'cell', label: 'Cell', icon: 'bi-grid-3x3-gap' },
+  { value: 'supervisor', label: 'Supervisor', icon: 'bi-person-badge' },
 ]
 
 export const FILTER_NAMES = FILTER_OPTIONS.map((option) => option.value)

@@ -1,18 +1,16 @@
 import { z } from 'zod'
 
 export const INITIAL_VALUES = {
-  name: '',
+  names: [],
 }
 
-// The name is picked from the country library (constants/locations.js)
+// The names are picked from the country library (constants/countryLibrary.js), several at once
 export const countrySchema = z.object({
-  name: z.string().min(1, 'Country is required'),
+  names: z.array(z.string()).min(1, 'Select at least one country'),
 })
 
 // ---------------------------------------------------------------------------
-// API mapping — form values → /user-country body ({ name })
+// API mapping — form values → /user-country bodies ({ name }), one per country
 // ---------------------------------------------------------------------------
 
-export const toCountryPayload = (values) => ({
-  name: values.name.trim(),
-})
+export const toCountryPayloads = (values) => values.names.map((name) => ({ name: name.trim() }))

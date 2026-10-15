@@ -6,14 +6,14 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function StateRow({ state, onDelete }) {
-  const { canEdit } = useOrgUser()
+  const { canAssign } = useOrgUser()
   return (
     <tr>
       <td className="font-tabular">{state.id}</td>
       <td className="fw-semibold">{state.name}</td>
       <td className="text-body-secondary">{state.countryName || '—'}</td>
       <td className="text-body-secondary text-nowrap">{formatDate(state.updatedAt)}</td>
-      {canEdit && (
+      {canAssign && (
         <td className="border-start">
           <div className="d-flex gap-1">
             <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${state.name}`} onClick={() => onDelete(state)} />
