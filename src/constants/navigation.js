@@ -115,6 +115,7 @@ export const NAV_SECTIONS = [
           { key: 'holidays', label: 'Holiday / Week Off', path: ROUTES.HOLIDAYS },
         ],
       },
+      { key: 'licence-keys', label: 'Licence Keys', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: MANAGERS },
       {
         key: 'users',
         label: 'Users',

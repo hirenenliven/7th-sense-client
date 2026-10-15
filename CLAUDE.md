@@ -19,6 +19,13 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 - Dark by default, light per user (`theme-light.scss`, see THEME.md): use `bg-body-*`, `.card-inset`, `text-body-secondary` (no `bg-light`/`bg-white`). New colour tokens need a light value in `_tokens-light.scss`.
 - Page headers: `.ts-page-header` > `.ts-eyebrow`, `h1`, `.ts-page-subtitle`. No self-rendered nav.
 
+## Tables
+- All list tables use the sortable table pattern: wrap `<Table responsive>` in `.ts-table-panel`, use `<SortableHead columns sort onSort />` as the `<thead>`, and integrate `TablePagination` as the footer.
+- Sortable columns: define `columns = [{ label, sort: (row) => value }, 'Actions']` → `const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))`, then render `sortedRows`. Plain string columns (Actions, View) are not sortable.
+- Latest-first ordering: after filtering, apply `newestFirst(matched)` from `utils/helpers.js` so new rows appear at the top.
+- Customer column: for superadmin views, add `{ label: 'Customer', sort: (row) => customerLabel(row.userId) }` and use `useOrgUser().customerLabel(userId | customerId)` in the row.
+- Status badge: use `<StatusBadge active={…} />` for Active/Inactive status (green pill with glowing dot, red for inactive).
+
 ## Forms
 - Countries/states/dial codes: `constants/locations.js` (`country-region-data` + `libphonenumber-js/min`). Address forms offer only `ENABLED_COUNTRIES`; the API takes ISO `countryCode`/`stateCode`, phones as `+<code><number>`.
 - Country / state assignment uses the full library (`constants/countryLibrary.js`, `ALL_COUNTRIES`; kept out of `locations.js` so only those screens bundle it). The server has no country list: it stores the names the client sends.
@@ -56,3 +63,7 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 - Masters › Shift has three screens, each a form beside its list (Edit loads a row into the form, or opens the shift modal; same access as clientele and parts, form only for `MANAGERS`): Add / Manage Shift (`pages/Shifts/`, cards), Breaks (`pages/Breaks/`) and Holiday / Week Off (`pages/Holidays/`).
 - A break belongs to a customer and to at most one of its shifts (`breaks.shift_id`; `shiftId` / `shiftName` in the API, null = no shift). It is put on a shift from either side: the Shift select on Breaks, or the "Shift Break Type" rows of `ShiftFormModal` (sends `breakIds`; offers only breaks no other shift takes). Saving a shift releases the breaks left out; deleting it releases all. `shiftSchema(breaksById)` mirrors the server rules (inside the shift, no overlap).
 - Times are `"HH:mm"` (TimePicker); an end not after the start runs past midnight. `utils/dateTime.js` has `minutesBetween` / `formatClock12`. Holidays have a name and dates (DatePicker); week offs a weekday (`WEEKDAYS`, 1 = Mon).
+
+## Licence keys
+- Masters › Licence Keys (`pages/LicenceKeys/`, `services/licenceKeyService.js`, menu and page `roles: MANAGERS`): the superadmin's Generate Licence Key card (`LicenceKeyGenerator`) sits above the list. Generate Key calls `POST /licence-keys/generate {count}` (keys shown, not saved); the keys are a `useFieldArray` (`keys: [{licenceKey, duration}]`) with a Subscription Duration select per key (`LICENCE_DURATIONS` in `licenceKeyForm.js`, mirrors server `dto.LicenceKeyDurations`; default Considerable Trial, "Set all" select); Save posts `{userId, licenceKeys: keys}` (all or none). Changing No. Of Key clears the generated keys. The server stores the end date (`expiresOn`, null = Life Time; `isExpired`).
+- List: superadmin sees every customer's (Customer column + filter), edits customer / duration / status in `LicenceKeyFormModal` (the key never changes) and deletes; customers and admins only read their company's. Keys look like `K7M2Q-XR9TB-4HWZP-N8CDF` (server-generated, `font-monospace`; Duration / Expires On columns, Expired filter).

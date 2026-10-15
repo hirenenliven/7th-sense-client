@@ -35,6 +35,8 @@ export const ROUTES = {
   SHIFTS: '/masters/shifts',
   BREAKS: '/masters/breaks',
   HOLIDAYS: '/masters/holidays',
+  // Licence keys: the superadmin generates them for a customer; managers read their company's
+  LICENCE_KEYS: '/masters/licence-keys',
   // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)
   USERS: '/masters/users',
   USER_ADD: '/masters/users/add',

@@ -3323,3 +3323,13 @@ $ts-toast-colors: (
 @media (prefers-reduced-motion: reduce) {
   .ts-multi-chip { animation: none; }
 }
+
+// Generated licence keys total (pages/LicenceKeys/LicenceKeyGenerator.jsx): "3 Key(s)"
+.ts-key-total {
+  padding: $ts-space-3 $ts-space-4;
+  font-size: $ts-fs-xl;
+  color: $ts-orange;
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+}

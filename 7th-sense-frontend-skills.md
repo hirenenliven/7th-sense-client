@@ -40,13 +40,89 @@
 #### 3. Styling Standards
 - **Bootstrap 5 First**: Leverage Bootstrap's utility classes and components
 - **SCSS for Customization**: Use SCSS for theme variables, custom components, and overrides
-- **Theme Architecture**: 
+- **Theme Architecture**:
   - `src/assets/scss/_variables.scss` - Bootstrap overrides and custom variables
   - `src/assets/scss/_components.scss` - Custom component styles
   - `src/assets/scss/theme.scss` - Main entry point importing Bootstrap and custom styles
 - **No Tailwind CSS**: Never use Tailwind CSS under any circumstances
 - **Responsive Design**: Mobile-first approach using Bootstrap's grid system
 - **Accessibility**: Follow WCAG 2.1 AA standards, use semantic HTML
+
+#### 3.1 Table Design Standards (Golden Standard)
+
+**All list tables MUST follow the sortable table pattern.**
+
+##### Required Components
+```jsx
+import useTableSort from '@/hooks/useTableSort'
+import SortableHead from '@/components/common/SortableHead'
+import TablePagination from '@/components/common/TablePagination'
+import { newestFirst } from '@/utils/helpers'
+```
+
+##### Table Structure Pattern
+
+**Step 1: Define sortable columns**
+```jsx
+const columns = [
+  { label: 'ID', sort: (row) => row.id },
+  { label: 'Name', sort: (row) => row.name },
+  { label: 'Status', sort: (row) => row.status },
+  { label: 'Created', sort: (row) => row.createdAt },
+  ...(canManage ? ['Actions'] : []),
+]
+```
+
+**Step 2: Use useTableSort hook**
+```jsx
+const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
+const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+```
+
+**Step 3: Apply latest-first ordering**
+```jsx
+const matched = useMemo(() => {
+  const term = search.trim().toLowerCase()
+  return term ? items.filter((item) => matchesSearch(item, term)) : items
+}, [items, search])
+
+const filtered = useMemo(() => newestFirst(matched), [matched])
+```
+
+**Step 4: Render table with SortableHead**
+```jsx
+<div className="ts-table-panel">
+  <Table hover responsive className="mb-0">
+    <SortableHead columns={columns} sort={sort} onSort={onSort} />
+    <tbody>
+      {pageRows.map((row) => (
+        <RowComponent key={row.id} row={row} />
+      ))}
+    </tbody>
+  </Table>
+  <TablePagination
+    total={filtered.length}
+    pageSize={pageSize}
+    currentPage={currentPage}
+    onPageChange={setPage}
+    onPageSizeChange={setPageSize}
+  />
+</div>
+```
+
+##### Key Rules for Tables
+
+1. **Wrap in `.ts-table-panel`**: Provides rounded panel with sticky header and scrollable body
+2. **Use `<SortableHead />`**: Replaces manual `<thead>` with sortable column headers
+3. **Define sort functions**: Each sortable column needs a `sort: (row) => value` function
+4. **Plain string columns**: Non-sortable columns (Actions, View) are plain strings in the array
+5. **Latest-first ordering**: Apply `newestFirst()` after filtering so new rows appear at top
+6. **Customer column**: For superadmin views, add customer label with `useOrgUser().customerLabel(userId | customerId)`
+7. **Status badge**: Use `<StatusBadge active={…} />` for Active/Inactive status (green for active, red for inactive)
+8. **TablePagination**: Integrate as footer inside the panel for consistent pagination
+
+##### Reference Implementation
+See `src/pages/Branches/BranchList.jsx`, `src/pages/Parts/PartList.jsx`, or `src/pages/Organization/Supervisors/SupervisorList.jsx` for complete working examples.
 
 #### 4. State Management
 - **Local State**: useState for component-level state

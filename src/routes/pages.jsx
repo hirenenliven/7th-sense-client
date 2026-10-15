@@ -17,6 +17,7 @@ const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
 const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
 const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
 const HolidaySetup = lazy(() => import('@/pages/Holidays/HolidaySetup'))
+const LicenceKeySetup = lazy(() => import('@/pages/LicenceKeys/LicenceKeySetup'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
@@ -65,6 +66,8 @@ export const PAGES = [
   { path: ROUTES.SHIFTS, element: <ShiftSetup /> },
   { path: ROUTES.BREAKS, element: <BreakSetup /> },
   { path: ROUTES.HOLIDAYS, element: <HolidaySetup /> },
+  // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
+  { path: ROUTES.LICENCE_KEYS, element: <LicenceKeySetup />, roles: MANAGERS },
   { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },
