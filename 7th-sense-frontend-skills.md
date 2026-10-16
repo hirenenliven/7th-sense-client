@@ -415,6 +415,38 @@ $secondary: #6c757d;
 @import 'components';
 ```
 
+### Graphify Knowledge Graph (Use Before Exploring Code)
+
+The repo is indexed by graphify (skill: `~/.claude/skills/graphify/SKILL.md`) into `graphify-out/`:
+
+- `graph.json` — nodes (components, hooks, services, pages, constants, docs) and edges (imports, calls, renders, uses), each with a `source_location`
+- `GRAPH_REPORT.md` — communities (feature areas such as *Shared Table & Modal Components*, *Shifts, Breaks & Holidays*, *Licence Keys*, *Production Schedule Form*), god nodes and surprising links
+- `graph.html` — interactive view for humans
+
+#### When to Use It
+Use the graph **first** for any task that needs codebase context: "where is X", "what uses Y", "how does Z flow", impact of a change, or finding the reference implementation to copy for a new screen. It answers in one call what would otherwise take many Grep/Read rounds.
+
+#### Commands
+```bash
+graphify query "how does the machine form load controllers by brand"   # BFS, broad context
+graphify query "save flow of production schedule" --dfs                # DFS, trace one path
+graphify query "<question>" --budget 1500                              # cap output tokens
+graphify path "ShiftFormModal" "breakService"                          # shortest link between two nodes
+graphify explain "useTableSort"                                        # a node and its neighbours
+graphify update .                                                      # refresh after code changes (no LLM)
+```
+
+#### Workflow
+1. Query the graph (or skim `GRAPH_REPORT.md` for the matching community).
+2. Read only the files the result points to, using their `source_location`.
+3. Fall back to Grep/Glob when the graph has no answer or the result looks outdated.
+4. After adding, renaming or deleting files, run `graphify update .` so the next session sees the change.
+
+#### Rules
+- Never hand-edit files in `graphify-out/`; regenerate them with graphify.
+- Treat `INFERRED` / `AMBIGUOUS` edges as hints — confirm in the source before relying on them.
+- The graph shows structure, not current behaviour: always read the actual code before editing it.
+
 ### Development Workflow
 
 1. **Setup**: Run `npm install` and configure environment variables

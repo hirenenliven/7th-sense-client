@@ -2,6 +2,14 @@
 
 React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme. No test framework. Details: @THEME.md, `7th-sense-frontend-skills.md`.
 
+## Graphify (code navigation — use first)
+- A knowledge graph of this repo lives in `graphify-out/` (`graph.json`, `GRAPH_REPORT.md`). Before exploring code with Grep/Glob/Read, use it to find the relevant files and relations:
+  - `graphify query "<question>"` (broad context; `--dfs` to trace a flow, `--budget 1500` to cap), `graphify path "A" "B"`, `graphify explain "X"`.
+  - `GRAPH_REPORT.md` lists the communities (feature areas) and god nodes — skim it for orientation.
+- Then open only the files the graph points to (cite `source_location`). Fall back to Grep/Glob if the graph has no answer or looks stale.
+- After adding/renaming/removing files: `graphify update .` (code only, no LLM) so the graph stays current. Never hand-edit `graphify-out/`.
+- Details: "Graphify" section of `7th-sense-frontend-skills.md`.
+
 ## Workflow
 - No `git commit`/`push` unless asked. Use Conventional Commits (`feat:`, `fix:`, `refactor:`).
 - After changes: `npm run lint` (report pass/fail + errors only).
