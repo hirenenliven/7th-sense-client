@@ -20,6 +20,8 @@ const HolidaySetup = lazy(() => import('@/pages/Holidays/HolidaySetup'))
 const LicenceKeySetup = lazy(() => import('@/pages/LicenceKeys/LicenceKeySetup'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
+const ProductionScheduleList = lazy(() => import('@/pages/ProductionSchedules/ProductionScheduleList'))
+const AddProductionSchedule = lazy(() => import('@/pages/ProductionSchedules/AddProductionSchedule'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
@@ -61,6 +63,10 @@ export const PAGES = [
   { path: ROUTES.PARTS, element: <PartList /> },
   { path: ROUTES.PART_ADD, element: <AddPart />, roles: MANAGERS },
   { path: ROUTES.PART_EDIT, element: <AddPart />, roles: MANAGERS },
+  // Production schedules: everyone reads their company's; managers add, edit and delete
+  { path: ROUTES.PRODUCTION_SCHEDULE, element: <ProductionScheduleList /> },
+  { path: ROUTES.PRODUCTION_SCHEDULE_ADD, element: <AddProductionSchedule />, roles: MANAGERS },
+  { path: ROUTES.PRODUCTION_SCHEDULE_EDIT, element: <AddProductionSchedule />, roles: MANAGERS },
   // Shift › Add / Manage Shift, Breaks, Holiday / Week Off: everyone reads their company's;
   // managers add, edit and delete (the pages hide the form)
   { path: ROUTES.SHIFTS, element: <ShiftSetup /> },

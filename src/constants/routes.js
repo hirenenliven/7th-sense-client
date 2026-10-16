@@ -9,6 +9,8 @@ export const ROUTES = {
   MACHINE_HEALTH: '/machines/health',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
+  PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',
+  PRODUCTION_SCHEDULE_EDIT: '/production/schedule/:id/edit',
   PRODUCTION_MONITOR: '/production/monitor',
   TOOLS: '/tools',
   TOOL_LIFE: '/tools/life',

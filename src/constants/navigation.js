@@ -30,6 +30,7 @@ export const NAV_SECTIONS = [
         icon: 'bi-gear-wide-connected',
         children: [
           { key: 'production-schedule', label: 'Schedule', path: ROUTES.PRODUCTION_SCHEDULE },
+          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS },
           { key: 'production-monitor', label: 'Live Monitor', path: ROUTES.PRODUCTION_MONITOR },
         ],
       },
