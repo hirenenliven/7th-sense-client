@@ -45,6 +45,27 @@ export const maskDateText = (text) => {
   return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('-')
 }
 
+// Date ranges (DateRangePicker) are typed and shown as "DD-MM-YYYY – DD-MM-YYYY"
+export const DATE_RANGE_SEPARATOR = ' – '
+export const DATE_RANGE_PLACEHOLDER = `${DATE_PLACEHOLDER}${DATE_RANGE_SEPARATOR}${DATE_PLACEHOLDER}`
+export const DATE_RANGE_TEXT_LENGTH = DATE_RANGE_PLACEHOLDER.length
+
+// Typing aid: two masked dates; the separator appears once the second date is started
+export const maskDateRangeText = (text) => {
+  const digits = String(text ?? '').replace(/\D/g, '').slice(0, 16)
+  const first = maskDateText(digits.slice(0, 8))
+  return digits.length > 8 ? `${first}${DATE_RANGE_SEPARATOR}${maskDateText(digits.slice(8))}` : first
+}
+
+// { from, to } ("YYYY-MM-DD") ↔ "DD-MM-YYYY – DD-MM-YYYY"; text → null until both dates are real
+export const isoRangeToText = ({ from, to }) => `${isoToDateText(from)}${DATE_RANGE_SEPARATOR}${isoToDateText(to)}`
+export const dateRangeTextToIso = (text) => {
+  const [fromText, toText] = String(text ?? '').split(DATE_RANGE_SEPARATOR)
+  const from = dateTextToIso(fromText)
+  const to = dateTextToIso(toText)
+  return from && to ? { from, to } : null
+}
+
 // Typing aid: keeps digits and adds the colon → "06:30"
 export const maskTimeText = (text) => {
   const digits = String(text ?? '').replace(/\D/g, '').slice(0, 4)
@@ -81,6 +102,11 @@ export const startOfToday = () => {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())
 }
+
+// "YYYY-MM-DD" helpers (date filters): today, a date moved by days, whole days from a to b
+export const todayIso = () => toIsoDate(startOfToday())
+export const shiftIsoDate = (value, days) => toIsoDate(addDays(parseIsoDate(value), days))
+export const daysBetweenIso = (from, to) => Math.round((parseIsoDate(to) - parseIsoDate(from)) / 86_400_000)
 
 // Durations (part setup / cycle / loading times): shown as "H:MM:SS", stored as whole seconds.
 // Hours go up to 999 (the parts API limit, dto/part_dto.go).

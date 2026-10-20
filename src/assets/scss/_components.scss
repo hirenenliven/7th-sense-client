@@ -2299,6 +2299,18 @@ $ts-toast-colors: (
   }
 
   &.is-today:not(.is-selected):focus-visible { box-shadow: 0 0 0 $ts-picker-ring-width $ts-orange; }
+
+  // Date range (DateRangePicker): the days between its two ends (the ends are .is-selected)
+  &.is-in-range:not(.is-selected) {
+    background-color: rgba($ts-orange, $ts-picker-selected-alpha);
+    color: $ts-ink;
+  }
+}
+
+// "Pick the start / end date" in the range calendar footer
+.ts-range-hint {
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
 }
 
 .ts-calendar-options {
@@ -3390,71 +3402,165 @@ $ts-toast-colors: (
 
 // -----------------------------------------------------------------------------
 // Charts (Recharts — components/charts). Series colours are --ts-chart-* / status CSS variables set in
-// JS; the axes, grid, legend, tooltip, range slider and speedometer are styled here for both themes.
+// JS; the cards, axes, grid, legend, tooltip, range slider and speedometer are styled here, so every
+// chart follows the theme (dark / light) without re-rendering.
 // -----------------------------------------------------------------------------
+
+// Chart card: icon tile + title in the header, the chart filling the body
+.ts-chart-card {
+  .card-header { min-height: $ts-chart-header-height; }
+}
+
+.ts-chart-card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $ts-chart-icon-size;
+  height: $ts-chart-icon-size;
+  font-size: $ts-fs-base;
+  color: $ts-ink-2;
+  background-color: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-sm;
+}
+
+.ts-chart-card-heading { min-width: 0; }
+
+// Header actions (date filter, status badge) on one line; on a narrow card they wrap under the title
+.ts-chart-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $ts-space-2;
+}
+
+// Date filter (components/charts/ChartDateFilter.jsx): one field for a day or a date range
+.ts-chart-date {
+  width: $ts-chart-date-width;
+
+  &.ts-chart-date-range { width: $ts-chart-date-range-width; }
+}
+
+.ts-chart-card-title {
+  margin: 0;
+  font-size: ts-rem(14);
+  font-weight: $ts-fw-title;
+  line-height: 1.25;
+}
 
 .ts-chart {
   position: relative;
   width: 100%;
-  height: $ts-chart-height;
+  height: $ts-chart-height-sm;
 
-  &.ts-chart-lg { height: $ts-chart-height-lg; }
+  @include media-breakpoint-up(md) { height: $ts-chart-height; }
+
+  &.ts-chart-lg {
+    height: $ts-chart-height;
+
+    @include media-breakpoint-up(md) { height: $ts-chart-height-lg; }
+  }
 
   .recharts-surface:focus,
   .recharts-wrapper:focus { outline: none; }
 
-  .recharts-cartesian-grid line,
+  // Recessive frame: faint horizontal grid, one baseline, muted ticks
+  .recharts-cartesian-grid line {
+    stroke: $ts-line;
+    stroke-opacity: $ts-chart-grid-alpha;
+  }
+
   .recharts-polar-grid line,
   .recharts-polar-grid polygon { stroke: $ts-line; }
 
-  .recharts-cartesian-axis-line,
-  .recharts-cartesian-axis-tick-line { stroke: $ts-line; }
+  .recharts-cartesian-axis-line { stroke: $ts-line; }
 
   .recharts-cartesian-axis-tick-value,
   .recharts-polar-angle-axis-tick-value,
   .recharts-brush-texts text {
     fill: $ts-ink-3;
-    font-size: $ts-fs-xs;
+    font-size: $ts-chart-tick-size;
+    font-variant-numeric: tabular-nums;
   }
 
   .recharts-polar-angle-axis-tick-value { fill: $ts-ink-2; }
 
-  // Hover crosshair (line / area) and column highlight (bars)
-  .recharts-tooltip-cursor { stroke: $ts-ink-3; }
+  // Hover: dashed crosshair (line / area), soft column highlight (bars)
+  .recharts-tooltip-cursor {
+    stroke: $ts-ink-3;
+    stroke-dasharray: 3 3;
+  }
+
   .recharts-rectangle.recharts-tooltip-cursor {
     stroke: none;
-    fill: rgba($ts-ink, .06);
+    fill: rgba($ts-ink, $ts-chart-cursor-alpha);
   }
 
   .recharts-active-dot circle { stroke: $ts-panel; }
 
-  .recharts-default-legend { font-size: $ts-fs-sm; }
+  .recharts-legend-wrapper { font-size: $ts-fs-sm; }
+  .recharts-legend-item { cursor: default; }
 
+  // Range slider (Brush): an overview of the line in an inset track, the picked span tinted
   .recharts-brush > rect {
     fill: $ts-panel-2;
     stroke: $ts-line;
   }
 
-  .recharts-brush-slide { fill: rgba($ts-orange, .12); }
-
-  .recharts-brush-traveller rect {
-    fill: $ts-ink-3;
-    stroke: $ts-panel;
+  .recharts-brush-slide {
+    fill: $ts-orange;
+    fill-opacity: $ts-chart-slide-alpha;
   }
+
+  .recharts-brush-traveller {
+    cursor: ew-resize;
+
+    rect {
+      fill: $ts-ink-3;
+      stroke: none;
+    }
+
+    line { stroke: $ts-panel; }
+  }
+}
+
+// No data: keeps the chart's height, a dashed inset with a hint
+.ts-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $ts-space-2;
+  height: 100%;
+  font-size: $ts-fs-md;
+  color: $ts-ink-3;
+  border: 1px dashed $ts-line;
+  border-radius: $ts-radius-md;
+
+  .bi { font-size: $ts-fs-xl; }
 }
 
 // Legend text keeps the text colour (the swatch carries the series colour)
 .ts-chart-legend-text { color: $ts-ink-2; }
 
-.ts-chart-center-label {
-  fill: $ts-ink;
-  font-size: $ts-fs-md;
-  font-weight: 600;
-}
-
 .ts-chart-ref-label {
   fill: $ts-ink-2;
-  font-size: $ts-fs-xs;
+  font-size: $ts-chart-tick-size;
+}
+
+// Donut centre: the headline share and its caption
+.ts-chart-center-value {
+  fill: $ts-ink;
+  font-size: $ts-num-sm;
+  font-weight: 700;
+  letter-spacing: $ts-ls-tight;
+}
+
+.ts-chart-center-caption {
+  fill: $ts-ink-3;
+  font-size: $ts-fs-sm;
 }
 
 .ts-chart-tooltip {
@@ -3468,8 +3574,11 @@ $ts-toast-colors: (
 }
 
 .ts-chart-tooltip-title {
-  margin-bottom: $ts-space-1;
-  color: $ts-ink-3;
+  padding-bottom: $ts-space-1;
+  margin-bottom: $ts-space-2;
+  font-weight: 600;
+  color: $ts-ink-2;
+  border-bottom: 1px solid $ts-line;
 }
 
 .ts-chart-tooltip-row {
@@ -3484,6 +3593,7 @@ $ts-toast-colors: (
 
 .ts-chart-tooltip-value {
   margin-left: auto;
+  padding-left: $ts-space-3;
   font-weight: 600;
   color: $ts-ink;
 }
@@ -3494,11 +3604,56 @@ $ts-toast-colors: (
   height: $ts-chart-swatch-size;
 }
 
-// Speedometer (components/charts/Speedometer.jsx): zone arc + needle, the value below
+// Sensor trend: current reading with its limits, and the time-range buttons
+.ts-chart-reading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ts-space-1 $ts-space-4;
+}
+
+.ts-chart-reading-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-1 $ts-space-3;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+}
+
+// Limit legend: a short dashed rule in the limit's colour, like the line on the chart
+.ts-chart-limit {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-1;
+  color: $ts-ink-2;
+
+  &::before {
+    content: "";
+    width: $ts-chart-limit-rule;
+    border-top: 2px dashed $ts-ink-3;
+  }
+
+  &.is-warning::before { border-top-color: $ts-amber; }
+  &.is-critical::before { border-top-color: $ts-red; }
+}
+
+// Range buttons scroll sideways on narrow screens instead of wrapping into a ragged block
+.ts-chart-range {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  .btn-group { flex-wrap: nowrap; }
+  .btn { white-space: nowrap; }
+}
+
+// Speedometer (components/charts/Speedometer.jsx): zone ring, value arc, needle; the value below
 .ts-gauge {
   width: 100%;
   max-width: $ts-gauge-max-width;
-  margin-inline: auto;
+  margin: auto;
   text-align: center;
 }
 
@@ -3511,6 +3666,7 @@ $ts-toast-colors: (
 .ts-gauge-scale {
   display: flex;
   justify-content: space-between;
-  font-size: $ts-fs-xs;
+  padding-inline: $ts-gauge-scale-inset;
+  font-size: $ts-chart-tick-size;
   color: $ts-ink-3;
 }

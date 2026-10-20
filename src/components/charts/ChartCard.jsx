@@ -1,19 +1,23 @@
 import PropTypes from 'prop-types'
 import { Card } from 'react-bootstrap'
 
-// Card around one chart: title (+ optional subtitle and header actions), the chart in the body
+// Card around one chart: icon tile, title (+ optional subtitle) and header actions, the chart in the body
 function ChartCard({ title, subtitle, icon, actions, children }) {
   return (
-    <Card className="h-100">
-      <Card.Header>
-        {icon && <i className={`bi ${icon} text-body-secondary`} aria-hidden="true" />}
-        <div>
-          <div>{title}</div>
-          {subtitle && <div className="card-subtitle fw-normal">{subtitle}</div>}
+    <Card className="ts-chart-card h-100">
+      <Card.Header className="flex-wrap">
+        {icon && (
+          <span className="ts-chart-card-icon" aria-hidden="true">
+            <i className={`bi ${icon}`} />
+          </span>
+        )}
+        <div className="ts-chart-card-heading">
+          <h2 className="ts-chart-card-title">{title}</h2>
+          {subtitle && <div className="card-subtitle">{subtitle}</div>}
         </div>
-        {actions && <div className="ts-header-actions">{actions}</div>}
+        {actions && <div className="ts-header-actions ts-chart-card-actions">{actions}</div>}
       </Card.Header>
-      <Card.Body>{children}</Card.Body>
+      <Card.Body className="d-flex flex-column">{children}</Card.Body>
     </Card>
   )
 }

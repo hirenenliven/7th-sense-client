@@ -1,4 +1,4 @@
-import { PICKER_LOCALE } from '@/utils/dateTime'
+import { PICKER_LOCALE, shiftIsoDate, todayIso } from '@/utils/dateTime'
 
 // Machine Health: the sensors drawn as charts, their limits and the trend time ranges.
 // Limits follow common machine-tool practice (bearing / motor temperatures in °C, ISO 10816 spindle
@@ -78,7 +78,7 @@ export const MACHINE_STATES = [
   { key: 'running', label: 'Running', color: 'good' },
   { key: 'idle', label: 'Idle', color: 'warning' },
   { key: 'alarm', label: 'Alarm', color: 'critical' },
-  { key: 'off', label: 'Off', color: 'neutral' },
+  { key: 'off', label: 'Off', color: 'neutral', muted: true }, // absence of work: drawn faded
 ]
 
 // Trend time ranges (the last … of readings)
@@ -93,6 +93,11 @@ export const TIME_RANGES = [
   { key: 'all', label: 'All', ms: Infinity },
 ]
 export const DEFAULT_RANGE = '1h'
+
+// Date filters: how far back a chart may look, and the day count of a date range (default / longest)
+export const HEALTH_DATE_MIN = shiftIsoDate(todayIso(), -365)
+export const DEFAULT_RANGE_DAYS = 14
+export const MAX_RANGE_DAYS = 31
 
 export const formatValue = (value, decimals = 0) =>
   Number(value).toLocaleString(PICKER_LOCALE, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
@@ -117,7 +122,7 @@ const fullTime = new Intl.DateTimeFormat(PICKER_LOCALE, {
 
 // Axis ticks get finer as the range gets shorter
 export const tickFormatter = (rangeMs) => {
-  if (rangeMs <= HOUR_MS) return (time) => clockSeconds.format(time)
+  if (rangeMs < HOUR_MS) return (time) => clockSeconds.format(time)
   if (rangeMs <= 24 * HOUR_MS) return (time) => clock.format(time)
   return (time) => dayClock.format(time)
 }

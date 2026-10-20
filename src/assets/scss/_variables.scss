@@ -190,11 +190,22 @@ $ts-control-h:     ts-rem(34);
 $ts-transition: .12s ease;
 
 // Charts (components/charts, Machine Health)
-$ts-chart-height:      ts-rem(260);
-$ts-chart-height-lg:   ts-rem(300); // sensor trend with its range slider
-$ts-chart-swatch-size: ts-rem(8);   // series dot in a chart tooltip
-$ts-chart-tooltip-min: ts-rem(150);
-$ts-gauge-max-width:   ts-rem(320); // speedometer
+$ts-chart-height-sm:     ts-rem(220); // phones
+$ts-chart-height:        ts-rem(260);
+$ts-chart-height-lg:     ts-rem(320); // sensor trend with its range slider
+$ts-chart-header-height: ts-rem(56);  // chart card header, so cards in a row line up
+$ts-chart-icon-size:     ts-rem(28);  // icon tile in a chart card header
+$ts-chart-tick-size:     ts-rem(11);  // axis ticks, limit labels, gauge scale
+$ts-chart-swatch-size:   ts-rem(8);   // series dot in a chart tooltip
+$ts-chart-tooltip-min:   ts-rem(160);
+$ts-chart-limit-rule:    ts-rem(14);  // dashed rule before "Warning" / "Critical"
+$ts-chart-grid-alpha:    .6;
+$ts-chart-cursor-alpha:  .06;         // bar hover column
+$ts-chart-slide-alpha:   .1;          // range slider: picked span
+$ts-gauge-max-width:     ts-rem(340); // speedometer
+$ts-chart-date-width:    ts-rem(140); // date picker in a chart card header (DD-MM-YYYY + calendar button)
+$ts-chart-date-range-width: ts-rem(230); // date-range picker there (DD-MM-YYYY – DD-MM-YYYY)
+$ts-gauge-scale-inset:   ts-rem(10);  // 0 / 100 labels under the ends of the arc
 
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
 $ts-login-bg:        #15181d !default; // page behind the rings

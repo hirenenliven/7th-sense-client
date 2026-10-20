@@ -63,7 +63,10 @@ const keyToDay = (event, cursor) => {
   }
 }
 
-function DateCalendar({ value, min, max, autoFocus, onSelect, onClear }) {
+// Month calendar with month / year views. Also the panel of DateRangePicker: `range` { from, to }
+// ("YYYY-MM-DD") highlights both ends and the days between, `onHoverDate` reports the day under the
+// pointer / keyboard focus (range preview) and `footer` replaces the Clear / Today buttons.
+export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, range, onHoverDate, footer }) {
   const selected = parseIsoDate(value)
   const minDate = parseIsoDate(min)
   const maxDate = parseIsoDate(max)
@@ -180,11 +183,17 @@ function DateCalendar({ value, min, max, autoFocus, onSelect, onClear }) {
                   .slice(week * 7, week * 7 + 7)
                   .map((date) => {
                     const iso = toIsoDate(date)
-                    const isSelected = isSameDay(date, selected)
+                    const isRangeStart = Boolean(range?.from) && iso === range.from
+                    const isRangeEnd = Boolean(range?.to) && iso === range.to
+                    const isSelected = isSameDay(date, selected) || isRangeStart || isRangeEnd
+                    const isInRange = Boolean(range?.from && range?.to) && iso > range.from && iso < range.to
                     const isOutside = date.getMonth() !== cursor.getMonth()
                     const classes = [
                       'ts-calendar-day',
                       isSelected && 'is-selected',
+                      isInRange && 'is-in-range',
+                      isRangeStart && 'is-range-start',
+                      isRangeEnd && 'is-range-end',
                       isSameDay(date, today) && 'is-today',
                       isOutside && 'is-outside',
                     ].filter(Boolean)
@@ -199,6 +208,8 @@ function DateCalendar({ value, min, max, autoFocus, onSelect, onClear }) {
                           aria-label={dayLabel.format(date)}
                           aria-current={isSameDay(date, today) ? 'date' : undefined}
                           onClick={() => onSelect(date)}
+                          onMouseEnter={onHoverDate && (() => onHoverDate(date))}
+                          onFocus={onHoverDate && (() => onHoverDate(date))}
                         >
                           {date.getDate()}
                         </button>
@@ -250,14 +261,16 @@ function DateCalendar({ value, min, max, autoFocus, onSelect, onClear }) {
         </div>
       )}
 
-      <div className="ts-picker-footer">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={onClear} disabled={!value}>
-          Clear
-        </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSelect(today)} disabled={isDisabled(today)}>
-          Today
-        </button>
-      </div>
+      {footer ?? (
+        <div className="ts-picker-footer">
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClear} disabled={!value}>
+            Clear
+          </button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSelect(today)} disabled={isDisabled(today)}>
+            Today
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -268,7 +281,10 @@ DateCalendar.propTypes = {
   max: PropTypes.string,
   autoFocus: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
-  onClear: PropTypes.func.isRequired,
+  onClear: PropTypes.func, // required unless `footer` replaces the default buttons
+  range: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }),
+  onHoverDate: PropTypes.func,
+  footer: PropTypes.node,
 }
 
 // Themed date field. Value and onChange use "YYYY-MM-DD" (like <input type="date">), so it drops
