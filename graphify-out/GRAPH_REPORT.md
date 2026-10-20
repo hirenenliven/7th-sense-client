@@ -6,12 +6,12 @@
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 1196 nodes · 4624 edges · 40 communities (39 shown, 1 thin omitted)
+- 1196 nodes · 4619 edges · 40 communities (39 shown, 1 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2cd09cf5`
+- Built from commit: `a89a785a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -61,12 +61,12 @@
 1. `react` - 113 edges
 2. `prop-types` - 87 edges
 3. `react-bootstrap` - 78 edges
-4. `Loader()` - 63 edges
+4. `Loader()` - 62 edges
 5. `withQuery()` - 60 edges
 6. `useOrgUser()` - 55 edges
 7. `sharedGet()` - 51 edges
 8. `toast` - 48 edges
-9. `useAuth()` - 45 edges
+9. `useAuth()` - 44 edges
 10. `ConfirmModal()` - 41 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -78,8 +78,8 @@
   CLAUDE.md → 7thsense-ui-review.html
 - `Form Handling Standard (React Hook Form + Zod)` --conceptually_related_to--> `CLAUDE.md Project Instructions`  [INFERRED]
   7th-sense-frontend-skills.md → CLAUDE.md
-- `App()` --calls--> `OrgUserProvider()`  [EXTRACTED]
-  src/App.jsx → src/context/OrgUserProvider.jsx
+- `MachineHealth()` --calls--> `AreaGrowthChart()`  [EXTRACTED]
+  src/pages/MachineHealth/MachineHealth.jsx → src/components/charts/AreaGrowthChart.jsx
 
 ## Import Cycles
 - None detected.
@@ -252,7 +252,7 @@ Nodes (7): navLeafShape, SidebarItem(), NAV_SECTIONS, filterNavByRole(), flatten
   CLAUDE.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **10 isolated node(s):** `bootstrap`, `@types/react`, `@types/react-dom`, `eslint`, `sass` (+5 more)
+- **10 isolated node(s):** `bootstrap`, `eslint`, `sass`, `@types/react`, `@types/react-dom` (+5 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 154 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -260,17 +260,17 @@ Nodes (7): navLeafShape, SidebarItem(), NAV_SECTIONS, filterNavByRole(), flatten
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `react` to `react-bootstrap`, `MachineHealth.jsx`, `MachineHealth.jsx`, `ModelFormModal.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `AddMachine.jsx`, `AddBranch.jsx`, `Date Picker`, `Licence Keys`, `Production Schedule Form`, `BreakFormModal.jsx`, `ClienteleFormModal.jsx`, `Topbar.jsx`, `HolidayFormModal.jsx`, `TimePicker.jsx`, `DateRangePicker.jsx`, `ShiftCard.jsx`, `main.jsx`, `package.json`, `FieldLabel`, `withQuery`, `StateFormModal.jsx`, `Login.jsx`, `theme.js`, `AppRoutes.jsx`, `Sidebar.jsx`?**
-  _High betweenness centrality (0.204) - this node is a cross-community bridge._
-- **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
+  _High betweenness centrality (0.193) - this node is a cross-community bridge._
+- **What connects `bootstrap`, `eslint`, `sass` to the rest of the system?**
   _10 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `react-bootstrap` be split into smaller, more focused modules?**
   _Cohesion score 0.05300224637241212 - nodes in this community are weakly interconnected._
 - **Why does `prop-types` connect `react` to `react-bootstrap`, `MachineHealth.jsx`, `MachineHealth.jsx`, `ModelFormModal.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `AddMachine.jsx`, `Date Picker`, `Licence Keys`, `Production Schedule Form`, `UserGuide.jsx`, `BreakFormModal.jsx`, `ClienteleFormModal.jsx`, `Topbar.jsx`, `HolidayFormModal.jsx`, `TimePicker.jsx`, `DateRangePicker.jsx`, `ShiftCard.jsx`, `main.jsx`, `package.json`, `FieldLabel`, `StateFormModal.jsx`, `AppRoutes.jsx`, `Sidebar.jsx`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
+  _High betweenness centrality (0.100) - this node is a cross-community bridge._
 - **Should `MachineHealth.jsx` be split into smaller, more focused modules?**
   _Cohesion score 0.0784313725490196 - nodes in this community are weakly interconnected._
 - **Why does `react-bootstrap` connect `react-bootstrap` to `MachineHealth.jsx`, `ModelFormModal.jsx`, `ShiftFormModal.jsx`, `react`, `Parts & Machine Picker`, `AddMachine.jsx`, `AddBranch.jsx`, `Licence Keys`, `Production Schedule Form`, `UserGuide.jsx`, `BreakFormModal.jsx`, `ClienteleFormModal.jsx`, `Topbar.jsx`, `HolidayFormModal.jsx`, `TimePicker.jsx`, `ShiftCard.jsx`, `main.jsx`, `package.json`, `FieldLabel`, `StateFormModal.jsx`, `Login.jsx`, `AppRoutes.jsx`, `Sidebar.jsx`?**
-  _High betweenness centrality (0.091) - this node is a cross-community bridge._
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
