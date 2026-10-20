@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   LANGUAGE: 'ts.language',
   THEME: 'ts.theme', // theme on screen, applied before the first render
   REMEMBERED_USERNAME: 'ts.login.username', // set when "Remember" is ticked on the login screen
+  MACHINE_VIEW: 'ts.machines.view', // All Machines: 'table' or 'cards'
 }
 
 // UI themes (users API `theme`, user_profiles.theme). Light is built from theme-light.scss.

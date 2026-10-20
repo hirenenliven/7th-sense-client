@@ -1,0 +1,21 @@
+{
+  "1": "CityFormModal.jsx",
+  "2": "LocationFormModal.jsx",
+  "3": "AddCustomer.jsx",
+  "4": "ShiftFormModal.jsx",
+  "11": "StateFormModal.jsx",
+  "16": "BreakFormModal.jsx",
+  "18": "HealthCharts.jsx",
+  "19": "Login.jsx",
+  "20": "HolidayFormModal.jsx",
+  "22": "ShopFormModal.jsx",
+  "23": "CountryFormModal.jsx",
+  "24": "ShiftCard.jsx",
+  "26": "toast.js",
+  "29": "package.json",
+  "31": "LineFormModal.jsx",
+  "33": "vite.config.js",
+  "34": "SupervisorFormModal.jsx",
+  "35": "CellFormModal.jsx",
+  "36": "apiClient"
+}

@@ -3333,3 +3333,184 @@ $ts-toast-colors: (
   border: 1px solid $ts-line;
   border-radius: $ts-radius;
 }
+
+// -----------------------------------------------------------------------------
+// Machine card (All Machines › card view): header → badges → details → chart slot
+// -----------------------------------------------------------------------------
+
+.ts-machine-card {
+  transition: border-color $ts-transition;
+
+  &:hover { border-color: rgba($ts-orange, $ts-tint-strong * 2); }
+
+  &.is-inactive .ts-machine-card-details { opacity: .6; }
+}
+
+.ts-machine-card-heading { min-width: 0; }
+
+.ts-machine-card-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $ts-shift-icon-size;
+  height: $ts-shift-icon-size;
+  font-size: $ts-fs-lg;
+  color: $ts-orange;
+  background-color: rgba($ts-orange, $ts-tint-soft);
+  border-radius: $ts-radius-md;
+}
+
+.ts-machine-card-name {
+  margin: 0;
+  font-size: $ts-fs-lg;
+  font-weight: 600;
+  color: $ts-ink;
+}
+
+.ts-machine-card-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $ts-space-2 $ts-space-3;
+  margin: 0;
+
+  dt {
+    font-size: $ts-fs-xs;
+    font-weight: 600;
+    color: $ts-ink-3;
+    letter-spacing: .04em;
+  }
+
+  dd {
+    margin: 0;
+    font-size: $ts-fs-sm;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// Charts (Recharts — components/charts). Series colours are --ts-chart-* / status CSS variables set in
+// JS; the axes, grid, legend, tooltip, range slider and speedometer are styled here for both themes.
+// -----------------------------------------------------------------------------
+
+.ts-chart {
+  position: relative;
+  width: 100%;
+  height: $ts-chart-height;
+
+  &.ts-chart-lg { height: $ts-chart-height-lg; }
+
+  .recharts-surface:focus,
+  .recharts-wrapper:focus { outline: none; }
+
+  .recharts-cartesian-grid line,
+  .recharts-polar-grid line,
+  .recharts-polar-grid polygon { stroke: $ts-line; }
+
+  .recharts-cartesian-axis-line,
+  .recharts-cartesian-axis-tick-line { stroke: $ts-line; }
+
+  .recharts-cartesian-axis-tick-value,
+  .recharts-polar-angle-axis-tick-value,
+  .recharts-brush-texts text {
+    fill: $ts-ink-3;
+    font-size: $ts-fs-xs;
+  }
+
+  .recharts-polar-angle-axis-tick-value { fill: $ts-ink-2; }
+
+  // Hover crosshair (line / area) and column highlight (bars)
+  .recharts-tooltip-cursor { stroke: $ts-ink-3; }
+  .recharts-rectangle.recharts-tooltip-cursor {
+    stroke: none;
+    fill: rgba($ts-ink, .06);
+  }
+
+  .recharts-active-dot circle { stroke: $ts-panel; }
+
+  .recharts-default-legend { font-size: $ts-fs-sm; }
+
+  .recharts-brush > rect {
+    fill: $ts-panel-2;
+    stroke: $ts-line;
+  }
+
+  .recharts-brush-slide { fill: rgba($ts-orange, .12); }
+
+  .recharts-brush-traveller rect {
+    fill: $ts-ink-3;
+    stroke: $ts-panel;
+  }
+}
+
+// Legend text keeps the text colour (the swatch carries the series colour)
+.ts-chart-legend-text { color: $ts-ink-2; }
+
+.ts-chart-center-label {
+  fill: $ts-ink;
+  font-size: $ts-fs-md;
+  font-weight: 600;
+}
+
+.ts-chart-ref-label {
+  fill: $ts-ink-2;
+  font-size: $ts-fs-xs;
+}
+
+.ts-chart-tooltip {
+  min-width: $ts-chart-tooltip-min;
+  padding: $ts-space-2 $ts-space-3;
+  font-size: $ts-fs-sm;
+  background-color: $ts-panel;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+  box-shadow: $ts-shadow-float;
+}
+
+.ts-chart-tooltip-title {
+  margin-bottom: $ts-space-1;
+  color: $ts-ink-3;
+}
+
+.ts-chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+
+  + .ts-chart-tooltip-row { margin-top: $ts-space-1; }
+}
+
+.ts-chart-tooltip-name { color: $ts-ink-2; }
+
+.ts-chart-tooltip-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: $ts-ink;
+}
+
+.ts-chart-swatch {
+  flex-shrink: 0;
+  width: $ts-chart-swatch-size;
+  height: $ts-chart-swatch-size;
+}
+
+// Speedometer (components/charts/Speedometer.jsx): zone arc + needle, the value below
+.ts-gauge {
+  width: 100%;
+  max-width: $ts-gauge-max-width;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ts-gauge-needle {
+  fill: $ts-ink;
+
+  .ts-gauge-hub-dot { fill: $ts-panel; }
+}
+
+.ts-gauge-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: $ts-fs-xs;
+  color: $ts-ink-3;
+}

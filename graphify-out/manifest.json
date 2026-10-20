@@ -12,10 +12,10 @@
     "semantic_hash": "864d6c2fdf5395dd794a18f846b1c998"
   },
   "package.json": {
-    "mtime": 1791952156.8401453,
-    "seen": 1792149093.2481754,
-    "ast_hash": "028fa41a670e189a8864fc98bce61bed",
-    "semantic_hash": "028fa41a670e189a8864fc98bce61bed"
+    "mtime": 1792489671.391412,
+    "seen": 1792490086.7888844,
+    "ast_hash": "58a3d0638560fd33a8d006fd71bcc974",
+    "semantic_hash": ""
   },
   "src/App.jsx": {
     "mtime": 1791886799.3591144,
@@ -168,10 +168,10 @@
     "semantic_hash": "c1c42499ca192416cce5b97fd7149d03"
   },
   "src/constants/app.js": {
-    "mtime": 1791961826.477033,
-    "seen": 1792149093.2481754,
-    "ast_hash": "5b3541cbbd74034e663ab0b8acea6f1c",
-    "semantic_hash": "5b3541cbbd74034e663ab0b8acea6f1c"
+    "mtime": 1792487725.422375,
+    "seen": 1792487784.534566,
+    "ast_hash": "d9160d7e6469d12d9c010709beda357b",
+    "semantic_hash": ""
   },
   "src/constants/countryLibrary.js": {
     "mtime": 1792039609.3841696,
@@ -180,10 +180,10 @@
     "semantic_hash": "5e7ee8656f0289e5e6869de070b076d4"
   },
   "src/constants/icons.js": {
-    "mtime": 1791956293.417016,
-    "seen": 1792149093.2481754,
-    "ast_hash": "fe214a59a257cc0fc2a1f69def67003a",
-    "semantic_hash": "fe214a59a257cc0fc2a1f69def67003a"
+    "mtime": 1792489206.6162956,
+    "seen": 1792490086.7889557,
+    "ast_hash": "39732759672ed2e3813ec0ccd81f7223",
+    "semantic_hash": ""
   },
   "src/constants/locations.js": {
     "mtime": 1791873088.5879533,
@@ -600,16 +600,16 @@
     "semantic_hash": "2422ee44c442acdd6e23e6ebbbd2473e"
   },
   "src/pages/Machines/MachineList.jsx": {
-    "mtime": 1792044642.936025,
-    "seen": 1792149093.2481754,
-    "ast_hash": "71c2b64a6e7f4282a550e5b55391b433",
-    "semantic_hash": "71c2b64a6e7f4282a550e5b55391b433"
+    "mtime": 1792489206.7830288,
+    "seen": 1792490086.7893386,
+    "ast_hash": "32b3e4bc11d10cd62efc00a2b85e2185",
+    "semantic_hash": ""
   },
   "src/pages/Machines/MachineRow.jsx": {
-    "mtime": 1791975871.0798092,
-    "seen": 1792149093.2481754,
-    "ast_hash": "1469ff4815550834d319fea1a92f2dce",
-    "semantic_hash": "1469ff4815550834d319fea1a92f2dce"
+    "mtime": 1792489206.6521904,
+    "seen": 1792490086.7893417,
+    "ast_hash": "d958dc0b28b0de8ae499b95c51a8f209",
+    "semantic_hash": ""
   },
   "src/pages/Machines/machineForm.js": {
     "mtime": 1791894909.9711652,
@@ -996,10 +996,10 @@
     "semantic_hash": "890d654ac7f6567b8e14ae35b30a2573"
   },
   "src/routes/pages.jsx": {
-    "mtime": 1792056063.42075,
-    "seen": 1792149093.2481754,
-    "ast_hash": "e1aa4f72d3ddddcc285be42ec076ef40",
-    "semantic_hash": "e1aa4f72d3ddddcc285be42ec076ef40"
+    "mtime": 1792490044.8767095,
+    "seen": 1792490086.789565,
+    "ast_hash": "3a2f443842c230d48992831a25026c76",
+    "semantic_hash": ""
   },
   "src/services/apiClient.js": {
     "mtime": 1791886759.5423288,
@@ -1188,10 +1188,10 @@
     "semantic_hash": "97bfbaa0ea19bb8335a841b07279a1cd"
   },
   "7th-sense-frontend-skills.md": {
-    "mtime": 1792046746.4795084,
-    "seen": 1792149093.2481754,
-    "ast_hash": "d68def05a712c47a1abd6e6e66db2873",
-    "semantic_hash": "d68def05a712c47a1abd6e6e66db2873"
+    "mtime": 1792150222.195227,
+    "seen": 1792487784.5349436,
+    "ast_hash": "125320db37243a0cb087fe28ce62c621",
+    "semantic_hash": ""
   },
   "7thsense-ui-review.html": {
     "mtime": 1791804759.2662663,
@@ -1200,10 +1200,10 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1792056093.346012,
-    "seen": 1792149093.2481754,
-    "ast_hash": "d1897896cbc93c4cd98f832c65f6e44d",
-    "semantic_hash": "d1897896cbc93c4cd98f832c65f6e44d"
+    "mtime": 1792150213.4572802,
+    "seen": 1792487784.5349603,
+    "ast_hash": "2e751235b713a5892748c63be3dbf687",
+    "semantic_hash": ""
   },
   "README.md": {
     "mtime": 1791885151.290444,
@@ -1234,5 +1234,77 @@
     "seen": 1792149093.2481754,
     "ast_hash": "c46e4d7bc14b22be4f21c929eb2b52c7",
     "semantic_hash": "c46e4d7bc14b22be4f21c929eb2b52c7"
+  },
+  "src/pages/Machines/MachineCard.jsx": {
+    "mtime": 1792489206.7028039,
+    "seen": 1792490086.7893348,
+    "ast_hash": "8f0278751241176631af955f6f9fee5a",
+    "semantic_hash": ""
+  },
+  "src/components/charts/ChartCard.jsx": {
+    "mtime": 1792489979.301075,
+    "seen": 1792490086.788891,
+    "ast_hash": "7ab1c07e1a1d3619a33473f10da90a3a",
+    "semantic_hash": ""
+  },
+  "src/components/charts/ChartTooltip.jsx": {
+    "mtime": 1792489884.013448,
+    "seen": 1792490086.7888932,
+    "ast_hash": "b8075dc0ef5fe396f9312f26ec842491",
+    "semantic_hash": ""
+  },
+  "src/components/charts/Speedometer.jsx": {
+    "mtime": 1792489884.1170473,
+    "seen": 1792490086.788895,
+    "ast_hash": "0b36899c3d1fb0ce957e5127904affb9",
+    "semantic_hash": ""
+  },
+  "src/components/charts/chartLegend.jsx": {
+    "mtime": 1792489979.2543182,
+    "seen": 1792490086.788897,
+    "ast_hash": "5d7ec8d6f4efe96393d067c8f5075689",
+    "semantic_hash": ""
+  },
+  "src/components/charts/chartTheme.js": {
+    "mtime": 1792489883.964258,
+    "seen": 1792490086.7888985,
+    "ast_hash": "78174b1b7b334d7a6d48ac180c28a915",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/HealthCharts.jsx": {
+    "mtime": 1792490007.7859583,
+    "seen": 1792490086.7893083,
+    "ast_hash": "cd779e963e41bcf5079d7a016d1c9e4d",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/HealthStatusBadge.jsx": {
+    "mtime": 1792489979.3476038,
+    "seen": 1792490086.789313,
+    "ast_hash": "dc4820890842d056701f2b96ea4217e5",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/MachineHealth.jsx": {
+    "mtime": 1792490034.8470309,
+    "seen": 1792490086.7893176,
+    "ast_hash": "cba8b288ddcdf4799dd7e5f47456a56c",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/SensorTrendCard.jsx": {
+    "mtime": 1792489979.3901367,
+    "seen": 1792490086.7893198,
+    "ast_hash": "bdf2d3cf15e89ac2d5474b95aca96a1f",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/healthSampleData.js": {
+    "mtime": 1792489922.6849136,
+    "seen": 1792490086.7893217,
+    "ast_hash": "cc6a6f164bfef090cfbf2ee5593a047f",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/healthSensors.js": {
+    "mtime": 1792489902.0153792,
+    "seen": 1792490086.7893243,
+    "ast_hash": "d8073a881fa70a551a111a94944a0b3f",
+    "semantic_hash": ""
   }
 }

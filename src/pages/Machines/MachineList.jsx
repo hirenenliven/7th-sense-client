@@ -1,18 +1,28 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
+import { Alert, Button, ButtonGroup, Card, Col, Form, InputGroup, Row, Table } from 'react-bootstrap'
 import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { MANAGERS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
+import { MANAGERS, PAGE_SIZES, STORAGE_KEYS, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { deleteMachine, getMachines } from '@/services/machineService'
+import { readStorage, writeStorage } from '@/utils/storage'
 import { toast } from '@/utils/toast'
+import MachineCard from './MachineCard'
 import MachineRow from './MachineRow'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+
+const VIEWS = [
+  { key: 'table', label: 'Table view', icon: 'bi-list-ul' },
+  { key: 'cards', label: 'Card view', icon: 'bi-grid-3x3-gap' },
+]
+
+// Machine Health opens on this machine (`?machineId=`)
+const healthPath = (machine) => `${ROUTES.MACHINE_HEALTH}?machineId=${machine.id}`
 
 const matchesSearch = (machine, term) =>
   [machine.id, machine.name, machine.serialNumber, machine.customerName, machine.modelName, machine.brandName, machine.controllerName, machine.lineName]
@@ -36,6 +46,13 @@ function MachineList() {
   const [customerFilter, setCustomerFilter] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
   const [page, setPage] = useState(1)
+
+  // Table rows or cards; remembered per browser
+  const [view, setView] = useState(() => readStorage(STORAGE_KEYS.MACHINE_VIEW, VIEWS[0].key))
+  const changeView = (key) => {
+    setView(key)
+    writeStorage(STORAGE_KEYS.MACHINE_VIEW, key)
+  }
 
   const [pendingDelete, setPendingDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -86,10 +103,12 @@ function MachineList() {
     { label: 'Installed', sort: (row) => row.installationDate },
     { label: 'Connection', sort: (row) => (row.onlineStatus ? 1 : 0) },
     { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    'Actions',
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  const handleHealth = useCallback((machine) => navigate(healthPath(machine)), [navigate])
 
   const handleEdit = useCallback(
     (machine) => navigate(generatePath(ROUTES.MACHINE_EDIT, { id: String(machine.id) })),
@@ -182,22 +201,41 @@ function MachineList() {
 
         {filtered.length ? (
           <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
+            {view === 'cards' ? (
+              <Row xs={1} md={2} xxl={3} className="g-3 p-3">
                 {pageRows.map((machine) => (
-                  <MachineRow
-                    key={machine.id}
-                    machine={machine}
-                    showCustomer={isSuperadmin}
-                    canEdit={canManage}
-                    canDelete={isSuperadmin}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
+                  <Col key={machine.id}>
+                    <MachineCard
+                      machine={machine}
+                      showCustomer={isSuperadmin}
+                      canEdit={canManage}
+                      canDelete={isSuperadmin}
+                      healthPath={healthPath(machine)}
+                      onEdit={handleEdit}
+                      onDelete={setPendingDelete}
+                    />
+                  </Col>
                 ))}
-              </tbody>
-            </Table>
+              </Row>
+            ) : (
+              <Table hover responsive className="mb-0">
+                <SortableHead columns={columns} sort={sort} onSort={onSort} />
+                <tbody>
+                  {pageRows.map((machine) => (
+                    <MachineRow
+                      key={machine.id}
+                      machine={machine}
+                      showCustomer={isSuperadmin}
+                      canEdit={canManage}
+                      canDelete={isSuperadmin}
+                      onHealth={handleHealth}
+                      onEdit={handleEdit}
+                      onDelete={setPendingDelete}
+                    />
+                  ))}
+                </tbody>
+              </Table>
+            )}
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -226,14 +264,29 @@ function MachineList() {
             {isSuperadmin ? 'Every customer’s machines, their model, controller and line.' : 'Your machines, their model, controller and line.'}
           </p>
         </div>
-        {canManage && (
-          <div className="ts-page-actions">
+        <div className="ts-page-actions">
+          <ButtonGroup aria-label="Machine list view">
+            {VIEWS.map((option) => (
+              <Button
+                key={option.key}
+                variant="ghost"
+                active={view === option.key}
+                aria-pressed={view === option.key}
+                title={option.label}
+                onClick={() => changeView(option.key)}
+              >
+                <i className={`bi ${option.icon}`} aria-hidden="true" />
+                <span className="visually-hidden">{option.label}</span>
+              </Button>
+            ))}
+          </ButtonGroup>
+          {canManage && (
             <Button as={Link} to={ROUTES.MACHINE_ADD}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
               Add Machine
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </header>
 
       <Card>

@@ -7,8 +7,9 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
 
-// showCustomer (superadmin): the customer column; canEdit (managers) / canDelete (superadmin): the actions
-function MachineRow({ machine, showCustomer, canEdit, canDelete, onEdit, onDelete }) {
+// showCustomer (superadmin): the customer column. Health is open to everyone; canEdit (managers) /
+// canDelete (superadmin) add the Edit / Delete actions.
+function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdit, onDelete }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -34,16 +35,15 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onEdit, onDelet
       <td>
         <StatusBadge active={isActive} />
       </td>
-      {canEdit && (
-        <td className="border-start">
-          <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
-            {canDelete && (
-              <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
-            )}
-          </div>
-        </td>
-      )}
+      <td className="border-start">
+        <div className="d-flex gap-1">
+          <IconAction icon={ACTION_ICONS.health} label={`${machine.name} health`} onClick={() => onHealth(machine)} />
+          {canEdit && <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />}
+          {canEdit && canDelete && (
+            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+          )}
+        </div>
+      </td>
     </tr>
   )
 }
@@ -65,6 +65,7 @@ MachineRow.propTypes = {
   showCustomer: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
+  onHealth: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }

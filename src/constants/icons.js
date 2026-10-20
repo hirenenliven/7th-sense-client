@@ -2,6 +2,7 @@
 // Rendered by components/common/IconAction.jsx (and the User Guide's action list).
 export const ACTION_ICONS = {
   view: 'bi-eye',
+  health: 'bi-heart-pulse',
   statement: 'bi-file-earmark-text',
   edit: 'bi-pencil',
   delete: 'bi-trash3',

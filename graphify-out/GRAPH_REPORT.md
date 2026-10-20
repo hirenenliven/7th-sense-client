@@ -1,244 +1,259 @@
-# Graph Report - 7th-sense-client  (2026-10-16)
+# Graph Report - 7th-sense-client  (2026-10-20)
 
 ## Corpus Check
-- 206 files · ~117,297 words
+- 214 files · ~122,628 words
 - Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 1036 nodes · 3454 edges · 40 communities (34 shown, 6 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 65 edges (avg confidence: 0.61)
-- Token cost: 158,543 input · 1,600 output
+- 1124 nodes · 4310 edges · 36 communities (35 shown, 1 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 75 edges (avg confidence: 0.84)
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `49f38982`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Shared Table & Modal Components
-- Org Customer & Multi-Select
-- Organization List Pages
-- Locations & Clientele
-- Shifts, Breaks & Holidays
+- CityFormModal.jsx
+- LocationFormModal.jsx
+- AddCustomer.jsx
+- ShiftFormModal.jsx
 - Status & Icon Widgets
 - Parts & Machine Picker
 - Machines & Health Sensors
 - Branches
 - Project Docs & Conventions
 - Date Picker
-- Controllers & Models Catalog
+- StateFormModal.jsx
 - Licence Keys
 - Production Schedule Form
 - ESLint Dev Dependencies
 - User Guide & Field Help
-- Schedule Jobs & Shift Timing
+- BreakFormModal.jsx
 - Runtime Dependencies
-- App Bootstrap & Theme
-- Login & Branding
-- Sidebar Navigation
+- HealthCharts.jsx
+- Login.jsx
+- HolidayFormModal.jsx
 - Time Picker
-- Routing & Fallback Pages
-- Topbar & Responsive Layout
-- Theme Showcase
+- ShopFormModal.jsx
+- CountryFormModal.jsx
+- ShiftCard.jsx
 - jsconfig Aliases
-- Toast Notifications
+- toast.js
 - npm Scripts
-- Auth Session
-- Package Metadata
+- package.json
 - Seven Logo Asset
-- Production Schedule List
+- LineFormModal.jsx
 - Login Logo Asset
-- Vite Config
-- Bootstrap Icons Dep
-- Hookform Resolvers Dep
-- libphonenumber Dep
-- prop-types Dep
-- React Dep
+- vite.config.js
+- SupervisorFormModal.jsx
+- CellFormModal.jsx
+- apiClient
 
 ## God Nodes (most connected - your core abstractions)
-1. `withQuery()` - 60 edges
-2. `useOrgUser()` - 55 edges
-3. `sharedGet()` - 51 edges
-4. `toast` - 48 edges
-5. `useAuth()` - 43 edges
-6. `useTableSort()` - 41 edges
-7. `newestFirst()` - 39 edges
-8. `formatDate()` - 33 edges
-9. `customerName()` - 32 edges
-10. `Loader()` - 31 edges
+1. `react` - 105 edges
+2. `react-bootstrap` - 78 edges
+3. `prop-types` - 77 edges
+4. `Loader()` - 63 edges
+5. `withQuery()` - 60 edges
+6. `useOrgUser()` - 55 edges
+7. `sharedGet()` - 51 edges
+8. `toast` - 48 edges
+9. `useAuth()` - 45 edges
+10. `ConfirmModal()` - 41 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Form Handling Standard (React Hook Form + Zod)` --conceptually_related_to--> `CLAUDE.md Project Instructions`  [INFERRED]
-  7th-sense-frontend-skills.md → CLAUDE.md
-- `Production Schedule (Single/Multiple Day jobs)` --conceptually_related_to--> `Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup)`  [AMBIGUOUS]
-  CLAUDE.md → 7thsense-ui-review.html
+- `loadCustomers()` --calls--> `getUsers()`  [EXTRACTED]
+  src/pages/Machines/AddMachine.jsx → src/services/customerService.js
 - `7thSense Theme Usage Guide` --conceptually_related_to--> `OEE (Availability / Performance / Quality)`  [INFERRED]
   THEME.md → 7thsense-ui-review.html
-- `Table Design Standard (Sortable Table Pattern)` --conceptually_related_to--> `CLAUDE.md Project Instructions`  [INFERRED]
+- `Production Schedule (Single/Multiple Day jobs)` --conceptually_related_to--> `Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup)`  [AMBIGUOUS]
+  CLAUDE.md → 7thsense-ui-review.html
+- `Form Handling Standard (React Hook Form + Zod)` --conceptually_related_to--> `CLAUDE.md Project Instructions`  [INFERRED]
   7th-sense-frontend-skills.md → CLAUDE.md
-- `7thSense Theme Usage Guide` --conceptually_related_to--> `Table Design Standard (Sortable Table Pattern)`  [INFERRED]
-  THEME.md → 7th-sense-frontend-skills.md
+- `App()` --calls--> `OrgUserProvider()`  [EXTRACTED]
+  src/App.jsx → src/context/OrgUserProvider.jsx
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
 - **Project convention documents (CLAUDE.md, frontend skills, THEME, README)** — claude, 7th_sense_frontend_skills, theme, readme [EXTRACTED 1.00]
-- **Dark/light dual theme system** — theme_design_tokens, theme_light_theme_second_build, theme_theme_switching, 7thsense_ui_review [INFERRED 0.85]
 - **Customer-scoped master data with role-based access** — claude_masters_customer_pattern, claude_role_based_access, claude_production_schedule, claude_licence_keys, claude_shifts_breaks [INFERRED 0.85]
+- **Dark/light dual theme system** — theme_design_tokens, theme_light_theme_second_build, theme_theme_switching, 7thsense_ui_review [INFERRED 0.85]
 
-## Communities (40 total, 6 thin omitted)
+## Communities (36 total, 1 thin omitted)
 
 ### Community 0 - "Shared Table & Modal Components"
+Cohesion: 0.05
+Nodes (127): react-bootstrap, react-router-dom, ConfirmModal(), Loader(), ARIA_SORT, SortableHead(), pageItems(), TablePagination() (+119 more)
+
+### Community 1 - "CityFormModal.jsx"
+Cohesion: 0.26
+Nodes (13): citySchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCityPayload(), toFormValues(), CityFormModal(), recordShape, createUserCity() (+5 more)
+
+### Community 2 - "LocationFormModal.jsx"
+Cohesion: 0.30
+Nodes (11): INITIAL_VALUES, locationSchema, NAME_MAX_LENGTH, toFormValues(), toLocationPayload(), LocationFormModal(), recordShape, createUserLocation() (+3 more)
+
+### Community 3 - "AddCustomer.jsx"
 Cohesion: 0.06
-Nodes (99): ConfirmModal(), Loader(), ARIA_SORT, SortableHead(), pageItems(), TablePagination(), ALL_MACHINE_ROLES, CUSTOMER_ROLE_ID (+91 more)
+Nodes (81): customerLabel(), ALL_MACHINE_ROLES, CUSTOMER_ROLE_ID, DEFAULT_THEME, ROLE_LABELS, ROLES, THEMES, USER_STATUS (+73 more)
 
-### Community 1 - "Org Customer & Multi-Select"
-Cohesion: 0.05
-Nodes (71): MultiSelectPicker(), summary(), toGroups(), customerLabel(), OrgCustomerField(), ALL_COUNTRIES, byName, findLibraryCountry() (+63 more)
-
-### Community 2 - "Organization List Pages"
-Cohesion: 0.05
-Nodes (74): byName(), CellList(), matchesSearch(), byName(), CityList(), matchesSearch(), byName(), LineList() (+66 more)
-
-### Community 3 - "Locations & Clientele"
-Cohesion: 0.07
-Nodes (67): THEMES, COUNTRIES, DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, ENABLED_COUNTRIES, getCountryCode(), getCountryName(), getDialCode() (+59 more)
-
-### Community 4 - "Shifts, Breaks & Holidays"
-Cohesion: 0.07
-Nodes (55): StatusToggle(), ALL_WEEKDAYS, BREAK_NAME_SUGGESTIONS, HOLIDAY_TYPES, SHIFT_STATUS, WEEKDAYS, breakSchema, INITIAL_VALUES (+47 more)
+### Community 4 - "ShiftFormModal.jsx"
+Cohesion: 0.19
+Nodes (19): clock(), EMPTY_BREAK_ROW, INITIAL_VALUES, MAX_BREAKS, MAX_LENGTH, offset(), shiftSchema(), toFormValues() (+11 more)
 
 ### Community 5 - "Status & Icon Widgets"
-Cohesion: 0.11
-Nodes (31): LiveClock(), CLOCK_TICK_MS, ACTION_ICONS, OrgUserContext, useOrgUser(), BranchRow(), ControllerRow(), dayLabel() (+23 more)
+Cohesion: 0.12
+Nodes (39): prop-types, react, IconAction(), LiveClock(), StatusBadge(), CLOCK_TICK_MS, ACTION_ICONS, MACHINE_STATUS (+31 more)
 
 ### Community 6 - "Parts & Machine Picker"
 Cohesion: 0.10
-Nodes (37): FieldLabel(), AddPart(), byName(), checkDrawing, DrawingUpload(), MachinePicker(), summary(), DRAWING_RULES (+29 more)
+Nodes (39): AddPart(), byName(), checkDrawing, DrawingUpload(), MachinePicker(), summary(), DRAWING_RULES, EMPTY_PROCESS (+31 more)
 
 ### Community 7 - "Machines & Health Sensors"
-Cohesion: 0.09
-Nodes (40): CONTROLLER_VERSION_TYPES, MACHINE_ACCURACIES, MACHINE_HEALTH_ALL, MACHINE_HEALTH_SENSORS, MACHINE_STATUS, MACHINE_SYSTEM_TYPES, SECURITY_MODES, AddMachine() (+32 more)
+Cohesion: 0.05
+Nodes (72): FieldLabel(), CONTROLLER_VERSION_TYPES, MACHINE_ACCURACIES, MACHINE_HEALTH_ALL, MACHINE_HEALTH_SENSORS, MACHINE_SYSTEM_TYPES, SECURITY_MODES, controllerSchema (+64 more)
 
 ### Community 8 - "Branches"
 Cohesion: 0.12
-Nodes (29): BRANCH_STATUS, AddBranch(), labelClass(), branchSchema, COLOR_PICKER_FALLBACK, INITIAL_VALUES, REQUIRED_FIELDS, toBranchPayload() (+21 more)
+Nodes (27): BRANCH_STATUS, AddBranch(), labelClass(), branchSchema, COLOR_PICKER_FALLBACK, INITIAL_VALUES, optional(), REQUIRED_FIELDS (+19 more)
 
 ### Community 9 - "Project Docs & Conventions"
 Cohesion: 0.11
-Nodes (31): Frontend Engineering Agent Configuration, Frontend Anti-Patterns to Avoid, API Integration via Axios apiClient, Form Handling Standard (React Hook Form + Zod), Styling Standards (Bootstrap First, SCSS, No Tailwind), Table Design Standard (Sortable Table Pattern), 7thSense UI/UX & Navigation Review (frozen sim data), AI Insights & Copilot (frozen insights) (+23 more)
+Nodes (22): Frontend Engineering Agent Configuration, API Integration via Axios apiClient, 7thSense UI/UX & Navigation Review (frozen sim data), AI Insights & Copilot (frozen insights), OEE (Availability / Performance / Quality), Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup), CLAUDE.md Project Instructions, API Response Envelope {statusCode, success, message, data} (+14 more)
 
 ### Community 10 - "Date Picker"
-Cohesion: 0.14
-Nodes (28): clamp(), DateCalendar(), DatePicker(), dayLabel, keyToDay(), monthGrid(), monthName, MONTHS (+20 more)
+Cohesion: 0.19
+Nodes (23): clamp(), DateCalendar(), DatePicker(), dayLabel, keyToDay(), monthGrid(), monthName, MONTHS (+15 more)
 
-### Community 11 - "Controllers & Models Catalog"
+### Community 11 - "StateFormModal.jsx"
 Cohesion: 0.14
-Nodes (21): controllerSchema, INITIAL_VALUES, MAX_LENGTH, toControllerPayload(), toFormValues(), ControllerFormModal(), FIELD_HELP, ControllerOptions() (+13 more)
+Nodes (22): country-region-data, MultiSelectPicker(), summary(), toGroups(), ALL_COUNTRIES, byName, findLibraryCountry(), getLibraryStateNames() (+14 more)
 
 ### Community 12 - "Licence Keys"
-Cohesion: 0.17
-Nodes (21): DEFAULT_DURATION, DURATION_VALUES, editSchema, GENERATE_INITIAL_VALUES, generateSchema, LICENCE_DURATIONS, LICENCE_KEY_STATUS, MAX_KEYS (+13 more)
+Cohesion: 0.15
+Nodes (27): @hookform/resolvers, react-hook-form, DEFAULT_DURATION, DURATION_VALUES, editSchema, GENERATE_INITIAL_VALUES, generateSchema, LICENCE_DURATIONS (+19 more)
 
 ### Community 13 - "Production Schedule Form"
-Cohesion: 0.15
-Nodes (22): AddProductionSchedule(), byLabel(), EMPTY_LISTS, ITEM_SELECTS, userLabel(), EMPTY_ITEM, idText(), INITIAL_VALUES (+14 more)
+Cohesion: 0.12
+Nodes (27): AddProductionSchedule(), byLabel(), EMPTY_LISTS, ITEM_SELECTS, userLabel(), EMPTY_ITEM, idText(), INITIAL_VALUES (+19 more)
 
 ### Community 14 - "ESLint Dev Dependencies"
-Cohesion: 0.10
-Nodes (21): eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals, devDependencies, eslint, @eslint/js (+13 more)
+Cohesion: 0.18
+Nodes (11): devDependencies, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals, sass, @types/react (+3 more)
 
 ### Community 15 - "User Guide & Field Help"
-Cohesion: 0.12
-Nodes (15): InfoTooltip(), NAV_SECTIONS, FIELD_HELP, ADD_BRANCH_STEPS, ADD_CUSTOMER_STEPS, COUNTRY_RULES, CUSTOMER_LIST_ACTIONS, FAQ (+7 more)
+Cohesion: 0.13
+Nodes (17): InfoTooltip(), FIELD_HELP, ADD_BRANCH_STEPS, ADD_CUSTOMER_STEPS, COUNTRY_RULES, CUSTOMER_LIST_ACTIONS, FAQ, MODULE_PURPOSE (+9 more)
 
-### Community 16 - "Schedule Jobs & Shift Timing"
-Cohesion: 0.18
-Nodes (17): SHIFT_TYPES, BreakRow(), itemMinutes(), MAX_LENGTH, MAX_QUANTITY, FIELD_HELP, optionShape, ScheduleJobFields() (+9 more)
+### Community 16 - "BreakFormModal.jsx"
+Cohesion: 0.23
+Nodes (13): StatusToggle(), breakSchema, INITIAL_VALUES, MAX_LENGTH, toBreakPayload(), toFormValues(), BreakFormModal(), FIELD_HELP (+5 more)
 
 ### Community 17 - "Runtime Dependencies"
-Cohesion: 0.11
-Nodes (19): axios, bootstrap, country-region-data, @fontsource-variable/roboto, dependencies, axios, bootstrap, country-region-data (+11 more)
+Cohesion: 0.12
+Nodes (16): dependencies, axios, bootstrap, bootstrap-icons, country-region-data, @fontsource-variable/roboto, @hookform/resolvers, libphonenumber-js (+8 more)
 
-### Community 18 - "App Bootstrap & Theme"
-Cohesion: 0.21
-Nodes (15): App(), @/assets/scss/theme-light.scss?inline, DEFAULT_THEME, THEME, useTheme(), applyTheme(), chooseTheme(), forceTheme() (+7 more)
+### Community 18 - "HealthCharts.jsx"
+Cohesion: 0.06
+Nodes (66): recharts, ChartCard(), LEGEND_PROPS, ACTIVE_DOT, ANIMATION_MS, BAR_GAP, BAR_MAX_SIZE, BAR_RADIUS (+58 more)
 
-### Community 19 - "Login & Branding"
-Cohesion: 0.18
-Nodes (11): BrandLogo(), LOGO_MARKUP, Footer(), env, Login(), redirectTarget(), CENTER, LoginBackdrop() (+3 more)
+### Community 19 - "Login.jsx"
+Cohesion: 0.07
+Nodes (46): @/assets/scss/theme-light.scss?inline, BrandLogo(), LOGO_MARKUP, Footer(), AppShell(), MainLayout(), Sidebar(), navLeafShape (+38 more)
 
-### Community 20 - "Sidebar Navigation"
-Cohesion: 0.24
-Nodes (9): AppShell(), Sidebar(), navLeafShape, SidebarItem(), SidebarContext, useSidebar(), filterNavByRole(), hasActiveChild() (+1 more)
+### Community 20 - "HolidayFormModal.jsx"
+Cohesion: 0.20
+Nodes (14): ALL_WEEKDAYS, BREAK_NAME_SUGGESTIONS, HOLIDAY_TYPES, SHIFT_STATUS, SHIFT_TYPES, WEEKDAYS, holidaySchema, INITIAL_VALUES (+6 more)
 
 ### Community 21 - "Time Picker"
-Cohesion: 0.18
-Nodes (13): assignRef(), PickerField(), POPPER_CONFIG, centerOption(), HOURS, MINUTES, TimeColumn(), TimePanel() (+5 more)
+Cohesion: 0.12
+Nodes (22): assignRef(), PickerField(), POPPER_CONFIG, centerOption(), HOURS, MINUTES, TimeColumn(), TimePanel() (+14 more)
 
-### Community 22 - "Routing & Fallback Pages"
-Cohesion: 0.16
-Nodes (10): MainLayout(), AppRoutes(), ComingSoon, guard(), Login, NotFound, PLACEHOLDERS, BUILT_PATHS (+2 more)
+### Community 22 - "ShopFormModal.jsx"
+Cohesion: 0.30
+Nodes (11): INITIAL_VALUES, NAME_MAX_LENGTH, shopSchema, toFormValues(), toShopPayload(), recordShape, ShopFormModal(), createUserShop() (+3 more)
 
-### Community 23 - "Topbar & Responsive Layout"
-Cohesion: 0.31
-Nodes (9): displayName(), Topbar(), BREAKPOINTS, LANGUAGES, STORAGE_KEYS, SidebarProvider(), useMediaQuery(), readStorage() (+1 more)
+### Community 23 - "CountryFormModal.jsx"
+Cohesion: 0.24
+Nodes (12): zod, countrySchema, INITIAL_VALUES, toCountryPayloads(), CountryFormModal(), NOUN, sameName(), createUserCountry() (+4 more)
 
-### Community 24 - "Theme Showcase"
-Cohesion: 0.25
-Nodes (6): EXCEPTIONS, FILTERS, KPIS, MACHINES, TABS, ThemeShowcase
+### Community 24 - "ShiftCard.jsx"
+Cohesion: 0.35
+Nodes (11): itemMinutes(), ScheduleJobFields(), Clock(), minutesBetween(), ShiftCard(), toMinutes(), typeLabel(), clockToMinutes() (+3 more)
 
 ### Community 25 - "jsconfig Aliases"
-Cohesion: 0.29
-Nodes (6): compilerOptions, baseUrl, jsx, paths, include, src
+Cohesion: 0.33
+Nodes (5): compilerOptions, baseUrl, jsx, paths, include
 
-### Community 26 - "Toast Notifications"
-Cohesion: 0.43
-Nodes (5): Toaster(), ICONS, ToastItem(), getToasts(), subscribeToasts()
+### Community 26 - "toast.js"
+Cohesion: 0.11
+Nodes (22): App(), Toaster(), ICONS, ToastItem(), TOAST_DEFAULTS, AuthContext, AuthProvider(), onUnauthorized() (+14 more)
 
 ### Community 27 - "npm Scripts"
 Cohesion: 0.33
 Nodes (6): scripts, build, build:theme, dev, lint, preview
 
-### Community 28 - "Auth Session"
-Cohesion: 0.53
-Nodes (4): AuthContext, AuthProvider(), onUnauthorized(), refreshUserTheme()
-
-### Community 29 - "Package Metadata"
-Cohesion: 0.40
-Nodes (4): name, private, type, version
+### Community 29 - "package.json"
+Cohesion: 0.12
+Nodes (18): name, private, type, version, axios, bootstrap, bootstrap-icons, eslint (+10 more)
 
 ### Community 30 - "Seven Logo Asset"
 Cohesion: 0.67
 Nodes (4): 7th Sense Logo (seven-logo.svg), 7th Sense Brand Identity, Brand Orange #f7941d, Stylized '7' Line Mark (nested strokes with dot accents)
 
-### Community 31 - "Production Schedule List"
-Cohesion: 0.67
-Nodes (4): matchesSearch(), ProductionScheduleList(), scheduleDates(), deleteProductionSchedule()
+### Community 31 - "LineFormModal.jsx"
+Cohesion: 0.28
+Nodes (12): INITIAL_VALUES, lineSchema, NAME_MAX_LENGTH, toFormValues(), toLinePayload(), LineFormModal(), recordShape, createUserLine() (+4 more)
 
 ### Community 32 - "Login Logo Asset"
 Cohesion: 0.67
 Nodes (3): 7th Sense Brand Orange (#f79420 / #f7941d), 7th Sense Login Logo (SVG), Stylized Orange '7' Line Mark (#f79420)
+
+### Community 33 - "vite.config.js"
+Cohesion: 0.29
+Nodes (4): vite, @vitejs/plugin-react, __dirname, SASS_SILENCED
+
+### Community 34 - "SupervisorFormModal.jsx"
+Cohesion: 0.26
+Nodes (14): INITIAL_VALUES, NAME_MAX_LENGTH, supervisorSchema, toFormValues(), toSupervisorPayload(), recordShape, SupervisorFormModal(), withQuery() (+6 more)
+
+### Community 35 - "CellFormModal.jsx"
+Cohesion: 0.28
+Nodes (12): OrgCustomerField(), cellSchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCellPayload(), toFormValues(), CellFormModal(), recordShape (+4 more)
 
 ## Ambiguous Edges - Review These
 - `Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup)` → `Production Schedule (Single/Multiple Day jobs)`  [AMBIGUOUS]
   CLAUDE.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **102 isolated node(s):** `baseUrl`, `jsx`, `paths`, `src`, `name` (+97 more)
-  These have ≤1 connection - possible missing edges or undocumented components.
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 isolated node(s):** `bootstrap`, `@types/react`, `@types/react-dom`, `eslint`, `sass` (+5 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 140 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `react` connect `Status & Icon Widgets` to `Shared Table & Modal Components`, `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `Date Picker`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`, `apiClient`?**
+  _High betweenness centrality (0.181) - this node is a cross-community bridge._
+- **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
+  _10 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Shared Table & Modal Components` be split into smaller, more focused modules?**
+  _Cohesion score 0.05314009661835749 - nodes in this community are weakly interconnected._
+- **Why does `react-bootstrap` connect `Shared Table & Modal Components` to `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Status & Icon Widgets`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`?**
+  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+- **Should `AddCustomer.jsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.06459078476751526 - nodes in this community are weakly interconnected._
+- **Why does `prop-types` connect `Status & Icon Widgets` to `Shared Table & Modal Components`, `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Date Picker`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`?**
+  _High betweenness centrality (0.089) - this node is a cross-community bridge._
+
+### Low-confidence Hints
+_AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
+
 - **What is the exact relationship between `Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup)` and `Production Schedule (Single/Multiple Day jobs)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `toast` connect `Shared Table & Modal Components` to `Org Customer & Multi-Select`, `Locations & Clientele`, `Shifts, Breaks & Holidays`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `Controllers & Models Catalog`, `Licence Keys`, `Production Schedule Form`, `Login & Branding`, `Topbar & Responsive Layout`, `Theme Showcase`, `Toast Notifications`, `Auth Session`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
-- **Why does `withQuery()` connect `Organization List Pages` to `Shared Table & Modal Components`, `Locations & Clientele`, `Shifts, Breaks & Holidays`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Licence Keys`, `Production Schedule Form`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `useAuth()` connect `Shared Table & Modal Components` to `Locations & Clientele`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `Production Schedule Form`, `Login & Branding`, `Sidebar Navigation`, `Topbar & Responsive Layout`, `Production Schedule List`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
-- **What connects `baseUrl`, `jsx`, `paths` to the rest of the system?**
-  _102 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Shared Table & Modal Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.06464542651593011 - nodes in this community are weakly interconnected._
-- **Should `Org Customer & Multi-Select` be split into smaller, more focused modules?**
-  _Cohesion score 0.053235653235653234 - nodes in this community are weakly interconnected._

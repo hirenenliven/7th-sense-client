@@ -45,6 +45,13 @@ $ts-blue:      #5aa9e6 !default;
 $ts-violet:    #9085e9 !default;
 $ts-neutral:   #9b9a90 !default;
 
+// Chart series (components/charts, Recharts): categorical colours in this fixed order, never cycled.
+// Checked for colour-blind separation and contrast on $ts-panel (light values: _tokens-light.scss).
+$ts-chart-1:   #4f9bd6 !default; // blue
+$ts-chart-2:   #dc6c12 !default; // orange
+$ts-chart-3:   #8a7de0 !default; // violet
+$ts-chart-4:   #1f9e8f !default; // teal
+
 // Tint strengths used for soft backgrounds
 $ts-tint-row:    8%;  // highlighted table row
 $ts-tint-soft:   14%; // soft badges / subtle bg
@@ -182,6 +189,13 @@ $ts-control-h:     ts-rem(34);
 
 $ts-transition: .12s ease;
 
+// Charts (components/charts, Machine Health)
+$ts-chart-height:      ts-rem(260);
+$ts-chart-height-lg:   ts-rem(300); // sensor trend with its range slider
+$ts-chart-swatch-size: ts-rem(8);   // series dot in a chart tooltip
+$ts-chart-tooltip-min: ts-rem(150);
+$ts-gauge-max-width:   ts-rem(320); // speedometer
+
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
 $ts-login-bg:        #15181d !default; // page behind the rings
 $ts-login-ring:      #232a35 !default; // ring arcs
@@ -220,6 +234,10 @@ $ts-tokens: (
   "blue": $ts-blue,
   "violet": $ts-violet,
   "neutral": $ts-neutral,
+  "chart-1": $ts-chart-1,
+  "chart-2": $ts-chart-2,
+  "chart-3": $ts-chart-3,
+  "chart-4": $ts-chart-4,
   "radius": $ts-radius,
   "radius-lg": $ts-radius-lg,
   "shadow-hover": $ts-shadow-hover,

@@ -33,6 +33,12 @@ $ts-blue:      #2b7bbf;
 $ts-violet:    #6a5cd0;
 $ts-neutral:   #77756c;
 
+// Chart series (same order as the dark tokens; checked on white)
+$ts-chart-1:   #2b7bbf;
+$ts-chart-2:   #e0700f;
+$ts-chart-3:   #6a5cd0;
+$ts-chart-4:   #0b8f80;
+
 // Shadows and overlays are lighter on a light page
 $ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .08);
 $ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .12);
