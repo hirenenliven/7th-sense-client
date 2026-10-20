@@ -6,12 +6,12 @@
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 1124 nodes · 4310 edges · 36 communities (35 shown, 1 thin omitted)
+- 1124 nodes · 4302 edges · 36 communities (35 shown, 1 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 75 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `49f38982`
+- Built from commit: `9463e478`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -57,13 +57,13 @@
 1. `react` - 105 edges
 2. `react-bootstrap` - 78 edges
 3. `prop-types` - 77 edges
-4. `Loader()` - 63 edges
+4. `Loader()` - 61 edges
 5. `withQuery()` - 60 edges
 6. `useOrgUser()` - 55 edges
 7. `sharedGet()` - 51 edges
 8. `toast` - 48 edges
-9. `useAuth()` - 45 edges
-10. `ConfirmModal()` - 41 edges
+9. `useAuth()` - 43 edges
+10. `ConfirmModal()` - 40 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `loadCustomers()` --calls--> `getUsers()`  [EXTRACTED]
@@ -74,8 +74,8 @@
   CLAUDE.md → 7thsense-ui-review.html
 - `Form Handling Standard (React Hook Form + Zod)` --conceptually_related_to--> `CLAUDE.md Project Instructions`  [INFERRED]
   7th-sense-frontend-skills.md → CLAUDE.md
-- `App()` --calls--> `OrgUserProvider()`  [EXTRACTED]
-  src/App.jsx → src/context/OrgUserProvider.jsx
+- `MachineTimeChart` --indirect_call--> `formatHours()`  [INFERRED]
+  src/pages/MachineHealth/HealthCharts.jsx → src/pages/MachineHealth/healthSensors.js
 
 ## Import Cycles
 - None detected.
@@ -240,17 +240,17 @@ Nodes (12): OrgCustomerField(), cellSchema, INITIAL_VALUES, NAME_MAX_LENGTH, toC
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `Status & Icon Widgets` to `Shared Table & Modal Components`, `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `Date Picker`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`, `apiClient`?**
-  _High betweenness centrality (0.181) - this node is a cross-community bridge._
+  _High betweenness centrality (0.177) - this node is a cross-community bridge._
 - **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
   _10 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Shared Table & Modal Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.05314009661835749 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05268000920174833 - nodes in this community are weakly interconnected._
 - **Why does `react-bootstrap` connect `Shared Table & Modal Components` to `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Status & Icon Widgets`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Branches`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+  _High betweenness centrality (0.089) - this node is a cross-community bridge._
 - **Should `AddCustomer.jsx` be split into smaller, more focused modules?**
   _Cohesion score 0.06459078476751526 - nodes in this community are weakly interconnected._
 - **Why does `prop-types` connect `Status & Icon Widgets` to `Shared Table & Modal Components`, `CityFormModal.jsx`, `LocationFormModal.jsx`, `AddCustomer.jsx`, `ShiftFormModal.jsx`, `Parts & Machine Picker`, `Machines & Health Sensors`, `Date Picker`, `StateFormModal.jsx`, `Licence Keys`, `Production Schedule Form`, `User Guide & Field Help`, `BreakFormModal.jsx`, `HealthCharts.jsx`, `Login.jsx`, `HolidayFormModal.jsx`, `Time Picker`, `ShopFormModal.jsx`, `CountryFormModal.jsx`, `ShiftCard.jsx`, `toast.js`, `package.json`, `LineFormModal.jsx`, `SupervisorFormModal.jsx`, `CellFormModal.jsx`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
