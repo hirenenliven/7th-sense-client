@@ -1428,21 +1428,21 @@
     "semantic_hash": ""
   },
   "src/i18n/locales/de.json": {
-    "mtime": 1792563012.4282334,
-    "seen": 1792563073.1126935,
-    "ast_hash": "624ffd4923703b042dba5c94e155b967",
+    "mtime": 1792563139.5598283,
+    "seen": 1792563183.1690826,
+    "ast_hash": "b7f3882a7bfebb9e0137606f9e7cd0ff",
     "semantic_hash": ""
   },
   "src/i18n/locales/fr.json": {
-    "mtime": 1792563012.436087,
-    "seen": 1792563073.1126947,
-    "ast_hash": "21bec4e386e1acc2d0482c808eade1a5",
+    "mtime": 1792563139.5635355,
+    "seen": 1792563183.1690848,
+    "ast_hash": "c0fd1d1796001c716a57099d0b317cb7",
     "semantic_hash": ""
   },
   "src/i18n/locales/it.json": {
-    "mtime": 1792563012.4430282,
-    "seen": 1792563073.1126966,
-    "ast_hash": "6961d1ee5d5b3a917f2e066cd1633391",
+    "mtime": 1792563139.569573,
+    "seen": 1792563183.1690862,
+    "ast_hash": "1d9c4838395144973723c698f61040b9",
     "semantic_hash": ""
   },
   "scripts/i18n.mjs": {
