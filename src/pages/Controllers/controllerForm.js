@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches the controllers columns (dto/controller_dto.go, dto/catalog_dto.go)
 export const MAX_LENGTH = {
@@ -13,9 +14,9 @@ export const INITIAL_VALUES = {
 }
 
 export const controllerSchema = z.object({
-  brandId: z.string().min(1, 'Brand is required'),
-  name: z.string().trim().min(1, 'Controller name is required').max(MAX_LENGTH.name, 'Name is too long'),
-  description: z.string().trim().max(MAX_LENGTH.description, 'Description is too long'),
+  brandId: z.string().min(1, tk('Brand is required')),
+  name: z.string().trim().min(1, tk('Controller name is required')).max(MAX_LENGTH.name, tk('Name is too long')),
+  description: z.string().trim().max(MAX_LENGTH.description, tk('Description is too long')),
 })
 
 // ---------------------------------------------------------------------------

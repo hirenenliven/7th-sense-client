@@ -9,6 +9,7 @@
 // <Toaster /> (mounted once in App.jsx) renders the queue.
 
 import { TOAST_DEFAULTS } from '@/constants/app'
+import i18n from '@/i18n'
 
 const listeners = new Set()
 let toasts = []
@@ -43,7 +44,7 @@ const show = (type, message, options = {}) => {
     id,
     type,
     message,
-    title: options.title ?? TOAST_DEFAULTS.titles[type],
+    title: options.title ?? i18n.t(TOAST_DEFAULTS.titles[type]),
     duration: options.duration ?? TOAST_DEFAULTS.duration[type],
     leaving: false,
     seq: nextId, // new seq on replace → remount → timer restarts

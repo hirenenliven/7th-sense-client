@@ -40,6 +40,7 @@ import {
   statusOf,
 } from './healthSensors'
 import SensorTrendCard from './SensorTrendCard'
+import { useTranslation } from 'react-i18next'
 
 // Coloured left edge on a tile whose reading needs attention
 const KPI_EDGE = { warning: 'card-status-warning', critical: 'card-status-danger' }
@@ -82,6 +83,7 @@ const machineLabel = (machine, withCustomer) =>
 // link; the first machine otherwise). Today's KPI tiles, then charts that each have a date filter (one
 // day or a range). Readings are SAMPLE data (healthSampleData.js) until the server has a sensor API.
 function MachineHealth() {
+  const { t } = useTranslation()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -197,17 +199,17 @@ function MachineHealth() {
   )
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading machines…" />
+    if (loading) return <Loader text={t('Loading machines…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load machines.</b> {error}
+            <b>{t('Could not load machines.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -218,9 +220,9 @@ function MachineHealth() {
         <Card>
           <Card.Body className="ts-empty">
             <i className="bi bi-heart-pulse ts-empty-icon" aria-hidden="true" />
-            <p className="mb-2">No machines to show health for.</p>
+            <p className="mb-2">{t('No machines to show health for.')}</p>
             <Button as={Link} to={ROUTES.MACHINES} size="sm" variant="ghost">
-              All Machines
+              {t('All Machines')}
             </Button>
           </Card.Body>
         </Card>
@@ -232,7 +234,7 @@ function MachineHealth() {
         <Alert variant="info" className="d-flex align-items-center gap-2">
           <i className="bi bi-info-circle" aria-hidden="true" />
           <span>
-            <b>Sample data.</b> These charts show example readings until live sensor data is connected.
+            <b>{t('Sample data.')}</b> These charts show example readings until live sensor data is connected.
           </span>
         </Alert>
 
@@ -263,8 +265,8 @@ function MachineHealth() {
         <Row xs={1} xl={3} className="g-3 mb-3">
           <Col>
             <ChartCard
-              title="Spindle Load"
-              subtitle={dates.load === today ? 'Speedometer · now' : 'Speedometer · end of day'}
+              title={t('Spindle Load')}
+              subtitle={dates.load === today ? t('Speedometer · now') : t('Speedometer · end of day')}
               icon="bi-speedometer2"
               actions={dateFilter('load', 'Spindle load')}
             >
@@ -290,7 +292,7 @@ function MachineHealth() {
           </Col>
           <Col>
             <ChartCard
-              title="Machine Time"
+              title={t('Machine Time')}
               subtitle="Donut · hours per state"
               icon="bi-pie-chart"
               actions={dateFilter('machineTime', 'Machine time')}
@@ -300,7 +302,7 @@ function MachineHealth() {
           </Col>
           <Col>
             <ChartCard
-              title="Subsystem Health"
+              title={t('Subsystem Health')}
               subtitle="Radar · score out of 100"
               icon="bi-bullseye"
               actions={dateFilter('subsystems', 'Subsystem health')}
@@ -321,7 +323,7 @@ function MachineHealth() {
         <Row xs={1} xl={2} className="g-3 mb-3">
           <Col>
             <ChartCard
-              title="Temperatures by Hour"
+              title={t('Temperatures by Hour')}
               subtitle="Grouped bar · four sensors every 3 hours"
               icon="bi-bar-chart"
               actions={dateFilter('temperatures', 'Temperatures')}
@@ -331,7 +333,7 @@ function MachineHealth() {
           </Col>
           <Col>
             <ChartCard
-              title="Machine Time by Day"
+              title={t('Machine Time by Day')}
               subtitle="Stacked bar · 24 h per day"
               icon="bi-bar-chart-steps"
               actions={dateFilter('machineTimeByDay', 'Machine time by day')}
@@ -351,7 +353,7 @@ function MachineHealth() {
         <Row xs={1} xl={2} className="g-3">
           <Col>
             <ChartCard
-              title="Spindle Run Hours Growth"
+              title={t('Spindle Run Hours Growth')}
               subtitle="Area · running total over the range"
               icon="bi-graph-up-arrow"
               actions={dateFilter('runHoursGrowth', 'Run hours growth')}
@@ -361,7 +363,7 @@ function MachineHealth() {
           </Col>
           <Col>
             <ChartCard
-              title="Daily Spindle Run Hours"
+              title={t('Daily Spindle Run Hours')}
               subtitle="Bar + line · with 7-day average"
               icon="bi-graph-up"
               actions={dateFilter('runHoursDaily', 'Daily run hours')}
@@ -386,8 +388,8 @@ function MachineHealth() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Operations · Machines</div>
-          <h1>Machine Health</h1>
+          <div className="ts-eyebrow">{t('Operations · Machines')}</div>
+          <h1>{t('Machine Health')}</h1>
           <p className="ts-page-subtitle">
             {machine ? `${machine.name}: sensor readings, limits and trends.` : 'Sensor readings, limits and trends of a machine.'}
           </p>
@@ -398,7 +400,7 @@ function MachineHealth() {
               className="w-auto"
               value={selectedId ?? ''}
               onChange={(event) => setSearchParams({ machineId: event.target.value })}
-              aria-label="Machine"
+              aria-label={t('Machine')}
             >
               {machines.map((item) => (
                 <option key={item.id} value={item.id}>

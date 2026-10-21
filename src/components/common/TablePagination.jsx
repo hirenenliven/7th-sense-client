@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { Form, Pagination } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { PAGE_SIZES } from '@/constants/app'
 
 // Up to this many pages every number is shown; above it, first · … · neighbours · … · last
@@ -24,6 +25,7 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
   const first = totalCount ? (page - 1) * pageSize + 1 : 0
   const last = Math.min(page * pageSize, totalCount)
   const [jumpTo, setJumpTo] = useState('')
+  const { t } = useTranslation()
   const id = useId()
 
   const goTo = (target) => onPageChange(Math.min(Math.max(1, target), pageCount))
@@ -41,14 +43,14 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
         {onPageSizeChange && (
           <div className="ts-page-size">
             <Form.Label htmlFor={`${id}-size`} className="mb-0 d-none d-sm-inline">
-              Rows per page
+              {t('Rows per page')}
             </Form.Label>
             <Form.Select
               id={`${id}-size`}
               size="sm"
               value={pageSize}
               onChange={(event) => onPageSizeChange(Number(event.target.value))}
-              aria-label="Rows per page"
+              aria-label={t('Rows per page')}
             >
               {pageSizes.map((size) => (
                 <option key={size} value={size}>
@@ -62,15 +64,15 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
           <span className="text-body">
             {first}–{last}
           </span>{' '}
-          of {totalCount}
+          {t('of {{total}}', { total: totalCount })}
         </span>
       </div>
 
       {pageCount > 1 && (
         <div className="ts-table-footer-nav">
-          <nav aria-label="Pagination">
+          <nav aria-label={t('Pagination')}>
             <Pagination size="sm" className="ts-pager">
-              <Pagination.Prev onClick={() => goTo(page - 1)} disabled={page === 1} aria-label="Previous page">
+              <Pagination.Prev onClick={() => goTo(page - 1)} disabled={page === 1} aria-label={t('Previous page')}>
                 <i className="bi bi-chevron-left" aria-hidden="true" />
               </Pagination.Prev>
               {pageItems(page, pageCount).map((item) =>
@@ -80,7 +82,7 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
                     className="d-none d-sm-block"
                     active={item === page}
                     onClick={() => goTo(item)}
-                    aria-label={`Page ${item}`}
+                    aria-label={t('Page {{page}}', { page: item })}
                   >
                     {item}
                   </Pagination.Item>
@@ -89,9 +91,9 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
                 ),
               )}
               <li className="ts-pager-status d-sm-none font-tabular">
-                Page {page} of {pageCount}
+                {t('Page {{page}} of {{pages}}', { page, pages: pageCount })}
               </li>
-              <Pagination.Next onClick={() => goTo(page + 1)} disabled={page === pageCount} aria-label="Next page">
+              <Pagination.Next onClick={() => goTo(page + 1)} disabled={page === pageCount} aria-label={t('Next page')}>
                 <i className="bi bi-chevron-right" aria-hidden="true" />
               </Pagination.Next>
             </Pagination>
@@ -100,7 +102,7 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
           {pageCount > MAX_PLAIN_PAGES && (
             <Form className="ts-page-jump d-none d-md-flex" onSubmit={handleJump}>
               <Form.Label htmlFor={`${id}-jump`} className="mb-0 text-nowrap">
-                Go to
+                {t('Go to')}
               </Form.Label>
               <Form.Control
                 id={`${id}-jump`}
@@ -112,7 +114,7 @@ function TablePagination({ page, pageSize, totalCount, onPageChange, onPageSizeC
                 placeholder={String(page)}
                 value={jumpTo}
                 onChange={(event) => setJumpTo(event.target.value)}
-                aria-label={`Go to page (1 to ${pageCount})`}
+                aria-label={t('Go to page (1 to {{pages}})', { pages: pageCount })}
               />
             </Form>
           )}

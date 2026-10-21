@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { DURATION_PATTERN, DURATION_ZERO, durationToSeconds, secondsToDuration } from '@/utils/dateTime'
+import { tk, tkv } from '@/i18n/tk'
 
 // Lengths of the parts columns (dto/part_dto.go, migration 016)
 export const MAX_LENGTH = {
@@ -49,56 +50,57 @@ export const INITIAL_VALUES = {
   processes: [EMPTY_PROCESS],
 }
 
-const durationText = (label) => z.string().trim().regex(DURATION_PATTERN, `${label}: use H:MM:SS, e.g. 1:30:00`)
+// message: tk('<Field>: use H:MM:SS, e.g. 1:30:00')
+const durationText = (message) => z.string().trim().regex(DURATION_PATTERN, message)
 
 const subProgramSchema = z.object({
-  name: z.string().trim().min(1, 'Sub program name is required').max(MAX_LENGTH.subProgramName, 'Name is too long'),
-  cycleTime: durationText('Cycle time'),
+  name: z.string().trim().min(1, tk('Sub program name is required')).max(MAX_LENGTH.subProgramName, tk('Name is too long')),
+  cycleTime: durationText(tk('Cycle time: use H:MM:SS, e.g. 1:30:00')),
 })
 
 const processSchema = z
   .object({
     processId: z.number().nullable(),
-    process: z.string().trim().min(1, 'Process is required').max(MAX_LENGTH.processText, 'Process is too long'),
-    programName: z.string().trim().min(1, 'Program name is required').max(MAX_LENGTH.processText, 'Program name is too long'),
-    machineIds: z.array(z.number()).min(1, 'Select at least one machine'),
-    drawingNo: z.string().trim().min(1, 'Drawing no. is required').max(MAX_LENGTH.processText, 'Drawing no. is too long'),
+    process: z.string().trim().min(1, tk('Process is required')).max(MAX_LENGTH.processText, tk('Process is too long')),
+    programName: z.string().trim().min(1, tk('Program name is required')).max(MAX_LENGTH.processText, tk('Program name is too long')),
+    machineIds: z.array(z.number()).min(1, tk('Select at least one machine')),
+    drawingNo: z.string().trim().min(1, tk('Drawing no. is required')).max(MAX_LENGTH.processText, tk('Drawing no. is too long')),
     drawingRevisionNo: z
       .string()
       .trim()
-      .min(1, 'Drawing revision no. is required')
-      .max(MAX_LENGTH.processText, 'Revision no. is too long'),
+      .min(1, tk('Drawing revision no. is required'))
+      .max(MAX_LENGTH.processText, tk('Revision no. is too long')),
     drawingFile: z.string(),
     drawingName: z.string(),
     drawingUpload: z.custom((value) => value === null || value instanceof File).nullable(),
-    accuracyId: z.string().min(1, 'Machine accuracy level is required'),
-    setupTime: durationText('Setup time'),
-    cycleTime: durationText('Cycle time').refine((value) => durationToSeconds(value) > 0, 'Cycle time must be more than 0:00:00'),
-    loadingTime: durationText('Loading / unloading time'),
+    accuracyId: z.string().min(1, tk('Machine accuracy level is required')),
+    setupTime: durationText(tk('Setup time: use H:MM:SS, e.g. 1:30:00')),
+    cycleTime: durationText(tk('Cycle time: use H:MM:SS, e.g. 1:30:00')).refine((value) => durationToSeconds(value) > 0, tk('Cycle time must be more than 0:00:00')),
+    loadingTime: durationText(tk('Loading / unloading time: use H:MM:SS, e.g. 1:30:00')),
     hasSubProgram: z.boolean(),
-    subPrograms: z.array(subProgramSchema).max(MAX_SUB_PROGRAMS, `Up to ${MAX_SUB_PROGRAMS} sub programs`),
+    subPrograms: z.array(subProgramSchema).max(MAX_SUB_PROGRAMS, tkv('Up to {{n}} sub programs', { n: MAX_SUB_PROGRAMS })),
   })
   .superRefine((process, ctx) => {
     if (!process.drawingFile && !process.drawingUpload) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Part drawing (PDF) is required', path: ['drawingFile'] })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: tk('Part drawing (PDF) is required'), path: ['drawingFile'] })
     }
     if (process.hasSubProgram && !process.subPrograms.length) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Add at least one sub program', path: ['subPrograms'] })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: tk('Add at least one sub program'), path: ['subPrograms'] })
     }
   })
 
 // Mirrors the parts API rules (dto/part_dto.go)
 export const partSchema = z.object({
-  userId: z.string().min(1, 'Customer is required'),
-  clienteleId: z.string().min(1, 'Clientele is required'),
-  partNo: z.string().trim().min(1, 'Part no. is required').max(MAX_LENGTH.partNo, 'Part no. is too long'),
-  partName: z.string().trim().min(1, 'Part name is required').max(MAX_LENGTH.partName, 'Part name is too long'),
+  userId: z.string().min(1, tk('Customer is required')),
+  clienteleId: z.string().min(1, tk('Clientele is required')),
+  partNo: z.string().trim().min(1, tk('Part no. is required')).max(MAX_LENGTH.partNo, tk('Part no. is too long')),
+  partName: z.string().trim().min(1, tk('Part name is required')).max(MAX_LENGTH.partName, tk('Part name is too long')),
   partCount: z
     .string()
     .trim()
-    .refine((value) => /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= MAX_PART_COUNT, `Part count is 1–${MAX_PART_COUNT}`),
+    .refine((value) => /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= MAX_PART_COUNT, tkv('Part count is 1–{{n}}', { n: MAX_PART_COUNT })),
   status: z.enum([PART_STATUS.ACTIVE, PART_STATUS.INACTIVE]),
-  processes: z.array(processSchema).min(1, 'Add at least one process').max(MAX_PROCESSES, `Up to ${MAX_PROCESSES} processes`),
+  processes: z.array(processSchema).min(1, tk('Add at least one process')).max(MAX_PROCESSES, tkv('Up to {{n}} processes', { n: MAX_PROCESSES })),
 })
 
 // ---------------------------------------------------------------------------

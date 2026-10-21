@@ -4,9 +4,11 @@ import IconAction from '@/components/common/IconAction'
 import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 // A country is only assigned and removed (superadmin), so the row has a delete action only
 function CountryRow({ country, onDelete }) {
+  const { t } = useTranslation()
   const { canAssign, customerLabel } = useOrgUser()
   return (
     <tr>
@@ -16,7 +18,7 @@ function CountryRow({ country, onDelete }) {
       <td className="text-body-secondary text-nowrap">{formatDate(country.updatedAt)}</td>
       {canAssign && (
         <td className="border-start">
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${country.name}`} onClick={() => onDelete(country)} />
+          <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: country.name })} onClick={() => onDelete(country)} />
         </td>
       )}
     </tr>

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { HOLIDAY_TYPES, SHIFT_STATUS, WEEKDAYS } from '@/constants/shifts'
@@ -12,15 +12,44 @@ import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import { INITIAL_VALUES, MAX_LENGTH, holidaySchema, toFormValues, toHolidayPayload } from './holidayForm'
 import { FIELD_HELP } from './holidayHelp'
+import { useTranslation } from 'react-i18next'
+import { tk } from '@/i18n/tk'
 
 const KINDS = [
-  { value: HOLIDAY_TYPES.HOLIDAY, label: 'Holiday' },
-  { value: HOLIDAY_TYPES.WEEK_OFF, label: 'Week Off' },
+  { value: HOLIDAY_TYPES.HOLIDAY, label: tk('Holiday') },
+  { value: HOLIDAY_TYPES.WEEK_OFF, label: tk('Week Off') },
 ]
+
+// Whole sentences per kind (languages with grammatical gender cannot build them from one noun)
+const KIND_TEXT = {
+  [HOLIDAY_TYPES.HOLIDAY]: {
+    added: tk('Holiday has been added.'),
+    updated: tk('Holiday has been updated.'),
+    createdTitle: tk('Holiday created'),
+    updatedTitle: tk('Holiday updated'),
+    saveFailed: tk('Could not save holiday'),
+    add: tk('Add Holiday'),
+    edit: tk('Edit Holiday'),
+    save: tk('Save Holiday'),
+    update: tk('Update Holiday'),
+  },
+  [HOLIDAY_TYPES.WEEK_OFF]: {
+    added: tk('Week off has been added.'),
+    updated: tk('Week off has been updated.'),
+    createdTitle: tk('Week off created'),
+    updatedTitle: tk('Week off updated'),
+    saveFailed: tk('Could not save week off'),
+    add: tk('Add Week Off'),
+    edit: tk('Edit Week Off'),
+    save: tk('Save Week Off'),
+    update: tk('Update Week Off'),
+  },
+}
 
 // Add / Edit Holiday or Week Off modal: adds one, or edits `holiday` (a list row). The superadmin picks the
 // customer; a customer or admin always saves to their own company.
 function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompanyId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(holiday)
   const emptyValues = canPickCustomer ? INITIAL_VALUES : { ...INITIAL_VALUES, userId: ownCompanyId ? String(ownCompanyId) : '' }
 
@@ -33,7 +62,7 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
   } = useForm({ resolver: zodResolver(holidaySchema), defaultValues: emptyValues })
   const [holidayType, startDate] = useWatch({ control, name: ['holidayType', 'startDate'] })
   const isWeekOff = holidayType === HOLIDAY_TYPES.WEEK_OFF
-  const kindLabel = isWeekOff ? 'Week Off' : 'Holiday'
+  const text = KIND_TEXT[isWeekOff ? HOLIDAY_TYPES.WEEK_OFF : HOLIDAY_TYPES.HOLIDAY]
 
   // Fresh values every time the modal opens: the row being edited, or an empty form
   useEffect(() => {
@@ -45,18 +74,18 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
     try {
       const payload = toHolidayPayload(values, isEdit)
       const saved = isEdit ? await updateHoliday(holiday.id, payload) : await createHoliday(payload)
-      toast.success(`${kindLabel} has been ${isEdit ? 'updated' : 'added'}.`, { title: `${kindLabel} ${isEdit ? 'updated' : 'created'}` })
+      toast.success(t(isEdit ? text.updated : text.added), { title: t(isEdit ? text.updatedTitle : text.createdTitle) })
       onSaved(saved, isEdit)
     } catch (error) {
-      toast.error(error.message, { title: `Could not save ${kindLabel.toLowerCase()}` })
+      toast.error(error.message, { title: t(text.saveFailed) })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? `Edit ${kindLabel}` : `Add ${kindLabel}`}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={t(isEdit ? text.edit : text.add)}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? `Edit ${kindLabel}` : `Add ${kindLabel}`}</Modal.Title>
+          <Modal.Title>{t(isEdit ? text.edit : text.add)}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -64,10 +93,10 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
             {canPickCustomer && (
               <Form.Group as={Col} xs={12} controlId="holiday-userId">
                 <FieldLabel required help={FIELD_HELP.userId}>
-                  Customer Name
+                  {t('Customer Name')}
                 </FieldLabel>
                 <Form.Select {...register('userId')} isInvalid={Boolean(errors.userId)}>
-                  <option value="">{customers.length ? 'Select Customer' : 'No customers yet'}</option>
+                  <option value="">{customers.length ? t('Select Customer') : t('No customers yet')}</option>
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -80,16 +109,16 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
 
             <Form.Group as={Col} xs={12}>
               <FieldLabel required help={FIELD_HELP.holidayType}>
-                Type
+                {t('Type')}
               </FieldLabel>
-              <div role="radiogroup" className="ts-radio-group" aria-label="Holiday or week off">
+              <div role="radiogroup" className="ts-radio-group" aria-label={t('Holiday or week off')}>
                 {KINDS.map((kind) => (
                   <Form.Check
                     key={kind.value}
                     inline
                     type="radio"
                     id={`holiday-type-${kind.value}`}
-                    label={kind.label}
+                    label={t(kind.label)}
                     value={kind.value}
                     {...register('holidayType')}
                   />
@@ -100,32 +129,32 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
             {isWeekOff ? (
               <>
                 <Form.Group as={Col} sm={6} controlId="holiday-weekDay">
-                  <Form.Label className="required">Day</Form.Label>
+                  <Form.Label className="required">{t('Day')}</Form.Label>
                   <Form.Select {...register('weekDay')} isInvalid={Boolean(errors.weekDay)}>
-                    <option value="">Select Day</option>
+                    <option value="">{t('Select Day')}</option>
                     {WEEKDAYS.map((day) => (
                       <option key={day.id} value={day.id}>
-                        {day.label}
+                        {t(day.label)}
                       </option>
                     ))}
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">{errors.weekDay?.message}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} sm={6} controlId="holiday-name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder="Week off" isInvalid={Boolean(errors.name)} />
+                  <Form.Label>{t('Name')}</Form.Label>
+                  <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder={t('Week off')} isInvalid={Boolean(errors.name)} />
                   <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
                 </Form.Group>
               </>
             ) : (
               <>
                 <Form.Group as={Col} xs={12} controlId="holiday-name">
-                  <Form.Label className="required">Holiday Name</Form.Label>
-                  <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder="Diwali" isInvalid={Boolean(errors.name)} />
+                  <Form.Label className="required">{t('Holiday Name')}</Form.Label>
+                  <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder={t('Diwali')} isInvalid={Boolean(errors.name)} />
                   <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} sm={6} controlId="holiday-startDate">
-                  <Form.Label className="required">Start Date</Form.Label>
+                  <Form.Label className="required">{t('Start Date')}</Form.Label>
                   <Controller
                     name="startDate"
                     control={control}
@@ -134,7 +163,7 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
                   {errors.startDate && <div className="invalid-feedback d-block">{errors.startDate.message}</div>}
                 </Form.Group>
                 <Form.Group as={Col} sm={6} controlId="holiday-endDate">
-                  <Form.Label className="required">End Date</Form.Label>
+                  <Form.Label className="required">{t('End Date')}</Form.Label>
                   <Controller
                     name="endDate"
                     control={control}
@@ -149,7 +178,7 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
 
             {isEdit && (
               <Form.Group as={Col} xs={12}>
-                <Form.Label className="required">Status</Form.Label>
+                <Form.Label className="required">{t('Status')}</Form.Label>
                 <StatusToggle
                   id="holiday-status"
                   {...register('status')}
@@ -164,18 +193,18 @@ function HolidayFormModal({ show, holiday, customers, canPickCustomer, ownCompan
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? `Update ${kindLabel}` : `Save ${kindLabel}`}
+                {t(isEdit ? text.update : text.save)}
               </>
             )}
           </Button>

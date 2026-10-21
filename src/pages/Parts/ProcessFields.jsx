@@ -10,9 +10,11 @@ import DrawingUpload from './DrawingUpload'
 import MachinePicker from './MachinePicker'
 import { EMPTY_SUB_PROGRAM, MAX_LENGTH, MAX_SUB_PROGRAMS, processSeconds } from './partForm'
 import { FIELD_HELP } from './partHelp'
+import { useTranslation } from 'react-i18next'
 
 // Sub programs of process `index` (shown when its Sub Program switch is on)
 function SubPrograms({ index, control, register, errors }) {
+  const { t } = useTranslation()
   const name = `processes.${index}.subPrograms`
   const { fields, append, remove } = useFieldArray({ control, name })
   const listError = errors?.subPrograms
@@ -24,7 +26,7 @@ function SubPrograms({ index, control, register, errors }) {
         return (
           <Row key={field.id} className="g-3 align-items-start mb-2">
             <Form.Group as={Col} md={6} lg={5} controlId={`${name}.${subIndex}.name`}>
-              <Form.Label className="required">Sub Program Name</Form.Label>
+              <Form.Label className="required">{t('Sub Program Name')}</Form.Label>
               <Form.Control
                 {...register(`${name}.${subIndex}.name`)}
                 autoComplete="off"
@@ -35,7 +37,7 @@ function SubPrograms({ index, control, register, errors }) {
               <Form.Control.Feedback type="invalid">{subErrors?.name?.message}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} xs={9} md={4} lg={3} controlId={`${name}.${subIndex}.cycleTime`}>
-              <Form.Label className="required">Cycle Time</Form.Label>
+              <Form.Label className="required">{t('Cycle Time')}</Form.Label>
               <Form.Control
                 {...register(`${name}.${subIndex}.cycleTime`)}
                 autoComplete="off"
@@ -46,7 +48,7 @@ function SubPrograms({ index, control, register, errors }) {
               <Form.Control.Feedback type="invalid">{subErrors?.cycleTime?.message}</Form.Control.Feedback>
             </Form.Group>
             <Col xs={3} md={2} lg={1} className="pt-md-4 mt-md-2">
-              <IconAction danger icon={ACTION_ICONS.delete} label={`Remove sub program ${subIndex + 1}`} onClick={() => remove(subIndex)} />
+              <IconAction danger icon={ACTION_ICONS.delete} label={t('Remove sub program {{n}}', { n: subIndex + 1 })} onClick={() => remove(subIndex)} />
             </Col>
           </Row>
         )
@@ -55,7 +57,7 @@ function SubPrograms({ index, control, register, errors }) {
       {listError?.root?.message && <div className="invalid-feedback d-block mb-2">{listError.root.message}</div>}
       <Button variant="ghost" size="sm" onClick={() => append({ ...EMPTY_SUB_PROGRAM })} disabled={fields.length >= MAX_SUB_PROGRAMS}>
         <i className="bi bi-plus-lg me-1" aria-hidden="true" />
-        Add sub program
+        {t('Add sub program')}
       </Button>
     </div>
   )
@@ -70,6 +72,7 @@ SubPrograms.propTypes = {
 
 // One process of the part: program, machines, drawing, accuracy and times
 function ProcessFields({ index, control, register, setValue, errors, machines, machinesPlaceholder, drawingUrl, canRemove, onRemove }) {
+  const { t } = useTranslation()
   const prefix = `processes.${index}`
   const process = useWatch({ control, name: prefix })
   const hasSubProgram = Boolean(process?.hasSubProgram)
@@ -111,19 +114,19 @@ function ProcessFields({ index, control, register, setValue, errors, machines, m
   )
 
   return (
-    <section className="ts-part-process" aria-label={`Process ${index + 1}`}>
+    <section className="ts-part-process" aria-label={t('Process {{n}}', { n: index + 1 })}>
       <div className="d-flex align-items-center mb-2">
-        <h2 className="ts-section-title mb-0 me-auto">Process {index + 1}</h2>
-        {canRemove && <IconAction danger icon={ACTION_ICONS.delete} label={`Remove process ${index + 1}`} onClick={onRemove} />}
+        <h2 className="ts-section-title mb-0 me-auto">{t('Process {{n}}', { n: index + 1 })}</h2>
+        {canRemove && <IconAction danger icon={ACTION_ICONS.delete} label={t('Remove process {{n}}', { n: index + 1 })} onClick={onRemove} />}
       </div>
 
       <Row xs={1} md={2} xl={5} className="g-3">
-        {text('process', 'Process', 'Process')}
-        {text('programName', 'Program Name', 'Program Name')}
+        {text('process', t('Process'), t('Process'))}
+        {text('programName', t('Program Name'), t('Program Name'))}
 
         <Form.Group as={Col} controlId={`${prefix}.machineIds`}>
           <FieldLabel required help={FIELD_HELP.machineIds}>
-            Applicable Machine
+            {t('Applicable Machine')}
           </FieldLabel>
           <Controller
             name={`${prefix}.machineIds`}
@@ -144,12 +147,12 @@ function ProcessFields({ index, control, register, setValue, errors, machines, m
           {errors?.machineIds && <div className="invalid-feedback d-block">{errors.machineIds.message}</div>}
         </Form.Group>
 
-        {text('drawingNo', 'Drawing No.', 'Drawing No.')}
-        {text('drawingRevisionNo', 'Drawing Revision No.', 'Drawing Revision No.')}
+        {text('drawingNo', t('Drawing No.'), t('Drawing No.'))}
+        {text('drawingRevisionNo', t('Drawing Revision No.'), t('Drawing Revision No.'))}
 
         <Form.Group as={Col}>
           <FieldLabel required help={FIELD_HELP.drawing}>
-            Part Drawing (PDF)
+            {t('Part Drawing (PDF)')}
           </FieldLabel>
           <DrawingUpload
             id={`${prefix}.drawingFile`}
@@ -167,35 +170,35 @@ function ProcessFields({ index, control, register, setValue, errors, machines, m
         </Form.Group>
 
         <Form.Group as={Col} controlId={`${prefix}.accuracyId`}>
-          <Form.Label className="required">Machine Accuracy Level</Form.Label>
+          <Form.Label className="required">{t('Machine Accuracy Level')}</Form.Label>
           <Form.Select {...register(`${prefix}.accuracyId`)} isInvalid={Boolean(errors?.accuracyId)}>
-            <option value="">Machine Accuracy</option>
+            <option value="">{t('Machine Accuracy')}</option>
             {MACHINE_ACCURACIES.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </Form.Select>
           <Form.Control.Feedback type="invalid">{errors?.accuracyId?.message}</Form.Control.Feedback>
         </Form.Group>
 
-        {duration('setupTime', 'Setup Time')}
-        {duration('cycleTime', 'Cycle Time')}
-        {duration('loadingTime', 'Loading / Unloading Time')}
+        {duration('setupTime', t('Setup Time'))}
+        {duration('cycleTime', t('Cycle Time'))}
+        {duration('loadingTime', t('Loading / Unloading Time'))}
 
         <Form.Group as={Col} controlId={`${prefix}.productionTime`}>
-          <FieldLabel help={FIELD_HELP.productionTime}>Production Time</FieldLabel>
+          <FieldLabel help={FIELD_HELP.productionTime}>{t('Production Time')}</FieldLabel>
           <Form.Control value={secondsToDuration(processSeconds(process))} readOnly tabIndex={-1} />
         </Form.Group>
       </Row>
 
       <div className="ts-part-subprogram">
         <div className="d-flex flex-wrap align-items-center gap-3">
-          <FieldLabel help={FIELD_HELP.subProgram}>Sub Program</FieldLabel>
+          <FieldLabel help={FIELD_HELP.subProgram}>{t('Sub Program')}</FieldLabel>
           <Form.Check
             type="switch"
             id={`${prefix}.hasSubProgram`}
-            label={hasSubProgram ? 'Yes' : 'No'}
+            label={hasSubProgram ? t('Yes') : t('No')}
             {...register(`${prefix}.hasSubProgram`)}
           />
         </div>

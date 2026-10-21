@@ -22,6 +22,9 @@ export const getCurrentUser = async () => unwrap(await sharedGet('/me'))
 // Saves the logged-in user's theme (THEME.DARK / THEME.LIGHT) in their profile; returns { theme }
 export const saveMyTheme = async (theme) => unwrap(await apiClient.put('/me/theme', { theme }))
 
+// Saves the logged-in user's UI language (a LANGUAGES code) in their profile; returns { language }
+export const saveMyLanguage = async (language) => unwrap(await apiClient.put('/me/language', { language }))
+
 export const createUser = async (user) => unwrap(await apiClient.post(USERS_PATH, user))
 
 export const updateUser = async (id, user) => unwrap(await apiClient.put(`${USERS_PATH}/${id}`, user))

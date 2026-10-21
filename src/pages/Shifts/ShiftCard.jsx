@@ -6,6 +6,7 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { SHIFT_STATUS, SHIFT_TYPES, WEEKDAYS } from '@/constants/shifts'
 import { formatClock12, formatHoursMinutes, parseTime } from '@/utils/dateTime'
+import { useTranslation } from 'react-i18next'
 
 const MINUTES_PER_DAY = 24 * 60
 
@@ -24,6 +25,7 @@ const minutesBetween = (start, end) => (toMinutes(end) - toMinutes(start) + MINU
 
 // "08:00 PM" → clock "08:00" + period "PM", so the period can be set smaller
 function Clock({ label, value, nextDay = false }) {
+  const { t } = useTranslation()
   const [clock, period] = formatClock12(value).split(' ')
   return (
     <div>
@@ -32,7 +34,7 @@ function Clock({ label, value, nextDay = false }) {
         {clock}
         {period && <span className="ts-shift-card-period">{period}</span>}
         {nextDay && (
-          <span className="ts-shift-card-next-day" title="Ends the next day">
+          <span className="ts-shift-card-next-day" title={t('Ends the next day')}>
             +1
           </span>
         )}
@@ -51,6 +53,7 @@ Clock.propTypes = {
 // hours, the working days (days off muted) and breaks. canManage (managers): Edit / Delete.
 // `isEditing`: this card is loaded in the form.
 function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const workingDays = new Set(shift.workingDays)
   const isInactive = shift.status === SHIFT_STATUS.INACTIVE
   const isNight = shift.shiftType === 'night'
@@ -59,9 +62,9 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
   const hasManyBreaks = shift.breaks.length > MAX_VISIBLE_BREAKS
 
   const stats = [
-    { label: 'Shift length', value: formatHoursMinutes(shift.durationMinutes) },
-    { label: 'Breaks', value: formatHoursMinutes(breakMinutes) },
-    { label: 'Working time', value: formatHoursMinutes(shift.durationMinutes - breakMinutes), accent: true },
+    { label: t('Shift length'), value: formatHoursMinutes(shift.durationMinutes) },
+    { label: t('Breaks'), value: formatHoursMinutes(breakMinutes) },
+    { label: t('Working time'), value: formatHoursMinutes(shift.durationMinutes - breakMinutes), accent: true },
   ]
 
   const classes = ['h-100', 'ts-shift-card', isEditing && 'is-editing', isInactive && 'is-inactive'].filter(Boolean)
@@ -79,7 +82,7 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
               <h2 className="ts-shift-card-name text-truncate">{shift.name}</h2>
               {isEditing && (
                 <Badge bg="" className="badge-soft-primary">
-                  Editing
+                  {t('Editing')}
                 </Badge>
               )}
               {isInactive && (
@@ -87,23 +90,23 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
               )}
             </div>
             <div className="ts-shift-card-meta">
-              Shift {number} · {typeLabel(shift.shiftType)}
+              {t('Shift {{n}} · {{type}}', { n: number, type: t(typeLabel(shift.shiftType)) })}
               {showCustomer && shift.customerName && ` · ${shift.customerName}`}
             </div>
           </div>
 
           {canManage && (
             <div className="d-flex gap-1 flex-shrink-0">
-              <IconAction icon={ACTION_ICONS.edit} label={`Edit shift ${shift.name}`} onClick={() => onEdit(shift)} />
-              <IconAction icon={ACTION_ICONS.delete} label={`Delete shift ${shift.name}`} onClick={() => onDelete(shift)} danger />
+              <IconAction icon={ACTION_ICONS.edit} label={t('Edit shift {{name}}', { name: shift.name })} onClick={() => onEdit(shift)} />
+              <IconAction icon={ACTION_ICONS.delete} label={t('Delete shift {{name}}', { name: shift.name })} onClick={() => onDelete(shift)} danger />
             </div>
           )}
         </div>
 
         <div className="ts-shift-card-hours">
-          <Clock label="Starts" value={shift.startTime} />
+          <Clock label={t('Starts')} value={shift.startTime} />
           <i className="bi bi-arrow-right ts-shift-card-arrow" aria-hidden="true" />
-          <Clock label="Ends" value={shift.endTime} nextDay={endsNextDay} />
+          <Clock label={t('Ends')} value={shift.endTime} nextDay={endsNextDay} />
         </div>
 
         <dl className="ts-shift-card-stats">
@@ -119,7 +122,7 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
         </dl>
 
         <div>
-          <div className="ts-shift-card-label">Working days</div>
+          <div className="ts-shift-card-label">{t('Working days')}</div>
           <ul className="ts-shift-days">
             {WEEKDAYS.map((day) => {
               const isWorking = workingDays.has(day.id)
@@ -127,9 +130,9 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
                 <li
                   key={day.id}
                   className={isWorking ? 'is-working' : undefined}
-                  title={`${day.label}: ${isWorking ? 'working day' : 'day off'}`}
+                  title={isWorking ? t('{{day}}: working day', { day: t(day.label) }) : t('{{day}}: day off', { day: t(day.label) })}
                 >
-                  {day.label.slice(0, 3)}
+                  {t(day.label).slice(0, 3)}
                   <span className="visually-hidden">{isWorking ? ' (working day)' : ' (day off)'}</span>
                 </li>
               )
@@ -138,13 +141,15 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
         </div>
 
         <div className="mt-auto">
-          <div className="ts-shift-card-label">Breaks{shift.breaks.length > 0 && ` (${shift.breaks.length})`}</div>
+          <div className="ts-shift-card-label">
+            {shift.breaks.length > 0 ? t('Breaks ({{n}})', { n: shift.breaks.length }) : t('Breaks')}
+          </div>
           {shift.breaks.length > 0 ? (
             // More than MAX_VISIBLE_BREAKS: the list scrolls (a tab stop, so the keyboard can scroll it too)
             <ul
               className={`ts-shift-breaks-list${hasManyBreaks ? ' is-scrollable' : ''}`}
               tabIndex={hasManyBreaks ? 0 : undefined}
-              aria-label={hasManyBreaks ? `Breaks of shift ${shift.name}` : undefined}
+              aria-label={hasManyBreaks ? t('Breaks of shift {{name}}', { name: shift.name }) : undefined}
             >
               {shift.breaks.map((shiftBreak) => (
                 <li key={shiftBreak.id}>
@@ -160,7 +165,7 @@ function ShiftCard({ shift, number, showCustomer, canManage, isEditing, onEdit, 
               ))}
             </ul>
           ) : (
-            <div className="small text-body-secondary">No breaks</div>
+            <div className="small text-body-secondary">{t('No breaks')}</div>
           )}
         </div>
       </Card.Body>

@@ -10,18 +10,21 @@ import useTableSort from '@/hooks/useTableSort'
 import { getUsers } from '@/services/customerService'
 import { deleteLicenceKey, getLicenceKeys } from '@/services/licenceKeyService'
 import { newestFirst } from '@/utils/helpers'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import LicenceKeyFormModal from './LicenceKeyFormModal'
 import LicenceKeyGenerator from './LicenceKeyGenerator'
 import LicenceKeyRow from './LicenceKeyRow'
 import { LICENCE_KEY_STATUS } from './licenceKeyForm'
+import { Trans, useTranslation } from 'react-i18next'
+import { tk } from '@/i18n/tk'
 
 const EXPIRED = 'expired'
 const STATUS_FILTERS = [
-  { value: '', label: 'All statuses' },
-  { value: LICENCE_KEY_STATUS.ACTIVE, label: 'Active' },
-  { value: LICENCE_KEY_STATUS.INACTIVE, label: 'Inactive' },
-  { value: EXPIRED, label: 'Expired' },
+  { value: '', label: tk('All statuses') },
+  { value: LICENCE_KEY_STATUS.ACTIVE, label: tk('Active') },
+  { value: LICENCE_KEY_STATUS.INACTIVE, label: tk('Inactive') },
+  { value: EXPIRED, label: tk('Expired') },
 ]
 
 const matchesSearch = (licenceKey, term) =>
@@ -31,6 +34,7 @@ const matchesSearch = (licenceKey, term) =>
 // The superadmin generates keys for a customer, edits (customer, status) and deletes them and sees
 // every customer's (filter by customer); a customer and its admins read their company's.
 function LicenceKeySetup() {
+  const { t } = useTranslation()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
 
@@ -69,7 +73,7 @@ function LicenceKeySetup() {
     let active = true
     getUsers()
       .then((users) => active && setCustomers(users.filter((option) => option.roleId === CUSTOMER_ROLE_ID)))
-      .catch((err) => active && toast.error(err.message, { title: 'Could not load customers' }))
+      .catch((err) => active && toast.error(err.message, { title: i18n.t('Could not load customers') }))
     return () => {
       active = false
     }
@@ -100,13 +104,13 @@ function LicenceKeySetup() {
   const firstIndex = (currentPage - 1) * pageSize
   const columns = [
     'Sr. No.',
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Licence Key', sort: (row) => row.licenceKey },
-    { label: 'Duration', sort: (row) => row.expiresOn ?? '9999' },
-    { label: 'Created', sort: (row) => row.createdAt },
-    { label: 'Expires On', sort: (row) => row.expiresOn ?? '9999' },
-    { label: 'Status', sort: (row) => row.status },
-    ...(isSuperadmin ? ['Actions'] : []),
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Licence Key'), sort: (row) => row.licenceKey },
+    { label: t('Duration'), sort: (row) => row.expiresOn ?? '9999' },
+    { label: t('Created'), sort: (row) => row.createdAt },
+    { label: t('Expires On'), sort: (row) => row.expiresOn ?? '9999' },
+    { label: t('Status'), sort: (row) => row.status },
+    ...(isSuperadmin ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
@@ -124,11 +128,11 @@ function LicenceKeySetup() {
   const handleCopy = useCallback(async (licenceKey) => {
     try {
       await navigator.clipboard.writeText(licenceKey.licenceKey)
-      toast.success(`${licenceKey.licenceKey} copied to the clipboard.`, { title: 'Copied' })
+      toast.success(t('{{key}} copied to the clipboard.', { key: licenceKey.licenceKey }), { title: t('Copied') })
     } catch {
-      toast.error('The browser did not allow copying.', { title: 'Could not copy' })
+      toast.error(t('The browser did not allow copying.'), { title: t('Could not copy') })
     }
-  }, [])
+  }, [t])
 
   const filterChange = (setter) => (event) => {
     setter(event.target.value)
@@ -140,27 +144,27 @@ function LicenceKeySetup() {
     try {
       await deleteLicenceKey(pendingDelete.id)
       setLicenceKeys((list) => list.filter((licenceKey) => licenceKey.id !== pendingDelete.id))
-      toast.success('The licence key has been deleted.', { title: 'Licence key deleted' })
+      toast.success(t('The licence key has been deleted.'), { title: t('Licence key deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete' })
+      toast.error(err.message, { title: t('Could not delete') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderList = () => {
-    if (loading) return <Loader text="Loading licence keys…" />
+    if (loading) return <Loader text={t('Loading licence keys…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load licence keys.</b> {error}
+            <b>{t('Could not load licence keys.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -170,7 +174,7 @@ function LicenceKeySetup() {
       return (
         <div className="ts-empty">
           <i className="bi bi-key ts-empty-icon" aria-hidden="true" />
-          <p className="mb-0">No licence keys yet.</p>
+          <p className="mb-0">{t('No licence keys yet.')}</p>
         </div>
       )
     }
@@ -181,25 +185,25 @@ function LicenceKeySetup() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder={isSuperadmin ? 'Search key, customer…' : 'Search key…'}
+              placeholder={isSuperadmin ? t('Search key, customer…') : t('Search key…')}
               value={search}
               onChange={filterChange(setSearch)}
-              aria-label="Search licence keys"
+              aria-label={t('Search licence keys')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
             </InputGroup.Text>
           </InputGroup>
-          <Form.Select className="w-auto" value={statusFilter} onChange={filterChange(setStatusFilter)} aria-label="Filter by status">
+          <Form.Select className="w-auto" value={statusFilter} onChange={filterChange(setStatusFilter)} aria-label={t('Filter by status')}>
             {STATUS_FILTERS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </Form.Select>
           {isSuperadmin && (
-            <Form.Select className="w-auto" value={customerFilter} onChange={filterChange(setCustomerFilter)} aria-label="Filter by customer">
-              <option value="">All customers</option>
+            <Form.Select className="w-auto" value={customerFilter} onChange={filterChange(setCustomerFilter)} aria-label={t('Filter by customer')}>
+              <option value="">{t('All customers')}</option>
               {filterOptions.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -240,7 +244,7 @@ function LicenceKeySetup() {
             />
           </div>
         ) : (
-          <div className="ts-empty">Nothing matches these filters.</div>
+          <div className="ts-empty">{t('Nothing matches these filters.')}</div>
         )}
       </>
     )
@@ -250,10 +254,10 @@ function LicenceKeySetup() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters</div>
-          <h1>Licence Keys</h1>
+          <div className="ts-eyebrow">{t('Masters')}</div>
+          <h1>{t('Licence Keys')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Generate licence keys for a customer and manage every customer’s keys.' : 'Your company’s licence keys.'}
+            {isSuperadmin ? t('Generate licence keys for a customer and manage every customer’s keys.') : t('Your company’s licence keys.')}
           </p>
         </div>
       </header>
@@ -270,13 +274,17 @@ function LicenceKeySetup() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete licence key"
-        confirmLabel="Delete"
+        title={t('Delete licence key')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong className="font-monospace">{pendingDelete?.licenceKey}</strong>?
+        <Trans
+          i18nKey="Delete <b>{{key}}</b>?"
+          values={{ key: pendingDelete?.licenceKey }}
+          components={{ b: <strong className="font-monospace" /> }}
+        />
       </ConfirmModal>
     </>
   )

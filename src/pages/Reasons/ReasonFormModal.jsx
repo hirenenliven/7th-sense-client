@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { Trans, useTranslation } from 'react-i18next'
 import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { getUsers } from '@/services/customerService'
 import useAuth from '@/hooks/useAuth'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
@@ -20,6 +22,7 @@ import { REASON_PAGES } from './reasonPages'
 // adds to their own company (the server enforces it).
 function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
   const page = REASON_PAGES[kind]
+  const { t } = useTranslation()
   const isEdit = Boolean(reason)
   const { user, hasRole } = useAuth()
   const canPickCustomer = hasRole(SUPERADMIN_ONLY)
@@ -43,7 +46,7 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       .then((users) => setCustomers({ items: users.filter((option) => option.roleId === CUSTOMER_ROLE_ID), loaded: true }))
       .catch((error) => {
         setCustomers({ items: [], loaded: true })
-        toast.error(error.message, { title: 'Could not load customers' })
+        toast.error(error.message, { title: i18n.t('Could not load customers') })
       })
   }, [show, canPickCustomer])
 
@@ -62,14 +65,14 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       const payload = toReasonPayload(values, isEdit)
       if (isEdit) {
         await page.update(reason.id, payload)
-        toast.success(`${payload.reason} has been updated.`, { title: `${page.singular} updated` })
+        toast.success(t('{{name}} has been updated.', { name: payload.reason }), { title: t(page.text.updated) })
       } else {
         await page.create(payload)
-        toast.success(`${payload.reason} has been added.`, { title: `${page.singular} created` })
+        toast.success(t('{{name}} has been added.', { name: payload.reason }), { title: t(page.text.created) })
       }
       onSaved()
     } catch (error) {
-      toast.error(error.message, { title: `Could not save ${page.noun}` })
+      toast.error(error.message, { title: t(page.text.saveFailed) })
     }
   }
 
@@ -78,10 +81,10 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       {canPickCustomer && (
         <Form.Group as={Col} xs={12} controlId={`${kind}-reason-userId`}>
           <FieldLabel required help={FIELD_HELP.userId}>
-            Customer Name
+            {t('Customer Name')}
           </FieldLabel>
           <Form.Select {...register('userId')} isInvalid={Boolean(errors.userId)}>
-            <option value="">{customers.items.length ? 'Select Customer' : 'No customers yet'}</option>
+            <option value="">{customers.items.length ? t('Select Customer') : t('No customers yet')}</option>
             {customers.items.map((customer) => (
               <option key={customer.id} value={customer.id}>
                 {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -93,7 +96,7 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       )}
 
       <Form.Group as={Col} xs={12} controlId={`${kind}-reason-reasonCode`}>
-        <FieldLabel help={FIELD_HELP.reasonCode}>Reason Code</FieldLabel>
+        <FieldLabel help={FIELD_HELP.reasonCode}>{t('Reason Code')}</FieldLabel>
         <Form.Control
           {...register('reasonCode')}
           autoComplete="off"
@@ -104,14 +107,14 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       </Form.Group>
 
       <Form.Group as={Col} xs={12} controlId={`${kind}-reason-reason`}>
-        <Form.Label className="required">Reason</Form.Label>
+        <Form.Label className="required">{t('Reason')}</Form.Label>
         <Form.Control {...register('reason')} autoComplete="off" maxLength={MAX_LENGTH.reason} isInvalid={Boolean(errors.reason)} />
         <Form.Control.Feedback type="invalid">{errors.reason?.message}</Form.Control.Feedback>
       </Form.Group>
 
       {isEdit && (
         <Form.Group as={Col} xs={12}>
-          <Form.Label className="required">Status</Form.Label>
+          <Form.Label className="required">{t('Status')}</Form.Label>
           <StatusToggle
             id={`${kind}-reason-status`}
             {...register('status')}
@@ -128,32 +131,32 @@ function ReasonFormModal({ kind, show, reason = null, onSaved, onHide }) {
       <Form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        aria-label={isEdit ? `Edit ${page.noun}` : `Add ${page.noun}`}
+        aria-label={isEdit ? t(page.text.edit) : t(page.text.add)}
         className="ts-modal-form"
       >
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? `Edit ${page.singular}` : `Add ${page.singular}`}</Modal.Title>
+          <Modal.Title>{isEdit ? t(page.text.edit) : t(page.text.add)}</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>{ready ? renderFields() : <Loader text="Loading options…" />}</Modal.Body>
+        <Modal.Body>{ready ? renderFields() : <Loader text={t('Loading options…')} />}</Modal.Body>
 
         <Modal.Footer>
           <span className="me-auto small text-body-secondary">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting || !ready}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>

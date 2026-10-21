@@ -1,13 +1,14 @@
 import { PICKER_LOCALE, shiftIsoDate, todayIso } from '@/utils/dateTime'
+import { tk } from '@/i18n/tk'
 
 // Machine Health: the sensors drawn as charts, their limits and the trend time ranges.
 // Limits follow common machine-tool practice (bearing / motor temperatures in °C, ISO 10816 spindle
 // vibration velocity in mm/s) until the server sends each machine's own thresholds.
 
 export const HEALTH_STATUS = {
-  good: { label: 'Normal', icon: 'bi-check-circle-fill', badge: 'badge-soft-success' },
-  warning: { label: 'Warning', icon: 'bi-exclamation-triangle-fill', badge: 'badge-soft-warning' },
-  critical: { label: 'Critical', icon: 'bi-x-octagon-fill', badge: 'badge-soft-danger' },
+  good: { label: tk('Normal'), icon: 'bi-check-circle-fill', badge: 'badge-soft-success' },
+  warning: { label: tk('Warning'), icon: 'bi-exclamation-triangle-fill', badge: 'badge-soft-warning' },
+  critical: { label: tk('Critical'), icon: 'bi-x-octagon-fill', badge: 'badge-soft-danger' },
 }
 
 export const statusOf = (value, { warning, critical }) => {
@@ -20,7 +21,7 @@ export const statusOf = (value, { warning, critical }) => {
 export const TREND_SENSORS = [
   {
     key: 'bearingTemp',
-    label: 'Bearing Temperature',
+    label: tk('Bearing Temperature'),
     unit: '°C',
     icon: 'bi-thermometer-half',
     decimals: 1,
@@ -30,7 +31,7 @@ export const TREND_SENSORS = [
   },
   {
     key: 'spindleMotorTemp',
-    label: 'Spindle Motor Temperature',
+    label: tk('Spindle Motor Temperature'),
     unit: '°C',
     icon: 'bi-thermometer-high',
     decimals: 1,
@@ -40,7 +41,7 @@ export const TREND_SENSORS = [
   },
   {
     key: 'headstockTemp',
-    label: 'Headstock Temperature',
+    label: tk('Headstock Temperature'),
     unit: '°C',
     icon: 'bi-thermometer',
     decimals: 1,
@@ -50,7 +51,7 @@ export const TREND_SENSORS = [
   },
   {
     key: 'spindleVibration',
-    label: 'Spindle Vibration',
+    label: tk('Spindle Vibration'),
     unit: 'mm/s',
     icon: 'bi-activity',
     decimals: 2,
@@ -61,36 +62,36 @@ export const TREND_SENSORS = [
 ]
 
 // Fourth series of the grouped temperature chart (no trend card of its own)
-export const HYDRAULIC_OIL_TEMP = { key: 'hydraulicOilTemp', label: 'Hydraulic Oil', sample: { base: 36, swing: 8, noise: 0.4 } }
+export const HYDRAULIC_OIL_TEMP = { key: 'hydraulicOilTemp', label: tk('Hydraulic Oil'), sample: { base: 36, swing: 8, noise: 0.4 } }
 
 // Grouped bars: the four temperatures at each hour, in series-colour order
 export const TEMPERATURE_GROUP = [
-  { key: 'bearingTemp', label: 'Bearing' },
-  { key: 'spindleMotorTemp', label: 'Spindle Motor' },
-  { key: 'headstockTemp', label: 'Headstock' },
+  { key: 'bearingTemp', label: tk('Bearing') },
+  { key: 'spindleMotorTemp', label: tk('Spindle Motor') },
+  { key: 'headstockTemp', label: tk('Headstock') },
   { key: HYDRAULIC_OIL_TEMP.key, label: HYDRAULIC_OIL_TEMP.label },
 ]
 
-export const SPINDLE_LOAD = { label: 'Spindle Load', unit: '%', min: 0, max: 100, warning: 70, critical: 90 }
+export const SPINDLE_LOAD = { label: tk('Spindle Load'), unit: '%', min: 0, max: 100, warning: 70, critical: 90 }
 
 // Machine states over a day: stacked bars and the donut
 export const MACHINE_STATES = [
-  { key: 'running', label: 'Running', color: 'good' },
-  { key: 'idle', label: 'Idle', color: 'warning' },
-  { key: 'alarm', label: 'Alarm', color: 'critical' },
-  { key: 'off', label: 'Off', color: 'neutral', muted: true }, // absence of work: drawn faded
+  { key: 'running', label: tk('Running'), color: 'good' },
+  { key: 'idle', label: tk('Idle'), color: 'warning' },
+  { key: 'alarm', label: tk('Alarm'), color: 'critical' },
+  { key: 'off', label: tk('Off'), color: 'neutral', muted: true }, // absence of work: drawn faded
 ]
 
 // Trend time ranges (the last … of readings)
 const MINUTE_MS = 60_000
 const HOUR_MS = 60 * MINUTE_MS
 export const TIME_RANGES = [
-  { key: '1m', label: '1 Minute', ms: MINUTE_MS },
-  { key: '30m', label: '30 Minutes', ms: 30 * MINUTE_MS },
-  { key: '1h', label: 'Hour', ms: HOUR_MS },
-  { key: '12h', label: '12 Hours', ms: 12 * HOUR_MS },
-  { key: '1d', label: '1 Day', ms: 24 * HOUR_MS },
-  { key: 'all', label: 'All', ms: Infinity },
+  { key: '1m', label: tk('1 Minute'), ms: MINUTE_MS },
+  { key: '30m', label: tk('30 Minutes'), ms: 30 * MINUTE_MS },
+  { key: '1h', label: tk('Hour'), ms: HOUR_MS },
+  { key: '12h', label: tk('12 Hours'), ms: 12 * HOUR_MS },
+  { key: '1d', label: tk('1 Day'), ms: 24 * HOUR_MS },
+  { key: 'all', label: tk('All'), ms: Infinity },
 ]
 export const DEFAULT_RANGE = '1h'
 

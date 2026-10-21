@@ -18,6 +18,7 @@ import {
 import { toast } from '@/utils/toast'
 import DatePicker from '@/components/common/DatePicker'
 import TimePicker from '@/components/common/TimePicker'
+import { useTranslation } from 'react-i18next'
 
 // Sample data — pages should receive this from services/hooks.
 const KPIS = [
@@ -49,6 +50,7 @@ const FILTERS = [
 const TABS = ['Machines', 'Lines', 'Shifts', 'Operators']
 
 function ThemeShowcase() {
+  const { t } = useTranslation()
   const [tab, setTab] = useState(TABS[0])
   const [filter, setFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
@@ -60,23 +62,23 @@ function ThemeShowcase() {
       {/* Page header */}
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Plant · Pune</div>
-          <h1>Theme showcase</h1>
-          <p className="ts-page-subtitle">Every element on this page uses theme classes only.</p>
+          <div className="ts-eyebrow">{t('Plant · Pune')}</div>
+          <h1>{t('Theme showcase')}</h1>
+          <p className="ts-page-subtitle">{t('Every element on this page uses theme classes only.')}</p>
         </div>
         <div className="ts-page-actions">
           <span className="ts-chip text-success">
             <i className="ts-dot ts-dot-live" />
-            Live
+            {t('Live')}
           </span>
-          <Form.Select size="sm" className="w-auto" aria-label="Shift">
-            <option>Shift A</option>
-            <option>Shift B</option>
+          <Form.Select size="sm" className="w-auto" aria-label={t('Shift')}>
+            <option>{t('Shift A')}</option>
+            <option>{t('Shift B')}</option>
           </Form.Select>
-          <Button variant="ghost" className="btn-icon" aria-label="Refresh">
+          <Button variant="ghost" className="btn-icon" aria-label={t('Refresh')}>
             ↻
           </Button>
-          <Button onClick={() => setShowModal(true)}>Open modal</Button>
+          <Button onClick={() => setShowModal(true)}>{t('Open modal')}</Button>
         </div>
       </header>
 
@@ -125,15 +127,15 @@ function ThemeShowcase() {
         <Col lg={8}>
           <Card>
             <Card.Header>
-              Machines
+              {t('Machines')}
               <Button variant="link" size="sm" className="p-0">
                 View all →
               </Button>
             </Card.Header>
             <Card.Body>
               <div className="ts-toolbar">
-                <Form.Control type="search" placeholder="Search machine, serial, cell…" />
-                <ButtonGroup aria-label="Status filter">
+                <Form.Control type="search" placeholder={t('Search machine, serial, cell…')} />
+                <ButtonGroup aria-label={t('Status filter')}>
                   {FILTERS.map((f) => (
                     <Button
                       key={f.key}
@@ -153,10 +155,10 @@ function ThemeShowcase() {
                 <Table hover responsive className="mb-0">
                   <thead>
                     <tr>
-                      <th>Machine</th>
-                      <th>Cell</th>
-                      <th>OEE</th>
-                      <th>Status</th>
+                      <th>{t('Machine')}</th>
+                      <th>{t('Cell')}</th>
+                      <th>{t('OEE')}</th>
+                      <th>{t('Status')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -207,8 +209,8 @@ function ThemeShowcase() {
             {/* Exceptions */}
             <Card>
               <Card.Body>
-                <h2 className="ts-section-title">Top exceptions</h2>
-                <p className="ts-note mb-3">Ranked by cost this shift.</p>
+                <h2 className="ts-section-title">{t('Top exceptions')}</h2>
+                <p className="ts-note mb-3">{t('Ranked by cost this shift.')}</p>
                 <div className="d-grid gap-2">
                   {EXCEPTIONS.map((e) => (
                     <div key={e.who} className={`card-inset card-clickable card-status-${e.status}`}>
@@ -231,94 +233,94 @@ function ThemeShowcase() {
             {/* Form */}
             <Card>
               <Card.Body>
-                <h2 className="ts-section-title">Log a reject</h2>
-                <p className="ts-note mb-3">Labels, inputs and states.</p>
+                <h2 className="ts-section-title">{t('Log a reject')}</h2>
+                <p className="ts-note mb-3">{t('Labels, inputs and states.')}</p>
                 <Form>
                   <Row className="g-2">
                     <Col xs={6}>
                       <Form.Group controlId="ts-qty">
-                        <Form.Label>Quantity</Form.Label>
+                        <Form.Label>{t('Quantity')}</Form.Label>
                         <Form.Control type="number" placeholder="0" />
                       </Form.Group>
                     </Col>
                     <Col xs={6}>
                       <Form.Group controlId="ts-reason">
-                        <Form.Label>Reason</Form.Label>
+                        <Form.Label>{t('Reason')}</Form.Label>
                         <Form.Select>
-                          <option>Dimension</option>
-                          <option>Surface</option>
+                          <option>{t('Dimension')}</option>
+                          <option>{t('Surface')}</option>
                         </Form.Select>
                       </Form.Group>
                     </Col>
                     <Col xs={6}>
                       <Form.Group controlId="ts-date">
-                        <Form.Label>Date</Form.Label>
+                        <Form.Label>{t('Date')}</Form.Label>
                         <DatePicker value={sampleDate} onChange={setSampleDate} />
                       </Form.Group>
                     </Col>
                     <Col xs={6}>
                       <Form.Group controlId="ts-time">
-                        <Form.Label>Shift start</Form.Label>
+                        <Form.Label>{t('Shift start')}</Form.Label>
                         <TimePicker value={sampleTime} onChange={setSampleTime} />
                       </Form.Group>
                     </Col>
                     <Col xs={12}>
                       <Dropdown>
                         <Dropdown.Toggle variant="ghost" size="sm">
-                          Actions
+                          {t('Actions')}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Header>Machine NX-3222</Dropdown.Header>
                           <Dropdown.Item as="button" type="button">
                             <i className="bi bi-pencil" aria-hidden="true" />
-                            Edit
+                            {t('Edit')}
                           </Dropdown.Item>
                           <Dropdown.Item as="button" type="button" active>
                             <i className="bi bi-pin-angle" aria-hidden="true" />
-                            Pinned
+                            {t('Pinned')}
                           </Dropdown.Item>
                           <Dropdown.Divider />
                           <Dropdown.Item as="button" type="button" disabled>
                             <i className="bi bi-trash" aria-hidden="true" />
-                            Delete
+                            {t('Delete')}
                           </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     </Col>
                     <Col xs={12}>
                       <Form.Group controlId="ts-note">
-                        <Form.Label>Note</Form.Label>
-                        <Form.Control as="textarea" rows={2} placeholder="Optional" />
-                        <Form.Text>Visible to the shift supervisor.</Form.Text>
+                        <Form.Label>{t('Note')}</Form.Label>
+                        <Form.Control as="textarea" rows={2} placeholder={t('Optional')} />
+                        <Form.Text>{t('Visible to the shift supervisor.')}</Form.Text>
                       </Form.Group>
                     </Col>
                     <Col xs={12}>
                       <Form.Label as="span" className="d-block" id="ts-severity-label">
-                        Severity
+                        {t('Severity')}
                       </Form.Label>
                       <div role="radiogroup" className="ts-radio-group" aria-labelledby="ts-severity-label">
-                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-minor" label="Minor" defaultChecked />
-                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-major" label="Major" />
-                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-critical" label="Critical" disabled />
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-minor" label={t('Minor')} defaultChecked />
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-major" label={t('Major')} />
+                        <Form.Check inline type="radio" name="ts-severity" id="ts-severity-critical" label={t('Critical')} disabled />
                       </div>
                     </Col>
                     <Col xs={12}>
-                      <Form.Check type="radio" name="ts-scope" id="ts-scope-line" label="This line only" defaultChecked />
-                      <Form.Check type="radio" name="ts-scope" id="ts-scope-shop" label="Whole shop" />
+                      <Form.Check type="radio" name="ts-scope" id="ts-scope-line" label={t('This line only')} defaultChecked />
+                      <Form.Check type="radio" name="ts-scope" id="ts-scope-shop" label={t('Whole shop')} />
                     </Col>
                     <Col xs={12}>
-                      <Form.Check type="switch" id="ts-notify" label="Notify maintenance" defaultChecked />
+                      <Form.Check type="switch" id="ts-notify" label={t('Notify maintenance')} defaultChecked />
                     </Col>
                   </Row>
                   <div className="d-flex flex-wrap gap-2 mt-3">
-                    <Button type="button" onClick={() => toast.success('Reject logged for NX-3222.', { title: 'Saved' })}>
-                      Save
+                    <Button type="button" onClick={() => toast.success('Reject logged for NX-3222.', { title: t('Saved') })}>
+                      {t('Save')}
                     </Button>
                     <Button type="button" variant="ghost">
-                      Cancel
+                      {t('Cancel')}
                     </Button>
                     <Button type="button" variant="ghost" disabled>
-                      Disabled
+                      {t('Disabled')}
                     </Button>
                   </div>
                 </Form>
@@ -331,45 +333,45 @@ function ThemeShowcase() {
       {/* Buttons, badges, alerts reference */}
       <Card className="mt-3">
         <Card.Body>
-          <h2 className="ts-section-title">Buttons & badges</h2>
+          <h2 className="ts-section-title">{t('Buttons & badges')}</h2>
           <div className="d-flex flex-wrap gap-2 my-3">
-            <Button>Primary</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="outline-primary">Outline</Button>
-            <Button variant="danger">Danger</Button>
+            <Button>{t('Primary')}</Button>
+            <Button variant="ghost">{t('Ghost')}</Button>
+            <Button variant="outline-primary">{t('Outline')}</Button>
+            <Button variant="danger">{t('Danger')}</Button>
             <Button variant="link">Link →</Button>
-            <Button size="sm">Small</Button>
-            <Button size="lg">Large</Button>
-            <Button disabled>Disabled</Button>
+            <Button size="sm">{t('Small')}</Button>
+            <Button size="lg">{t('Large')}</Button>
+            <Button disabled>{t('Disabled')}</Button>
           </div>
-          <h2 className="ts-section-title">Toasts</h2>
+          <h2 className="ts-section-title">{t('Toasts')}</h2>
           <div className="d-flex flex-wrap gap-2 my-3">
             <Button variant="ghost" onClick={() => toast.success('Customer saved successfully.')}>
-              Success toast
+              {t('Success toast')}
             </Button>
-            <Button variant="ghost" onClick={() => toast.error('Server did not respond.', { title: 'Save failed' })}>
-              Error toast
+            <Button variant="ghost" onClick={() => toast.error('Server did not respond.', { title: t('Save failed') })}>
+              {t('Error toast')}
             </Button>
             <Button variant="ghost" onClick={() => toast.warning('Tool T12 is near end of life.')}>
-              Warning toast
+              {t('Warning toast')}
             </Button>
             <Button variant="ghost" onClick={() => toast.info('Report export started.')}>
-              Info toast
+              {t('Info toast')}
             </Button>
           </div>
           <div className="d-flex flex-wrap gap-2 mb-2">
-            <Badge bg="" className="badge-outline-success">OK</Badge>
-            <Badge bg="" className="badge-outline-warning">Watch</Badge>
-            <Badge bg="" className="badge-outline-serious">Serious</Badge>
-            <Badge bg="" className="badge-outline-danger">Critical</Badge>
-            <Badge bg="" className="badge-outline-muted">No data</Badge>
+            <Badge bg="" className="badge-outline-success">{t('OK')}</Badge>
+            <Badge bg="" className="badge-outline-warning">{t('Watch')}</Badge>
+            <Badge bg="" className="badge-outline-serious">{t('Serious')}</Badge>
+            <Badge bg="" className="badge-outline-danger">{t('Critical')}</Badge>
+            <Badge bg="" className="badge-outline-muted">{t('No data')}</Badge>
           </div>
           <div className="d-flex flex-wrap gap-2 mb-3">
-            <Badge bg="" className="badge-soft-success">Ahead</Badge>
-            <Badge bg="" className="badge-soft-danger">Behind</Badge>
-            <Badge bg="" className="badge-soft-info">Info</Badge>
-            <Badge bg="" className="badge-soft-violet">AI</Badge>
-            <Badge bg="primary">Primary</Badge>
+            <Badge bg="" className="badge-soft-success">{t('Ahead')}</Badge>
+            <Badge bg="" className="badge-soft-danger">{t('Behind')}</Badge>
+            <Badge bg="" className="badge-soft-info">{t('Info')}</Badge>
+            <Badge bg="" className="badge-soft-violet">{t('AI')}</Badge>
+            <Badge bg="primary">{t('Primary')}</Badge>
           </div>
           <Alert variant="danger" className="mb-2">
             <b>Breakdown:</b> NX-3222 stopped — ticket raised.
@@ -386,7 +388,7 @@ function ThemeShowcase() {
           <Modal.Title>NX-3222 · #JM-1187</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="ts-eyebrow mb-2">Loss breakdown</div>
+          <div className="ts-eyebrow mb-2">{t('Loss breakdown')}</div>
           <ProgressBar className="progress-lg mb-3">
             <ProgressBar now={45} variant="danger" key="down" />
             <ProgressBar now={20} variant="warning" key="slow" />
@@ -398,14 +400,14 @@ function ThemeShowcase() {
             <span className="text-serious"><i className="ts-swatch" /> Scrap</span>
           </div>
           <p className="text-body-secondary mb-0">
-            Spindle vibration exceeded the 2σ band for 14 minutes before the stop.
+            {t('Spindle vibration exceeded the 2σ band for 14 minutes before the stop.')}
           </p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="ghost" onClick={() => setShowModal(false)}>
-            Close
+            {t('Close')}
           </Button>
-          <Button onClick={() => setShowModal(false)}>Raise ticket</Button>
+          <Button onClick={() => setShowModal(false)}>{t('Raise ticket')}</Button>
         </Modal.Footer>
       </Modal>
 

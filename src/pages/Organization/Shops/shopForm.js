@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches user_shop.name VARCHAR(100) (dto/user_shop_dto.go)
 export const NAME_MAX_LENGTH = 100
@@ -9,8 +10,8 @@ export const INITIAL_VALUES = {
 }
 
 export const shopSchema = z.object({
-  userLocationId: z.string().min(1, 'Location is required'),
-  name: z.string().trim().min(1, 'Shop is required').max(NAME_MAX_LENGTH, 'Name is too long'),
+  userLocationId: z.string().min(1, tk('Location is required')),
+  name: z.string().trim().min(1, tk('Shop is required')).max(NAME_MAX_LENGTH, tk('Name is too long')),
 })
 
 // ---------------------------------------------------------------------------

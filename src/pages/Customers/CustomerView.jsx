@@ -12,6 +12,7 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
 import { FILTER_OPTIONS } from './customerForm'
 import { customerName } from './customerFormat'
+import { useTranslation } from 'react-i18next'
 
 const EMPTY = '—'
 
@@ -53,6 +54,7 @@ DetailCard.propTypes = {
 // Masters › Customers › View and Masters › Users › View (kind): everything GET /users/{id} returns.
 // profile, companyProfile and address may each be null. Users also show their role and machines.
 function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const { t } = useTranslation()
   const account = ACCOUNT_PAGES[kind]
   const isUser = kind === ACCOUNT_KIND.USER
   const { id } = useParams()
@@ -98,19 +100,19 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">{account.section}</div>
-        <h1>{customer ? customerName({ ...customer, ...customer.companyProfile }) : account.title}</h1>
-        <p className="ts-page-subtitle">{account.viewSubtitle}</p>
+        <div className="ts-eyebrow">{t(account.section)}</div>
+        <h1>{customer ? customerName({ ...customer, ...customer.companyProfile }) : t(account.title)}</h1>
+        <p className="ts-page-subtitle">{t(account.viewSubtitle)}</p>
       </div>
       <div className="ts-page-actions">
         <Button as={Link} to={account.routes.list} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          {account.title} list
+          {t(account.text.backToList)}
         </Button>
         {customer && (
           <Button as={Link} to={generatePath(account.routes.edit, { id: String(customer.id) })}>
             <i className="bi bi-pencil me-2" aria-hidden="true" />
-            Edit
+            {t('Edit')}
           </Button>
         )}
       </div>
@@ -121,7 +123,7 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
     return (
       <>
         {header}
-        <Loader text={`Loading ${account.noun}…`} />
+        <Loader text={t(account.text.loadingOne)} />
       </>
     )
   }
@@ -131,7 +133,7 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this {account.noun}.</b> {error}
+          <b>{t(account.text.loadOneFailed)}</b> {error}
         </Alert>
       </>
     )
@@ -141,16 +143,17 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const address = customer.address ?? {}
   const profile = customer.profile ?? {}
   const isActive = customer.status !== USER_STATUS.INACTIVE
-  const themeLabel = THEMES.find((option) => option.value === profile.theme)?.label ?? profile.theme
+  const themeOption = THEMES.find((option) => option.value === profile.theme)
+  const themeLabel = themeOption ? t(themeOption.label) : profile.theme
   const chosenFilters = new Set(profile.filters ?? [])
   const filterLabels = FILTER_OPTIONS.filter((option) => chosenFilters.has(option.value))
   const seesAllMachines = ALL_MACHINE_ROLES.includes(customer.role)
   const assignedCount = customer.machineIds?.length ?? 0
   const machinesValue = seesAllMachines
-    ? 'All company machines'
+    ? t('All company machines')
     : machineNames.length
       ? machineNames.join(', ')
-      : `${assignedCount} assigned`
+      : t('{{n}} assigned', { n: assignedCount })
 
   return (
     <>
@@ -161,10 +164,10 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <Col lg={12}>
             <DetailCard
               icon="bi-shield-check"
-              title="Access"
+              title={t('Access')}
               items={[
-                ['Role', ROLE_LABELS[customer.role] ?? customer.role],
-                ['Machines', machinesValue],
+                [t('Role'), ROLE_LABELS[customer.role] ? t(ROLE_LABELS[customer.role]) : customer.role],
+                [t('Machines'), machinesValue],
               ]}
             />
           </Col>
@@ -172,27 +175,27 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Col lg={6}>
           <DetailCard
             icon="bi-building"
-            title="Company details"
+            title={t('Company details')}
             items={[
-              ['Company Name', company.companyName],
-              ['Branch', branchName || customer.branchId],
-              ['Finix ID', company.finixId],
-              ['GST No.', company.gstNumber],
-              ['PAN No.', company.panNumber],
-              ['Website', company.website],
-              ['Company Logo', profile.profilePicture],
+              [t('Company Name'), company.companyName],
+              [t('Branch'), branchName || customer.branchId],
+              [t('Finix ID'), company.finixId],
+              [t('GST No.'), company.gstNumber],
+              [t('PAN No.'), company.panNumber],
+              [t('Website'), company.website],
+              [t('Company Logo'), profile.profilePicture],
             ]}
           />
         </Col>
         <Col lg={6}>
           <DetailCard
             icon="bi-person-lock"
-            title="Login"
+            title={t('Login')}
             items={[
-              ['User Name', customer.username],
-              ['Email', customer.email],
+              [t('User Name'), customer.username],
+              [t('Email'), customer.email],
               [
-                'Status',
+                t('Status'),
                 <StatusBadge key="status" active={isActive} />,
               ],
             ]}
@@ -201,28 +204,28 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Col lg={6}>
           <DetailCard
             icon="bi-geo-alt"
-            title="Address"
+            title={t('Address')}
             items={[
-              ['Address - 1', address.addressLine1],
-              ['Address - 2', address.addressLine2],
-              ['City', address.city],
-              ['State', address.stateName],
-              ['Country', address.countryName],
-              ['Zip Code', address.pinCode],
+              [t('Address - 1'), address.addressLine1],
+              [t('Address - 2'), address.addressLine2],
+              [t('City'), address.city],
+              [t('State'), address.stateName],
+              [t('Country'), address.countryName],
+              [t('Zip Code'), address.pinCode],
             ]}
           />
         </Col>
         <Col lg={6}>
           <DetailCard
             icon="bi-telephone"
-            title="Contact & settings"
+            title={t('Contact & settings')}
             items={[
-              ['Contact Person', profile.contactPerson],
-              ['Primary Phone', customer.mobile],
-              ['Secondary Phone', profile.contactPhone],
-              ['Time Zone', profile.timezone],
-              ['Day Start From', toTime(profile.startDayTime)],
-              ['Theme', themeLabel],
+              [t('Contact Person'), profile.contactPerson],
+              [t('Primary Phone'), customer.mobile],
+              [t('Secondary Phone'), profile.contactPhone],
+              [t('Time Zone'), profile.timezone],
+              [t('Day Start From'), toTime(profile.startDayTime)],
+              [t('Theme'), themeLabel],
             ]}
           />
         </Col>
@@ -231,19 +234,19 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
       <Card>
         <Card.Header>
           <i className="bi bi-funnel text-primary" aria-hidden="true" />
-          Filters
+          {t('Filters')}
         </Card.Header>
         <Card.Body>
           {filterLabels.length ? (
             <div className="d-flex flex-wrap gap-2">
               {filterLabels.map((option) => (
                 <Badge key={option.value} bg="primary">
-                  {option.label}
+                  {t(option.label)}
                 </Badge>
               ))}
             </div>
           ) : (
-            <span className="text-body-secondary">No filters selected.</span>
+            <span className="text-body-secondary">{t('No filters selected.')}</span>
           )}
         </Card.Body>
       </Card>

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import env from '@/config/env'
+import i18n from '@/i18n'
+import { tk } from '@/i18n/tk'
 
 const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
@@ -12,7 +14,7 @@ const apiClient = axios.create({
 // Authentication: the server sets an HttpOnly session cookie at login, and the browser sends it
 // with every same-origin /api request. No token is stored or attached here.
 
-const GENERIC_ERROR = 'Something went wrong'
+const GENERIC_ERROR = tk('Something went wrong')
 
 // 401 = no valid session (expired, logged out elsewhere, user deactivated).
 // AuthProvider subscribes and sends the user back to the login screen.
@@ -24,13 +26,15 @@ export const onUnauthorized = (listener) => {
 }
 
 // Normalize error responses: { message, statusCode }. 400 / 404 messages are written for
-// end users and shown as is; server errors (5xx) get a generic message.
+// end users and shown translated (scripts/i18n.mjs collects them from the server); server errors
+// (5xx) get a generic message.
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const statusCode = error.response?.data?.statusCode ?? error.response?.status
-    const message =
-      statusCode >= 500 ? GENERIC_ERROR : error.response?.data?.message || error.message || GENERIC_ERROR
+    const message = i18n.t(
+      statusCode >= 500 ? GENERIC_ERROR : error.response?.data?.message || error.message || GENERIC_ERROR,
+    )
     if (statusCode === 401) unauthorizedListeners.forEach((listener) => listener())
     return Promise.reject({ ...error, message, statusCode })
   },

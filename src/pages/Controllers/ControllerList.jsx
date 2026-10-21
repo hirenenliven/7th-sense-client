@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
+import { Trans, useTranslation } from 'react-i18next'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
@@ -24,6 +25,7 @@ const byBrandThenName = (a, b) =>
 // Masters › Machine Catalog › Controllers (superadmin): the controllers of each brand with
 // search, brand filter, paging, add / edit and delete. Every user sees them in the machine form.
 function ControllerList() {
+  const { t } = useTranslation()
   const [controllers, setControllers] = useState([])
   const [brands, setBrands] = useState([])
   const [loading, setLoading] = useState(true)
@@ -72,11 +74,11 @@ function ControllerList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Controller', sort: (row) => row.name },
-    { label: 'Brand', sort: (row) => row.brandName },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    'Actions',
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Controller'), sort: (row) => row.name },
+    { label: t('Brand'), sort: (row) => row.brandName },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    t('Actions'),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function ControllerList() {
     try {
       await deleteController(pendingDelete.id)
       setControllers((list) => list.filter((controller) => controller.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Controller deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Controller deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete controller' })
+      toast.error(err.message, { title: t('Could not delete controller') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading controllers…" />
+    if (loading) return <Loader text={t('Loading controllers…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load controllers.</b> {error}
+            <b>{t('Could not load controllers.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,13 +137,13 @@ function ControllerList() {
           <i className="bi bi-motherboard ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No controllers yet.</p>
+              <p className="mb-2">{t('No controllers yet.')}</p>
               <Button size="sm" onClick={openAdd}>
-                Add the first controller
+                {t('Add the first controller')}
               </Button>
             </>
           ) : (
-            <p className="mb-0">Every controller belongs to a brand, and no brands exist yet.</p>
+            <p className="mb-0">{t('Every controller belongs to a brand, and no brands exist yet.')}</p>
           )}
         </div>
       )
@@ -153,13 +155,13 @@ function ControllerList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, controller, brand, description…"
+              placeholder={t('Search ID, controller, brand, description…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search controllers"
+              aria-label={t('Search controllers')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -172,9 +174,9 @@ function ControllerList() {
               setBrandFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by brand"
+            aria-label={t('Filter by brand')}
           >
-            <option value="">All brands</option>
+            <option value="">{t('All brands')}</option>
             {brands.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -205,7 +207,7 @@ function ControllerList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No controllers match these filters.</div>
+          <div className="ts-empty">{t('No controllers match these filters.')}</div>
         )}
       </>
     )
@@ -215,14 +217,14 @@ function ControllerList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Machine Catalog</div>
-          <h1>Controllers</h1>
-          <p className="ts-page-subtitle">CNC controllers of each brand, offered in the machine form.</p>
+          <div className="ts-eyebrow">{t('Masters · Machine Catalog')}</div>
+          <h1>{t('Controllers')}</h1>
+          <p className="ts-page-subtitle">{t('CNC controllers of each brand, offered in the machine form.')}</p>
         </div>
         <div className="ts-page-actions">
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add Controller
+            {t('Add Controller')}
           </Button>
         </div>
       </header>
@@ -242,14 +244,17 @@ function ControllerList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete controller"
-        confirmLabel="Delete"
+        title={t('Delete controller')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
-        {' '}A controller that still has models, or that machines use, cannot be deleted.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? A controller that still has models, or that machines use, cannot be deleted."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

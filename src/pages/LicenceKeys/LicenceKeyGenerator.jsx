@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Card, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import FieldLabel from '@/components/common/FieldLabel'
@@ -9,14 +9,16 @@ import { toast } from '@/utils/toast'
 import { customerOptionLabel } from './licenceKeyFormat'
 import { DEFAULT_DURATION, GENERATE_INITIAL_VALUES, LICENCE_DURATIONS, MAX_KEYS, generateSchema } from './licenceKeyForm'
 import { FIELD_HELP } from './licenceKeyHelp'
+import { useTranslation } from 'react-i18next'
+import { translateText } from '@/i18n/tk'
 
-const pluralKeys = (count) => `${count} licence key${count === 1 ? '' : 's'}`
 
 // Generate Licence Key card (superadmin): pick the customer and the number of keys, Generate Key
 // asks the server for new keys (not saved) and lists them, each with its Subscription Duration;
 // Save stores them for the customer. Changing the number clears the generated keys; Cancel clears
 // the form.
 function LicenceKeyGenerator({ customers, onSaved }) {
+  const { t } = useTranslation()
   const [generating, setGenerating] = useState(false)
 
   const {
@@ -40,7 +42,7 @@ function LicenceKeyGenerator({ customers, onSaved }) {
       const keys = await generateLicenceKeys(Number(getValues('count')))
       replace(keys.map((licenceKey) => ({ licenceKey, duration: DEFAULT_DURATION })))
     } catch (error) {
-      toast.error(error.message, { title: 'Could not generate keys' })
+      toast.error(error.message, { title: t('Could not generate keys') })
     } finally {
       setGenerating(false)
     }
@@ -49,11 +51,13 @@ function LicenceKeyGenerator({ customers, onSaved }) {
   const onSave = async ({ userId, keys }) => {
     try {
       const saved = await createLicenceKeys(Number(userId), keys)
-      toast.success(`${pluralKeys(saved.length)} saved.`, { title: 'Licence keys saved' })
+      toast.success(saved.length === 1 ? t('1 licence key saved.') : t('{{n}} licence keys saved.', { n: saved.length }), {
+        title: t('Licence keys saved'),
+      })
       onSaved(saved)
       reset(GENERATE_INITIAL_VALUES)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save licence keys' })
+      toast.error(error.message, { title: t('Could not save licence keys') })
     }
   }
 
@@ -67,23 +71,26 @@ function LicenceKeyGenerator({ customers, onSaved }) {
   const copyKeys = async () => {
     try {
       await navigator.clipboard.writeText(fields.map((field) => field.licenceKey).join('\n'))
-      toast.success(`${pluralKeys(fields.length)} copied to the clipboard.`, { title: 'Copied' })
+      toast.success(
+        fields.length === 1 ? t('1 licence key copied to the clipboard.') : t('{{n}} licence keys copied to the clipboard.', { n: fields.length }),
+        { title: t('Copied') },
+      )
     } catch {
-      toast.error('The browser did not allow copying.', { title: 'Could not copy' })
+      toast.error(t('The browser did not allow copying.'), { title: t('Could not copy') })
     }
   }
 
   const durationOptions = LICENCE_DURATIONS.map((duration) => (
     <option key={duration.value} value={duration.value}>
-      {duration.label}
+      {translateText(t, duration.label)}
     </option>
   ))
 
   return (
     <Card className="mb-3">
-      <Form noValidate onSubmit={handleSubmit(onSave)} aria-label="Generate licence key">
+      <Form noValidate onSubmit={handleSubmit(onSave)} aria-label={t('Generate licence key')}>
         <Card.Header>
-          <span className="text-primary">Generate Licence Key</span>
+          <span className="text-primary">{t('Generate Licence Key')}</span>
           <span className="ts-header-actions text-body-secondary">
             <i className="bi bi-key-fill" aria-hidden="true" />
           </span>
@@ -92,9 +99,9 @@ function LicenceKeyGenerator({ customers, onSaved }) {
         <Card.Body>
           <Row className="g-3">
             <Form.Group as={Col} md={6} controlId="licence-userId">
-              <Form.Label className="required">Customer</Form.Label>
+              <Form.Label className="required">{t('Customer')}</Form.Label>
               <Form.Select {...register('userId')} isInvalid={Boolean(errors.userId)} disabled={busy}>
-                <option value="">{customers.length ? 'Select Customer' : 'No customers yet'}</option>
+                <option value="">{customers.length ? t('Select Customer') : t('No customers yet')}</option>
                 {customers.map((customer) => (
                   <option key={customer.id} value={customer.id}>
                     {customerOptionLabel(customer)}
@@ -106,7 +113,7 @@ function LicenceKeyGenerator({ customers, onSaved }) {
 
             <Form.Group as={Col} md={6} controlId="licence-count">
               <FieldLabel required help={FIELD_HELP.count}>
-                No. Of Key
+                {t('No. Of Key')}
               </FieldLabel>
               <Form.Control
                 {...register('count', { onChange: () => replace([]) })}
@@ -125,28 +132,28 @@ function LicenceKeyGenerator({ customers, onSaved }) {
             {generating ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Generating…
+                {t('Generating…')}
               </>
             ) : (
               <>
                 <i className="bi bi-stars me-2" aria-hidden="true" />
-                Generate Key
+                {t('Generate Key')}
               </>
             )}
           </Button>
           {errors.keys?.message && <div className="invalid-feedback d-block">{errors.keys.message}</div>}
 
           {fields.length > 0 && (
-            <section className="mt-3" aria-label="Generated licence keys">
+            <section className="mt-3" aria-label={t('Generated licence keys')}>
               <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <span className="text-body-secondary small me-auto">Generated keys are saved only when you click Save.</span>
-                <Form.Select size="sm" className="w-auto" defaultValue="" onChange={setAllDurations} aria-label="Set duration of all keys" disabled={busy}>
-                  <option value="">Set all durations…</option>
+                <span className="text-body-secondary small me-auto">{t('Generated keys are saved only when you click Save.')}</span>
+                <Form.Select size="sm" className="w-auto" defaultValue="" onChange={setAllDurations} aria-label={t('Set duration of all keys')} disabled={busy}>
+                  <option value="">{t('Set all durations…')}</option>
                   {durationOptions}
                 </Form.Select>
                 <Button variant="link" size="sm" onClick={copyKeys}>
                   <i className="bi bi-clipboard me-1" aria-hidden="true" />
-                  Copy all
+                  {t('Copy all')}
                 </Button>
               </div>
 
@@ -154,9 +161,9 @@ function LicenceKeyGenerator({ customers, onSaved }) {
                 <Table responsive className="mb-0 align-middle">
                   <thead>
                     <tr>
-                      <th>Sr. No.</th>
-                      <th>Licence Key</th>
-                      <th>Subscription Duration</th>
+                      <th>{t('Sr. No.')}</th>
+                      <th>{t('Licence Key')}</th>
+                      <th>{t('Subscription Duration')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -168,7 +175,7 @@ function LicenceKeyGenerator({ customers, onSaved }) {
                           <Form.Select
                             {...register(`keys.${index}.duration`)}
                             isInvalid={Boolean(errors.keys?.[index]?.duration)}
-                            aria-label={`Subscription duration of ${field.licenceKey}`}
+                            aria-label={t('Subscription duration of {{key}}', { key: field.licenceKey })}
                             disabled={busy}
                           >
                             {durationOptions}
@@ -180,7 +187,7 @@ function LicenceKeyGenerator({ customers, onSaved }) {
                 </Table>
               </div>
 
-              <div className="ts-key-total mt-3">{fields.length} Key(s)</div>
+              <div className="ts-key-total mt-3">{t('{{n}} Key(s)', { n: fields.length })}</div>
             </section>
           )}
         </Card.Body>
@@ -190,14 +197,14 @@ function LicenceKeyGenerator({ customers, onSaved }) {
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               'Save'
             )}
           </Button>
           <Button variant="ghost" onClick={() => reset(GENERATE_INITIAL_VALUES)} disabled={busy}>
-            Cancel
+            {t('Cancel')}
           </Button>
         </Card.Footer>
       </Form>

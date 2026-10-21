@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Form, Spinner } from 'react-bootstrap'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import BrandLogo from '@/components/common/BrandLogo'
@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import LoginBackdrop from './LoginBackdrop'
 import LoginClock from './LoginClock'
 import { INITIAL_VALUES, loginSchema } from './loginForm'
+import { useTranslation } from 'react-i18next'
 
 // Where to go after login: the protected page that sent the user here, else the dashboard
 const redirectTarget = (location) => {
@@ -24,6 +25,7 @@ const redirectTarget = (location) => {
 }
 
 function Login() {
+  const { t } = useTranslation()
   const { user, isChecking, login } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -62,10 +64,10 @@ function Login() {
   }
 
   const handleForgotPassword = () => {
-    toast.info('Please contact your administrator to reset your password.', { title: 'Forgot password' })
+    toast.info(t('Please contact your administrator to reset your password.'), { title: t('Forgot password') })
   }
 
-  if (isChecking) return <Loader text="Checking your session…" />
+  if (isChecking) return <Loader text={t('Checking your session…')} />
   // Already logged in (e.g. opened /login in a new tab)
   if (user) return <Navigate to={redirectTarget(location)} replace />
 
@@ -77,9 +79,9 @@ function Login() {
       <main className="ts-login-main">
         <div className="ts-login-panel">
           <BrandLogo className="ts-login-logo" />
-          <h1 className="visually-hidden">Log in to {env.appName}</h1>
+          <h1 className="visually-hidden">{t('Log in to {{app}}', { app: env.appName })}</h1>
 
-          <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Login">
+          <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={t('Login')}>
             {errors.root?.server && (
               <Alert variant="danger" className="py-2" role="alert">
                 {errors.root.server.message}
@@ -87,7 +89,7 @@ function Login() {
             )}
 
             <Form.Group className="mb-3" controlId="username">
-              <Form.Label>Username</Form.Label>
+              <Form.Label>{t('Username')}</Form.Label>
               <Form.Control
                 {...register('username')}
                 autoComplete="username"
@@ -99,7 +101,7 @@ function Login() {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="password">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>{t('Password')}</Form.Label>
               <Form.Control
                 {...register('password')}
                 type="password"
@@ -112,9 +114,9 @@ function Login() {
             </Form.Group>
 
             <div className="d-flex align-items-center justify-content-between mb-4">
-              <Form.Check {...register('remember')} id="remember" label="Remember" className="ts-login-remember mb-0" />
+              <Form.Check {...register('remember')} id="remember" label={t('Remember')} className="ts-login-remember mb-0" />
               <Button variant="link" className="ts-login-link" onClick={handleForgotPassword}>
-                Forgot Password?
+                {t('Forgot Password?')}
               </Button>
             </div>
 
@@ -122,7 +124,7 @@ function Login() {
               {isSubmitting ? (
                 <>
                   <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                  Logging in…
+                  {t('Logging in…')}
                 </>
               ) : (
                 'Login'

@@ -1,15 +1,17 @@
 import { Dropdown, Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
-const summary = (picked, machines, placeholder) => {
+const summary = (t, picked, machines, placeholder) => {
   if (!picked.length) return placeholder
-  if (picked.length === 1) return machines.find((machine) => machine.id === picked[0])?.name ?? '1 machine selected'
-  if (picked.length === machines.length) return 'All machines'
-  return `${picked.length} machines selected`
+  if (picked.length === 1) return machines.find((machine) => machine.id === picked[0])?.name ?? t('1 machine selected')
+  if (picked.length === machines.length) return t('All machines')
+  return t('{{n}} machines selected', { n: picked.length })
 }
 
 // Multi-select of the customer's machines; value = picked machine ids (in list order).
-function MachinePicker({ id, machines, value, onChange, onBlur, placeholder = 'Select machine', disabled = false, isInvalid = false }) {
+function MachinePicker({ id, machines, value, onChange, onBlur, placeholder, disabled = false, isInvalid = false }) {
+  const { t } = useTranslation()
   const picked = new Set(value)
   const allPicked = machines.length > 0 && machines.every((machine) => picked.has(machine.id))
 
@@ -28,14 +30,14 @@ function MachinePicker({ id, machines, value, onChange, onBlur, placeholder = 'S
         disabled={disabled}
         className={`form-select ts-select-toggle text-start text-truncate${isInvalid ? ' is-invalid' : ''}`}
       >
-        {summary(value, machines, placeholder)}
+        {summary(t, value, machines, placeholder ?? t('Select machine'))}
       </Dropdown.Toggle>
       <Dropdown.Menu className="ts-check-menu w-100">
         {machines.length > 1 && (
           <div className="ts-check-menu-all">
             <Form.Check
               id={`${id}-all`}
-              label="All machines"
+              label={t('All machines')}
               checked={allPicked}
               onChange={() => onChange(allPicked ? [] : machines.map((machine) => machine.id))}
             />

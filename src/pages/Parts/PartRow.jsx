@@ -6,9 +6,11 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 import { secondsToDuration } from '@/utils/dateTime'
 import { PART_STATUS } from './partForm'
+import { useTranslation } from 'react-i18next'
 
 // showCustomer (superadmin): the customer column; canManage (managers): edit and delete
 function PartRow({ part, showCustomer, canManage, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const isActive = part.status !== PART_STATUS.INACTIVE
 
   return (
@@ -24,7 +26,7 @@ function PartRow({ part, showCustomer, canManage, onEdit, onDelete }) {
       <td className="font-tabular">{part.partCount}</td>
       <td className="font-tabular text-nowrap">
         {secondsToDuration(part.productionTime)}
-        <div className="small text-body-secondary">{part.productionTime} sec.</div>
+        <div className="small text-body-secondary">{t('{{n}} sec.', { n: part.productionTime })}</div>
       </td>
       <td>
         <StatusBadge active={isActive} />
@@ -33,8 +35,8 @@ function PartRow({ part, showCustomer, canManage, onEdit, onDelete }) {
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${part.partName}`} onClick={() => onEdit(part)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${part.partName}`} onClick={() => onDelete(part)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: part.partName })} onClick={() => onEdit(part)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: part.partName })} onClick={() => onDelete(part)} />
           </div>
         </td>
       )}

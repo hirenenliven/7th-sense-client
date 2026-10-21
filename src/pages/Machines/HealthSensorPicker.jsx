@@ -1,17 +1,19 @@
 import { Dropdown, Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { MACHINE_HEALTH_SENSORS } from '@/constants/machines'
+import { useTranslation } from 'react-i18next'
 
 const ALL_IDS = MACHINE_HEALTH_SENSORS.map((sensor) => sensor.id)
 
-const summary = (count) => {
-  if (!count) return 'Select machine health'
-  if (count === ALL_IDS.length) return 'All health sensors'
-  return `${count} sensor${count === 1 ? '' : 's'} selected`
+const summary = (t, count) => {
+  if (!count) return t('Select machine health')
+  if (count === ALL_IDS.length) return t('All health sensors')
+  return count === 1 ? t('1 sensor selected') : t('{{n}} sensors selected', { n: count })
 }
 
 // Multi-select of the machine health sensors (constants/machines.js); value = picked ids.
 function HealthSensorPicker({ id, value, onChange, isInvalid = false }) {
+  const { t } = useTranslation()
   const picked = new Set(value)
   const allPicked = picked.size === ALL_IDS.length
 
@@ -29,13 +31,13 @@ function HealthSensorPicker({ id, value, onChange, isInvalid = false }) {
         variant=""
         className={`form-select ts-select-toggle text-start${isInvalid ? ' is-invalid' : ''}`}
       >
-        {summary(picked.size)}
+        {summary(t, picked.size)}
       </Dropdown.Toggle>
       <Dropdown.Menu className="ts-check-menu w-100">
         <div className="ts-check-menu-all">
           <Form.Check
             id={`${id}-all`}
-            label="All sensors"
+            label={t('All sensors')}
             checked={allPicked}
             onChange={() => onChange(allPicked ? [] : ALL_IDS)}
           />
@@ -45,7 +47,7 @@ function HealthSensorPicker({ id, value, onChange, isInvalid = false }) {
             <Form.Check
               key={sensor.id}
               id={`${id}-${sensor.id}`}
-              label={sensor.label}
+              label={t(sensor.label)}
               checked={picked.has(sensor.id)}
               onChange={() => toggle(sensor.id)}
             />

@@ -6,10 +6,13 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 import { LICENCE_KEY_STATUS, durationLabel } from './licenceKeyForm'
+import { useTranslation } from 'react-i18next'
+import { translateText } from '@/i18n/tk'
 
 // number: Sr. No. in the filtered list. showCustomer (superadmin): the customer column;
 // canManage (superadmin): edit and delete
 function LicenceKeyRow({ licenceKey, number, showCustomer, canManage, onCopy, onEdit, onDelete }) {
+  const { t } = useTranslation()
   return (
     <tr>
       <td className="font-tabular">{number}</td>
@@ -17,16 +20,16 @@ function LicenceKeyRow({ licenceKey, number, showCustomer, canManage, onCopy, on
       <td>
         <div className="d-flex align-items-center gap-1">
           <span className="font-monospace fw-semibold text-nowrap">{licenceKey.licenceKey}</span>
-          <IconAction icon="bi-clipboard" label={`Copy ${licenceKey.licenceKey}`} onClick={() => onCopy(licenceKey)} />
+          <IconAction icon="bi-clipboard" label={t('Copy {{key}}', { key: licenceKey.licenceKey })} onClick={() => onCopy(licenceKey)} />
         </div>
       </td>
-      <td className="text-nowrap">{durationLabel(licenceKey.duration)}</td>
+      <td className="text-nowrap">{translateText(t, durationLabel(licenceKey.duration))}</td>
       <td className="text-nowrap">{formatDate(licenceKey.createdAt)}</td>
       <td className="text-nowrap">
-        {licenceKey.expiresOn ? formatDate(`${licenceKey.expiresOn}T00:00`) : 'Never'}
+        {licenceKey.expiresOn ? formatDate(`${licenceKey.expiresOn}T00:00`) : t('Never')}
         {licenceKey.isExpired && (
           <Badge bg="" className="badge-soft-danger ms-2">
-            Expired
+            {t('Expired')}
           </Badge>
         )}
       </td>
@@ -36,8 +39,8 @@ function LicenceKeyRow({ licenceKey, number, showCustomer, canManage, onCopy, on
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${licenceKey.licenceKey}`} onClick={() => onEdit(licenceKey)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${licenceKey.licenceKey}`} onClick={() => onDelete(licenceKey)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: licenceKey.licenceKey })} onClick={() => onEdit(licenceKey)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: licenceKey.licenceKey })} onClick={() => onDelete(licenceKey)} />
           </div>
         </td>
       )}

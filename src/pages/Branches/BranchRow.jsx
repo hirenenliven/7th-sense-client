@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import IconAction from '@/components/common/IconAction'
 import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
@@ -8,6 +9,7 @@ import { BRANCH_STATUS } from '@/constants/app'
 
 // canManage (superadmin): the status switch works and the edit / delete actions show
 function BranchRow({ branch, canManage, statusBusy, onToggleStatus, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const isActive = branch.status !== BRANCH_STATUS.INACTIVE
   const { customerLabel } = useOrgUser()
 
@@ -39,14 +41,14 @@ function BranchRow({ branch, canManage, statusBusy, onToggleStatus, onEdit, onDe
           checked={isActive}
           disabled={!canManage || statusBusy}
           onChange={() => onToggleStatus(branch)}
-          aria-label={`${branch.name} is ${isActive ? 'active' : 'inactive'}`}
+          aria-label={isActive ? t('{{name}} is active', { name: branch.name }) : t('{{name}} is inactive', { name: branch.name })}
         />
       </td>
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${branch.name}`} onClick={() => onEdit(branch)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${branch.name}`} onClick={() => onDelete(branch)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: branch.name })} onClick={() => onEdit(branch)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: branch.name })} onClick={() => onDelete(branch)} />
           </div>
         </td>
       )}

@@ -1,5 +1,6 @@
 import { PICKER_LOCALE, parseIsoDate, shiftIsoDate } from '@/utils/dateTime'
 import { HYDRAULIC_OIL_TEMP, MACHINE_STATES, SPINDLE_LOAD, TEMPERATURE_GROUP, TREND_SENSORS } from './healthSensors'
+import { tk } from '@/i18n/tk'
 
 // SAMPLE readings for the Machine Health charts. The server has no sensor-data API yet; replace these
 // functions with service calls (same shapes) when it does. Every value is seeded by the machine id and
@@ -151,7 +152,7 @@ export const runHours = (machineId, isoDate) => dayStates(machineId, isoDate).ru
 // Subsystem scores (100 = healthy) for the radar
 export const subsystemScores = (machineId, isoDate) => {
   const random = randomFor(machineId, isoDate, 'subsystems')
-  return ['Spindle', 'Hydraulics', 'Lubrication', 'Coolant', 'Pneumatics', 'Electrical'].map((name) => ({
+  return [tk('Spindle'), tk('Hydraulics'), tk('Lubrication'), tk('Coolant'), tk('Pneumatics'), tk('Electrical')].map((name) => ({
     name,
     score: Math.round(62 + random() * 36),
   }))

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import PickerField from './PickerField'
 import { TIME_PLACEHOLDER, TIME_TEXT_LENGTH, maskTimeText, pad2, parseTime, timeTextToValue, toTimeValue } from '@/utils/dateTime'
 
@@ -70,6 +71,7 @@ function TimePanel({ value, autoFocus, onPick, onClear, onDone }) {
   const hoursRef = useRef(null)
   const minutesRef = useRef(null)
   const nowHour = new Date().getHours()
+  const { t } = useTranslation()
 
   // On open: show the picked time (or the current hour) and focus it when opened from the button
   useEffect(() => {
@@ -95,7 +97,7 @@ function TimePanel({ value, autoFocus, onPick, onClear, onDone }) {
     <div className="ts-time-panel">
       <div className="ts-time-columns">
         <TimeColumn
-          label="Hour"
+          label={t('Hour')}
           options={HOURS}
           selected={time?.hours}
           highlight={nowHour}
@@ -107,7 +109,7 @@ function TimePanel({ value, autoFocus, onPick, onClear, onDone }) {
           :
         </div>
         <TimeColumn
-          label="Minute"
+          label={t('Minute')}
           options={MINUTES}
           selected={time?.minutes}
           highlight={0}
@@ -119,13 +121,13 @@ function TimePanel({ value, autoFocus, onPick, onClear, onDone }) {
 
       <div className="ts-picker-footer">
         <button type="button" className="btn btn-ghost btn-sm" onClick={onClear} disabled={!value}>
-          Clear
+          {t('Clear')}
         </button>
         <button type="button" className="btn btn-ghost btn-sm" onClick={setNow}>
-          Now
+          {t('Now')}
         </button>
         <button type="button" className="btn btn-primary btn-sm ms-auto" onClick={onDone}>
-          Done
+          {t('Done')}
         </button>
       </div>
     </div>
@@ -145,6 +147,7 @@ TimePanel.propTypes = {
 // The value stays '' until the typed time is complete and valid.
 function TimePicker({ ref, value = '', onChange, onBlur, name, id, isInvalid = false, disabled = false }) {
   const [text, setText] = useState(value)
+  const { t } = useTranslation()
   const [syncedValue, setSyncedValue] = useState(value)
 
   // Value changed from outside (form reset, record loaded) → show it
@@ -179,8 +182,8 @@ function TimePicker({ ref, value = '', onChange, onBlur, name, id, isInvalid = f
       maxLength={TIME_TEXT_LENGTH}
       inputMode="numeric"
       icon="bi-clock"
-      toggleLabel="Choose time"
-      panelLabel="Choose time"
+      toggleLabel={t('Choose time')}
+      panelLabel={t('Choose time')}
       renderPanel={({ close, autoFocus }) => (
         <TimePanel
           value={value}

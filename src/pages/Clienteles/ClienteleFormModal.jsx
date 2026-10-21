@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { Trans, useTranslation } from 'react-i18next'
 import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { COUNTRIES, getDialCode, getStates } from '@/constants/locations'
 import { createClientele, getClienteleById, updateClientele } from '@/services/clienteleService'
 import { getUsers } from '@/services/customerService'
 import useAuth from '@/hooks/useAuth'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
@@ -21,6 +23,7 @@ import { FIELD_HELP } from './clienteleHelp'
 // adds to their own company (the server enforces it).
 function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
   const isEdit = Boolean(clienteleId)
+  const { t } = useTranslation()
   const { user, hasRole } = useAuth()
   const canPickCustomer = hasRole(SUPERADMIN_ONLY)
   const ownCompanyId = user?.role === ROLES.CUSTOMER ? user.id : user?.companyId
@@ -47,7 +50,7 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       .then((users) => setCustomers({ items: users.filter((option) => option.roleId === CUSTOMER_ROLE_ID), loaded: true }))
       .catch((error) => {
         setCustomers({ items: [], loaded: true })
-        toast.error(error.message, { title: 'Could not load customers' })
+        toast.error(error.message, { title: i18n.t('Could not load customers') })
       })
   }, [show, canPickCustomer])
 
@@ -86,14 +89,14 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       const payload = toClientelePayload(values, isEdit)
       if (isEdit) {
         await updateClientele(clienteleId, payload)
-        toast.success(`${payload.name} has been updated.`, { title: 'Clientele updated' })
+        toast.success(t('{{name}} has been updated.', { name: payload.name }), { title: t('Clientele updated') })
       } else {
         await createClientele(payload)
-        toast.success(`${payload.name} has been added.`, { title: 'Clientele created' })
+        toast.success(t('{{name}} has been added.', { name: payload.name }), { title: t('Clientele created') })
       }
       onSaved()
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save clientele' })
+      toast.error(error.message, { title: t('Could not save clientele') })
     }
   }
 
@@ -102,10 +105,10 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       {canPickCustomer && (
         <Form.Group as={Col} md={6} controlId="clientele-userId">
           <FieldLabel required help={FIELD_HELP.userId}>
-            Customer Name
+            {t('Customer Name')}
           </FieldLabel>
           <Form.Select {...register('userId')} isInvalid={Boolean(errors.userId)}>
-            <option value="">{customers.items.length ? 'Select Customer' : 'No customers yet'}</option>
+            <option value="">{customers.items.length ? t('Select Customer') : t('No customers yet')}</option>
             {customers.items.map((customer) => (
               <option key={customer.id} value={customer.id}>
                 {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -118,27 +121,27 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
 
       <Form.Group as={Col} md={6} controlId="clientele-clientCode">
         <FieldLabel required help={FIELD_HELP.clientCode}>
-          Client ID
+          {t('Client ID')}
         </FieldLabel>
         <Form.Control {...register('clientCode')} autoComplete="off" maxLength={MAX_LENGTH.clientCode} isInvalid={Boolean(errors.clientCode)} />
         <Form.Control.Feedback type="invalid">{errors.clientCode?.message}</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group as={Col} md={6} controlId="clientele-name">
-        <Form.Label className="required">Client Name</Form.Label>
+        <Form.Label className="required">{t('Client Name')}</Form.Label>
         <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} isInvalid={Boolean(errors.name)} />
         <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group as={Col} md={6} controlId="clientele-email">
-        <Form.Label>Client Email</Form.Label>
+        <Form.Label>{t('Client Email')}</Form.Label>
         <Form.Control {...register('email')} type="email" autoComplete="off" maxLength={MAX_LENGTH.email} isInvalid={Boolean(errors.email)} />
         <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group as={Col} md={6} controlId="clientele-contactNumber">
         <FieldLabel required help={FIELD_HELP.contactNumber}>
-          Contact Number
+          {t('Contact Number')}
         </FieldLabel>
         <InputGroup hasValidation>
           <InputGroup.Text>{getDialCode(countryCode)}</InputGroup.Text>
@@ -154,13 +157,13 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       </Form.Group>
 
       <Form.Group as={Col} xs={12} controlId="clientele-address">
-        <Form.Label className="required">Address</Form.Label>
+        <Form.Label className="required">{t('Address')}</Form.Label>
         <Form.Control {...register('address')} autoComplete="off" maxLength={MAX_LENGTH.address} isInvalid={Boolean(errors.address)} />
         <Form.Control.Feedback type="invalid">{errors.address?.message}</Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group as={Col} md={4} controlId="clientele-countryCode">
-        <Form.Label className="required">Country</Form.Label>
+        <Form.Label className="required">{t('Country')}</Form.Label>
         <Form.Select {...register('countryCode', { onChange: () => setValue('stateCode', '') })} isInvalid={Boolean(errors.countryCode)}>
           {COUNTRIES.map((country) => (
             <option key={country.code} value={country.code}>
@@ -172,14 +175,14 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       </Form.Group>
 
       <Form.Group as={Col} md={4} controlId="clientele-stateCode">
-        <Form.Label className="required">State</Form.Label>
+        <Form.Label className="required">{t('State')}</Form.Label>
         {/* Controlled: the options change with the country, so the saved state shows once they exist */}
         <Controller
           name="stateCode"
           control={control}
           render={({ field }) => (
             <Form.Select {...field} isInvalid={Boolean(errors.stateCode)}>
-              <option value="">Select State</option>
+              <option value="">{t('Select State')}</option>
               {states.map((state) => (
                 <option key={state.code} value={state.code}>
                   {state.name}
@@ -192,14 +195,14 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
       </Form.Group>
 
       <Form.Group as={Col} md={4} controlId="clientele-city">
-        <Form.Label className="required">City</Form.Label>
+        <Form.Label className="required">{t('City')}</Form.Label>
         <Form.Control {...register('city')} autoComplete="off" maxLength={MAX_LENGTH.city} isInvalid={Boolean(errors.city)} />
         <Form.Control.Feedback type="invalid">{errors.city?.message}</Form.Control.Feedback>
       </Form.Group>
 
       {isEdit && (
         <Form.Group as={Col} md={6}>
-          <Form.Label className="required">Status</Form.Label>
+          <Form.Label className="required">{t('Status')}</Form.Label>
           <StatusToggle
             id="clientele-status"
             {...register('status')}
@@ -215,40 +218,40 @@ function ClienteleFormModal({ show, clienteleId = null, onSaved, onHide }) {
     if (loadError) {
       return (
         <Alert variant="danger" className="mb-0">
-          <b>Could not load this clientele.</b> {loadError}
+          <b>{t('Could not load this clientele.')}</b> {loadError}
         </Alert>
       )
     }
-    if (!ready) return <Loader text={recordLoading ? 'Loading clientele…' : 'Loading options…'} />
+    if (!ready) return <Loader text={recordLoading ? t('Loading clientele…') : t('Loading options…')} />
     return renderFields()
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} size="lg" centered scrollable backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit clientele' : 'Add clientele'} className="ts-modal-form">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit Clientele') : t('Add Clientele')} className="ts-modal-form">
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Clientele' : 'Add Clientele'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Clientele') : t('Add Clientele')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>{renderBody()}</Modal.Body>
 
         <Modal.Footer>
           <span className="me-auto small text-body-secondary">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting || !ready}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Clientele' : 'Save Clientele'}
+                {isEdit ? t('Update Clientele') : t('Save Clientele')}
               </>
             )}
           </Button>

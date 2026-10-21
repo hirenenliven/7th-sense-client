@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import PickerField from './PickerField'
 import {
   DATE_PLACEHOLDER,
   DATE_TEXT_LENGTH,
-  PICKER_LOCALE,
+  displayLocale,
   addDays,
   addMonths,
   dateTextToIso,
@@ -19,20 +20,23 @@ import {
 const WEEK_START = 1 // Monday, as in en-GB
 const YEARS_PER_PAGE = 12
 
-const monthTitle = new Intl.DateTimeFormat(PICKER_LOCALE, { month: 'long', year: 'numeric' })
-const monthName = new Intl.DateTimeFormat(PICKER_LOCALE, { month: 'short' })
-const dayLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-
-// Mon … Sun: 1 Jan 2024 was a Monday
-const WEEKDAYS = Array.from({ length: 7 }, (_, index) => {
-  const date = new Date(2024, 0, 1 + ((WEEK_START + index + 6) % 7))
+// Month / weekday names of a locale (the language on screen)
+const calendarNames = (locale) => {
+  const monthName = new Intl.DateTimeFormat(locale, { month: 'short' })
   return {
-    short: date.toLocaleDateString(PICKER_LOCALE, { weekday: 'short' }).slice(0, 2),
-    long: date.toLocaleDateString(PICKER_LOCALE, { weekday: 'long' }),
+    monthTitle: new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }),
+    dayLabel: new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    // Mon … Sun: 1 Jan 2024 was a Monday
+    weekdays: Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(2024, 0, 1 + ((WEEK_START + index + 6) % 7))
+      return {
+        short: date.toLocaleDateString(locale, { weekday: 'short' }).slice(0, 2),
+        long: date.toLocaleDateString(locale, { weekday: 'long' }),
+      }
+    }),
+    months: Array.from({ length: 12 }, (_, month) => monthName.format(new Date(2024, month, 1))),
   }
-})
-
-const MONTHS = Array.from({ length: 12 }, (_, month) => monthName.format(new Date(2024, month, 1)))
+}
 
 // 6 weeks × 7 days covering the cursor's month
 const monthGrid = (cursor) => {
@@ -76,6 +80,9 @@ export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, ra
   const [shownValue, setShownValue] = useState(value)
   const gridRef = useRef(null)
   const focusCursor = useRef(autoFocus)
+  const { t, i18n } = useTranslation()
+  const locale = displayLocale(i18n.resolvedLanguage)
+  const { monthTitle, dayLabel, weekdays: WEEKDAYS, months: MONTHS } = useMemo(() => calendarNames(locale), [locale])
 
   // Follow a date typed into the field while the calendar is open
   if (value !== shownValue) {
@@ -115,21 +122,21 @@ export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, ra
       prev: () => moveTo(addMonths(cursor, -1), false),
       next: () => moveTo(addMonths(cursor, 1), false),
       up: () => setView('months'),
-      step: 'month',
+      step: t('month'),
     },
     months: {
       title: String(year),
       prev: () => moveTo(addMonths(cursor, -12), false),
       next: () => moveTo(addMonths(cursor, 12), false),
       up: () => setView('years'),
-      step: 'year',
+      step: t('year'),
     },
     years: {
       title: `${pageStart} – ${pageStart + YEARS_PER_PAGE - 1}`,
       prev: () => moveTo(addMonths(cursor, -12 * YEARS_PER_PAGE), false),
       next: () => moveTo(addMonths(cursor, 12 * YEARS_PER_PAGE), false),
       up: null,
-      step: `${YEARS_PER_PAGE} years`,
+      step: t('{{n}} years', { n: YEARS_PER_PAGE }),
     },
   }[view]
 
@@ -146,7 +153,7 @@ export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, ra
   return (
     <div className="ts-calendar">
       <div className="ts-calendar-header">
-        <button type="button" className="ts-calendar-nav" onClick={header.prev} aria-label={`Previous ${header.step}`}>
+        <button type="button" className="ts-calendar-nav" onClick={header.prev} aria-label={t('Previous {{step}}', { step: header.step })}>
           <i className="bi bi-chevron-left" aria-hidden="true" />
         </button>
         <button
@@ -155,12 +162,16 @@ export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, ra
           onClick={header.up ?? undefined}
           disabled={!header.up}
           aria-live="polite"
-          aria-label={header.up ? `${header.title}, choose ${view === 'days' ? 'month' : 'year'}` : header.title}
+          aria-label={
+            header.up
+              ? t('{{title}}, choose {{level}}', { title: header.title, level: view === 'days' ? t('month') : t('year') })
+              : header.title
+          }
         >
           {header.title}
           {header.up && <i className="bi bi-chevron-down" aria-hidden="true" />}
         </button>
-        <button type="button" className="ts-calendar-nav" onClick={header.next} aria-label={`Next ${header.step}`}>
+        <button type="button" className="ts-calendar-nav" onClick={header.next} aria-label={t('Next {{step}}', { step: header.step })}>
           <i className="bi bi-chevron-right" aria-hidden="true" />
         </button>
       </div>
@@ -264,10 +275,10 @@ export function DateCalendar({ value, min, max, autoFocus, onSelect, onClear, ra
       {footer ?? (
         <div className="ts-picker-footer">
           <button type="button" className="btn btn-ghost btn-sm" onClick={onClear} disabled={!value}>
-            Clear
+            {t('Clear')}
           </button>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSelect(today)} disabled={isDisabled(today)}>
-            Today
+            {t('Today')}
           </button>
         </div>
       )}
@@ -293,6 +304,7 @@ DateCalendar.propTypes = {
 function DatePicker({ ref, value = '', onChange, onBlur, name, id, isInvalid = false, disabled = false, min, max }) {
   const [text, setText] = useState(() => isoToDateText(value))
   const [syncedValue, setSyncedValue] = useState(value)
+  const { t } = useTranslation()
 
   // Value changed from outside (form reset, record loaded) → show it
   if (value !== syncedValue) {
@@ -326,8 +338,8 @@ function DatePicker({ ref, value = '', onChange, onBlur, name, id, isInvalid = f
       maxLength={DATE_TEXT_LENGTH}
       inputMode="numeric"
       icon="bi-calendar3"
-      toggleLabel="Choose date"
-      panelLabel="Choose date"
+      toggleLabel={t('Choose date')}
+      panelLabel={t('Choose date')}
       renderPanel={({ close, autoFocus }) => (
         <DateCalendar
           value={value}

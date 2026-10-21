@@ -6,14 +6,17 @@ import { CUSTOMER_ROLE_ID, MANAGERS, ROLES, SUPERADMIN_ONLY } from '@/constants/
 import useAuth from '@/hooks/useAuth'
 import { getUsers } from '@/services/customerService'
 import { deleteShift, getShifts } from '@/services/shiftService'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import ShiftCard from './ShiftCard'
 import ShiftFormModal from './ShiftFormModal'
+import { Trans, useTranslation } from 'react-i18next'
 
 // Masters › Shifts › Shift Setup: the shift cards. The superadmin works on every customer's shifts
 // (filter by customer); everyone else sees their company's. Managers (superadmin, customer, admin)
 // add (Add Shift) and edit (a card's Edit) in the Shift modal, and delete.
 function ShiftSetup() {
+  const { t } = useTranslation()
   const { user, hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const canManage = hasRole(MANAGERS)
@@ -51,7 +54,7 @@ function ShiftSetup() {
     let active = true
     getUsers()
       .then((users) => active && setCustomers(users.filter((option) => option.roleId === CUSTOMER_ROLE_ID)))
-      .catch((err) => active && toast.error(err.message, { title: 'Could not load customers' }))
+      .catch((err) => active && toast.error(err.message, { title: i18n.t('Could not load customers') }))
     return () => {
       active = false
     }
@@ -89,27 +92,27 @@ function ShiftSetup() {
     try {
       await deleteShift(pendingDelete.id)
       setShifts((list) => list.filter((shift) => shift.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Shift deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Shift deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete shift' })
+      toast.error(err.message, { title: t('Could not delete shift') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderCards = () => {
-    if (loading) return <Loader text="Loading shifts…" />
+    if (loading) return <Loader text={t('Loading shifts…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load shifts.</b> {error}
+            <b>{t('Could not load shifts.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -119,7 +122,7 @@ function ShiftSetup() {
       return (
         <div className="ts-empty">
           <i className="bi bi-calendar3 ts-empty-icon" aria-hidden="true" />
-          <p className="mb-0">{shifts.length ? 'No shifts for this customer.' : 'No shifts yet.'}</p>
+          <p className="mb-0">{shifts.length ? t('No shifts for this customer.') : t('No shifts yet.')}</p>
         </div>
       )
     }
@@ -147,17 +150,17 @@ function ShiftSetup() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Shifts</div>
-          <h1>Shift Setup</h1>
+          <div className="ts-eyebrow">{t('Masters · Shifts')}</div>
+          <h1>{t('Shift Setup')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s shifts, their working days and breaks.' : 'Your shifts, their working days and breaks.'}
+            {isSuperadmin ? t('Every customer’s shifts, their working days and breaks.') : t('Your shifts, their working days and breaks.')}
           </p>
         </div>
         {(canManage || (isSuperadmin && filterOptions.length > 0)) && (
           <div className="ts-page-actions">
             {isSuperadmin && filterOptions.length > 0 && (
-              <Form.Select value={customerFilter} onChange={(event) => setCustomerFilter(event.target.value)} aria-label="Filter shifts by customer">
-                <option value="">All customers</option>
+              <Form.Select value={customerFilter} onChange={(event) => setCustomerFilter(event.target.value)} aria-label={t('Filter shifts by customer')}>
+                <option value="">{t('All customers')}</option>
                 {filterOptions.map((customer) => (
                   <option key={customer.id} value={customer.id}>
                     {customer.name}
@@ -168,7 +171,7 @@ function ShiftSetup() {
             {canManage && (
               <Button onClick={handleAdd} disabled={loading || Boolean(error)}>
                 <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-                Add Shift
+                {t('Add Shift')}
               </Button>
             )}
           </div>
@@ -191,13 +194,17 @@ function ShiftSetup() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete shift"
-        confirmLabel="Delete"
+        title={t('Delete shift')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete shift <strong>{pendingDelete?.name}</strong>? Its breaks stay in the customer's break list.
+        <Trans
+          i18nKey="Delete shift <b>{{name}}</b>? Its breaks stay in the customer's break list."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

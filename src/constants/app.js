@@ -1,3 +1,5 @@
+import { tk } from '@/i18n/tk'
+
 // Bootstrap grid breakpoints (keep in sync with $grid-breakpoints)
 export const BREAKPOINTS = {
   sm: 576,
@@ -22,18 +24,22 @@ export const THEME = {
 }
 
 export const THEMES = [
-  { value: THEME.DARK, label: 'Dark' },
-  { value: THEME.LIGHT, label: 'Light' },
+  { value: THEME.DARK, label: tk('Dark') },
+  { value: THEME.LIGHT, label: tk('Light') },
 ]
 
 // Used when a user has no theme saved (or an unknown one)
 export const DEFAULT_THEME = THEME.DARK
 
+// Header language picker. Each code needs src/i18n/locales/<code>.json; labels are in their own language.
 export const LANGUAGES = [
   { code: 'en', label: 'English' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'mr', label: 'मराठी' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'it', label: 'Italiano' },
 ]
+
+export const DEFAULT_LANGUAGE = 'en'
 
 export const CLOCK_TICK_MS = 1000
 
@@ -48,14 +54,15 @@ export const ROLES = {
   SHOP_HEAD: 'shop_head',
 }
 
+// English keys: show with t(ROLE_LABELS[role])
 export const ROLE_LABELS = {
-  [ROLES.SUPERADMIN]: 'Super Administrator',
-  [ROLES.ADMIN]: 'Administrator',
-  [ROLES.SUPERVISOR]: 'Supervisor',
-  [ROLES.OPERATOR]: 'Operator',
-  [ROLES.CUSTOMER]: 'Customer',
-  [ROLES.QC]: 'Quality Control',
-  [ROLES.SHOP_HEAD]: 'Shop Head',
+  [ROLES.SUPERADMIN]: tk('Super Administrator'),
+  [ROLES.ADMIN]: tk('Administrator'),
+  [ROLES.SUPERVISOR]: tk('Supervisor'),
+  [ROLES.OPERATOR]: tk('Operator'),
+  [ROLES.CUSTOMER]: tk('Customer'),
+  [ROLES.QC]: tk('Quality Control'),
+  [ROLES.SHOP_HEAD]: tk('Shop Head'),
 }
 
 // A customer is a company; the users it and its admins add are members of it (users API `companyId`).
@@ -82,10 +89,10 @@ export const TOAST_DEFAULTS = {
     error: 7000,
   },
   titles: {
-    success: 'Success',
-    info: 'Info',
-    warning: 'Warning',
-    error: 'Error',
+    success: tk('Success'),
+    info: tk('Info'),
+    warning: tk('Warning'),
+    error: tk('Error'),
   },
 }
 

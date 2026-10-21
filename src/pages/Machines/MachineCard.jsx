@@ -7,16 +7,18 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 // Card view of a machine (same data and actions as MachineRow); the footer links to its Machine Health page.
 function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
   const details = [
-    ...(showCustomer ? [{ label: 'Customer', value: machine.customerName }] : []),
-    { label: 'Model', value: machine.modelName },
-    { label: 'Brand / Controller', value: [machine.brandName, machine.controllerName].filter(Boolean).join(' · ') },
-    { label: 'Line', value: machine.lineName },
-    { label: 'Installed', value: machine.installationDate && formatDate(machine.installationDate) },
+    ...(showCustomer ? [{ label: t('Customer'), value: machine.customerName }] : []),
+    { label: t('Model'), value: machine.modelName },
+    { label: t('Brand / Controller'), value: [machine.brandName, machine.controllerName].filter(Boolean).join(' · ') },
+    { label: t('Line'), value: machine.lineName },
+    { label: t('Installed'), value: machine.installationDate && formatDate(machine.installationDate) },
   ]
 
   return (
@@ -35,9 +37,9 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, on
           </div>
           {canEdit && (
             <div className="d-flex gap-1 flex-shrink-0">
-              <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
+              <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: machine.name })} onClick={() => onEdit(machine)} />
               {canDelete && (
-                <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+                <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: machine.name })} onClick={() => onDelete(machine)} />
               )}
             </div>
           )}
@@ -45,7 +47,7 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, on
 
         <div className="d-flex flex-wrap gap-2">
           <Badge bg="" className={machine.onlineStatus ? 'badge-soft-success' : 'badge-outline-muted'}>
-            {machine.onlineStatus ? 'Online' : 'Offline'}
+            {machine.onlineStatus ? t('Online') : t('Offline')}
           </Badge>
           <StatusBadge active={isActive} />
         </div>
@@ -62,7 +64,7 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, on
         <div className="mt-auto">
           <Button as={Link} to={healthPath} variant="ghost" size="sm">
             <i className={`bi ${ACTION_ICONS.health} me-2`} aria-hidden="true" />
-            Health
+            {t('Health')}
           </Button>
         </div>
       </Card.Body>

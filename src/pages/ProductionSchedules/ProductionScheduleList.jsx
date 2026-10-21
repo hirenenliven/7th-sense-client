@@ -14,6 +14,7 @@ import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
 import ScheduleRow from './ScheduleRow'
 import { SCHEDULE_TYPES, scheduleDates } from './scheduleForm'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (schedule, term) =>
   [schedule.id, schedule.machineName, schedule.customerName, scheduleDates(schedule)].some((value) =>
@@ -23,6 +24,7 @@ const matchesSearch = (schedule, term) =>
 // Production › Schedule. The superadmin sees every customer's schedules (filter by customer);
 // everyone else their company's. Managers (superadmin, customer, admin) add, edit and delete.
 function ProductionScheduleList() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
@@ -78,16 +80,16 @@ function ProductionScheduleList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Schedule Date', sort: (row) => row.startDate },
-    { label: 'Type', sort: (row) => row.scheduleType },
-    { label: 'Machine', sort: (row) => row.machineName },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Jobs', sort: (row) => row.itemCount },
-    { label: 'Total Qty.', sort: (row) => row.totalQuantity },
-    { label: 'Status', sort: (row) => row.status },
-    { label: 'Created', sort: (row) => row.createdAt },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Schedule Date'), sort: (row) => row.startDate },
+    { label: t('Type'), sort: (row) => row.scheduleType },
+    { label: t('Machine'), sort: (row) => row.machineName },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Jobs'), sort: (row) => row.itemCount },
+    { label: t('Total Qty.'), sort: (row) => row.totalQuantity },
+    { label: t('Status'), sort: (row) => row.status },
+    { label: t('Created'), sort: (row) => row.createdAt },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -102,27 +104,27 @@ function ProductionScheduleList() {
     try {
       await deleteProductionSchedule(pendingDelete.id)
       setSchedules((list) => list.filter((schedule) => schedule.id !== pendingDelete.id))
-      toast.success(`The schedule of ${pendingDelete.machineName} has been deleted.`, { title: 'Schedule deleted' })
+      toast.success(t('The schedule of {{machine}} has been deleted.', { machine: pendingDelete.machineName }), { title: t('Schedule deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete schedule' })
+      toast.error(err.message, { title: t('Could not delete schedule') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading production schedules…" />
+    if (loading) return <Loader text={t('Loading production schedules…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load production schedules.</b> {error}
+            <b>{t('Could not load production schedules.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -132,10 +134,10 @@ function ProductionScheduleList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-calendar-week ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No production schedules yet.</p>
+          <p className="mb-2">{t('No production schedules yet.')}</p>
           {canManage && (
             <Button as={Link} to={ROUTES.PRODUCTION_SCHEDULE_ADD} size="sm">
-              Add the first schedule
+              {t('Add the first schedule')}
             </Button>
           )}
         </div>
@@ -148,13 +150,13 @@ function ProductionScheduleList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, machine, customer, date…"
+              placeholder={t('Search ID, machine, customer, date…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search production schedules"
+              aria-label={t('Search production schedules')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -167,12 +169,12 @@ function ProductionScheduleList() {
               setTypeFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by schedule type"
+            aria-label={t('Filter by schedule type')}
           >
-            <option value="">All types</option>
+            <option value="">{t('All types')}</option>
             {SCHEDULE_TYPES.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </Form.Select>
@@ -184,9 +186,9 @@ function ProductionScheduleList() {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -225,7 +227,7 @@ function ProductionScheduleList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No production schedules match these filters.</div>
+          <div className="ts-empty">{t('No production schedules match these filters.')}</div>
         )}
       </>
     )
@@ -235,17 +237,17 @@ function ProductionScheduleList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Production · Schedule</div>
-          <h1>Production Schedule</h1>
+          <div className="ts-eyebrow">{t('Production · Schedule')}</div>
+          <h1>{t('Production Schedule')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s machine schedules and their jobs.' : 'Your machine schedules and their jobs.'}
+            {isSuperadmin ? t('Every customer’s machine schedules and their jobs.') : t('Your machine schedules and their jobs.')}
           </p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button as={Link} to={ROUTES.PRODUCTION_SCHEDULE_ADD}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Production Schedule
+              {t('Add Production Schedule')}
             </Button>
           </div>
         )}
@@ -257,14 +259,17 @@ function ProductionScheduleList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete production schedule"
-        confirmLabel="Delete"
+        title={t('Delete production schedule')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete the schedule of <strong>{pendingDelete?.machineName}</strong> on {pendingDelete ? scheduleDates(pendingDelete) : ''} with its{' '}
-        {pendingDelete?.itemCount} job(s)?
+        <Trans
+          i18nKey="Delete the schedule of <b>{{machine}}</b> on {{dates}} with its {{n}} job(s)?"
+          values={{ machine: pendingDelete?.machineName, dates: pendingDelete ? scheduleDates(pendingDelete) : '', n: pendingDelete?.itemCount }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

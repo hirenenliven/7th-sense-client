@@ -15,6 +15,7 @@ import { toBranchPayload, toFormValues } from './branchForm'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (branch, term, customerLabel) =>
   [branch.id, branch.code, branch.name, customerLabel(branch.customerId), branch.email, branch.cityName]
@@ -22,6 +23,7 @@ const matchesSearch = (branch, term, customerLabel) =>
 
 // Branches are shared by every company: everyone reads them, only the superadmin changes them
 function BranchList() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { hasRole } = useAuth()
   const canManage = hasRole(SUPERADMIN_ONLY)
@@ -65,15 +67,15 @@ function BranchList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Code', sort: (row) => row.code },
-    { label: 'Name', sort: (row) => row.name },
-    { label: 'Customer', sort: (row) => customerLabel(row.customerId) },
-    { label: 'Email', sort: (row) => row.email },
-    { label: 'City', sort: (row) => row.cityName },
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Code'), sort: (row) => row.code },
+    { label: t('Name'), sort: (row) => row.name },
+    { label: t('Customer'), sort: (row) => customerLabel(row.customerId) },
+    { label: t('Email'), sort: (row) => row.email },
+    { label: t('City'), sort: (row) => row.cityName },
     'Colour',
-    { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('Status'), sort: (row) => row.status },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -98,14 +100,17 @@ function BranchList() {
     setStatusBusy(branch.id, true)
     try {
       await updateBranch(branch.id, { ...toBranchPayload(toFormValues(branch), branch), status })
-      toast.success(`${branch.name} is now ${status}.`, { title: 'Status updated' })
+      toast.success(
+        status === BRANCH_STATUS.ACTIVE ? t('{{name}} is now active.', { name: branch.name }) : t('{{name}} is now inactive.', { name: branch.name }),
+        { title: t('Status updated') },
+      )
     } catch (err) {
       setBranchStatus(branch.id, previous)
-      toast.error(err.message, { title: 'Could not update status' })
+      toast.error(err.message, { title: t('Could not update status') })
     } finally {
       setStatusBusy(branch.id, false)
     }
-  }, [])
+  }, [t])
 
   const handleEdit = useCallback(
     (branch) => navigate(generatePath(ROUTES.BRANCH_EDIT, { id: String(branch.id) })),
@@ -117,27 +122,27 @@ function BranchList() {
     try {
       await deleteBranch(pendingDelete.id)
       setBranches((list) => list.filter((branch) => branch.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Branch deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Branch deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete branch' })
+      toast.error(err.message, { title: t('Could not delete branch') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading branches…" />
+    if (loading) return <Loader text={t('Loading branches…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load branches.</b> {error}
+            <b>{t('Could not load branches.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -147,10 +152,10 @@ function BranchList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-diagram-3 ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No branches yet.</p>
+          <p className="mb-2">{t('No branches yet.')}</p>
           {canManage && (
             <Button as={Link} to={ROUTES.BRANCH_ADD} size="sm">
-              Add the first branch
+              {t('Add the first branch')}
             </Button>
           )}
         </div>
@@ -163,13 +168,13 @@ function BranchList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, code, name, customer, email, city…"
+              placeholder={t('Search ID, code, name, customer, email, city…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search branches"
+              aria-label={t('Search branches')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -207,7 +212,7 @@ function BranchList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No branches match “{search.trim()}”.</div>
+          <div className="ts-empty">{t('No branches match “{{search}}”.', { search: search.trim() })}</div>
         )}
       </>
     )
@@ -217,15 +222,15 @@ function BranchList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Branches</div>
-          <h1>Manage Branch</h1>
-          <p className="ts-page-subtitle">All branches, their tax details and owning customers.</p>
+          <div className="ts-eyebrow">{t('Masters · Branches')}</div>
+          <h1>{t('Manage Branch')}</h1>
+          <p className="ts-page-subtitle">{t('All branches, their tax details and owning customers.')}</p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button as={Link} to={ROUTES.BRANCH_ADD}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add New
+              {t('Add New')}
             </Button>
           </div>
         )}
@@ -237,13 +242,17 @@ function BranchList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete branch"
-        confirmLabel="Delete"
+        title={t('Delete branch')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>? Customers assigned to it will need a new branch.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? Customers assigned to it will need a new branch."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

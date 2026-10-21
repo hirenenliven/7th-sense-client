@@ -1,10 +1,12 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import IconAction from '@/components/common/IconAction'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function ModelRow({ model, onEdit, onDelete }) {
+  const { t } = useTranslation()
   return (
     <tr>
       <td className="font-tabular">{model.id}</td>
@@ -14,8 +16,8 @@ function ModelRow({ model, onEdit, onDelete }) {
       <td className="text-body-secondary text-nowrap">{formatDate(model.updatedAt)}</td>
       <td className="border-start">
         <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${model.name}`} onClick={() => onEdit(model)} />
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${model.name}`} onClick={() => onDelete(model)} />
+          <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: model.name })} onClick={() => onEdit(model)} />
+          <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: model.name })} onClick={() => onDelete(model)} />
         </div>
       </td>
     </tr>

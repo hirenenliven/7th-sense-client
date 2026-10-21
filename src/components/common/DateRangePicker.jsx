@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { DateCalendar } from './DatePicker'
 import PickerField from './PickerField'
 import {
@@ -36,6 +37,7 @@ const sameRange = (a, b) => a.from === b.from && a.to === b.to
 function RangePanel({ value, min, max, maxDays, presets, autoFocus, onPick }) {
   const [start, setStart] = useState(null)
   const [hover, setHover] = useState(null)
+  const { t } = useTranslation()
   const span = maxDays ? maxDays - 1 : null
   const lastDay = max ? earlier(max, todayIso()) : todayIso()
 
@@ -66,7 +68,7 @@ function RangePanel({ value, min, max, maxDays, presets, autoFocus, onPick }) {
       footer={
         <div className="ts-picker-footer flex-wrap">
           <span className="ts-range-hint" aria-live="polite">
-            {start ? 'Pick the end date' : 'Pick the start date'}
+            {start ? t('Pick the end date') : t('Pick the start date')}
           </span>
           <div className="d-flex gap-1">
             {presets
@@ -76,10 +78,10 @@ function RangePanel({ value, min, max, maxDays, presets, autoFocus, onPick }) {
                   key={days}
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  aria-label={`Last ${days} days`}
+                  aria-label={t('Last {{n}} days', { n: days })}
                   onClick={() => onPick({ from: shiftIsoDate(lastDay, 1 - days), to: lastDay })}
                 >
-                  {days}D
+                  {t('{{n}}D', { n: days })}
                 </button>
               ))}
           </div>
@@ -106,6 +108,7 @@ function DateRangePicker({ id, value, onChange, min, max, maxDays, presets = DEF
   const [text, setText] = useState(() => isoRangeToText(value))
   const [syncedValue, setSyncedValue] = useState(value)
   const limits = { min, max, maxDays }
+  const { t } = useTranslation()
 
   // Value changed from outside → show it
   if (!sameRange(value, syncedValue)) {
@@ -141,8 +144,8 @@ function DateRangePicker({ id, value, onChange, min, max, maxDays, presets = DEF
       maxLength={DATE_RANGE_TEXT_LENGTH}
       inputMode="numeric"
       icon="bi-calendar-range"
-      toggleLabel="Choose date range"
-      panelLabel="Choose date range"
+      toggleLabel={t('Choose date range')}
+      panelLabel={t('Choose date range')}
       renderPanel={({ close, autoFocus }) => (
         <RangePanel
           value={value}

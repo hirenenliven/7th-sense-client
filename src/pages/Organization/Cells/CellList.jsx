@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import CellFormModal from './CellFormModal'
 import CellRow from './CellRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (cell, term) =>
   [cell.id, cell.name, cell.lineName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -24,6 +25,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 // Masters › Cells: the logged-in user's cells with search, line filter,
 // paging, add / edit and delete.
 function CellList() {
+  const { t } = useTranslation()
   const [cells, setCells] = useState([])
   const [lines, setLines] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function CellList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Cell', sort: (row) => row.name },
-    { label: 'Line', sort: (row) => row.lineName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canEdit ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Cell'), sort: (row) => row.name },
+    { label: t('Line'), sort: (row) => row.lineName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canEdit ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function CellList() {
     try {
       await deleteUserCell(pendingDelete.id, pendingDelete.userId)
       setCells((list) => list.filter((cell) => cell.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Cell deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Cell deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete cell' })
+      toast.error(err.message, { title: t('Could not delete cell') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading cells…" />
+    if (loading) return <Loader text={t('Loading cells…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load cells.</b> {error}
+            <b>{t('Could not load cells.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,18 +137,18 @@ function CellList() {
           <i className="bi bi-grid-3x3-gap ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No cells yet.</p>
+              <p className="mb-2">{t('No cells yet.')}</p>
               {canEdit && (
                 <Button size="sm" onClick={openAdd}>
-                  Add the first cell
+                  {t('Add the first cell')}
                 </Button>
               )}
             </>
           ) : (
             <>
-              <p className="mb-2">Every cell belongs to a line. Add a line first.</p>
+              <p className="mb-2">{t('Every cell belongs to a line. Add a line first.')}</p>
               <Button as={Link} to={ROUTES.ORG_LINES} size="sm" variant="ghost">
-                Go to Lines
+                {t('Go to Lines')}
               </Button>
             </>
           )}
@@ -160,13 +162,13 @@ function CellList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, cell, line…"
+              placeholder={t('Search ID, cell, line…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search cells"
+              aria-label={t('Search cells')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -179,9 +181,9 @@ function CellList() {
               setLineFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by line"
+            aria-label={t('Filter by line')}
           >
-            <option value="">All lines</option>
+            <option value="">{t('All lines')}</option>
             {lines.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -217,7 +219,7 @@ function CellList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No cells match these filters.</div>
+          <div className="ts-empty">{t('No cells match these filters.')}</div>
         )}
       </>
     )
@@ -227,15 +229,15 @@ function CellList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Cells</div>
-          <h1>Cells</h1>
-          <p className="ts-page-subtitle">Your cells and the line each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · Cells')}</div>
+          <h1>{t('Cells')}</h1>
+          <p className="ts-page-subtitle">{t('Your cells and the line each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Cell
+              {t('Add Cell')}
             </Button>
           )}
         </div>
@@ -256,13 +258,13 @@ function CellList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete cell"
-        confirmLabel="Delete"
+        title={t('Delete cell')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
         {' '}A cell that still has supervisors cannot be deleted — delete those first.
       </ConfirmModal>
     </>

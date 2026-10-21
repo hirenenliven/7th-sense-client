@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches user_city.name VARCHAR(100) (dto/user_city_dto.go)
 export const NAME_MAX_LENGTH = 100
@@ -9,8 +10,8 @@ export const INITIAL_VALUES = {
 }
 
 export const citySchema = z.object({
-  userStateId: z.string().min(1, 'State is required'),
-  name: z.string().trim().min(1, 'City is required').max(NAME_MAX_LENGTH, 'Name is too long'),
+  userStateId: z.string().min(1, tk('State is required')),
+  name: z.string().trim().min(1, tk('City is required')).max(NAME_MAX_LENGTH, tk('Name is too long')),
 })
 
 // ---------------------------------------------------------------------------

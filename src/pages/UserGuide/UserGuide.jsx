@@ -7,6 +7,7 @@ import { NAV_SECTIONS } from '@/constants/navigation'
 import { ROUTES } from '@/constants/routes'
 import { BUILT_PATHS } from '@/routes/pages'
 import { FIELD_HELP } from '@/pages/Customers/customerHelp'
+import { useTranslation } from 'react-i18next'
 
 // The guide covers tasks and the rules a user cannot guess from a label.
 // Field-by-field format help lives on the form itself (FIELD_HELP → (i) popovers), not here.
@@ -169,13 +170,14 @@ OpenLink.propTypes = {
 }
 
 function UserGuide() {
+  const { t } = useTranslation()
   return (
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">System</div>
-          <h1>User Guide</h1>
-          <p className="ts-page-subtitle">What each module does and how to complete common tasks.</p>
+          <div className="ts-eyebrow">{t('System')}</div>
+          <h1>{t('User Guide')}</h1>
+          <p className="ts-page-subtitle">{t('What each module does and how to complete common tasks.')}</p>
         </div>
       </header>
 
@@ -184,7 +186,7 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-compass text-primary" aria-hidden="true" />
-            Getting started
+            {t('Getting started')}
           </Card.Header>
           <Card.Body>
             <Row xs={1} md={2} xxl={4} className="g-3">
@@ -192,10 +194,10 @@ function UserGuide() {
                 <div className="card-inset h-100">
                   <h5 className="mb-1">
                     <i className="bi bi-layout-sidebar text-primary me-2" aria-hidden="true" />
-                    Find your way
+                    {t('Find your way')}
                   </h5>
                   <p className="ts-note mb-0">
-                    Open the sidebar with <strong>Menu</strong> in the top bar. Modules with an arrow expand to show their screens.
+                    Open the sidebar with <strong>{t('Menu')}</strong> in the top bar. Modules with an arrow expand to show their screens.
                   </p>
                 </div>
               </Col>
@@ -203,10 +205,10 @@ function UserGuide() {
                 <div className="card-inset h-100">
                   <h5 className="mb-1">
                     <i className="bi bi-list-ol text-primary me-2" aria-hidden="true" />
-                    Set up in order
+                    {t('Set up in order')}
                   </h5>
                   <p className="ts-note mb-0">
-                    Build your organisation first (Country → Supervisor), then branches, then customers. See <strong>Set up your organisation</strong> below.
+                    Build your organisation first (Country → Supervisor), then branches, then customers. See <strong>{t('Set up your organisation')}</strong> below.
                   </p>
                 </div>
               </Col>
@@ -214,17 +216,17 @@ function UserGuide() {
                 <div className="card-inset h-100">
                   <h5 className="mb-1">
                     <i className="bi bi-input-cursor-text text-primary me-2" aria-hidden="true" />
-                    Fill in forms
+                    {t('Fill in forms')}
                   </h5>
                   <p className="ts-note mb-0">
                     Fields marked <span className="text-danger">*</span> are required. For format help, hover or tap{' '}
                     <InfoTooltip
-                      title="Field help"
+                      title={t('Field help')}
                       content="Opens a short explanation of the field, an example value and the rules it must follow."
                       example="Try it on GST No. in Add Customer"
                       placement="top"
                     />{' '}
-                    next to a label.
+                    {t('next to a label.')}
                   </p>
                 </div>
               </Col>
@@ -232,10 +234,10 @@ function UserGuide() {
                 <div className="card-inset h-100">
                   <h5 className="mb-1">
                     <i className="bi bi-check2-circle text-primary me-2" aria-hidden="true" />
-                    Check your input
+                    {t('Check your input')}
                   </h5>
                   <p className="ts-note mb-0">
-                    When you save, any field that needs attention turns red with a message. Results and server messages appear as notifications.
+                    {t('When you save, any field that needs attention turns red with a message. Results and server messages appear as notifications.')}
                   </p>
                 </div>
               </Col>
@@ -247,7 +249,7 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-grid text-primary" aria-hidden="true" />
-            Modules
+            {t('Modules')}
           </Card.Header>
           <Card.Body className="vstack gap-4">
             {NAV_SECTIONS.map((section) => (
@@ -267,9 +269,9 @@ function UserGuide() {
                             <li key={link.key} className="d-flex align-items-center justify-content-between gap-2">
                               {BUILT_PATHS.has(link.path) ? <Link to={link.path}>{link.label}</Link> : <span className="text-body-secondary">{link.label}</span>}
                               {BUILT_PATHS.has(link.path) ? (
-                                <Badge bg="" className="badge-soft-success">Available</Badge>
+                                <Badge bg="" className="badge-soft-success">{t('Available')}</Badge>
                               ) : (
-                                <Badge bg="" className="badge-outline-muted">Coming soon</Badge>
+                                <Badge bg="" className="badge-outline-muted">{t('Coming soon')}</Badge>
                               )}
                             </li>
                           ))}
@@ -287,24 +289,24 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-diagram-3 text-primary" aria-hidden="true" />
-            Set up your organisation
-            <OpenLink to={ROUTES.ORG_COUNTRIES} label="Open Country" />
+            {t('Set up your organisation')}
+            <OpenLink to={ROUTES.ORG_COUNTRIES} label={t('Open Country')} />
           </Card.Header>
           <Card.Body>
             <p className="ts-note mb-3">
-              Your organisation is a chain of levels under <strong>Masters</strong>, from Country down to Supervisor. Each level is added under one from the level above.
+              Your organisation is a chain of levels under <strong>{t('Masters')}</strong>, from Country down to Supervisor. Each level is added under one from the level above.
             </p>
 
             <Row className="g-4">
               <Col lg={6}>
-                <div className="ts-section-title mb-2">Levels, top to bottom</div>
+                <div className="ts-section-title mb-2">{t('Levels, top to bottom')}</div>
                 <div className="ts-table-panel">
                   <Table size="sm" className="mb-0">
                     <thead>
                       <tr>
-                        <th scope="col">Level</th>
-                        <th scope="col">Belongs To</th>
-                        <th scope="col">Edit</th>
+                        <th scope="col">{t('Level')}</th>
+                        <th scope="col">{t('Belongs To')}</th>
+                        <th scope="col">{t('Edit')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -314,7 +316,7 @@ function UserGuide() {
                             <Link to={level.path}>{level.label}</Link>
                           </th>
                           <td className="text-body-secondary">{level.parent ?? '—'}</td>
-                          <td className="text-body-secondary">{level.editable ? 'Yes' : 'Delete and add again'}</td>
+                          <td className="text-body-secondary">{level.editable ? t('Yes') : t('Delete and add again')}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -323,7 +325,7 @@ function UserGuide() {
               </Col>
 
               <Col lg={6}>
-                <div className="ts-section-title mb-2">Rules</div>
+                <div className="ts-section-title mb-2">{t('Rules')}</div>
                 <ul className="vstack gap-2 mb-0 ps-3 ts-note">
                   {ORG_RULES.map((rule) => (
                     <li key={rule}>{rule}</li>
@@ -338,22 +340,22 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-signpost-split text-primary" aria-hidden="true" />
-            Add a branch
-            <OpenLink to={ROUTES.BRANCH_ADD} label="Open Add Branch" />
+            {t('Add a branch')}
+            <OpenLink to={ROUTES.BRANCH_ADD} label={t('Open Add Branch')} />
           </Card.Header>
           <Card.Body>
             <p className="ts-note mb-3">
-              Go to <strong>Masters › Branches › Add Branch</strong>. Add its city under <strong>Masters › City</strong> first so you can pick it.
+              Go to <strong>{t('Masters › Branches › Add Branch')}</strong>. Add its city under <strong>{t('Masters › City')}</strong> first so you can pick it.
             </p>
             <Row className="g-4">
               <Col lg={6}>
-                <div className="ts-section-title mb-2">Steps</div>
+                <div className="ts-section-title mb-2">{t('Steps')}</div>
                 <StepList steps={ADD_BRANCH_STEPS} />
               </Col>
               <Col lg={6}>
-                <div className="ts-section-title mb-2">In the Branch List</div>
+                <div className="ts-section-title mb-2">{t('In the Branch List')}</div>
                 <p className="ts-note mb-0">
-                  Search by ID, code, name, email or city. Use the switch to make a branch active or inactive, the pencil to edit it and the bin to delete it.
+                  {t('Search by ID, code, name, email or city. Use the switch to make a branch active or inactive, the pencil to edit it and the bin to delete it.')}
                 </p>
               </Col>
             </Row>
@@ -364,30 +366,30 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-building-add text-primary" aria-hidden="true" />
-            Add a customer
-            <OpenLink to={ROUTES.CUSTOMER_ADD} label="Open Add Customer" />
+            {t('Add a customer')}
+            <OpenLink to={ROUTES.CUSTOMER_ADD} label={t('Open Add Customer')} />
           </Card.Header>
           <Card.Body>
             <p className="ts-note mb-3">
-              Creates a customer account together with its login. Go to <strong>Masters › Customers › Add Customer</strong>.
+              Creates a customer account together with its login. Go to <strong>{t('Masters › Customers › Add Customer')}</strong>.
             </p>
 
             <Row className="g-4">
               <Col lg={6}>
-                <div className="ts-section-title mb-2">Steps</div>
+                <div className="ts-section-title mb-2">{t('Steps')}</div>
                 <StepList steps={ADD_CUSTOMER_STEPS} />
               </Col>
 
               <Col lg={6} className="vstack gap-4">
                 <div>
-                  <div className="ts-section-title mb-2">Rules that depend on the country</div>
+                  <div className="ts-section-title mb-2">{t('Rules that depend on the country')}</div>
                   <div className="ts-table-panel">
                     <Table size="sm" className="mb-0">
                       <thead>
                         <tr>
-                          <th scope="col">Field</th>
-                          <th scope="col">India</th>
-                          <th scope="col">Other Countries</th>
+                          <th scope="col">{t('Field')}</th>
+                          <th scope="col">{t('India')}</th>
+                          <th scope="col">{t('Other Countries')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -404,7 +406,7 @@ function UserGuide() {
                 </div>
 
                 <div>
-                  <div className="ts-section-title mb-2">Settings that affect reports</div>
+                  <div className="ts-section-title mb-2">{t('Settings that affect reports')}</div>
                   <div className="vstack gap-2">
                     {REPORTING_FIELDS.map((help) => (
                       <div key={help.title} className="card-inset">
@@ -424,12 +426,12 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-people text-primary" aria-hidden="true" />
-            Manage customers
-            <OpenLink to={ROUTES.CUSTOMERS} label="Open Customer List" />
+            {t('Manage customers')}
+            <OpenLink to={ROUTES.CUSTOMERS} label={t('Open Customer List')} />
           </Card.Header>
           <Card.Body>
             <p className="ts-note mb-3">
-              <strong>Masters › Customers › Customer List</strong> shows every customer. Search by ID, user name, customer, email or mobile, and choose how many rows to show per page.
+              <strong>{t('Masters › Customers › Customer List')}</strong> shows every customer. Search by ID, user name, customer, email or mobile, and choose how many rows to show per page.
             </p>
             <Row xs={1} md={2} xxl={4} className="g-3">
               {CUSTOMER_LIST_ACTIONS.map((action) => (
@@ -451,7 +453,7 @@ function UserGuide() {
         <Card>
           <Card.Header>
             <i className="bi bi-question-circle text-primary" aria-hidden="true" />
-            Common questions
+            {t('Common questions')}
           </Card.Header>
           <Card.Body>
             <Accordion flush>

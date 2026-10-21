@@ -6,16 +6,18 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { isoToDateText } from '@/utils/dateTime'
 import { formatDate } from '@/utils/helpers'
 import { SCHEDULE_STATUS, SCHEDULE_TYPE, scheduleDates } from './scheduleForm'
+import { useTranslation } from 'react-i18next'
 
 // showCustomer (superadmin): the customer column; canManage (managers): edit and delete
 function ScheduleRow({ schedule, showCustomer, canManage, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const label = `schedule of ${schedule.machineName} on ${isoToDateText(schedule.startDate)}`
 
   return (
     <tr>
       <td className="font-tabular">{schedule.id}</td>
       <td className="font-tabular text-nowrap">{scheduleDates(schedule)}</td>
-      <td>{schedule.scheduleType === SCHEDULE_TYPE.MULTIPLE ? 'Multiple Day' : 'Single Day'}</td>
+      <td>{schedule.scheduleType === SCHEDULE_TYPE.MULTIPLE ? t('Multiple Day') : t('Single Day')}</td>
       <td className="fw-semibold">{schedule.machineName || '—'}</td>
       {showCustomer && <td>{schedule.customerName || '—'}</td>}
       <td className="font-tabular">{schedule.itemCount}</td>
@@ -27,8 +29,8 @@ function ScheduleRow({ schedule, showCustomer, canManage, onEdit, onDelete }) {
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${label}`} onClick={() => onEdit(schedule)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${label}`} onClick={() => onDelete(schedule)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: label })} onClick={() => onEdit(schedule)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: label })} onClick={() => onDelete(schedule)} />
           </div>
         </td>
       )}

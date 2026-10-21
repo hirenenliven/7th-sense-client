@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -18,6 +18,8 @@ import { createMachine, getMachineById, updateMachine } from '@/services/machine
 import { getUserLines } from '@/services/userLineService'
 import useAuth from '@/hooks/useAuth'
 import { formatDate } from '@/utils/helpers'
+import i18n from '@/i18n'
+import { tk } from '@/i18n/tk'
 import { toast } from '@/utils/toast'
 import DatePicker from '@/components/common/DatePicker'
 import FieldLabel from '@/components/common/FieldLabel'
@@ -26,6 +28,7 @@ import { customerName } from '@/pages/Customers/customerFormat'
 import HealthSensorPicker from './HealthSensorPicker'
 import { INITIAL_VALUES, MAX_LENGTH, NO, REQUIRED_FIELDS, YES, machineSchema, toFormValues, toMachinePayload } from './machineForm'
 import { FIELD_HELP } from './machineHelp'
+import { Trans, useTranslation } from 'react-i18next'
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 
@@ -59,7 +62,8 @@ Field.propTypes = {
 }
 
 // Loads one option list; { items, loading, error }. `load` = null skips loading (empty list).
-function useOptions(load, title) {
+// failTitle: the toast title (an English key) when it cannot be loaded.
+function useOptions(load, failTitle) {
   const [state, setState] = useState({ items: [], loading: Boolean(load), error: '' })
 
   useEffect(() => {
@@ -74,22 +78,23 @@ function useOptions(load, title) {
       .catch((error) => {
         if (!active) return
         setState({ items: [], loading: false, error: error.message })
-        toast.error(error.message, { title: `Could not load ${title}` })
+        toast.error(error.message, { title: i18n.t(failTitle) })
       })
     return () => {
       active = false
     }
-  }, [load, title])
+  }, [load, failTitle])
 
   return state
 }
 
-// First option of a dependent select: loading / unavailable / pick the parent first / empty
-const placeholder = ({ loading, error, items }, label, { needs, empty } = {}) => {
-  if (needs) return needs
-  if (loading) return `Loading ${label.toLowerCase()}…`
-  if (error) return `${label} unavailable`
-  return items.length ? `Select ${label.toLowerCase()}` : empty ?? `No ${label.toLowerCase()} yet`
+// First option of a dependent select: pick the parent first / loading / unavailable / pick / empty.
+// text holds the translated wording of each case.
+const placeholder = ({ loading, error, items }, text) => {
+  if (text.needs) return text.needs
+  if (loading) return text.loading
+  if (error) return text.error
+  return items.length ? text.select : text.empty
 }
 
 const loadCustomers = () => getUsers().then((users) => users.filter((user) => user.roleId === CUSTOMER_ROLE_ID))
@@ -100,6 +105,7 @@ const loadModels = () => getModels().then((list) => [...list].sort(byName))
 // Add and edit share this form: /machines/add and /machines/:id/edit (managers only). The superadmin
 // picks the customer; a customer or admin always adds to their own company (the server enforces it).
 function AddMachine() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -128,10 +134,10 @@ function AddMachine() {
   const [machineLoading, setMachineLoading] = useState(isEdit)
   const [machineError, setMachineError] = useState('')
 
-  const customers = useOptions(canPickCustomer ? loadCustomers : null, 'customers')
-  const brands = useOptions(loadBrands, 'brands')
-  const controllers = useOptions(loadControllers, 'controllers')
-  const models = useOptions(loadModels, 'models')
+  const customers = useOptions(canPickCustomer ? loadCustomers : null, tk('Could not load customers'))
+  const brands = useOptions(loadBrands, tk('Could not load brands'))
+  const controllers = useOptions(loadControllers, tk('Could not load controllers'))
+  const models = useOptions(loadModels, tk('Could not load models'))
 
   const userId = watch('userId')
   const brandId = watch('brandId')
@@ -139,7 +145,7 @@ function AddMachine() {
 
   // Lines are the picked customer's (Masters › Line, admin acting for that customer)
   const loadLines = useMemo(() => (userId ? () => getUserLines(null, userId).then((list) => [...list].sort(byName)) : null), [userId])
-  const lines = useOptions(loadLines, 'lines')
+  const lines = useOptions(loadLines, tk('Could not load lines'))
 
   // Catalog: Brand → Controller → Model (Masters › Machine Catalog)
   const brandControllers = useMemo(
@@ -183,14 +189,14 @@ function AddMachine() {
       const payload = toMachinePayload(values)
       if (isEdit) {
         await updateMachine(id, payload)
-        toast.success(`${payload.name} has been updated.`, { title: 'Machine updated' })
+        toast.success(t('{{name}} has been updated.', { name: payload.name }), { title: t('Machine updated') })
       } else {
         await createMachine(payload)
-        toast.success(`${payload.name} has been added.`, { title: 'Machine created' })
+        toast.success(t('{{name}} has been added.', { name: payload.name }), { title: t('Machine created') })
       }
       navigate(ROUTES.MACHINES)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save machine' })
+      toast.error(error.message, { title: t('Could not save machine') })
     }
   }
 
@@ -199,8 +205,8 @@ function AddMachine() {
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">Operations · Machines</div>
-        <h1>{isEdit ? 'Edit Machine' : 'Add Machine'}</h1>
+        <div className="ts-eyebrow">{t('Operations · Machines')}</div>
+        <h1>{isEdit ? t('Edit Machine') : t('Add Machine')}</h1>
         <p className="ts-page-subtitle">
           {isEdit ? 'Update the machine and how its data is read.' : "Register a customer's machine and how its data is read."}
         </p>
@@ -208,7 +214,7 @@ function AddMachine() {
       <div className="ts-page-actions">
         <Button as={Link} to={ROUTES.MACHINES} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          Machine list
+          {t('Machine list')}
         </Button>
       </div>
     </header>
@@ -221,7 +227,7 @@ function AddMachine() {
     return (
       <>
         {header}
-        <Loader text={machineLoading ? 'Loading machine…' : 'Loading options…'} />
+        <Loader text={machineLoading ? t('Loading machine…') : t('Loading options…')} />
       </>
     )
   }
@@ -231,7 +237,7 @@ function AddMachine() {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this machine.</b> {machineError}
+          <b>{t('Could not load this machine.')}</b> {machineError}
         </Alert>
       </>
     )
@@ -241,23 +247,28 @@ function AddMachine() {
     <>
       {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit machine' : 'Add machine'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit machine') : t('Add machine')}>
         {/* Machine details */}
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-cpu text-primary" aria-hidden="true" />
-            Machine details
+            {t('Machine details')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
               {canPickCustomer && (
-                <Field name="userId" label="Customer" help={FIELD_HELP.userId} {...fieldProps}>
+                <Field name="userId" label={t('Customer')} help={FIELD_HELP.userId} {...fieldProps}>
                   <Form.Select
                     {...register('userId', { onChange: clearLine })}
                     disabled={customers.loading || Boolean(customers.error)}
                     isInvalid={Boolean(errors.userId)}
                   >
-                    <option value="">{placeholder(customers, 'Customer', { empty: 'No customers yet' })}</option>
+                    <option value="">{placeholder(customers, {
+                        loading: t('Loading customers…'),
+                        error: t('Customers unavailable'),
+                        select: t('Select customer'),
+                        empty: t('No customers yet'),
+                      })}</option>
                     {customers.items.map((customer) => (
                       <option key={customer.id} value={customer.id}>
                         {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -268,25 +279,30 @@ function AddMachine() {
               )}
 
               <Form.Group as={Col} md={6} controlId="addedDate">
-                <Form.Label>Machine Added Date</Form.Label>
+                <Form.Label>{t('Machine Added Date')}</Form.Label>
                 <Form.Control value={formatDate(existing?.createdAt ?? new Date())} readOnly />
               </Form.Group>
 
-              <Field name="name" label="Machine Name" {...fieldProps}>
+              <Field name="name" label={t('Machine Name')} {...fieldProps}>
                 <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder="VMC-01" isInvalid={Boolean(errors.name)} />
               </Field>
 
-              <Field name="serialNumber" label="Machine Sr. No." {...fieldProps}>
+              <Field name="serialNumber" label={t('Machine Sr. No.')} {...fieldProps}>
                 <Form.Control {...register('serialNumber')} autoComplete="off" maxLength={MAX_LENGTH.serialNumber} isInvalid={Boolean(errors.serialNumber)} />
               </Field>
 
-              <Field name="brandId" label="Brand" {...fieldProps}>
+              <Field name="brandId" label={t('Brand')} {...fieldProps}>
                 <Form.Select
                   {...register('brandId', { onChange: clearController })}
                   disabled={brands.loading || Boolean(brands.error)}
                   isInvalid={Boolean(errors.brandId)}
                 >
-                  <option value="">{placeholder(brands, 'Brand')}</option>
+                  <option value="">{placeholder(brands, {
+                      loading: t('Loading brands…'),
+                      error: t('Brands unavailable'),
+                      select: t('Select brand'),
+                      empty: t('No brands yet'),
+                    })}</option>
                   {brands.items.map((brand) => (
                     <option key={brand.id} value={brand.id}>
                       {brand.name}
@@ -295,7 +311,7 @@ function AddMachine() {
                 </Form.Select>
               </Field>
 
-              <Field name="controllerId" label="Controller" help={FIELD_HELP.controllerId} {...fieldProps}>
+              <Field name="controllerId" label={t('Controller')} help={FIELD_HELP.controllerId} {...fieldProps}>
                 <Form.Select
                   {...register('controllerId', { onChange: clearModel })}
                   disabled={!brandId || controllers.loading || Boolean(controllers.error)}
@@ -304,8 +320,13 @@ function AddMachine() {
                   <option value="">
                     {placeholder(
                       { ...controllers, items: brandControllers },
-                      'Controller',
-                      { needs: brandId ? '' : 'Select a brand first', empty: 'No controllers for this brand' },
+                      {
+                        needs: brandId ? '' : t('Select a brand first'),
+                        loading: t('Loading controllers…'),
+                        error: t('Controllers unavailable'),
+                        select: t('Select controller'),
+                        empty: t('No controllers for this brand'),
+                      },
                     )}
                   </option>
                   {brandControllers.map((option) => (
@@ -316,7 +337,7 @@ function AddMachine() {
                 </Form.Select>
               </Field>
 
-              <Field name="modelId" label="Model Name" help={FIELD_HELP.modelId} {...fieldProps}>
+              <Field name="modelId" label={t('Model Name')} help={FIELD_HELP.modelId} {...fieldProps}>
                 <Form.Select
                   {...register('modelId')}
                   disabled={!controllerId || models.loading || Boolean(models.error)}
@@ -325,8 +346,13 @@ function AddMachine() {
                   <option value="">
                     {placeholder(
                       { ...models, items: controllerModels },
-                      'Model',
-                      { needs: controllerId ? '' : 'Select a controller first', empty: 'No models for this controller' },
+                      {
+                        needs: controllerId ? '' : t('Select a controller first'),
+                        loading: t('Loading models…'),
+                        error: t('Models unavailable'),
+                        select: t('Select model'),
+                        empty: t('No models for this controller'),
+                      },
                     )}
                   </option>
                   {controllerModels.map((option) => (
@@ -337,22 +363,22 @@ function AddMachine() {
                 </Form.Select>
               </Field>
 
-              <Field name="controllerVersion" label="Controller Software Ver." {...fieldProps}>
+              <Field name="controllerVersion" label={t('Controller Software Ver.')} {...fieldProps}>
                 <Form.Control {...register('controllerVersion')} autoComplete="off" maxLength={MAX_LENGTH.controllerVersion} placeholder="V04.07" isInvalid={Boolean(errors.controllerVersion)} />
               </Field>
 
-              <Field name="accuracyId" label="Machine Accuracy" {...fieldProps}>
+              <Field name="accuracyId" label={t('Machine Accuracy')} {...fieldProps}>
                 <Form.Select {...register('accuracyId')} isInvalid={Boolean(errors.accuracyId)}>
-                  <option value="">Select machine accuracy</option>
+                  <option value="">{t('Select machine accuracy')}</option>
                   {MACHINE_ACCURACIES.map((option) => (
                     <option key={option.id} value={option.id}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </Form.Select>
               </Field>
 
-              <Field name="lineId" label="Machine Line No." help={FIELD_HELP.lineId} {...fieldProps}>
+              <Field name="lineId" label={t('Machine Line No.')} help={FIELD_HELP.lineId} {...fieldProps}>
                 {/* Controlled: the options load after the customer is known */}
                 <Controller
                   name="lineId"
@@ -360,7 +386,13 @@ function AddMachine() {
                   render={({ field }) => (
                     <Form.Select {...field} disabled={!userId || lines.loading || Boolean(lines.error)} isInvalid={Boolean(errors.lineId)}>
                       <option value="">
-                        {placeholder(lines, 'Line', { needs: userId ? '' : 'Select a customer first', empty: 'No lines for this customer' })}
+                        {placeholder(lines, {
+                          needs: userId ? '' : t('Select a customer first'),
+                          loading: t('Loading lines…'),
+                          error: t('Lines unavailable'),
+                          select: t('Select line'),
+                          empty: t('No lines for this customer'),
+                        })}
                       </option>
                       {lines.items.map((line) => (
                         <option key={line.id} value={line.id}>
@@ -372,21 +404,21 @@ function AddMachine() {
                 />
               </Field>
 
-              <Field name="isInsured" label="Insured" {...fieldProps}>
+              <Field name="isInsured" label={t('Insured')} {...fieldProps}>
                 <Form.Select {...register('isInsured')} isInvalid={Boolean(errors.isInsured)}>
-                  <option value={NO}>No</option>
-                  <option value={YES}>Yes</option>
+                  <option value={NO}>{t('No')}</option>
+                  <option value={YES}>{t('Yes')}</option>
                 </Form.Select>
               </Field>
 
-              <Field name="maintenanceRequired" label="Maintenance Req." {...fieldProps}>
+              <Field name="maintenanceRequired" label={t('Maintenance Req.')} {...fieldProps}>
                 <Form.Select {...register('maintenanceRequired')} isInvalid={Boolean(errors.maintenanceRequired)}>
-                  <option value={NO}>No</option>
-                  <option value={YES}>Yes</option>
+                  <option value={NO}>{t('No')}</option>
+                  <option value={YES}>{t('Yes')}</option>
                 </Form.Select>
               </Field>
 
-              <Field name="installationDate" label="Installation Date" md={3} {...fieldProps}>
+              <Field name="installationDate" label={t('Installation Date')} md={3} {...fieldProps}>
                 <Controller
                   name="installationDate"
                   control={control}
@@ -394,7 +426,7 @@ function AddMachine() {
                 />
               </Field>
 
-              <Field name="billDate" label="Bill Date" md={3} {...fieldProps}>
+              <Field name="billDate" label={t('Bill Date')} md={3} {...fieldProps}>
                 <Controller
                   name="billDate"
                   control={control}
@@ -402,7 +434,7 @@ function AddMachine() {
                 />
               </Field>
 
-              <Field name="warrantyDate" label="Warranty End Date" {...fieldProps}>
+              <Field name="warrantyDate" label={t('Warranty End Date')} {...fieldProps}>
                 <Controller
                   name="warrantyDate"
                   control={control}
@@ -410,29 +442,29 @@ function AddMachine() {
                 />
               </Field>
 
-              <Field name="hourlyCost" label="Machine Hourly Cost" {...fieldProps}>
+              <Field name="hourlyCost" label={t('Machine Hourly Cost')} {...fieldProps}>
                 <Form.Control {...register('hourlyCost')} inputMode="decimal" autoComplete="off" placeholder="800.00" isInvalid={Boolean(errors.hourlyCost)} />
               </Field>
 
-              <Field name="amc" label="AMC - only after O/W" help={FIELD_HELP.amc} {...fieldProps}>
+              <Field name="amc" label={t('AMC - only after O/W')} help={FIELD_HELP.amc} {...fieldProps}>
                 <Form.Control {...register('amc')} autoComplete="off" maxLength={MAX_LENGTH.amc} isInvalid={Boolean(errors.amc)} />
               </Field>
 
-              <Field name="machineSystemType" label="Machine System Type" {...fieldProps}>
+              <Field name="machineSystemType" label={t('Machine System Type')} {...fieldProps}>
                 <Form.Select {...register('machineSystemType')} isInvalid={Boolean(errors.machineSystemType)}>
                   {MACHINE_SYSTEM_TYPES.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </Form.Select>
               </Field>
 
-              <Field name="securityMode" label="Security Type" help={FIELD_HELP.securityMode} {...fieldProps}>
+              <Field name="securityMode" label={t('Security Type')} help={FIELD_HELP.securityMode} {...fieldProps}>
                 <Form.Select {...register('securityMode')} isInvalid={Boolean(errors.securityMode)}>
                   {SECURITY_MODES.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </Form.Select>
@@ -445,29 +477,29 @@ function AddMachine() {
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-hdd-network text-primary" aria-hidden="true" />
-            Machine data access details
+            {t('Machine data access details')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
-              <Field name="localIp" label="Local IP" help={FIELD_HELP.localIp} md={4} {...fieldProps}>
+              <Field name="localIp" label={t('Local IP')} help={FIELD_HELP.localIp} md={4} {...fieldProps}>
                 <Form.Control {...register('localIp')} autoComplete="off" inputMode="decimal" placeholder="192.168.1.10" isInvalid={Boolean(errors.localIp)} />
               </Field>
 
-              <Field name="liveIp" label="Live IP" help={FIELD_HELP.liveIp} md={4} {...fieldProps}>
+              <Field name="liveIp" label={t('Live IP')} help={FIELD_HELP.liveIp} md={4} {...fieldProps}>
                 <Form.Control {...register('liveIp')} autoComplete="off" inputMode="decimal" placeholder="103.81.119.106" isInvalid={Boolean(errors.liveIp)} />
               </Field>
 
-              <Field name="port" label="Port" help={FIELD_HELP.port} md={4} {...fieldProps}>
+              <Field name="port" label={t('Port')} help={FIELD_HELP.port} md={4} {...fieldProps}>
                 <Form.Control {...register('port')} autoComplete="off" inputMode="numeric" placeholder="4840" isInvalid={Boolean(errors.port)} />
               </Field>
 
-              <Field name="username" label="User Name" md={4} {...fieldProps}>
+              <Field name="username" label={t('User Name')} md={4} {...fieldProps}>
                 <Form.Control {...register('username')} autoComplete="off" maxLength={MAX_LENGTH.username} isInvalid={Boolean(errors.username)} />
               </Field>
 
               <Form.Group as={Col} md={4} controlId="password">
                 <FieldLabel required={!isEdit} help={FIELD_HELP.password}>
-                  Password
+                  {t('Password')}
                 </FieldLabel>
                 <InputGroup hasValidation>
                   <Form.Control
@@ -481,19 +513,19 @@ function AddMachine() {
                   <Button
                     variant="ghost"
                     onClick={() => setShowPassword((show) => !show)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t('Hide password') : t('Show password')}
                     aria-pressed={showPassword}
                   >
                     <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
                   </Button>
                   <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
                 </InputGroup>
-                {isEdit && <Form.Text>To change the password type it here, otherwise leave it blank.</Form.Text>}
+                {isEdit && <Form.Text>{t('To change the password type it here, otherwise leave it blank.')}</Form.Text>}
               </Form.Group>
 
               <Form.Group as={Col} md={4}>
                 <Form.Label as="span" className="required d-block" id="controllerVersionType-label">
-                  Controller Ver.
+                  {t('Controller Ver.')}
                 </Form.Label>
                 <div role="radiogroup" className="ts-radio-group" aria-labelledby="controllerVersionType-label">
                   {CONTROLLER_VERSION_TYPES.map((option) => (
@@ -514,16 +546,16 @@ function AddMachine() {
                 )}
               </Form.Group>
 
-              <Field name="longitude" label="Longitude" md={4} {...fieldProps}>
+              <Field name="longitude" label={t('Longitude')} md={4} {...fieldProps}>
                 <Form.Control {...register('longitude')} autoComplete="off" inputMode="decimal" placeholder="70.671297" isInvalid={Boolean(errors.longitude)} />
               </Field>
 
-              <Field name="latitude" label="Latitude" md={4} {...fieldProps}>
+              <Field name="latitude" label={t('Latitude')} md={4} {...fieldProps}>
                 <Form.Control {...register('latitude')} autoComplete="off" inputMode="decimal" placeholder="22.244054" isInvalid={Boolean(errors.latitude)} />
               </Field>
 
               <Form.Group as={Col} md={4}>
-                <FieldLabel help={FIELD_HELP.healthIds}>Machine Health</FieldLabel>
+                <FieldLabel help={FIELD_HELP.healthIds}>{t('Machine Health')}</FieldLabel>
                 <Controller
                   name="healthIds"
                   control={control}
@@ -537,24 +569,24 @@ function AddMachine() {
         {/* Actions */}
         <div className="ts-form-actions">
           <span className="ts-form-actions-note">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={() => navigate(ROUTES.MACHINES)} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button variant="ghost" onClick={() => reset()} disabled={isSubmitting}>
-            Reset
+            {t('Reset')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Machine' : 'Save Machine'}
+                {isEdit ? t('Update Machine') : t('Save Machine')}
               </>
             )}
           </Button>

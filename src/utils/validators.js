@@ -1,4 +1,7 @@
-// Reusable field validators. Each returns an error message, or '' when valid.
+import { tk, tkv } from '@/i18n/tk'
+
+// Reusable field validators. Each returns an error message (a key: show it with translateText), or ''
+// when valid.
 
 export const PATTERNS = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
@@ -37,7 +40,7 @@ export const minLength = (min, label) => (value) =>
 // File check: allowed MIME types + max size in bytes
 export const fileRule = ({ types, maxBytes }) => (file) => {
   if (!file) return ''
-  if (!types.includes(file.type)) return 'Unsupported file type'
-  if (file.size > maxBytes) return `File must be smaller than ${Math.round(maxBytes / (1024 * 1024))} MB`
+  if (!types.includes(file.type)) return tk('Unsupported file type')
+  if (file.size > maxBytes) return tkv('File must be smaller than {{n}} MB', { n: Math.round(maxBytes / (1024 * 1024)) })
   return ''
 }

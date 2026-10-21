@@ -4,20 +4,21 @@ import { normalizeTheme } from '@/utils/theme'
 import { ACCOUNT_KIND } from './accountPages'
 import { PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
+import { tk, tkv } from '@/i18n/tk'
 
 // Filters the customer can use on their screens and reports (users API `filters`, user_filters table).
 // `value` is the filter name the API stores; this order is also the order they are sent in.
 // `icon` is the chip icon on the form.
 export const FILTER_OPTIONS = [
-  { value: 'country', label: 'Country', icon: 'bi-globe2' },
-  { value: 'state', label: 'State', icon: 'bi-map' },
-  { value: 'branch', label: 'Branch', icon: 'bi-diagram-3' },
-  { value: 'city', label: 'City', icon: 'bi-buildings' },
-  { value: 'location', label: 'Location', icon: 'bi-geo-alt' },
-  { value: 'shop', label: 'Shop', icon: 'bi-shop' },
-  { value: 'line', label: 'Line', icon: 'bi-distribute-vertical' },
-  { value: 'cell', label: 'Cell', icon: 'bi-grid-3x3-gap' },
-  { value: 'supervisor', label: 'Supervisor', icon: 'bi-person-badge' },
+  { value: 'country', label: tk('Country'), icon: 'bi-globe2' },
+  { value: 'state', label: tk('State'), icon: 'bi-map' },
+  { value: 'branch', label: tk('Branch'), icon: 'bi-diagram-3' },
+  { value: 'city', label: tk('City'), icon: 'bi-buildings' },
+  { value: 'location', label: tk('Location'), icon: 'bi-geo-alt' },
+  { value: 'shop', label: tk('Shop'), icon: 'bi-shop' },
+  { value: 'line', label: tk('Line'), icon: 'bi-distribute-vertical' },
+  { value: 'cell', label: tk('Cell'), icon: 'bi-grid-3x3-gap' },
+  { value: 'supervisor', label: tk('Supervisor'), icon: 'bi-person-badge' },
 ]
 
 export const FILTER_NAMES = FILTER_OPTIONS.map((option) => option.value)
@@ -89,48 +90,48 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
     roleId: z.string(),
     companyId: z.string(),
     machineIds: z.array(z.string()),
-    branchId: z.string().min(1, 'Branch is required'),
-    companyName: z.string().min(1, 'Company name is required').max(150, 'Company name is too long'),
-    finixId: z.string().regex(/^\d*$/, 'Finix ID must be a number').optional().or(z.literal('')),
+    branchId: z.string().min(1, tk('Branch is required')),
+    companyName: z.string().min(1, tk('Company name is required')).max(150, tk('Company name is too long')),
+    finixId: z.string().regex(/^\d*$/, tk('Finix ID must be a number')).optional().or(z.literal('')),
     gstNo: z.string().optional(),
     panNo: z.string().optional(),
-    website: z.string().regex(PATTERNS.url, 'Enter a valid website, e.g. www.example.com').optional().or(z.literal('')),
+    website: z.string().regex(PATTERNS.url, tk('Enter a valid website, e.g. www.example.com')).optional().or(z.literal('')),
     logo: z
       .any()
-      .refine((file) => !file || file === '' || file instanceof File, 'Invalid file')
-      .refine((file) => !file || file === '' || ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type), 'Unsupported file type')
-      .refine((file) => !file || file === '' || file.size <= 2 * 1024 * 1024, 'File must be smaller than 2 MB')
+      .refine((file) => !file || file === '' || file instanceof File, tk('Invalid file'))
+      .refine((file) => !file || file === '' || ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type), tk('Unsupported file type'))
+      .refine((file) => !file || file === '' || file.size <= 2 * 1024 * 1024, tk('File must be smaller than 2 MB'))
       .nullable()
       .optional(),
-    email: z.string().min(1, 'Email is required').regex(PATTERNS.email, 'Enter a valid email address'),
-    username: z.string().min(1, 'User name is required').regex(PATTERNS.username, 'Use 3–50 letters, numbers, dot or underscore'),
+    email: z.string().min(1, tk('Email is required')).regex(PATTERNS.email, tk('Enter a valid email address')),
+    username: z.string().min(1, tk('User name is required')).regex(PATTERNS.username, tk('Use 3–50 letters, numbers, dot or underscore')),
     password: z.string(),
-    address1: z.string().min(1, 'Address line 1 is required'),
+    address1: z.string().min(1, tk('Address line 1 is required')),
     address2: z.string().optional(),
-    country: z.string().min(1, 'Country is required'),
-    state: z.string().min(1, 'State is required'),
-    city: z.string().min(1, 'City is required'),
-    zipCode: z.string().min(1, 'Zip code is required'),
-    contactPerson: z.string().min(1, 'Contact person is required'),
-    primaryPhone: z.string().min(1, 'Primary phone is required').regex(PATTERNS.phone, 'Enter a valid phone number'),
-    secondaryPhone: z.string().regex(PATTERNS.phone, 'Enter a valid phone number').optional().or(z.literal('')),
-    timeZone: z.string().min(1, 'Time zone is required'),
-    dayStartFrom: z.string().min(1, 'Day start time is required'),
-    theme: z.enum(THEMES.map((option) => option.value), { message: 'Theme is required' }),
+    country: z.string().min(1, tk('Country is required')),
+    state: z.string().min(1, tk('State is required')),
+    city: z.string().min(1, tk('City is required')),
+    zipCode: z.string().min(1, tk('Zip code is required')),
+    contactPerson: z.string().min(1, tk('Contact person is required')),
+    primaryPhone: z.string().min(1, tk('Primary phone is required')).regex(PATTERNS.phone, tk('Enter a valid phone number')),
+    secondaryPhone: z.string().regex(PATTERNS.phone, tk('Enter a valid phone number')).optional().or(z.literal('')),
+    timeZone: z.string().min(1, tk('Time zone is required')),
+    dayStartFrom: z.string().min(1, tk('Day start time is required')),
+    theme: z.enum(THEMES.map((option) => option.value), { message: tk('Theme is required') }),
     filters: z.array(z.enum(FILTER_NAMES)),
   })
   .superRefine((data, ctx) => {
     if (kind === ACCOUNT_KIND.USER && !data.roleId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Role is required', path: ['roleId'] })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: tk('Role is required'), path: ['roleId'] })
     }
     if (kind === ACCOUNT_KIND.USER && needsCompany && !data.companyId) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Customer is required', path: ['companyId'] })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: tk('Customer is required'), path: ['companyId'] })
     }
 
     if (!isEdit && data.password.length < PASSWORD_MIN_LENGTH) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
+        message: tkv('Password must be at least {{n}} characters', { n: PASSWORD_MIN_LENGTH }),
         path: ['password'],
       })
     }
@@ -140,13 +141,13 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       if (!data.gstNo || data.gstNo.trim() === '') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'GST No. is required',
+          message: tk('GST No. is required'),
           path: ['gstNo'],
         })
       } else if (!PATTERNS.gstin.test(data.gstNo)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Enter a valid 15-character GSTIN',
+          message: tk('Enter a valid 15-character GSTIN'),
           path: ['gstNo'],
         })
       }
@@ -154,13 +155,13 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       if (!data.panNo || data.panNo.trim() === '') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'PAN No. is required',
+          message: tk('PAN No. is required'),
           path: ['panNo'],
         })
       } else if (!PATTERNS.pan.test(data.panNo)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Enter a valid PAN, e.g. ABCDE1234F',
+          message: tk('Enter a valid PAN, e.g. ABCDE1234F'),
           path: ['panNo'],
         })
       }
@@ -168,7 +169,7 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       if (!PATTERNS.pinIndia.test(data.zipCode)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Enter a valid 6-digit PIN code',
+          message: tk('Enter a valid 6-digit PIN code'),
           path: ['zipCode'],
         })
       }
@@ -177,7 +178,7 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       if (!PATTERNS.postalCode.test(data.zipCode)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Enter a valid postal code',
+          message: tk('Enter a valid postal code'),
           path: ['zipCode'],
         })
       }

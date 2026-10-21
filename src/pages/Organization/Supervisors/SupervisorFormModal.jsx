@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserSupervisor, updateUserSupervisor } from '@/services/userSupervisorService'
@@ -9,9 +9,11 @@ import useOrgUser from '@/hooks/useOrgUser'
 import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, supervisorSchema, toSupervisorPayload, toFormValues } from './supervisorForm'
+import { useTranslation } from 'react-i18next'
 
 // Add / edit a supervisor: its cell and name. `supervisor` = the supervisor being edited, null when adding.
 function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(supervisor)
 
   // The superadmin picks the customer on the form; others always save to their own company
@@ -49,18 +51,20 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
       const ownerId = canPickUser ? values.customerId : userId
       const payload = toSupervisorPayload(values)
       const saved = isEdit ? await updateUserSupervisor(supervisor.id, payload, ownerId) : await createUserSupervisor(payload, ownerId)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Supervisor updated' : 'Supervisor added' })
+      toast.success(isEdit ? t('{{name}} has been updated.', { name: saved.name }) : t('{{name}} has been added.', { name: saved.name }), {
+        title: isEdit ? t('Supervisor updated') : t('Supervisor added'),
+      })
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save supervisor' })
+      toast.error(error.message, { title: t('Could not save supervisor') })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit supervisor' : 'Add supervisor'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit supervisor') : t('Add supervisor')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Supervisor' : 'Add Supervisor'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Supervisor') : t('Add Supervisor')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -72,9 +76,9 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
             error={errors.customerId?.message}
           />
           <Form.Group controlId="supervisor-cell" className="mb-3">
-            <Form.Label className="required">Cell</Form.Label>
+            <Form.Label className="required">{t('Cell')}</Form.Label>
             <Form.Select {...register('userCellId')} isInvalid={Boolean(errors.userCellId)}>
-              <option value="">Select cell</option>
+              <option value="">{t('Select cell')}</option>
               {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.lineName ? `${option.name} · ${option.lineName}` : option.name}
@@ -85,7 +89,7 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
           </Form.Group>
 
           <Form.Group controlId="supervisor-name">
-            <Form.Label className="required">Supervisor Name</Form.Label>
+            <Form.Label className="required">{t('Supervisor Name')}</Form.Label>
             <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
           </Form.Group>
@@ -93,18 +97,18 @@ function SupervisorFormModal({ show, supervisor, cells, defaultCellId, onSaved, 
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>

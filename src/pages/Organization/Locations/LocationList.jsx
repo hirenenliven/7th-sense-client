@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import LocationFormModal from './LocationFormModal'
 import LocationRow from './LocationRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (location, term) =>
   [location.id, location.name, location.branchName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -24,6 +25,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 // Masters › Locations: the logged-in user's locations with search, branch filter,
 // paging, add / edit and delete.
 function LocationList() {
+  const { t } = useTranslation()
   const [locations, setLocations] = useState([])
   const [branches, setBranches] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function LocationList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Location', sort: (row) => row.name },
-    { label: 'Branch', sort: (row) => row.branchName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canEdit ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Location'), sort: (row) => row.name },
+    { label: t('Branch'), sort: (row) => row.branchName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canEdit ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function LocationList() {
     try {
       await deleteUserLocation(pendingDelete.id, pendingDelete.userId)
       setLocations((list) => list.filter((location) => location.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Location deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Location deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete location' })
+      toast.error(err.message, { title: t('Could not delete location') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading locations…" />
+    if (loading) return <Loader text={t('Loading locations…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load locations.</b> {error}
+            <b>{t('Could not load locations.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,18 +137,18 @@ function LocationList() {
           <i className="bi bi-geo-alt ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No locations yet.</p>
+              <p className="mb-2">{t('No locations yet.')}</p>
               {canEdit && (
                 <Button size="sm" onClick={openAdd}>
-                  Add the first location
+                  {t('Add the first location')}
                 </Button>
               )}
             </>
           ) : (
             <>
-              <p className="mb-2">Every location belongs to a branch. Add a branch first.</p>
+              <p className="mb-2">{t('Every location belongs to a branch. Add a branch first.')}</p>
               <Button as={Link} to={ROUTES.BRANCHES} size="sm" variant="ghost">
-                Go to Branches
+                {t('Go to Branches')}
               </Button>
             </>
           )}
@@ -160,13 +162,13 @@ function LocationList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, location, branch…"
+              placeholder={t('Search ID, location, branch…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search locations"
+              aria-label={t('Search locations')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -179,9 +181,9 @@ function LocationList() {
               setBranchFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by branch"
+            aria-label={t('Filter by branch')}
           >
-            <option value="">All branches</option>
+            <option value="">{t('All branches')}</option>
             {branches.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -217,7 +219,7 @@ function LocationList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No locations match these filters.</div>
+          <div className="ts-empty">{t('No locations match these filters.')}</div>
         )}
       </>
     )
@@ -227,15 +229,15 @@ function LocationList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Locations</div>
-          <h1>Locations</h1>
-          <p className="ts-page-subtitle">Your locations and the branch each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · Locations')}</div>
+          <h1>{t('Locations')}</h1>
+          <p className="ts-page-subtitle">{t('Your locations and the branch each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Location
+              {t('Add Location')}
             </Button>
           )}
         </div>
@@ -256,13 +258,13 @@ function LocationList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete location"
-        confirmLabel="Delete"
+        title={t('Delete location')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
         {' '}A location that still has shops cannot be deleted — delete those first.
       </ConfirmModal>
     </>

@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import ShopFormModal from './ShopFormModal'
 import ShopRow from './ShopRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (shop, term) =>
   [shop.id, shop.name, shop.locationName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -24,6 +25,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 // Masters › Shops: the logged-in user's shops with search, location filter,
 // paging, add / edit and delete.
 function ShopList() {
+  const { t } = useTranslation()
   const [shops, setShops] = useState([])
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function ShopList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Shop', sort: (row) => row.name },
-    { label: 'Location', sort: (row) => row.locationName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canEdit ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Shop'), sort: (row) => row.name },
+    { label: t('Location'), sort: (row) => row.locationName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canEdit ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function ShopList() {
     try {
       await deleteUserShop(pendingDelete.id, pendingDelete.userId)
       setShops((list) => list.filter((shop) => shop.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Shop deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Shop deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete shop' })
+      toast.error(err.message, { title: t('Could not delete shop') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading shops…" />
+    if (loading) return <Loader text={t('Loading shops…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load shops.</b> {error}
+            <b>{t('Could not load shops.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,18 +137,18 @@ function ShopList() {
           <i className="bi bi-shop ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No shops yet.</p>
+              <p className="mb-2">{t('No shops yet.')}</p>
               {canEdit && (
                 <Button size="sm" onClick={openAdd}>
-                  Add the first shop
+                  {t('Add the first shop')}
                 </Button>
               )}
             </>
           ) : (
             <>
-              <p className="mb-2">Every shop belongs to a location. Add a location first.</p>
+              <p className="mb-2">{t('Every shop belongs to a location. Add a location first.')}</p>
               <Button as={Link} to={ROUTES.ORG_LOCATIONS} size="sm" variant="ghost">
-                Go to Locations
+                {t('Go to Locations')}
               </Button>
             </>
           )}
@@ -160,13 +162,13 @@ function ShopList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, shop, location…"
+              placeholder={t('Search ID, shop, location…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search shops"
+              aria-label={t('Search shops')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -179,9 +181,9 @@ function ShopList() {
               setLocationFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by location"
+            aria-label={t('Filter by location')}
           >
-            <option value="">All locations</option>
+            <option value="">{t('All locations')}</option>
             {locations.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -217,7 +219,7 @@ function ShopList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No shops match these filters.</div>
+          <div className="ts-empty">{t('No shops match these filters.')}</div>
         )}
       </>
     )
@@ -227,15 +229,15 @@ function ShopList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Shops</div>
-          <h1>Shops</h1>
-          <p className="ts-page-subtitle">Your shops and the location each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · Shops')}</div>
+          <h1>{t('Shops')}</h1>
+          <p className="ts-page-subtitle">{t('Your shops and the location each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Shop
+              {t('Add Shop')}
             </Button>
           )}
         </div>
@@ -256,13 +258,13 @@ function ShopList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete shop"
-        confirmLabel="Delete"
+        title={t('Delete shop')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
         {' '}A shop that still has lines cannot be deleted — delete those first.
       </ConfirmModal>
     </>

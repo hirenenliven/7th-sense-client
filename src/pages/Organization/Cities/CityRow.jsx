@@ -4,8 +4,10 @@ import IconAction from '@/components/common/IconAction'
 import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 function CityRow({ city, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const { canEdit, customerLabel } = useOrgUser()
   return (
     <tr>
@@ -17,8 +19,8 @@ function CityRow({ city, onEdit, onDelete }) {
       {canEdit && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${city.name}`} onClick={() => onEdit(city)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${city.name}`} onClick={() => onDelete(city)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: city.name })} onClick={() => onEdit(city)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: city.name })} onClick={() => onDelete(city)} />
           </div>
         </td>
       )}

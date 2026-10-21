@@ -1,12 +1,13 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Dropdown, Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 // Field text: the placeholder, "All …", or the picked labels (the field truncates them; the count pill
 // beside them says how many there are)
-const summary = (pickedOptions, options, placeholder, noun) => {
+const summary = (t, pickedOptions, options, placeholder, noun) => {
   if (!pickedOptions.length) return placeholder
-  if (pickedOptions.length > 1 && pickedOptions.length === options.length) return `All ${noun.many}`
+  if (pickedOptions.length > 1 && pickedOptions.length === options.length) return t('All {{items}}', { items: noun.many })
   return pickedOptions.map((option) => option.label).join(', ')
 }
 
@@ -24,6 +25,7 @@ const toGroups = (list) =>
 // of one group get a heading. value = picked option values, kept in option order. The open list has
 // a search, an "All" row and a footer with the count and Clear; the picked options are listed below
 // the field as neutral chips (under the same group headings), each removable.
+// noun, placeholder and emptyText arrive translated.
 function MultiSelectPicker({
   id,
   options,
@@ -31,11 +33,12 @@ function MultiSelectPicker({
   onChange,
   onBlur,
   noun,
-  placeholder = 'Select',
-  emptyText = 'Nothing to select',
+  placeholder,
+  emptyText,
   disabled = false,
   isInvalid = false,
 }) {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
@@ -93,7 +96,7 @@ function MultiSelectPicker({
 
   const pickedOptions = options.filter((option) => picked.has(option.value))
   const pickedGroups = toGroups(pickedOptions)
-  const countLabel = (count) => `${count} ${count === 1 ? noun.one : noun.many}`
+  const countLabel = (count) => t('{{n}} {{items}}', { n: count, items: count === 1 ? noun.one : noun.many })
 
   return (
     <>
@@ -117,10 +120,10 @@ function MultiSelectPicker({
         >
           <span className="ts-multi-toggle">
             <span className={`text-truncate${value.length ? '' : ' text-body-tertiary'}`}>
-              {options.length ? summary(pickedOptions, options, placeholder, noun) : emptyText}
+              {options.length ? summary(t, pickedOptions, options, placeholder ?? t('Select'), noun) : (emptyText ?? t('Nothing to select'))}
             </span>
             {value.length > 1 && (
-              <span className="ts-multi-count" aria-label={`${countLabel(value.length)} selected`}>
+              <span className="ts-multi-count" aria-label={t('{{items}} selected', { items: countLabel(value.length) })}>
                 {value.length}
               </span>
             )}
@@ -136,8 +139,8 @@ function MultiSelectPicker({
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               onKeyDown={(event) => event.key === ' ' && event.stopPropagation()}
-              placeholder={`Search ${noun.many}…`}
-              aria-label={`Search ${noun.many}`}
+              placeholder={t('Search {{items}}…', { items: noun.many })}
+              aria-label={t('Search {{items}}', { items: noun.many })}
               autoComplete="off"
             />
           </div>
@@ -149,7 +152,7 @@ function MultiSelectPicker({
                 className="ts-multi-menu-all"
                 label={
                   <>
-                    <span>{term ? `All ${shown.length} shown` : `All ${noun.many}`}</span>
+                    <span>{term ? t('All {{n}} shown', { n: shown.length }) : t('All {{items}}', { items: noun.many })}</span>
                     <span className="ts-multi-menu-meta">
                       {shownPickedCount}/{shown.length}
                     </span>
@@ -184,15 +187,15 @@ function MultiSelectPicker({
             ) : (
               <div className="ts-multi-menu-empty">
                 <i className="bi bi-search" aria-hidden="true" />
-                No {noun.many} match “{search.trim()}”.
+                {t('No {{items}} match “{{search}}”.', { items: noun.many, search: search.trim() })}
               </div>
             )}
           </div>
 
           <div className="ts-multi-menu-foot">
-            <span aria-live="polite">{value.length ? `${countLabel(value.length)} selected` : 'None selected'}</span>
+            <span aria-live="polite">{value.length ? t('{{items}} selected', { items: countLabel(value.length) }) : t('None selected')}</span>
             <Button variant="link" size="sm" className="ts-multi-clear" onClick={() => onChange([])} disabled={disabled || !value.length}>
-              Clear
+              {t('Clear')}
             </Button>
           </div>
         </Dropdown.Menu>
@@ -202,13 +205,13 @@ function MultiSelectPicker({
         <div className="ts-multi-picked">
           <div className="ts-multi-picked-head">
             <span className="ts-multi-picked-title">
-              Selected
+              {t('Selected')}
               <span className="ts-multi-count">{pickedOptions.length}</span>
             </span>
             {pickedOptions.length > 1 && (
               <Button variant="link" size="sm" className="ts-multi-clear" onClick={() => onChange([])} disabled={disabled}>
                 <i className="bi bi-x-circle me-1" aria-hidden="true" />
-                Clear all
+                {t('Clear all')}
               </Button>
             )}
           </div>
@@ -221,7 +224,11 @@ function MultiSelectPicker({
                     <span className="ts-multi-picked-group-count">{group.options.length}</span>
                   </div>
                 )}
-                <ul className="ts-multi-chips" aria-label={group.name ? `Selected ${noun.many} of ${group.name}` : `Selected ${noun.many}`}>
+                <ul className="ts-multi-chips" aria-label={
+                    group.name
+                      ? t('Selected {{items}} of {{group}}', { items: noun.many, group: group.name })
+                      : t('Selected {{items}}', { items: noun.many })
+                  }>
                   {group.options.map((option) => (
                     <li key={option.value} className="ts-multi-chip" title={option.label}>
                       <span className="text-truncate">{option.label}</span>
@@ -230,7 +237,7 @@ function MultiSelectPicker({
                         className="ts-multi-chip-remove"
                         onClick={() => toggle(option.value)}
                         disabled={disabled}
-                        aria-label={`Remove ${option.label}${option.group ? `, ${option.group}` : ''}`}
+                        aria-label={t('Remove {{item}}', { item: option.group ? `${option.label}, ${option.group}` : option.label })}
                       >
                         <i className="bi bi-x" aria-hidden="true" />
                       </Button>

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 // Active / Inactive segmented control for forms. Two radios, so it takes a React Hook Form
 // registration as is: <StatusToggle id="shift-status" {...register('status')} />
@@ -12,15 +13,16 @@ function StatusToggle({
   inactiveValue = 'inactive',
   isInvalid = false,
   disabled = false,
-  label = 'Status',
+  label,
 }) {
+  const { t } = useTranslation()
   const options = [
-    { value: activeValue, label: 'Active', tone: 'is-active' },
-    { value: inactiveValue, label: 'Inactive', tone: 'is-inactive' },
+    { value: activeValue, label: t('Active'), tone: 'is-active' },
+    { value: inactiveValue, label: t('Inactive'), tone: 'is-inactive' },
   ]
 
   return (
-    <div className={`ts-status-toggle${isInvalid ? ' is-invalid' : ''}`} role="radiogroup" aria-label={label}>
+    <div className={`ts-status-toggle${isInvalid ? ' is-invalid' : ''}`} role="radiogroup" aria-label={label ?? t('Status')}>
       {options.map((option) => (
         <label key={option.value} className={`ts-status-option ${option.tone}`} htmlFor={`${id}-${option.value}`}>
           <input

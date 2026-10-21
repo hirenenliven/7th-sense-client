@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import IconAction from '@/components/common/IconAction'
 import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
@@ -8,6 +9,7 @@ import { CLIENTELE_STATUS } from './clienteleForm'
 
 // showCustomer (superadmin): the customer column; canManage (managers): edit and delete
 function ClienteleRow({ clientele, showCustomer, canManage, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const isActive = clientele.status !== CLIENTELE_STATUS.INACTIVE
   // Names; rows saved before migration 018 hold ISO codes
   const country = getCountryName(clientele.countryName) || clientele.countryName
@@ -33,8 +35,8 @@ function ClienteleRow({ clientele, showCustomer, canManage, onEdit, onDelete }) 
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${clientele.name}`} onClick={() => onEdit(clientele)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${clientele.name}`} onClick={() => onDelete(clientele)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: clientele.name })} onClick={() => onEdit(clientele)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: clientele.name })} onClick={() => onDelete(clientele)} />
           </div>
         </td>
       )}

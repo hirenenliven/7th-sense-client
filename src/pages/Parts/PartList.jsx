@@ -13,6 +13,7 @@ import PartRow from './PartRow'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (part, term) =>
   [part.id, part.partNo, part.partName, part.clienteleName, part.customerName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -20,6 +21,7 @@ const matchesSearch = (part, term) =>
 // Masters › Parts › Part List. The superadmin sees every customer's parts (filter by customer);
 // everyone else their company's. Managers (superadmin, customer, admin) add, edit and delete.
 function PartList() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
@@ -71,16 +73,16 @@ function PartList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Part No.', sort: (row) => row.partNo },
-    { label: 'Part Name', sort: (row) => row.partName },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Processes', sort: (row) => row.processCount },
-    { label: 'Part Count', sort: (row) => row.partCount },
-    { label: 'Production Time', sort: (row) => row.productionTime },
-    { label: 'Status', sort: (row) => row.status },
-    { label: 'Created', sort: (row) => row.createdAt },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Part No.'), sort: (row) => row.partNo },
+    { label: t('Part Name'), sort: (row) => row.partName },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Processes'), sort: (row) => row.processCount },
+    { label: t('Part Count'), sort: (row) => row.partCount },
+    { label: t('Production Time'), sort: (row) => row.productionTime },
+    { label: t('Status'), sort: (row) => row.status },
+    { label: t('Created'), sort: (row) => row.createdAt },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -92,27 +94,27 @@ function PartList() {
     try {
       await deletePart(pendingDelete.id)
       setParts((list) => list.filter((part) => part.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.partName} has been deleted.`, { title: 'Part deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.partName }), { title: t('Part deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete part' })
+      toast.error(err.message, { title: t('Could not delete part') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading parts…" />
+    if (loading) return <Loader text={t('Loading parts…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load parts.</b> {error}
+            <b>{t('Could not load parts.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -122,10 +124,10 @@ function PartList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-rocket-takeoff ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No parts yet.</p>
+          <p className="mb-2">{t('No parts yet.')}</p>
           {canManage && (
             <Button as={Link} to={ROUTES.PART_ADD} size="sm">
-              Add the first part
+              {t('Add the first part')}
             </Button>
           )}
         </div>
@@ -138,13 +140,13 @@ function PartList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, part no., part name, clientele, customer…"
+              placeholder={t('Search ID, part no., part name, clientele, customer…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search parts"
+              aria-label={t('Search parts')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -158,9 +160,9 @@ function PartList() {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -199,7 +201,7 @@ function PartList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No parts match these filters.</div>
+          <div className="ts-empty">{t('No parts match these filters.')}</div>
         )}
       </>
     )
@@ -209,17 +211,17 @@ function PartList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Parts</div>
-          <h1>Part List</h1>
+          <div className="ts-eyebrow">{t('Masters · Parts')}</div>
+          <h1>{t('Part List')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s parts, their processes and production time.' : 'Your parts, their processes and production time.'}
+            {isSuperadmin ? t('Every customer’s parts, their processes and production time.') : t('Your parts, their processes and production time.')}
           </p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button as={Link} to={ROUTES.PART_ADD}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Part
+              {t('Add Part')}
             </Button>
           </div>
         )}
@@ -231,13 +233,17 @@ function PartList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete part"
-        confirmLabel="Delete"
+        title={t('Delete part')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.partName}</strong> ({pendingDelete?.partNo})? It will no longer be offered for production.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b> ({{code}})? It will no longer be offered for production."
+          values={{ name: pendingDelete?.partName, code: pendingDelete?.partNo }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

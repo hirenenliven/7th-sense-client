@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import AuthContext from './AuthContext'
 import { onUnauthorized } from '@/services/apiClient'
 import * as authService from '@/services/authService'
+import { refreshUserLanguage } from '@/utils/language'
 import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 
@@ -24,6 +25,7 @@ function AuthProvider({ children }) {
         if (!active) return
         setUser(sessionUser)
         refreshUserTheme()
+        refreshUserLanguage()
       })
       .catch(() => active && setUser(null))
       .finally(() => active && setIsChecking(false))
@@ -51,6 +53,7 @@ function AuthProvider({ children }) {
     const loggedIn = await authService.login(credentials)
     setUser(loggedIn)
     refreshUserTheme()
+    refreshUserLanguage()
     return loggedIn
   }, [])
 

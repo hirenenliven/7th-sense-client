@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches models.name VARCHAR(100) (dto/machine_model_dto.go)
 export const NAME_MAX_LENGTH = 100
@@ -9,8 +10,8 @@ export const INITIAL_VALUES = {
 }
 
 export const modelSchema = z.object({
-  controllerId: z.string().min(1, 'Controller is required'),
-  name: z.string().trim().min(1, 'Model name is required').max(NAME_MAX_LENGTH, 'Name is too long'),
+  controllerId: z.string().min(1, tk('Controller is required')),
+  name: z.string().trim().min(1, tk('Model name is required')).max(NAME_MAX_LENGTH, tk('Name is too long')),
 })
 
 // ---------------------------------------------------------------------------
@@ -32,7 +33,7 @@ export const toFormValues = (model) => ({
 export const groupByBrand = (controllers) => {
   const groups = new Map()
   controllers.forEach((controller) => {
-    const brandName = controller.brandName || 'No brand'
+    const brandName = controller.brandName || ''
     if (!groups.has(brandName)) groups.set(brandName, [])
     groups.get(brandName).push(controller)
   })

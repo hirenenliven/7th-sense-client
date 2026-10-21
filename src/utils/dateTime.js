@@ -3,6 +3,10 @@
 // The fields show and accept dates as DD-MM-YYYY and times as HH:MM.
 
 export const PICKER_LOCALE = 'en-GB'
+
+// Locale for month / weekday names in the language on screen (i18n.resolvedLanguage); English keeps
+// PICKER_LOCALE (en-GB: day before month, weeks from Monday)
+export const displayLocale = (language) => (!language || language === 'en' ? PICKER_LOCALE : language)
 export const DATE_PLACEHOLDER = 'DD-MM-YYYY'
 export const TIME_PLACEHOLDER = 'HH:MM'
 export const DATE_TEXT_LENGTH = DATE_PLACEHOLDER.length

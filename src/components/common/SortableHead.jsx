@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { SORT_DIR } from '@/hooks/useTableSort'
 
 const ARIA_SORT = { [SORT_DIR.ASC]: 'ascending', [SORT_DIR.DESC]: 'descending' }
 
 // <thead> of a list table with sortable columns (state from hooks/useTableSort.js). A column is a
 // label string (plain header, e.g. Actions) or { label, sort } (a header button that sorts).
+// Labels arrive translated (t('Client Name') in the page's columns).
 function SortableHead({ columns, sort, onSort }) {
+  const { t } = useTranslation()
   return (
     <thead>
       <tr>
@@ -28,7 +31,7 @@ function SortableHead({ columns, sort, onSort }) {
                 type="button"
                 className={`ts-sort-btn${active ? ' is-active' : ''}`}
                 onClick={() => onSort(column.label)}
-                title={`Sort by ${column.label}`}
+                title={t('Sort by {{column}}', { column: column.label })}
               >
                 {column.label}
                 <i className={`bi ${icon} ts-sort-icon`} aria-hidden="true" />

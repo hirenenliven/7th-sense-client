@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserLine, updateUserLine } from '@/services/userLineService'
@@ -9,9 +9,11 @@ import useOrgUser from '@/hooks/useOrgUser'
 import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, lineSchema, toLinePayload, toFormValues } from './lineForm'
+import { useTranslation } from 'react-i18next'
 
 // Add / edit a line: its shop and name. `line` = the line being edited, null when adding.
 function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(line)
 
   // The superadmin picks the customer on the form; others always save to their own company
@@ -49,18 +51,20 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
       const ownerId = canPickUser ? values.customerId : userId
       const payload = toLinePayload(values)
       const saved = isEdit ? await updateUserLine(line.id, payload, ownerId) : await createUserLine(payload, ownerId)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Line updated' : 'Line added' })
+      toast.success(isEdit ? t('{{name}} has been updated.', { name: saved.name }) : t('{{name}} has been added.', { name: saved.name }), {
+        title: isEdit ? t('Line updated') : t('Line added'),
+      })
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save line' })
+      toast.error(error.message, { title: t('Could not save line') })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit line' : 'Add line'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit line') : t('Add line')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Line' : 'Add Line'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Line') : t('Add Line')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -72,9 +76,9 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
             error={errors.customerId?.message}
           />
           <Form.Group controlId="line-shop" className="mb-3">
-            <Form.Label className="required">Shop</Form.Label>
+            <Form.Label className="required">{t('Shop')}</Form.Label>
             <Form.Select {...register('userShopId')} isInvalid={Boolean(errors.userShopId)}>
-              <option value="">Select shop</option>
+              <option value="">{t('Select shop')}</option>
               {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.locationName ? `${option.name} · ${option.locationName}` : option.name}
@@ -85,7 +89,7 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
           </Form.Group>
 
           <Form.Group controlId="line-name">
-            <Form.Label className="required">Line Name</Form.Label>
+            <Form.Label className="required">{t('Line Name')}</Form.Label>
             <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
           </Form.Group>
@@ -93,18 +97,18 @@ function LineFormModal({ show, line, shops, defaultShopId, onSaved, onHide }) {
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>

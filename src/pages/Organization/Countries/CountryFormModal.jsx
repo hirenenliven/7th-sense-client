@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { ALL_COUNTRIES } from '@/constants/countryLibrary'
@@ -11,6 +11,7 @@ import useOrgUser from '@/hooks/useOrgUser'
 import { ownedBy, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, countrySchema, toCountryPayloads } from './countryForm'
+import { useTranslation } from 'react-i18next'
 
 const NOUN = { one: 'country', many: 'countries' }
 
@@ -20,6 +21,7 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 // each is saved as its own user_country row. Countries the user already added are hidden.
 // onSaved(addedCountries) gets the rows that were saved.
 function CountryFormModal({ show, countries, onSaved, onHide }) {
+  const { t } = useTranslation()
   // The superadmin picks the customer on the form; others always save to their own company
   const { canPickUser, userId } = useOrgUser()
   const schema = useMemo(() => withCustomer(countrySchema, canPickUser), [canPickUser])
@@ -60,20 +62,23 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
       try {
         added.push(await createUserCountry(payload, ownerId))
       } catch (error) {
-        toast.error(`${payload.name}: ${error.message}`, { title: 'Could not save country' })
+        toast.error(t('{{name}}: {{message}}', { name: payload.name, message: error.message }), { title: t('Could not save country') })
       }
     }
     if (!added.length) return
-    const names = added.length === 1 ? `${added[0].name} has` : `${added.length} countries have`
-    toast.success(`${names} been added.`, { title: 'Countries added' })
+    const message =
+      added.length === 1
+        ? t('{{name}} has been added.', { name: added[0].name })
+        : t('{{n}} countries have been added.', { n: added.length })
+    toast.success(message, { title: t('Countries added') })
     onSaved(added)
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label="Add countries">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={t('Add countries')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>Add Countries</Modal.Title>
+          <Modal.Title>{t('Add Countries')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -84,7 +89,7 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
             error={errors.customerId?.message}
           />
           <Form.Group controlId="country-names">
-            <Form.Label className="required">Countries</Form.Label>
+            <Form.Label className="required">{t('Countries')}</Form.Label>
             <Controller
               name="names"
               control={control}
@@ -96,8 +101,8 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   noun={NOUN}
-                  placeholder="Select countries"
-                  emptyText="Every country is already added"
+                  placeholder={t('Select countries')}
+                  emptyText={t('Every country is already added')}
                   disabled={isSubmitting}
                   isInvalid={Boolean(errors.names)}
                 />
@@ -109,18 +114,18 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                Save
+                {t('Save')}
               </>
             )}
           </Button>

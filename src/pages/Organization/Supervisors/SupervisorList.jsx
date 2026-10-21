@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import SupervisorFormModal from './SupervisorFormModal'
 import SupervisorRow from './SupervisorRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (supervisor, term) =>
   [supervisor.id, supervisor.name, supervisor.cellName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -24,6 +25,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 // Masters › Supervisors: the logged-in user's supervisors with search, cell filter,
 // paging, add / edit and delete.
 function SupervisorList() {
+  const { t } = useTranslation()
   const [supervisors, setSupervisors] = useState([])
   const [cells, setCells] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function SupervisorList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Supervisor', sort: (row) => row.name },
-    { label: 'Cell', sort: (row) => row.cellName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canEdit ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Supervisor'), sort: (row) => row.name },
+    { label: t('Cell'), sort: (row) => row.cellName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canEdit ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function SupervisorList() {
     try {
       await deleteUserSupervisor(pendingDelete.id, pendingDelete.userId)
       setSupervisors((list) => list.filter((supervisor) => supervisor.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Supervisor deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Supervisor deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete supervisor' })
+      toast.error(err.message, { title: t('Could not delete supervisor') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading supervisors…" />
+    if (loading) return <Loader text={t('Loading supervisors…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load supervisors.</b> {error}
+            <b>{t('Could not load supervisors.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,18 +137,18 @@ function SupervisorList() {
           <i className="bi bi-person-badge ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No supervisors yet.</p>
+              <p className="mb-2">{t('No supervisors yet.')}</p>
               {canEdit && (
                 <Button size="sm" onClick={openAdd}>
-                  Add the first supervisor
+                  {t('Add the first supervisor')}
                 </Button>
               )}
             </>
           ) : (
             <>
-              <p className="mb-2">Every supervisor belongs to a cell. Add a cell first.</p>
+              <p className="mb-2">{t('Every supervisor belongs to a cell. Add a cell first.')}</p>
               <Button as={Link} to={ROUTES.ORG_CELLS} size="sm" variant="ghost">
-                Go to Cells
+                {t('Go to Cells')}
               </Button>
             </>
           )}
@@ -160,13 +162,13 @@ function SupervisorList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, supervisor, cell…"
+              placeholder={t('Search ID, supervisor, cell…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search supervisors"
+              aria-label={t('Search supervisors')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -179,9 +181,9 @@ function SupervisorList() {
               setCellFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by cell"
+            aria-label={t('Filter by cell')}
           >
-            <option value="">All cells</option>
+            <option value="">{t('All cells')}</option>
             {cells.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -217,7 +219,7 @@ function SupervisorList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No supervisors match these filters.</div>
+          <div className="ts-empty">{t('No supervisors match these filters.')}</div>
         )}
       </>
     )
@@ -227,15 +229,15 @@ function SupervisorList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Supervisors</div>
-          <h1>Supervisors</h1>
-          <p className="ts-page-subtitle">Your supervisors and the cell each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · Supervisors')}</div>
+          <h1>{t('Supervisors')}</h1>
+          <p className="ts-page-subtitle">{t('Your supervisors and the cell each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Supervisor
+              {t('Add Supervisor')}
             </Button>
           )}
         </div>
@@ -256,13 +258,13 @@ function SupervisorList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete supervisor"
-        confirmLabel="Delete"
+        title={t('Delete supervisor')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
       </ConfirmModal>
     </>
   )

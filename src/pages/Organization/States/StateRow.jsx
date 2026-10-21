@@ -4,8 +4,10 @@ import IconAction from '@/components/common/IconAction'
 import useOrgUser from '@/hooks/useOrgUser'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 function StateRow({ state, onDelete }) {
+  const { t } = useTranslation()
   const { canAssign, customerLabel } = useOrgUser()
   return (
     <tr>
@@ -17,7 +19,7 @@ function StateRow({ state, onDelete }) {
       {canAssign && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${state.name}`} onClick={() => onDelete(state)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: state.name })} onClick={() => onDelete(state)} />
           </div>
         </td>
       )}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BRANCH_STATUS, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
@@ -10,6 +10,7 @@ import { createBranch, getBranchById, updateBranch } from '@/services/branchServ
 import { getUsers } from '@/services/customerService'
 import { getUserCities } from '@/services/userCityService'
 import { PATTERNS } from '@/utils/validators'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
@@ -25,11 +26,13 @@ import {
   toFormValues,
 } from './branchForm'
 import { FIELD_HELP } from './branchHelp'
+import { Trans, useTranslation } from 'react-i18next'
 
 const labelClass = (name) => (REQUIRED_FIELDS.has(name) ? 'required' : undefined)
 
 // Add and edit share this form: /masters/branches/add and /masters/branches/:id/edit
 function AddBranch() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -74,7 +77,7 @@ function AddBranch() {
       .catch((error) => {
         if (!active) return
         setCustomersError(error.message)
-        toast.error(error.message, { title: 'Could not load customers' })
+        toast.error(error.message, { title: i18n.t('Could not load customers') })
       })
       .finally(() => active && setCustomersLoading(false))
     return () => {
@@ -94,7 +97,7 @@ function AddBranch() {
       .catch((error) => {
         if (!active) return
         setCitiesError(error.message)
-        toast.error(error.message, { title: 'Could not load cities' })
+        toast.error(error.message, { title: i18n.t('Could not load cities') })
       })
       .finally(() => active && setCitiesLoading(false))
     return () => {
@@ -134,28 +137,28 @@ function AddBranch() {
       const payload = toBranchPayload(values, existing)
       if (isEdit) {
         await updateBranch(id, payload)
-        toast.success(`${payload.name} has been updated.`, { title: 'Branch updated' })
+        toast.success(t('{{name}} has been updated.', { name: payload.name }), { title: t('Branch updated') })
       } else {
         await createBranch(payload)
-        toast.success(`${payload.name} has been added.`, { title: 'Branch created' })
+        toast.success(t('{{name}} has been added.', { name: payload.name }), { title: t('Branch created') })
       }
       navigate(ROUTES.BRANCHES)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save branch' })
+      toast.error(error.message, { title: t('Could not save branch') })
     }
   }
 
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">Masters · Branches</div>
-        <h1>{isEdit ? 'Edit Branch' : 'Add Branch'}</h1>
-        <p className="ts-page-subtitle">{isEdit ? 'Update the branch details.' : 'Create a branch and link it to a customer.'}</p>
+        <div className="ts-eyebrow">{t('Masters · Branches')}</div>
+        <h1>{isEdit ? t('Edit Branch') : t('Add Branch')}</h1>
+        <p className="ts-page-subtitle">{isEdit ? t('Update the branch details.') : t('Create a branch and link it to a customer.')}</p>
       </div>
       <div className="ts-page-actions">
         <Button as={Link} to={ROUTES.BRANCHES} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          Branch list
+          {t('Branch list')}
         </Button>
       </div>
     </header>
@@ -165,7 +168,7 @@ function AddBranch() {
     return (
       <>
         {header}
-        <Loader text="Loading branch…" />
+        <Loader text={t('Loading branch…')} />
       </>
     )
   }
@@ -175,7 +178,7 @@ function AddBranch() {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this branch.</b> {branchError}
+          <b>{t('Could not load this branch.')}</b> {branchError}
         </Alert>
       </>
     )
@@ -185,39 +188,39 @@ function AddBranch() {
     <>
       {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit branch' : 'Add branch'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit Branch') : t('Add Branch')}>
         {/* Branch */}
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-diagram-3 text-primary" aria-hidden="true" />
-            Branch details
+            {t('Branch details')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={6} xxl={4} controlId="code">
-                <FieldLabel required help={FIELD_HELP.code}>Code</FieldLabel>
+                <FieldLabel required help={FIELD_HELP.code}>{t('Code')}</FieldLabel>
                 <Form.Control {...register('code', { onChange: handleChange })} autoComplete="off" maxLength={20} placeholder="PUNE01" isInvalid={Boolean(errors.code)} />
                 <Form.Control.Feedback type="invalid">{errors.code?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="name">
-                <Form.Label className={labelClass('name')}>Name</Form.Label>
+                <Form.Label className={labelClass('name')}>{t('Name')}</Form.Label>
                 <Form.Control {...register('name')} autoComplete="off" maxLength={200} isInvalid={Boolean(errors.name)} />
                 <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="email">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>{t('Email')}</Form.Label>
                 <Form.Control {...register('email')} type="email" autoComplete="off" maxLength={255} isInvalid={Boolean(errors.email)} />
                 <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
               </Form.Group>
 
               {canPickCustomer && (
                 <Form.Group as={Col} md={6} xxl={4} controlId="customerId">
-                  <FieldLabel required help={FIELD_HELP.customerId}>Customer</FieldLabel>
+                  <FieldLabel required help={FIELD_HELP.customerId}>{t('Customer')}</FieldLabel>
                   <Form.Select {...register('customerId', { onChange: handleCustomerChange })} disabled={customersLoading || Boolean(customersError)} isInvalid={Boolean(errors.customerId)}>
                     <option value="">
-                      {customersLoading ? 'Loading customers…' : customersError ? 'Customers unavailable' : 'Select customer'}
+                      {customersLoading ? t('Loading customers…') : customersError ? t('Customers unavailable') : t('Select customer')}
                     </option>
                     {customers.map((customer) => (
                       <option key={customer.id} value={customer.id}>
@@ -230,14 +233,14 @@ function AddBranch() {
               )}
 
               <Form.Group as={Col} md={6} xxl={4} controlId="colorCode">
-                <FieldLabel help={FIELD_HELP.colorCode}>Colour</FieldLabel>
+                <FieldLabel help={FIELD_HELP.colorCode}>{t('Colour')}</FieldLabel>
                 <InputGroup hasValidation>
                   <Form.Control
                     type="color"
                     className="form-control-color"
                     value={PATTERNS.hexColor.test(colorCode) ? colorCode : COLOR_PICKER_FALLBACK}
                     onChange={(event) => setValue('colorCode', event.target.value.toUpperCase(), { shouldValidate: true })}
-                    aria-label="Pick colour"
+                    aria-label={t('Pick colour')}
                   />
                   <Form.Control {...register('colorCode', { onChange: handleChange })} autoComplete="off" maxLength={7} placeholder="#F58220" isInvalid={Boolean(errors.colorCode)} />
                   <Form.Control.Feedback type="invalid">{errors.colorCode?.message}</Form.Control.Feedback>
@@ -245,7 +248,7 @@ function AddBranch() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4}>
-                <Form.Label className={labelClass('status')}>Status</Form.Label>
+                <Form.Label className={labelClass('status')}>{t('Status')}</Form.Label>
                 <StatusToggle
                   id="status"
                   {...register('status')}
@@ -268,13 +271,13 @@ function AddBranch() {
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={8} controlId="address">
-                <Form.Label>Address</Form.Label>
+                <Form.Label>{t('Address')}</Form.Label>
                 <Form.Control {...register('address')} autoComplete="street-address" maxLength={500} isInvalid={Boolean(errors.address)} />
                 <Form.Control.Feedback type="invalid">{errors.address?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={4} controlId="userCityId">
-                <FieldLabel help={FIELD_HELP.userCityId}>City</FieldLabel>
+                <FieldLabel help={FIELD_HELP.userCityId}>{t('City')}</FieldLabel>
                 {/* key: re-mount once the options arrive, so a saved city loaded earlier shows */}
                 <Form.Select
                   key={cities.length}
@@ -284,14 +287,14 @@ function AddBranch() {
                 >
                   <option value="">
                     {!customerId
-                      ? 'Select a customer first'
+                      ? t('Select a customer first')
                       : citiesLoading
-                        ? 'Loading cities…'
+                        ? t('Loading cities…')
                         : citiesError
-                          ? 'Cities unavailable'
+                          ? t('Cities unavailable')
                           : cities.length
-                            ? 'Select city'
-                            : 'No cities yet'}
+                            ? t('Select city')
+                            : t('No cities yet')}
                   </option>
                   {cities.map((city) => (
                     <option key={city.id} value={city.id}>
@@ -302,19 +305,22 @@ function AddBranch() {
                 <Form.Control.Feedback type="invalid">{errors.userCityId?.message}</Form.Control.Feedback>
                 {customerId && !citiesLoading && !citiesError && !cities.length && (
                   <Form.Text>
-                    This customer has no cities. Add them under <Link to={ROUTES.ORG_CITIES}>Masters › City</Link>.
+                    <Trans
+                      i18nKey="This customer has no cities. Add them under <l>Masters › City</l>."
+                      components={{ l: <Link to={ROUTES.ORG_CITIES} /> }}
+                    />
                   </Form.Text>
                 )}
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="gstNumber">
-                <Form.Label>GST No.</Form.Label>
+                <Form.Label>{t('GST No.')}</Form.Label>
                 <Form.Control {...register('gstNumber', { onChange: handleChange })} autoComplete="off" maxLength={15} placeholder="22ABCDE1234F1Z5" isInvalid={Boolean(errors.gstNumber)} />
                 <Form.Control.Feedback type="invalid">{errors.gstNumber?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="panNumber">
-                <Form.Label>PAN No.</Form.Label>
+                <Form.Label>{t('PAN No.')}</Form.Label>
                 <Form.Control {...register('panNumber', { onChange: handleChange })} autoComplete="off" maxLength={10} placeholder="ABCDE1234F" isInvalid={Boolean(errors.panNumber)} />
                 <Form.Control.Feedback type="invalid">{errors.panNumber?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -325,24 +331,24 @@ function AddBranch() {
         {/* Actions */}
         <div className="ts-form-actions">
           <span className="ts-form-actions-note">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={() => navigate(ROUTES.BRANCHES)} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button variant="ghost" onClick={() => reset()} disabled={isSubmitting}>
-            Reset
+            {t('Reset')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Branch' : 'Save Branch'}
+                {isEdit ? t('Update Branch') : t('Save Branch')}
               </>
             )}
           </Button>

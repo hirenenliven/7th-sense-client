@@ -27,6 +27,9 @@ React 19 + Vite, plain JS (no TS), Bootstrap 5 via `react-bootstrap`, SCSS theme
 - Dark by default, light per user (`theme-light.scss`, see THEME.md): use `bg-body-*`, `.card-inset`, `text-body-secondary` (no `bg-light`/`bg-white`). New colour tokens need a light value in `_tokens-light.scss`.
 - Page headers: `.ts-page-header` > `.ts-eyebrow`, `h1`, `.ts-page-subtitle`. No self-rendered nav.
 
+## Language
+- Header language select → `chooseLanguage` (`utils/language.js`): `i18n.changeLanguage` re-renders every `useTranslation` screen at once, then `PUT /me/language` saves it to the user's profile (toast on failure, the language stays). Login / session check applies `profile.language` (`refreshUserLanguage`, same `GET /me` as the theme). Text that should switch needs `t('…')` keys in all `i18n/locales/*.json`; a new language needs a `LANGUAGES` entry and a server `dto.Languages` entry.
+
 ## Tables
 - All list tables use the sortable table pattern: wrap `<Table responsive>` in `.ts-table-panel`, use `<SortableHead columns sort onSort />` as the `<thead>`, and integrate `TablePagination` as the footer.
 - Sortable columns: define `columns = [{ label, sort: (row) => value }, 'Actions']` → `const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))`, then render `sortedRows`. Plain string columns (Actions, View) are not sortable.

@@ -15,6 +15,7 @@ import { toast } from '@/utils/toast'
 import CityFormModal from './CityFormModal'
 import CityRow from './CityRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (city, term) =>
   [city.id, city.name, city.stateName].some((value) => String(value ?? '').toLowerCase().includes(term))
@@ -24,6 +25,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 // Masters › Cities: the logged-in user's cities with search, state filter,
 // paging, add / edit and delete.
 function CityList() {
+  const { t } = useTranslation()
   const [cities, setCities] = useState([])
   const [states, setStates] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function CityList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'City', sort: (row) => row.name },
-    { label: 'State', sort: (row) => row.stateName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canEdit ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('City'), sort: (row) => row.name },
+    { label: t('State'), sort: (row) => row.stateName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canEdit ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function CityList() {
     try {
       await deleteUserCity(pendingDelete.id, pendingDelete.userId)
       setCities((list) => list.filter((city) => city.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'City deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('City deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete city' })
+      toast.error(err.message, { title: t('Could not delete city') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading cities…" />
+    if (loading) return <Loader text={t('Loading cities…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load cities.</b> {error}
+            <b>{t('Could not load cities.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,18 +137,18 @@ function CityList() {
           <i className="bi bi-buildings ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No cities yet.</p>
+              <p className="mb-2">{t('No cities yet.')}</p>
               {canEdit && (
                 <Button size="sm" onClick={openAdd}>
-                  Add the first city
+                  {t('Add the first city')}
                 </Button>
               )}
             </>
           ) : (
             <>
-              <p className="mb-2">Every city belongs to a state. Add a state first.</p>
+              <p className="mb-2">{t('Every city belongs to a state. Add a state first.')}</p>
               <Button as={Link} to={ROUTES.ORG_STATES} size="sm" variant="ghost">
-                Go to States
+                {t('Go to States')}
               </Button>
             </>
           )}
@@ -160,13 +162,13 @@ function CityList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, city, state…"
+              placeholder={t('Search ID, city, state…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search cities"
+              aria-label={t('Search cities')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -179,9 +181,9 @@ function CityList() {
               setStateFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by state"
+            aria-label={t('Filter by state')}
           >
-            <option value="">All states</option>
+            <option value="">{t('All states')}</option>
             {states.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -217,7 +219,7 @@ function CityList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No cities match these filters.</div>
+          <div className="ts-empty">{t('No cities match these filters.')}</div>
         )}
       </>
     )
@@ -227,15 +229,15 @@ function CityList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Cities</div>
-          <h1>Cities</h1>
-          <p className="ts-page-subtitle">Your cities and the state each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · Cities')}</div>
+          <h1>{t('Cities')}</h1>
+          <p className="ts-page-subtitle">{t('Your cities and the state each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add City
+              {t('Add City')}
             </Button>
           )}
         </div>
@@ -256,13 +258,13 @@ function CityList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete city"
-        confirmLabel="Delete"
+        title={t('Delete city')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
         {' '}A city that still has branches cannot be deleted — delete those first.
       </ConfirmModal>
     </>

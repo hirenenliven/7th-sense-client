@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Lengths of the downtime_reasons / idle_reasons columns (dto/downtime_reason_dto.go, migration 027)
 export const MAX_LENGTH = {
@@ -17,9 +18,9 @@ export const INITIAL_VALUES = {
 
 // Mirrors the downtime / idle reasons API rules (dto/downtime_reason_dto.go)
 export const reasonSchema = z.object({
-  userId: z.string().min(1, 'Customer is required'),
-  reasonCode: z.string().trim().max(MAX_LENGTH.reasonCode, 'Reason code is too long'),
-  reason: z.string().trim().min(1, 'Reason is required').max(MAX_LENGTH.reason, 'Reason is too long'),
+  userId: z.string().min(1, tk('Customer is required')),
+  reasonCode: z.string().trim().max(MAX_LENGTH.reasonCode, tk('Reason code is too long')),
+  reason: z.string().trim().min(1, tk('Reason is required')).max(MAX_LENGTH.reason, tk('Reason is too long')),
   status: z.enum([REASON_STATUS.ACTIVE, REASON_STATUS.INACTIVE]),
 })
 

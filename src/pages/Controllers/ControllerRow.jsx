@@ -1,10 +1,12 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import IconAction from '@/components/common/IconAction'
 import { ACTION_ICONS } from '@/constants/icons'
 import { formatDate } from '@/utils/helpers'
 
 function ControllerRow({ controller, onEdit, onDelete }) {
+  const { t } = useTranslation()
   return (
     <tr>
       <td className="font-tabular">{controller.id}</td>
@@ -16,8 +18,8 @@ function ControllerRow({ controller, onEdit, onDelete }) {
       <td className="text-body-secondary text-nowrap">{formatDate(controller.updatedAt)}</td>
       <td className="border-start">
         <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.edit} label={`Edit ${controller.name}`} onClick={() => onEdit(controller)} />
-          <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${controller.name}`} onClick={() => onDelete(controller)} />
+          <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: controller.name })} onClick={() => onEdit(controller)} />
+          <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: controller.name })} onClick={() => onDelete(controller)} />
         </div>
       </td>
     </tr>

@@ -1,6 +1,7 @@
 import { BRANCH_STATUS } from '@/constants/app'
 import { PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Native <input type="color"> cannot be blank; shown in the picker until a colour is chosen
 export const COLOR_PICKER_FALLBACK = '#000000'
@@ -27,16 +28,16 @@ const optional = (pattern, message) => z.string().regex(pattern, message).option
 
 // Mirrors the branches API rules (dto/branch_dto.go)
 export const branchSchema = z.object({
-  code: z.string().min(1, 'Code is required').regex(PATTERNS.branchCode, 'Use 2–20 capital letters or digits'),
-  name: z.string().trim().min(1, 'Name is required').max(200, 'Name is too long'),
-  email: optional(PATTERNS.email, 'Enter a valid email address'),
-  customerId: z.string().min(1, 'Customer is required'),
-  address: z.string().max(500, 'Address is too long').optional(),
+  code: z.string().min(1, tk('Code is required')).regex(PATTERNS.branchCode, tk('Use 2–20 capital letters or digits')),
+  name: z.string().trim().min(1, tk('Name is required')).max(200, tk('Name is too long')),
+  email: optional(PATTERNS.email, tk('Enter a valid email address')),
+  customerId: z.string().min(1, tk('Customer is required')),
+  address: z.string().max(500, tk('Address is too long')).optional(),
   userCityId: z.string().optional(),
-  gstNumber: optional(PATTERNS.gstin, 'Enter a valid 15-character GSTIN'),
-  panNumber: optional(PATTERNS.pan, 'Enter a valid PAN, e.g. ABCDE1234F'),
-  colorCode: optional(PATTERNS.hexColor, 'Enter a colour such as #F58220'),
-  status: z.enum([BRANCH_STATUS.ACTIVE, BRANCH_STATUS.INACTIVE], { message: 'Status is required' }),
+  gstNumber: optional(PATTERNS.gstin, tk('Enter a valid 15-character GSTIN')),
+  panNumber: optional(PATTERNS.pan, tk('Enter a valid PAN, e.g. ABCDE1234F')),
+  colorCode: optional(PATTERNS.hexColor, tk('Enter a colour such as #F58220')),
+  status: z.enum([BRANCH_STATUS.ACTIVE, BRANCH_STATUS.INACTIVE], { message: tk('Status is required') }),
 })
 
 // ---------------------------------------------------------------------------

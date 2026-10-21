@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
@@ -26,6 +27,7 @@ const byBrandControllerName = (a, b) =>
 // Masters › Machine Catalog › Models (superadmin): the machine models of each controller with
 // search, controller filter, paging, add / edit and delete. Every user sees them in the machine form.
 function ModelList() {
+  const { t } = useTranslation()
   const [models, setModels] = useState([])
   const [controllers, setControllers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -73,12 +75,12 @@ function ModelList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Model', sort: (row) => row.name },
-    { label: 'Controller', sort: (row) => row.controllerName },
-    { label: 'Brand', sort: (row) => row.brandName },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    'Actions',
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Model'), sort: (row) => row.name },
+    { label: t('Controller'), sort: (row) => row.controllerName },
+    { label: t('Brand'), sort: (row) => row.brandName },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    t('Actions'),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -103,27 +105,27 @@ function ModelList() {
     try {
       await deleteModel(pendingDelete.id)
       setModels((list) => list.filter((model) => model.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Model deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Model deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete model' })
+      toast.error(err.message, { title: t('Could not delete model') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading models…" />
+    if (loading) return <Loader text={t('Loading models…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load models.</b> {error}
+            <b>{t('Could not load models.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -135,16 +137,16 @@ function ModelList() {
           <i className="bi bi-boxes ts-empty-icon" aria-hidden="true" />
           {canAdd ? (
             <>
-              <p className="mb-2">No models yet.</p>
+              <p className="mb-2">{t('No models yet.')}</p>
               <Button size="sm" onClick={openAdd}>
-                Add the first model
+                {t('Add the first model')}
               </Button>
             </>
           ) : (
             <>
-              <p className="mb-2">Every model belongs to a controller. Add a controller first.</p>
+              <p className="mb-2">{t('Every model belongs to a controller. Add a controller first.')}</p>
               <Button as={Link} to={ROUTES.CONTROLLERS} size="sm" variant="ghost">
-                Go to Controllers
+                {t('Go to Controllers')}
               </Button>
             </>
           )}
@@ -158,13 +160,13 @@ function ModelList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, model, controller, brand…"
+              placeholder={t('Search ID, model, controller, brand…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search models"
+              aria-label={t('Search models')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -177,9 +179,9 @@ function ModelList() {
               setControllerFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by controller"
+            aria-label={t('Filter by controller')}
           >
-            <option value="">All controllers</option>
+            <option value="">{t('All controllers')}</option>
             <ControllerOptions controllers={controllers} />
           </Form.Select>
         </div>
@@ -206,7 +208,7 @@ function ModelList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No models match these filters.</div>
+          <div className="ts-empty">{t('No models match these filters.')}</div>
         )}
       </>
     )
@@ -216,14 +218,14 @@ function ModelList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Machine Catalog</div>
-          <h1>Models</h1>
-          <p className="ts-page-subtitle">Machine models of each controller, offered in the machine form.</p>
+          <div className="ts-eyebrow">{t('Masters · Machine Catalog')}</div>
+          <h1>{t('Models')}</h1>
+          <p className="ts-page-subtitle">{t('Machine models of each controller, offered in the machine form.')}</p>
         </div>
         <div className="ts-page-actions">
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add Model
+            {t('Add Model')}
           </Button>
         </div>
       </header>
@@ -243,14 +245,17 @@ function ModelList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete model"
-        confirmLabel="Delete"
+        title={t('Delete model')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
-        {' '}A model that machines use cannot be deleted.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? A model that machines use cannot be deleted."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

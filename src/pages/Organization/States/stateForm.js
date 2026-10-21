@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 export const INITIAL_VALUES = {
   userCountryIds: [],
@@ -19,8 +20,8 @@ export const keepStatesOf = (states, userCountryIds) =>
 
 // Any number of the user's countries, then any number of their states (country library)
 export const stateSchema = z.object({
-  userCountryIds: z.array(z.string()).min(1, 'Select at least one country'),
-  states: z.array(z.string()).min(1, 'Select at least one state'),
+  userCountryIds: z.array(z.string()).min(1, tk('Select at least one country')),
+  states: z.array(z.string()).min(1, tk('Select at least one state')),
 })
 
 // ---------------------------------------------------------------------------

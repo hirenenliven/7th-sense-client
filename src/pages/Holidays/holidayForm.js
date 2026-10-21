@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { HOLIDAY_TYPES, SHIFT_STATUS } from '@/constants/shifts'
+import { tk } from '@/i18n/tk'
 
 // Lengths of the holidays API (dto/holiday_dto.go, migration 020)
 export const MAX_LENGTH = { name: 100 }
@@ -18,9 +19,9 @@ export const INITIAL_VALUES = {
 // before start); a week off needs a weekday, its name is optional.
 export const holidaySchema = z
   .object({
-    userId: z.string().min(1, 'Customer is required'),
+    userId: z.string().min(1, tk('Customer is required')),
     holidayType: z.enum([HOLIDAY_TYPES.HOLIDAY, HOLIDAY_TYPES.WEEK_OFF]),
-    name: z.string().trim().max(MAX_LENGTH.name, 'Name is too long'),
+    name: z.string().trim().max(MAX_LENGTH.name, tk('Name is too long')),
     startDate: z.string(),
     endDate: z.string(),
     weekDay: z.string(),
@@ -29,15 +30,15 @@ export const holidaySchema = z
   .superRefine((values, ctx) => {
     const issue = (message, path) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path })
     if (values.holidayType === HOLIDAY_TYPES.WEEK_OFF) {
-      if (!values.weekDay) issue('Week off day is required', ['weekDay'])
+      if (!values.weekDay) issue(tk('Week off day is required'), ['weekDay'])
       return
     }
-    if (!values.name.trim()) issue('Holiday name is required', ['name'])
-    if (!values.startDate) issue('Start date is required', ['startDate'])
-    if (!values.endDate) issue('End date is required', ['endDate'])
+    if (!values.name.trim()) issue(tk('Holiday name is required'), ['name'])
+    if (!values.startDate) issue(tk('Start date is required'), ['startDate'])
+    if (!values.endDate) issue(tk('End date is required'), ['endDate'])
     // YYYY-MM-DD compares correctly as text
     if (values.startDate && values.endDate && values.endDate < values.startDate) {
-      issue('End date is before the start date', ['endDate'])
+      issue(tk('End date is before the start date'), ['endDate'])
     }
   })
 

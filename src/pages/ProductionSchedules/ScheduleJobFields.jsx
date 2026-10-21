@@ -9,6 +9,7 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { formatClock12, formatHoursMinutes } from '@/utils/dateTime'
 import { MAX_LENGTH, MAX_QUANTITY, itemMinutes } from './scheduleForm'
 import { FIELD_HELP } from './scheduleHelp'
+import { useTranslation } from 'react-i18next'
 
 const optionShape = PropTypes.shape({ value: PropTypes.string.isRequired, label: PropTypes.string.isRequired })
 
@@ -16,6 +17,7 @@ const optionShape = PropTypes.shape({ value: PropTypes.string.isRequired, label:
 // `options` are the customer's lists ({ value, label }); `processOptions(partId)` the part's
 // processes that run on the selected machine. `placeholder` is shown while a list is empty.
 function ScheduleJobFields({ index, control, register, setValue, errors, isMultiple, startDate, endDate, options, processOptions, shiftsById, placeholder, canRemove, onRemove }) {
+  const { t } = useTranslation()
   const prefix = `items.${index}`
   const item = useWatch({ control, name: prefix })
   const shift = shiftsById.get(item?.shiftId)
@@ -44,10 +46,10 @@ function ScheduleJobFields({ index, control, register, setValue, errors, isMulti
             disabled={disabled || !list.length}
             isInvalid={Boolean(errors?.[field])}
           >
-            <option value="">{list.length ? `Select ${label}` : emptyText}</option>
+            <option value="">{list.length ? t('Select {{item}}', { item: label }) : emptyText}</option>
             {list.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </Form.Select>
@@ -73,21 +75,21 @@ function ScheduleJobFields({ index, control, register, setValue, errors, isMulti
 
   const processes = processOptions(item?.partId)
   let processEmpty = placeholder.process
-  if (!item?.partId) processEmpty = 'Select a part first'
-  else if (processes.loading) processEmpty = 'Loading processes…'
-  else if (!processes.items.length) processEmpty = 'No process of this part runs on the machine'
+  if (!item?.partId) processEmpty = t('Select a part first')
+  else if (processes.loading) processEmpty = t('Loading processes…')
+  else if (!processes.items.length) processEmpty = t('No process of this part runs on the machine')
 
   return (
-    <section className="ts-part-process" aria-label={`Job ${index + 1}`}>
+    <section className="ts-part-process" aria-label={t('Job {{n}}', { n: index + 1 })}>
       <div className="d-flex align-items-center mb-2">
-        <h2 className="ts-section-title mb-0 me-auto">Job {index + 1}</h2>
-        {canRemove && <IconAction danger icon={ACTION_ICONS.delete} label={`Remove job ${index + 1}`} onClick={onRemove} />}
+        <h2 className="ts-section-title mb-0 me-auto">{t('Job {{n}}', { n: index + 1 })}</h2>
+        {canRemove && <IconAction danger icon={ACTION_ICONS.delete} label={t('Remove job {{n}}', { n: index + 1 })} onClick={onRemove} />}
       </div>
 
       <Row xs={1} md={2} xl={isMultiple ? 5 : 4} className="g-3 mb-3">
         {isMultiple && (
           <Form.Group as={Col} controlId={`${prefix}.scheduleDate`}>
-            <Form.Label className="required">Date</Form.Label>
+            <Form.Label className="required">{t('Date')}</Form.Label>
             <Controller
               name={`${prefix}.scheduleDate`}
               control={control}
@@ -107,49 +109,49 @@ function ScheduleJobFields({ index, control, register, setValue, errors, isMulti
 
         <Form.Group as={Col} controlId={`${prefix}.jobId`}>
           <FieldLabel required help={FIELD_HELP.jobId}>
-            Job ID
+            {t('Job ID')}
           </FieldLabel>
           <Form.Control
             {...register(`${prefix}.jobId`)}
             autoComplete="off"
             maxLength={MAX_LENGTH.jobId}
-            placeholder="Job ID"
+            placeholder={t('Job ID')}
             isInvalid={Boolean(errors?.jobId)}
           />
           <Form.Control.Feedback type="invalid">{errors?.jobId?.message}</Form.Control.Feedback>
         </Form.Group>
 
-        {select('supervisorId', 'Supervisor / Programmer', options.supervisors, placeholder.supervisor)}
-        {select('operatorId', 'Operator', options.operators, placeholder.operator)}
-        {select('shiftId', 'Shift', options.shifts, placeholder.shift)}
+        {select('supervisorId', t('Supervisor / Programmer'), options.supervisors, placeholder.supervisor)}
+        {select('operatorId', t('Operator'), options.operators, placeholder.operator)}
+        {select('shiftId', t('Shift'), options.shifts, placeholder.shift)}
       </Row>
 
       <Row xs={1} md={2} xl={5} className="g-3">
-        {select('partId', 'Part', options.parts, placeholder.part, { onPick: () => setValue(`${prefix}.processId`, '') })}
+        {select('partId', t('Part'), options.parts, placeholder.part, { onPick: () => setValue(`${prefix}.processId`, '') })}
 
         <Form.Group as={Col} controlId={`${prefix}.quantity`}>
-          <Form.Label className="required">Qty.</Form.Label>
+          <Form.Label className="required">{t('Qty.')}</Form.Label>
           <Form.Control
             {...register(`${prefix}.quantity`)}
             type="number"
             min={1}
             max={MAX_QUANTITY}
             inputMode="numeric"
-            placeholder="Qty."
+            placeholder={t('Qty.')}
             isInvalid={Boolean(errors?.quantity)}
           />
           <Form.Control.Feedback type="invalid">{errors?.quantity?.message}</Form.Control.Feedback>
         </Form.Group>
 
-        {select('processId', 'Part Process', processes.items, processEmpty, { help: FIELD_HELP.processId })}
-        {time('startTime', 'Start Time')}
+        {select('processId', t('Part Process'), processes.items, processEmpty, { help: FIELD_HELP.processId })}
+        {time('startTime', t('Start Time'))}
         <Col>
-          {time('endTime', 'End Time')}
+          {time('endTime', t('End Time'))}
           {(shift || minutes !== null) && (
             <Form.Text>
-              {minutes !== null && `${formatHoursMinutes(minutes)} hours`}
+              {minutes !== null && t('{{time}} hours', { time: formatHoursMinutes(minutes) })}
               {minutes !== null && shift && ' · '}
-              {shift && `Shift ${formatClock12(shift.startTime)} – ${formatClock12(shift.endTime)}`}
+              {shift && t('Shift {{start}} – {{end}}', { start: formatClock12(shift.startTime), end: formatClock12(shift.endTime) })}
             </Form.Text>
           )}
         </Col>

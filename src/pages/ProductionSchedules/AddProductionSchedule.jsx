@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
@@ -11,6 +11,7 @@ import { getPartById, getParts } from '@/services/partService'
 import { createProductionSchedule, getProductionScheduleById, updateProductionSchedule } from '@/services/productionScheduleService'
 import { getShifts } from '@/services/shiftService'
 import useAuth from '@/hooks/useAuth'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import { formatClock12 } from '@/utils/dateTime'
 import DatePicker from '@/components/common/DatePicker'
@@ -31,6 +32,7 @@ import {
   toSchedulePayload,
 } from './scheduleForm'
 import { FIELD_HELP } from './scheduleHelp'
+import { Trans, useTranslation } from 'react-i18next'
 
 const EMPTY_LISTS = { machines: [], shifts: [], parts: [], supervisors: [], operators: [] }
 const byLabel = (a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
@@ -45,6 +47,7 @@ const ITEM_SELECTS = ['supervisorId', 'operatorId', 'shiftId', 'partId', 'proces
 // server enforces it). Every list of a job is the customer's; part processes are those of the part that
 // run on the selected machine.
 function AddProductionSchedule() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -90,7 +93,7 @@ function AddProductionSchedule() {
       .catch((error) => {
         if (!active) return
         setCustomers({ items: [], loading: false })
-        toast.error(error.message, { title: 'Could not load customers' })
+        toast.error(error.message, { title: i18n.t('Could not load customers') })
       })
     return () => {
       active = false
@@ -133,7 +136,7 @@ function AddProductionSchedule() {
       .catch((error) => {
         if (!active) return
         setLists({ ...EMPTY_LISTS, loading: false })
-        toast.error(error.message, { title: 'Could not load schedule options' })
+        toast.error(error.message, { title: i18n.t('Could not load schedule options') })
       })
     return () => {
       active = false
@@ -155,7 +158,7 @@ function AddProductionSchedule() {
         .then((part) => setPartDetails((previous) => new Map(previous).set(partId, { loading: false, processes: part.processes ?? [] })))
         .catch((error) => {
           setPartDetails((previous) => new Map(previous).set(partId, { loading: false, processes: [] }))
-          toast.error(error.message, { title: 'Could not load part processes' })
+          toast.error(error.message, { title: i18n.t('Could not load part processes') })
         })
     })
   }, [partIds, partDetails])
@@ -211,43 +214,43 @@ function AddProductionSchedule() {
       const payload = toSchedulePayload(values, existing)
       if (isEdit) {
         await updateProductionSchedule(id, payload)
-        toast.success('The production schedule has been updated.', { title: 'Schedule updated' })
+        toast.success(t('The production schedule has been updated.'), { title: t('Schedule updated') })
       } else {
         await createProductionSchedule(payload)
-        toast.success('The production schedule has been added.', { title: 'Schedule created' })
+        toast.success(t('The production schedule has been added.'), { title: t('Schedule created') })
       }
       navigate(ROUTES.PRODUCTION_SCHEDULE)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save schedule' })
+      toast.error(error.message, { title: t('Could not save schedule') })
     }
   }
 
-  const emptyText = (plural) => {
-    if (!userId) return 'Select a customer first'
-    if (lists.loading) return `Loading ${plural}…`
-    return `No ${plural} for this customer`
+  // While a list is empty: pick the customer first / loading / none (whole sentences per list)
+  const emptyText = (loading, none) => {
+    if (!userId) return t('Select a customer first')
+    return lists.loading ? loading : none
   }
   const placeholder = {
-    supervisor: emptyText('supervisors'),
-    operator: emptyText('operators'),
-    shift: emptyText('shifts'),
-    part: emptyText('parts'),
-    process: 'Select Part Process',
+    supervisor: emptyText(t('Loading supervisors…'), t('No supervisors for this customer')),
+    operator: emptyText(t('Loading operators…'), t('No operators for this customer')),
+    shift: emptyText(t('Loading shifts…'), t('No shifts for this customer')),
+    part: emptyText(t('Loading parts…'), t('No parts for this customer')),
+    process: t('Select Part Process'),
   }
 
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">Production · Schedule</div>
-        <h1>{isEdit ? 'Edit Production Schedule' : 'Add Production Schedule'}</h1>
+        <div className="ts-eyebrow">{t('Production · Schedule')}</div>
+        <h1>{isEdit ? t('Edit Production Schedule') : t('Add Production Schedule')}</h1>
         <p className="ts-page-subtitle">
-          {isEdit ? 'Update the jobs planned on this machine.' : 'Plan the jobs a machine runs, by shift, for one day or several.'}
+          {isEdit ? t('Update the jobs planned on this machine.') : t('Plan the jobs a machine runs, by shift, for one day or several.')}
         </p>
       </div>
       <div className="ts-page-actions">
         <Button as={Link} to={ROUTES.PRODUCTION_SCHEDULE} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          Schedule list
+          {t('Schedule list')}
         </Button>
       </div>
     </header>
@@ -258,7 +261,7 @@ function AddProductionSchedule() {
     return (
       <>
         {header}
-        <Loader text={scheduleLoading ? 'Loading schedule…' : 'Loading options…'} />
+        <Loader text={scheduleLoading ? t('Loading schedule…') : t('Loading options…')} />
       </>
     )
   }
@@ -268,7 +271,7 @@ function AddProductionSchedule() {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this schedule.</b> {scheduleError}
+          <b>{t('Could not load this schedule.')}</b> {scheduleError}
         </Alert>
       </>
     )
@@ -280,17 +283,17 @@ function AddProductionSchedule() {
     <>
       {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit production schedule' : 'Add production schedule'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit production schedule') : t('Add production schedule')}>
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-calendar-week text-primary" aria-hidden="true" />
-            {isEdit ? 'Edit Production Schedule' : 'Add Production Schedule'}
+            {isEdit ? t('Edit Production Schedule') : t('Add Production Schedule')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3 mb-4">
               <Form.Group as={Col} xs={12}>
                 <FieldLabel required help={FIELD_HELP.scheduleType}>
-                  Schedule Type
+                  {t('Schedule Type')}
                 </FieldLabel>
                 <div>
                   {SCHEDULE_TYPES.map((option) => (
@@ -299,7 +302,7 @@ function AddProductionSchedule() {
                       inline
                       type="radio"
                       id={`scheduleType-${option.value}`}
-                      label={option.label}
+                      label={t(option.label)}
                       value={option.value}
                       {...register('scheduleType')}
                     />
@@ -308,7 +311,7 @@ function AddProductionSchedule() {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xl={3} controlId="startDate">
-                <Form.Label className="required">{isMultiple ? 'Schedule Start Date' : 'Schedule of Date'}</Form.Label>
+                <Form.Label className="required">{isMultiple ? t('Schedule Start Date') : t('Schedule of Date')}</Form.Label>
                 <Controller
                   name="startDate"
                   control={control}
@@ -319,7 +322,7 @@ function AddProductionSchedule() {
 
               {isMultiple && (
                 <Form.Group as={Col} md={6} xl={3} controlId="endDate">
-                  <Form.Label className="required">Schedule End Date</Form.Label>
+                  <Form.Label className="required">{t('Schedule End Date')}</Form.Label>
                   <Controller
                     name="endDate"
                     control={control}
@@ -333,9 +336,9 @@ function AddProductionSchedule() {
 
               {canPickCustomer && (
                 <Form.Group as={Col} md={6} xl={3} controlId="userId">
-                  <Form.Label className="required">Select Customer</Form.Label>
+                  <Form.Label className="required">{t('Select Customer')}</Form.Label>
                   <Form.Select {...register('userId', { onChange: handleCustomerChange })} isInvalid={Boolean(errors.userId)}>
-                    <option value="">{customers.items.length ? 'Select Customer' : 'No customers yet'}</option>
+                    <option value="">{customers.items.length ? t('Select Customer') : t('No customers yet')}</option>
                     {customers.items.map((customer) => (
                       <option key={customer.id} value={customer.id}>
                         {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -348,7 +351,7 @@ function AddProductionSchedule() {
 
               <Form.Group as={Col} md={6} xl={3} controlId="machineId">
                 <FieldLabel required help={FIELD_HELP.machineId}>
-                  Machine
+                  {t('Machine')}
                 </FieldLabel>
                 {/* Controlled: the options load after the customer is known */}
                 <Controller
@@ -378,7 +381,7 @@ function AddProductionSchedule() {
 
               {isEdit && (
                 <Form.Group as={Col} md={6} xl={3}>
-                  <Form.Label className="required">Status</Form.Label>
+                  <Form.Label className="required">{t('Status')}</Form.Label>
                   <StatusToggle
                     id="status"
                     {...register('status')}
@@ -412,7 +415,7 @@ function AddProductionSchedule() {
             {itemListError && <div className="invalid-feedback d-block mb-2">{itemListError}</div>}
             <Button onClick={() => append({ ...EMPTY_ITEM })} disabled={fields.length >= MAX_ITEMS}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add More
+              {t('Add More')}
             </Button>
           </Card.Body>
         </Card>
@@ -420,24 +423,24 @@ function AddProductionSchedule() {
         {/* Actions */}
         <div className="ts-form-actions">
           <span className="ts-form-actions-note">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={() => navigate(ROUTES.PRODUCTION_SCHEDULE)} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button variant="ghost" onClick={() => reset()} disabled={isSubmitting}>
-            Reset
+            {t('Reset')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Schedule' : 'Save Schedule'}
+                {isEdit ? t('Update Schedule') : t('Save Schedule')}
               </>
             )}
           </Button>

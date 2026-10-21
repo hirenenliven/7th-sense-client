@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Collapse } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { hasActiveChild } from '@/utils/navigation'
 
@@ -11,6 +12,8 @@ function SidebarItem({ item, onNavigate }) {
   const childActive = hasActiveChild(item, pathname)
   const [expanded, setExpanded] = useState(childActive)
   const submenuId = useId()
+  const { t } = useTranslation()
+  const label = (entry) => t(entry.label)
 
   const icon = item.icon && <i className={`bi ${item.icon} ts-sidenav-icon`} aria-hidden="true" />
 
@@ -19,7 +22,7 @@ function SidebarItem({ item, onNavigate }) {
       <li>
         <NavLink to={item.path} end className={linkClass} onClick={onNavigate}>
           {icon}
-          <span className="ts-sidenav-label">{item.label}</span>
+          <span className="ts-sidenav-label">{label(item)}</span>
         </NavLink>
       </li>
     )
@@ -35,7 +38,7 @@ function SidebarItem({ item, onNavigate }) {
         aria-controls={submenuId}
       >
         {icon}
-        <span className="ts-sidenav-label">{item.label}</span>
+        <span className="ts-sidenav-label">{label(item)}</span>
         <i className="bi bi-chevron-down ts-sidenav-caret" aria-hidden="true" />
       </button>
       <Collapse in={expanded}>
@@ -44,7 +47,7 @@ function SidebarItem({ item, onNavigate }) {
             {item.children.map((child) => (
               <li key={child.key}>
                 <NavLink to={child.path} end className={linkClass} onClick={onNavigate}>
-                  {child.label}
+                  {label(child)}
                 </NavLink>
               </li>
             ))}

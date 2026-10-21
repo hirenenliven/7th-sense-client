@@ -15,10 +15,12 @@ import MachineRow from './MachineRow'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
+import { tk } from '@/i18n/tk'
 
 const VIEWS = [
-  { key: 'table', label: 'Table view', icon: 'bi-list-ul' },
-  { key: 'cards', label: 'Card view', icon: 'bi-grid-3x3-gap' },
+  { key: 'table', label: tk('Table view'), icon: 'bi-list-ul' },
+  { key: 'cards', label: tk('Card view'), icon: 'bi-grid-3x3-gap' },
 ]
 
 // Machine Health opens on this machine (`?machineId=`)
@@ -32,6 +34,7 @@ const matchesSearch = (machine, term) =>
 // and deletes them; managers (superadmin, customer, admin) add and edit; everyone else only
 // reads the machines the server returns for them.
 function MachineList() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
@@ -94,16 +97,16 @@ function MachineList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Machine', sort: (row) => row.name },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Model', sort: (row) => row.modelName },
-    { label: 'Brand / Controller', sort: (row) => [row.brandName, row.controllerName].filter(Boolean).join(' ') },
-    { label: 'Line', sort: (row) => row.lineName },
-    { label: 'Installed', sort: (row) => row.installationDate },
-    { label: 'Connection', sort: (row) => (row.onlineStatus ? 1 : 0) },
-    { label: 'Status', sort: (row) => row.status },
-    'Actions',
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Machine'), sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Model'), sort: (row) => row.modelName },
+    { label: t('Brand / Controller'), sort: (row) => [row.brandName, row.controllerName].filter(Boolean).join(' ') },
+    { label: t('Line'), sort: (row) => row.lineName },
+    { label: t('Installed'), sort: (row) => row.installationDate },
+    { label: t('Connection'), sort: (row) => (row.onlineStatus ? 1 : 0) },
+    { label: t('Status'), sort: (row) => row.status },
+    t('Actions'),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -120,10 +123,10 @@ function MachineList() {
     try {
       await deleteMachine(pendingDelete.id)
       setMachines((list) => list.filter((machine) => machine.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Machine deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Machine deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete machine' })
+      toast.error(err.message, { title: t('Could not delete machine') })
     } finally {
       setDeleting(false)
     }
@@ -131,17 +134,17 @@ function MachineList() {
 
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading machines…" />
+    if (loading) return <Loader text={t('Loading machines…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load machines.</b> {error}
+            <b>{t('Could not load machines.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -151,10 +154,10 @@ function MachineList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-cpu ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No machines yet.</p>
+          <p className="mb-2">{t('No machines yet.')}</p>
           {canManage && (
             <Button as={Link} to={ROUTES.MACHINE_ADD} size="sm">
-              Add the first machine
+              {t('Add the first machine')}
             </Button>
           )}
         </div>
@@ -167,13 +170,13 @@ function MachineList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, machine, serial no., customer, model…"
+              placeholder={t('Search ID, machine, serial no., customer, model…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search machines"
+              aria-label={t('Search machines')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -187,9 +190,9 @@ function MachineList() {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -248,7 +251,7 @@ function MachineList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No machines match these filters.</div>
+          <div className="ts-empty">{t('No machines match these filters.')}</div>
         )}
       </>
     )
@@ -258,32 +261,32 @@ function MachineList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Operations · Machines</div>
-          <h1>All Machines</h1>
+          <div className="ts-eyebrow">{t('Operations · Machines')}</div>
+          <h1>{t('All Machines')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s machines, their model, controller and line.' : 'Your machines, their model, controller and line.'}
+            {isSuperadmin ? t('Every customer’s machines, their model, controller and line.') : t('Your machines, their model, controller and line.')}
           </p>
         </div>
         <div className="ts-page-actions">
-          <ButtonGroup aria-label="Machine list view">
+          <ButtonGroup aria-label={t('Machine list view')}>
             {VIEWS.map((option) => (
               <Button
                 key={option.key}
                 variant="ghost"
                 active={view === option.key}
                 aria-pressed={view === option.key}
-                title={option.label}
+                title={t(option.label)}
                 onClick={() => changeView(option.key)}
               >
                 <i className={`bi ${option.icon}`} aria-hidden="true" />
-                <span className="visually-hidden">{option.label}</span>
+                <span className="visually-hidden">{t(option.label)}</span>
               </Button>
             ))}
           </ButtonGroup>
           {canManage && (
             <Button as={Link} to={ROUTES.MACHINE_ADD}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Machine
+              {t('Add Machine')}
             </Button>
           )}
         </div>
@@ -295,13 +298,17 @@ function MachineList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete machine"
-        confirmLabel="Delete"
+        title={t('Delete machine')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>? Its data will no longer be collected or shown.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? Its data will no longer be collected or shown."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

@@ -15,6 +15,7 @@ import { customerMobile, customerName } from './customerFormat'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (customer, term) =>
   [customer.id, customer.username, customerName(customer), ROLE_LABELS[customer.role], customer.email, customerMobile(customer)]
@@ -22,6 +23,7 @@ const matchesSearch = (customer, term) =>
 
 // Masters › Customers and Masters › Users (kind): the same list, on each kind's accounts
 function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const { t } = useTranslation()
   const account = ACCOUNT_PAGES[kind]
   const navigate = useNavigate()
 
@@ -63,16 +65,16 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'User Name', sort: (row) => row.username },
-    { label: kind === ACCOUNT_KIND.USER ? 'Name' : 'Customer Name', sort: (row) => customerName(row) },
-    ...(kind === ACCOUNT_KIND.USER ? [{ label: 'Role', sort: (row) => ROLE_LABELS[row.role] ?? row.role }] : []),
-    { label: 'Email', sort: (row) => row.email },
-    { label: 'Mobile Number', sort: (row) => customerMobile(row) },
-    { label: 'Status', sort: (row) => row.status },
-    ...(kind === ACCOUNT_KIND.USER ? [] : ['Statement']),
-    'View',
-    'Actions',
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('User Name'), sort: (row) => row.username },
+    { label: kind === ACCOUNT_KIND.USER ? t('Name') : t('Customer Name'), sort: (row) => customerName(row) },
+    ...(kind === ACCOUNT_KIND.USER ? [{ label: t('Role'), sort: (row) => (ROLE_LABELS[row.role] ? t(ROLE_LABELS[row.role]) : row.role) }] : []),
+    { label: t('Email'), sort: (row) => row.email },
+    { label: t('Mobile Number'), sort: (row) => customerMobile(row) },
+    { label: t('Status'), sort: (row) => row.status },
+    ...(kind === ACCOUNT_KIND.USER ? [] : [t('Statement')]),
+    t('View'),
+    t('Actions'),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -99,15 +101,20 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
       try {
         const current = await getUserById(customer.id)
         await updateUser(customer.id, { ...toUserPayload(toFormValues(current), current, kind), status })
-        toast.success(`${customerName(customer)} is now ${status}.`, { title: 'Status updated' })
+        toast.success(
+          status === USER_STATUS.ACTIVE
+            ? t('{{name}} is now active.', { name: customerName(customer) })
+            : t('{{name}} is now inactive.', { name: customerName(customer) }),
+          { title: t('Status updated') },
+        )
       } catch (err) {
         setCustomerStatus(customer.id, previous)
-        toast.error(err.message, { title: 'Could not update status' })
+        toast.error(err.message, { title: t('Could not update status') })
       } finally {
         setStatusBusy(customer.id, false)
       }
     },
-    [kind],
+    [kind, t],
   )
 
   const handleView = useCallback(
@@ -121,35 +128,35 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   )
 
   const handleUnavailable = useCallback((feature) => {
-    toast.info(`${feature} is not available yet.`, { title: 'Coming soon' })
-  }, [])
+    toast.info(t('{{feature}} is not available yet.', { feature: t(feature) }), { title: t('Coming soon') })
+  }, [t])
 
   const confirmDelete = async () => {
     setDeleting(true)
     try {
       await deleteUser(pendingDelete.id)
       setCustomers((list) => list.filter((customer) => customer.id !== pendingDelete.id))
-      toast.success(`${customerName(pendingDelete)} has been deleted.`, { title: `${account.title} deleted` })
+      toast.success(t('{{name}} has been deleted.', { name: customerName(pendingDelete) }), { title: t(account.text.deletedTitle) })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: `Could not delete ${account.noun}` })
+      toast.error(err.message, { title: t(account.text.deleteFailed) })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text={`Loading ${account.noun}s…`} />
+    if (loading) return <Loader text={t(account.text.loadingList)} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load {account.noun}s.</b> {error}
+            <b>{t(account.text.loadListFailed)}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -159,9 +166,9 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
       return (
         <div className="ts-empty">
           <i className={`bi ${account.icon} ts-empty-icon`} aria-hidden="true" />
-          <p className="mb-2">No {account.noun}s yet.</p>
+          <p className="mb-2">{t(account.text.empty)}</p>
           <Button as={Link} to={account.routes.add} size="sm">
-            Add the first {account.noun}
+            {t(account.text.addFirst)}
           </Button>
         </div>
       )
@@ -173,13 +180,13 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder={`Search ID, user name, ${kind === ACCOUNT_KIND.USER ? 'name, role' : 'customer'}, email, mobile…`}
+              placeholder={t(account.text.searchPlaceholder)}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label={`Search ${account.noun}s`}
+              aria-label={t(account.text.search)}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -220,7 +227,7 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
           </div>
         ) : (
           <div className="ts-empty">
-            No {account.noun}s match “{search.trim()}”.
+            {t(account.text.noMatch, { search: search.trim() })}
           </div>
         )}
       </>
@@ -231,14 +238,14 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">{account.section}</div>
-          <h1>{account.listTitle}</h1>
-          <p className="ts-page-subtitle">{account.listSubtitle}</p>
+          <div className="ts-eyebrow">{t(account.section)}</div>
+          <h1>{t(account.listTitle)}</h1>
+          <p className="ts-page-subtitle">{t(account.listSubtitle)}</p>
         </div>
         <div className="ts-page-actions">
           <Button as={Link} to={account.routes.add}>
             <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add New
+            {t('Add New')}
           </Button>
         </div>
       </header>
@@ -249,13 +256,17 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title={`Delete ${account.noun}`}
-        confirmLabel="Delete"
+        title={t(account.text.deleteTitle)}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete && customerName(pendingDelete)}</strong>? Their login will stop working.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? Their login will stop working."
+          values={{ name: pendingDelete && customerName(pendingDelete) }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

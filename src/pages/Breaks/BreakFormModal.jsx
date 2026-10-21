@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { BREAK_NAME_SUGGESTIONS, SHIFT_STATUS } from '@/constants/shifts'
 import { createBreak, updateBreak } from '@/services/breakService'
 import { getShifts } from '@/services/shiftService'
 import { formatClock12, minutesBetween } from '@/utils/dateTime'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import TimePicker from '@/components/common/TimePicker'
@@ -14,6 +15,7 @@ import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import { INITIAL_VALUES, MAX_LENGTH, breakSchema, toBreakPayload, toFormValues } from './breakForm'
 import { FIELD_HELP } from './breakHelp'
+import { useTranslation } from 'react-i18next'
 
 const NAME_SUGGESTIONS_ID = 'break-name-suggestions'
 
@@ -21,6 +23,7 @@ const NAME_SUGGESTIONS_ID = 'break-name-suggestions'
 // customer; a customer or admin always saves to their own company. The shift is optional: one of
 // the customer's shifts, or none (picked later on Add / Manage Shift).
 function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompanyId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(shiftBreak)
   const emptyValues = canPickCustomer ? INITIAL_VALUES : { ...INITIAL_VALUES, userId: ownCompanyId ? String(ownCompanyId) : '' }
 
@@ -48,16 +51,16 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
       .catch((error) => {
         if (!active) return
         setShifts({ items: [], loading: false })
-        toast.error(error.message, { title: 'Could not load shifts' })
+        toast.error(error.message, { title: i18n.t('Could not load shifts') })
       })
     return () => {
       active = false
     }
   }, [userId, canPickCustomer])
 
-  let shiftPlaceholder = 'No shift (pick it later)'
-  if (!userId) shiftPlaceholder = 'Select a customer first'
-  else if (shifts.loading) shiftPlaceholder = 'Loading shifts…'
+  let shiftPlaceholder = t('No shift (pick it later)')
+  if (!userId) shiftPlaceholder = t('Select a customer first')
+  else if (shifts.loading) shiftPlaceholder = t('Loading shifts…')
 
   // Fresh values every time the modal opens: the row being edited, or an empty form
   useEffect(() => {
@@ -69,10 +72,13 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
     try {
       const payload = toBreakPayload(values, isEdit)
       const saved = isEdit ? await updateBreak(shiftBreak.id, payload) : await createBreak(payload)
-      toast.success(`${payload.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Break updated' : 'Break created' })
+      toast.success(
+        isEdit ? t('{{name}} has been updated.', { name: payload.name }) : t('{{name}} has been added.', { name: payload.name }),
+        { title: isEdit ? t('Break updated updated') : t('Break created created') },
+      )
       onSaved(saved, isEdit)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save break' })
+      toast.error(error.message, { title: t('Could not save break') })
     }
   }
 
@@ -80,9 +86,9 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit break' : 'Add break'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit Break') : t('Add Break')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? `Edit Break · ${shiftBreak.name}` : 'Add Break'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Break · {{name}}', { name: shiftBreak.name }) : t('Add Break')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -90,11 +96,11 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
             {canPickCustomer && (
               <Form.Group as={Col} xs={12} controlId="break-userId">
                 <FieldLabel required help={FIELD_HELP.userId}>
-                  Customer Name
+                  {t('Customer Name')}
                 </FieldLabel>
                 {/* Shifts belong to one customer: a new customer starts with none picked */}
                 <Form.Select {...register('userId', { onChange: () => setValue('shiftId', '') })} isInvalid={Boolean(errors.userId)}>
-                  <option value="">{customers.length ? 'Select Customer' : 'No customers yet'}</option>
+                  <option value="">{customers.length ? t('Select Customer') : t('No customers yet')}</option>
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -106,7 +112,7 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
             )}
 
             <Form.Group as={Col} xs={12} controlId="break-shiftId">
-              <FieldLabel help={FIELD_HELP.shiftId}>Shift</FieldLabel>
+              <FieldLabel help={FIELD_HELP.shiftId}>{t('Shift')}</FieldLabel>
               {/* Controlled: the options load after the customer is known */}
               <Controller
                 name="shiftId"
@@ -116,7 +122,7 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
                     <option value="">{shiftPlaceholder}</option>
                     {shifts.items.map((shift) => (
                       <option key={shift.id} value={shift.id}>
-                        {`${shift.name} · ${formatClock12(shift.startTime)} to ${formatClock12(shift.endTime)}`}
+                        {t('{{name}} · {{start}} to {{end}}', { name: shift.name, start: formatClock12(shift.startTime), end: formatClock12(shift.endTime) })}
                       </option>
                     ))}
                   </Form.Select>
@@ -126,18 +132,18 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
             </Form.Group>
 
             <Form.Group as={Col} xs={12} controlId="break-name">
-              <Form.Label className="required">Break Name</Form.Label>
+              <Form.Label className="required">{t('Break Name')}</Form.Label>
               <Form.Control
                 {...register('name')}
                 list={NAME_SUGGESTIONS_ID}
                 autoComplete="off"
                 maxLength={MAX_LENGTH.name}
-                placeholder="Lunch"
+                placeholder={t('Lunch')}
                 isInvalid={Boolean(errors.name)}
               />
               <datalist id={NAME_SUGGESTIONS_ID}>
                 {BREAK_NAME_SUGGESTIONS.map((suggestion) => (
-                  <option key={suggestion} value={suggestion} />
+                  <option key={suggestion} value={t(suggestion)} />
                 ))}
               </datalist>
               <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
@@ -145,7 +151,7 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
 
             <Form.Group as={Col} sm={6} controlId="break-startTime">
               <FieldLabel required help={FIELD_HELP.times}>
-                Start Time
+                {t('Start Time')}
               </FieldLabel>
               <Controller
                 name="startTime"
@@ -156,7 +162,7 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
             </Form.Group>
 
             <Form.Group as={Col} sm={6} controlId="break-endTime">
-              <Form.Label className="required">End Time</Form.Label>
+              <Form.Label className="required">{t('End Time')}</Form.Label>
               <Controller
                 name="endTime"
                 control={control}
@@ -172,7 +178,7 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
 
             {isEdit && (
               <Form.Group as={Col} xs={12}>
-                <Form.Label className="required">Status</Form.Label>
+                <Form.Label className="required">{t('Status')}</Form.Label>
                 <StatusToggle
                   id="break-status"
                   {...register('status')}
@@ -187,18 +193,18 @@ function BreakFormModal({ show, shiftBreak, customers, canPickCustomer, ownCompa
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Break' : 'Save Break'}
+                {isEdit ? t('Update Break') : t('Save Break')}
               </>
             )}
           </Button>

@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import FieldLabel from '@/components/common/FieldLabel'
 import { createModel, updateModel } from '@/services/catalogService'
 import { toast } from '@/utils/toast'
@@ -13,6 +14,7 @@ import { FIELD_HELP } from './modelHelp'
 // Add / edit a machine model: its controller and name. `model` = the model being edited, null when adding.
 function ModelFormModal({ show, model, controllers, defaultControllerId, onSaved, onHide }) {
   const isEdit = Boolean(model)
+  const { t } = useTranslation()
 
   const {
     register,
@@ -33,25 +35,28 @@ function ModelFormModal({ show, model, controllers, defaultControllerId, onSaved
     try {
       const payload = toModelPayload(values)
       const saved = isEdit ? await updateModel(model.id, payload) : await createModel(payload)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Model updated' : 'Model added' })
+      toast.success(
+        isEdit ? t('{{name}} has been updated.', { name: saved.name }) : t('{{name}} has been added.', { name: saved.name }),
+        { title: isEdit ? t('Model updated') : t('Model added') },
+      )
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save model' })
+      toast.error(error.message, { title: t('Could not save model') })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit model' : 'Add model'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit Model') : t('Add Model')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Model' : 'Add Model'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Model') : t('Add Model')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <Form.Group controlId="model-controller" className="mb-3">
-            <FieldLabel required>Controller</FieldLabel>
+            <FieldLabel required>{t('Controller')}</FieldLabel>
             <Form.Select {...register('controllerId')} isInvalid={Boolean(errors.controllerId)}>
-              <option value="">Select controller</option>
+              <option value="">{t('Select controller')}</option>
               <ControllerOptions controllers={controllers} />
             </Form.Select>
             <Form.Control.Feedback type="invalid">{errors.controllerId?.message}</Form.Control.Feedback>
@@ -59,7 +64,7 @@ function ModelFormModal({ show, model, controllers, defaultControllerId, onSaved
 
           <Form.Group controlId="model-name">
             <FieldLabel required help={FIELD_HELP.name}>
-              Model Name
+              {t('Model Name')}
             </FieldLabel>
             <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
@@ -68,18 +73,18 @@ function ModelFormModal({ show, model, controllers, defaultControllerId, onSaved
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>

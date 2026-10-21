@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -10,6 +10,7 @@ import { ROUTES } from '@/constants/routes'
 import { getBreaks } from '@/services/breakService'
 import { createShift, updateShift } from '@/services/shiftService'
 import { formatClock12, formatHoursMinutes, minutesBetween } from '@/utils/dateTime'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import IconAction from '@/components/common/IconAction'
@@ -18,6 +19,7 @@ import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import { EMPTY_BREAK_ROW, INITIAL_VALUES, MAX_BREAKS, MAX_LENGTH, shiftSchema, toFormValues, toShiftPayload } from './shiftForm'
 import { FIELD_HELP } from './shiftHelp'
+import { Trans, useTranslation } from 'react-i18next'
 
 const breakTime = (shiftBreak) => (shiftBreak ? `${formatClock12(shiftBreak.startTime)} to ${formatClock12(shiftBreak.endTime)}` : '')
 
@@ -25,6 +27,7 @@ const breakTime = (shiftBreak) => (shiftBreak ? `${formatClock12(shiftBreak.star
 // The superadmin picks the customer; a customer or admin always saves to their own company.
 // Breaks are picked from the customer's breaks (Masters › Shifts › Breaks).
 function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(shift)
   const emptyValues = canPickCustomer ? INITIAL_VALUES : { ...INITIAL_VALUES, userId: ownCompanyId ? String(ownCompanyId) : '' }
 
@@ -63,7 +66,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
       .catch((error) => {
         if (!active) return
         setBreaks({ items: [], loading: false })
-        toast.error(error.message, { title: 'Could not load breaks' })
+        toast.error(error.message, { title: i18n.t('Could not load breaks') })
       })
     return () => {
       active = false
@@ -80,10 +83,12 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
     try {
       const payload = toShiftPayload(values, isEdit)
       const saved = isEdit ? await updateShift(shift.id, payload) : await createShift(payload)
-      toast.success(`${payload.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Shift updated' : 'Shift created' })
+      toast.success(isEdit ? t('{{name}} has been updated.', { name: payload.name }) : t('{{name}} has been added.', { name: payload.name }), {
+        title: isEdit ? t('Shift updated') : t('Shift created'),
+      })
       onSaved(saved, isEdit)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save shift' })
+      toast.error(error.message, { title: t('Could not save shift') })
     }
   }
 
@@ -98,7 +103,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
       scrollable
       backdrop={isSubmitting ? 'static' : true}
     >
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit shift' : 'Add shift'} className="ts-modal-form">
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit shift') : t('Add shift')} className="ts-modal-form">
         <Modal.Header closeButton={!isSubmitting}>
           <Modal.Title>{isEdit ? `Edit Shift · ${shift.name}` : 'Add Shift'}</Modal.Title>
         </Modal.Header>
@@ -108,11 +113,11 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
             {canPickCustomer && (
               <Form.Group as={Col} xs={12} controlId="shift-userId">
                 <FieldLabel required help={FIELD_HELP.userId}>
-                  Customer Name
+                  {t('Customer Name')}
                 </FieldLabel>
                 {/* Breaks belong to one customer: a new customer starts with none picked */}
                 <Form.Select {...register('userId', { onChange: () => setValue('breaks', []) })} isInvalid={Boolean(errors.userId)}>
-                  <option value="">{customers.length ? 'Select Customer' : 'No customers yet'}</option>
+                  <option value="">{customers.length ? t('Select Customer') : t('No customers yet')}</option>
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customerName(customer) === '—' ? customer.username : `${customerName(customer)} (${customer.username})`}
@@ -124,18 +129,18 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
             )}
 
             <Form.Group as={Col} md={6} controlId="shift-name">
-              <Form.Label className="required">Shift Name</Form.Label>
+              <Form.Label className="required">{t('Shift Name')}</Form.Label>
               <Form.Control {...register('name')} autoComplete="off" maxLength={MAX_LENGTH.name} placeholder="A" isInvalid={Boolean(errors.name)} />
               <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md={6} controlId="shift-shiftType">
-              <Form.Label className="required">Shift Type</Form.Label>
+              <Form.Label className="required">{t('Shift Type')}</Form.Label>
               <Form.Select {...register('shiftType')} isInvalid={Boolean(errors.shiftType)}>
-                <option value="">Select Shift Type</option>
+                <option value="">{t('Select Shift Type')}</option>
                 {SHIFT_TYPES.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.label)}
                   </option>
                 ))}
               </Form.Select>
@@ -144,7 +149,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
 
             <Form.Group as={Col} sm={6} controlId="shift-startTime">
               <FieldLabel required help={FIELD_HELP.times}>
-                Shift Start Time
+                {t('Shift Start Time')}
               </FieldLabel>
               <Controller
                 name="startTime"
@@ -155,7 +160,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
             </Form.Group>
 
             <Form.Group as={Col} sm={6} controlId="shift-endTime">
-              <Form.Label className="required">Shift End Time</Form.Label>
+              <Form.Label className="required">{t('Shift End Time')}</Form.Label>
               <Controller
                 name="endTime"
                 control={control}
@@ -171,20 +176,20 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
 
             <Form.Group as={Col} xs={12}>
               <FieldLabel required help={FIELD_HELP.workingDays}>
-                Working Days
+                {t('Working Days')}
               </FieldLabel>
               <Controller
                 name="workingDays"
                 control={control}
                 render={({ field }) => (
-                  <div className="ts-radio-group" role="group" aria-label="Working days">
+                  <div className="ts-radio-group" role="group" aria-label={t('Working days')}>
                     {WEEKDAYS.map((day) => (
                       <Form.Check
                         key={day.id}
                         inline
                         type="checkbox"
                         id={`shift-day-${day.id}`}
-                        label={day.label}
+                        label={t(day.label)}
                         checked={field.value.includes(day.id)}
                         isInvalid={Boolean(errors.workingDays)}
                         onChange={(event) =>
@@ -200,7 +205,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
 
             {isEdit && (
               <Form.Group as={Col} md={6}>
-                <Form.Label className="required">Status</Form.Label>
+                <Form.Label className="required">{t('Status')}</Form.Label>
                 <StatusToggle
                   id="shift-status"
                   {...register('status')}
@@ -216,10 +221,10 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
             {fields.length > 0 && (
               <Row className="g-2 mb-1" aria-hidden="true">
                 <Col xs={6}>
-                  <FieldLabel help={FIELD_HELP.breaks}>Shift Break Type</FieldLabel>
+                  <FieldLabel help={FIELD_HELP.breaks}>{t('Shift Break Type')}</FieldLabel>
                 </Col>
                 <Col xs={5}>
-                  <Form.Label className="mb-0">Break Time</Form.Label>
+                  <Form.Label className="mb-0">{t('Break Time')}</Form.Label>
                 </Col>
               </Row>
             )}
@@ -236,11 +241,11 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
                       render={({ field: selectField }) => (
                         <Form.Select
                           {...selectField}
-                          aria-label={`Break ${index + 1}`}
+                          aria-label={t('Break {{n}}', { n: index + 1 })}
                           disabled={!userId || breaks.loading}
                           isInvalid={Boolean(rowError)}
                         >
-                          <option value="">{breaks.loading ? 'Loading breaks…' : 'Select Shift Break'}</option>
+                          <option value="">{breaks.loading ? t('Loading breaks…') : t('Select Shift Break')}</option>
                           {breaks.items.map((option) => (
                             <option key={option.id} value={option.id}>
                               {option.name}
@@ -252,18 +257,20 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
                     {rowError && <div className="invalid-feedback d-block">{rowError.message}</div>}
                   </Col>
                   <Col xs={5}>
-                    <Form.Control value={breakTime(picked)} readOnly tabIndex={-1} aria-label={`Break ${index + 1} time`} />
+                    <Form.Control value={breakTime(picked)} readOnly tabIndex={-1} aria-label={t('Break {{n}} time', { n: index + 1 })} />
                   </Col>
                   <Col xs={1} className="d-flex justify-content-end">
-                    <IconAction danger icon={ACTION_ICONS.remove} label={`Remove break ${index + 1}`} onClick={() => remove(index)} />
+                    <IconAction danger icon={ACTION_ICONS.remove} label={t('Remove break {{n}}', { n: index + 1 })} onClick={() => remove(index)} />
                   </Col>
                 </Row>
               )
             })}
             {userId && !breaks.loading && !breaks.items.length ? (
               <p className="small text-body-secondary mb-0">
-                No free breaks for this customer: each break belongs to one shift. Add more in{' '}
-                <Link to={ROUTES.BREAKS}>Breaks</Link>.
+                <Trans
+                  i18nKey="No free breaks for this customer: each break belongs to one shift. Add more in <l>Breaks</l>."
+                  components={{ l: <Link to={ROUTES.BREAKS} /> }}
+                />
               </p>
             ) : (
               <Button
@@ -272,7 +279,7 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
                 disabled={!userId || fields.length >= MAX_BREAKS || fields.length >= breaks.items.length}
               >
                 <i className="bi bi-plus-lg me-1" aria-hidden="true" />
-                {fields.length ? 'Add More Breaks' : 'Add Break'}
+                {fields.length ? t('Add More Breaks') : t('Add Break')}
               </Button>
             )}
           </div>
@@ -280,18 +287,18 @@ function ShiftFormModal({ show, shift, customers, canPickCustomer, ownCompanyId,
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update Shift' : 'Save Shift'}
+                {isEdit ? t('Update Shift') : t('Save Shift')}
               </>
             )}
           </Button>

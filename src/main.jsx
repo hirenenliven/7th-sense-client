@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import '@fontsource-variable/roboto'
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
 import '@/assets/scss/theme.scss'
+import '@/i18n'
 
 import App from '@/App'
 import { THEME } from '@/constants/app'

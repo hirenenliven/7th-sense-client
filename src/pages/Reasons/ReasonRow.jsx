@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import IconAction from '@/components/common/IconAction'
 import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
@@ -7,6 +8,7 @@ import { REASON_STATUS } from './reasonForm'
 
 // showCustomer (superadmin): the customer column; canManage (managers): edit and delete
 function ReasonRow({ reason, showCustomer, canManage, onEdit, onDelete }) {
+  const { t } = useTranslation()
   return (
     <tr>
       <td className="font-tabular">{reason.id}</td>
@@ -19,8 +21,8 @@ function ReasonRow({ reason, showCustomer, canManage, onEdit, onDelete }) {
       {canManage && (
         <td className="border-start">
           <div className="d-flex gap-1">
-            <IconAction icon={ACTION_ICONS.edit} label={`Edit ${reason.reason}`} onClick={() => onEdit(reason)} />
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${reason.reason}`} onClick={() => onDelete(reason)} />
+            <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: reason.reason })} onClick={() => onEdit(reason)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: reason.reason })} onClick={() => onDelete(reason)} />
           </div>
         </td>
       )}

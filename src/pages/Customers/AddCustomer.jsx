@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -14,6 +14,7 @@ import { getAssignableRoles } from '@/services/roleService'
 import useAuth from '@/hooks/useAuth'
 import { formatFileSize } from '@/utils/helpers'
 import { refreshUserTheme } from '@/utils/theme'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import TimePicker from '@/components/common/TimePicker'
@@ -32,11 +33,13 @@ import {
 import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
 import { customerName } from './customerFormat'
 import { FIELD_HELP } from './customerHelp'
+import { Trans, useTranslation } from 'react-i18next'
 
 // Customers and users share this form (add and edit): /masters/customers/add, /masters/customers/:id/edit,
 // /masters/users/add and /masters/users/:id/edit. Users also get the Access card: role, company
 // (the superadmin picks it) and the machines they may access.
 function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
+  const { t } = useTranslation()
   const page = ACCOUNT_PAGES[kind]
   const isUser = kind === ACCOUNT_KIND.USER
   const navigate = useNavigate()
@@ -104,7 +107,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
       .catch((error) => {
         if (!active) return
         setBranchesError(error.message)
-        toast.error(error.message, { title: 'Could not load branches' })
+        toast.error(error.message, { title: i18n.t('Could not load branches') })
       })
       .finally(() => active && setBranchesLoading(false))
     return () => {
@@ -126,7 +129,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
       .catch((error) => {
         if (!active) return
         setAccessError(error.message)
-        toast.error(error.message, { title: 'Could not load roles' })
+        toast.error(error.message, { title: i18n.t('Could not load roles') })
       })
     return () => {
       active = false
@@ -144,7 +147,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     setMachinesLoading(true)
     getMachines(needsCompany ? companyId : undefined)
       .then((list) => active && setMachines(list))
-      .catch((error) => active && toast.error(error.message, { title: 'Could not load machines' }))
+      .catch((error) => active && toast.error(error.message, { title: i18n.t('Could not load machines') }))
       .finally(() => active && setMachinesLoading(false))
     return () => {
       active = false
@@ -208,32 +211,32 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
       const payload = toUserPayload(assignsMachines ? values : { ...values, machineIds: [] }, existing, kind)
       if (isEdit) {
         await updateUser(id, payload)
-        toast.success(`${values.companyName} has been updated.`, { title: `${page.title} updated` })
+        toast.success(t('{{name}} has been updated.', { name: values.companyName }), { title: t(page.text.updatedTitle) })
       } else {
         await createUser(payload)
-        toast.success(`${values.companyName} has been added.`, { title: `${page.title} created` })
+        toast.success(t('{{name}} has been added.', { name: values.companyName }), { title: t(page.text.createdTitle) })
       }
       // Re-apply the logged-in user's theme in case this was their own account
       refreshUserTheme()
       navigate(page.routes.list)
     } catch (error) {
-      toast.error(error.message, { title: `Could not save ${page.noun}` })
+      toast.error(error.message, { title: t(page.text.saveFailed) })
     }
   }
 
   const header = (
     <header className="ts-page-header">
       <div>
-        <div className="ts-eyebrow">{page.section}</div>
-        <h1>{isEdit ? `Edit ${page.title}` : `Add ${page.title}`}</h1>
+        <div className="ts-eyebrow">{t(page.section)}</div>
+        <h1>{t(isEdit ? page.text.edit : page.text.add)}</h1>
         <p className="ts-page-subtitle">
-          {isEdit ? `Update the ${page.noun} account and its login.` : `Create a ${page.noun} account and its login.`}
+          {t(isEdit ? page.text.editSubtitle : page.text.addSubtitle)}
         </p>
       </div>
       <div className="ts-page-actions">
         <Button as={Link} to={page.routes.list} variant="ghost">
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-          {page.title} list
+          {t(page.text.backToList)}
         </Button>
       </div>
     </header>
@@ -243,7 +246,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     return (
       <>
         {header}
-        <Loader text={`Loading ${page.noun}…`} />
+        <Loader text={t(page.text.loadingOne)} />
       </>
     )
   }
@@ -253,7 +256,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
       <>
         {header}
         <Alert variant="danger">
-          <b>Could not load this {page.noun}.</b> {customerError}
+          <b>{t(page.text.loadOneFailed)}</b> {customerError}
         </Alert>
       </>
     )
@@ -263,13 +266,13 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     <>
       {header}
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? `Edit ${page.noun}` : `Add ${page.noun}`}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={t(isEdit ? page.text.edit : page.text.add)}>
         {/* Access: role, company and machines (users only) */}
         {isUser && (
           <Card className="mb-3">
             <Card.Header>
               <i className="bi bi-shield-check text-primary" aria-hidden="true" />
-              Access
+              {t('Access')}
               {assignsMachines && (
                 <span className="ms-auto d-flex gap-1">
                   <Button
@@ -278,10 +281,10 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                     onClick={() => setValue('machineIds', machines.map((machine) => String(machine.id)), { shouldDirty: true })}
                     disabled={!machines.length || machineIds.length === machines.length}
                   >
-                    Select all
+                    {t('Select all')}
                   </Button>
                   <Button variant="link" size="sm" onClick={() => setValue('machineIds', [], { shouldDirty: true })} disabled={!machineIds.length}>
-                    Clear
+                    {t('Clear')}
                   </Button>
                 </span>
               )}
@@ -289,13 +292,13 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
             <Card.Body>
               <Row className="g-3">
                 <Form.Group as={Col} md={6} xxl={4} controlId="roleId">
-                  <FieldLabel required help={FIELD_HELP.roleId}>Role</FieldLabel>
+                  <FieldLabel required help={FIELD_HELP.roleId}>{t('Role')}</FieldLabel>
                   {/* key: re-mount once the options arrive, so a saved role loaded earlier shows */}
                   <Form.Select key={roles.length} {...register('roleId')} disabled={Boolean(accessError)} isInvalid={Boolean(errors.roleId)}>
-                    <option value="">{accessError ? 'Roles unavailable' : 'Select role'}</option>
+                    <option value="">{accessError ? t('Roles unavailable') : t('Select role')}</option>
                     {roles.map((role) => (
                       <option key={role.id} value={role.id}>
-                        {ROLE_LABELS[role.name] ?? role.name}
+                        {ROLE_LABELS[role.name] ? t(ROLE_LABELS[role.name]) : role.name}
                       </option>
                     ))}
                   </Form.Select>
@@ -304,9 +307,9 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
 
                 {needsCompany && (
                   <Form.Group as={Col} md={6} xxl={4} controlId="companyId">
-                    <Form.Label className={labelClass('companyId')}>Customer</Form.Label>
+                    <Form.Label className={labelClass('companyId')}>{t('Customer')}</Form.Label>
                     <Form.Select key={companies.length} {...register('companyId', { onChange: handleCompanyChange })} isInvalid={Boolean(errors.companyId)}>
-                      <option value="">Select customer</option>
+                      <option value="">{t('Select customer')}</option>
                       {companies.map((company) => (
                         <option key={company.id} value={company.id}>
                           {customerName(company) === '—' ? company.username : `${customerName(company)} (${company.username})`}
@@ -314,23 +317,23 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                       ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">{errors.companyId?.message}</Form.Control.Feedback>
-                    {!errors.companyId && <Form.Text>Company the user belongs to.</Form.Text>}
+                    {!errors.companyId && <Form.Text>{t('Company the user belongs to.')}</Form.Text>}
                   </Form.Group>
                 )}
               </Row>
 
               {roleName && !assignsMachines && (
                 <Alert variant="info" className="mt-3 mb-0">
-                  {ROLE_LABELS[roleName] ?? roleName} users see every machine of the company.
+                  {t('{{role}} users see every machine of the company.', { role: ROLE_LABELS[roleName] ? t(ROLE_LABELS[roleName]) : roleName })}
                 </Alert>
               )}
 
               {assignsMachines && (
                 <fieldset className="mt-3" aria-describedby="machines-hint">
-                  <legend className="visually-hidden">Machines</legend>
-                  <FieldLabel help={FIELD_HELP.machineIds}>Machines this user can access</FieldLabel>
+                  <legend className="visually-hidden">{t('Machines')}</legend>
+                  <FieldLabel help={FIELD_HELP.machineIds}>{t('Machines this user can access')}</FieldLabel>
                   {machinesLoading ? (
-                    <Loader text="Loading machines…" />
+                    <Loader text={t('Loading machines…')} />
                   ) : machines.length ? (
                     <div className="d-flex flex-wrap gap-3 mt-1">
                       {machines.map((machine) => (
@@ -346,7 +349,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                     </div>
                   ) : (
                     <div className="text-body-secondary mt-1">
-                      {needsCompany && !companyId ? 'Select a customer to see its machines.' : 'This company has no machines yet.'}
+                      {needsCompany && !companyId ? t('Select a customer to see its machines.') : t('This company has no machines yet.')}
                     </div>
                   )}
                   <Form.Text id="machines-hint">
@@ -362,15 +365,15 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-building text-primary" aria-hidden="true" />
-            Company details
+            {t('Company details')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={6} xxl={4} controlId="branchId">
-                <Form.Label className={labelClass('branchId')}>Branch</Form.Label>
+                <Form.Label className={labelClass('branchId')}>{t('Branch')}</Form.Label>
                 <Form.Select {...register('branchId')} disabled={branchesLoading || Boolean(branchesError)} isInvalid={Boolean(errors.branchId)}>
                   <option value="">
-                    {branchesLoading ? 'Loading branches…' : branchesError ? 'Branches unavailable' : 'Select branch'}
+                    {branchesLoading ? 'Loading branches…' : branchesError ? t('Branches unavailable') : t('Select branch')}
                   </option>
                   {branches.map((branch) => (
                     <option key={branch.id} value={branch.id}>
@@ -382,36 +385,36 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="companyName">
-                <Form.Label className={labelClass('companyName')}>Company Name</Form.Label>
+                <Form.Label className={labelClass('companyName')}>{t('Company Name')}</Form.Label>
                 <Form.Control {...register('companyName')} autoComplete="organization" maxLength={150} isInvalid={Boolean(errors.companyName)} />
                 <Form.Control.Feedback type="invalid">{errors.companyName?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="finixId">
-                <Form.Label>Finix ID</Form.Label>
+                <Form.Label>{t('Finix ID')}</Form.Label>
                 <Form.Control {...register('finixId')} autoComplete="off" />
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="gstNo">
-                <FieldLabel required={isRequired('gstNo')} help={FIELD_HELP.gstNo}>GST No.</FieldLabel>
+                <FieldLabel required={isRequired('gstNo')} help={FIELD_HELP.gstNo}>{t('GST No.')}</FieldLabel>
                 <Form.Control {...register('gstNo', { onChange: handleChange })} autoComplete="off" maxLength={15} placeholder="22ABCDE1234F1Z5" isInvalid={Boolean(errors.gstNo)} />
                 <Form.Control.Feedback type="invalid">{errors.gstNo?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="panNo">
-                <FieldLabel required={isRequired('panNo')} help={FIELD_HELP.panNo}>PAN No.</FieldLabel>
+                <FieldLabel required={isRequired('panNo')} help={FIELD_HELP.panNo}>{t('PAN No.')}</FieldLabel>
                 <Form.Control {...register('panNo', { onChange: handleChange })} autoComplete="off" maxLength={10} placeholder="ABCDE1234F" isInvalid={Boolean(errors.panNo)} />
                 <Form.Control.Feedback type="invalid">{errors.panNo?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="website">
-                <Form.Label>Website</Form.Label>
+                <Form.Label>{t('Website')}</Form.Label>
                 <Form.Control {...register('website')} type="url" autoComplete="url" placeholder="www.example.com" isInvalid={Boolean(errors.website)} />
                 <Form.Control.Feedback type="invalid">{errors.website?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="logo">
-                <Form.Label>Company Logo</Form.Label>
+                <Form.Label>{t('Company Logo')}</Form.Label>
                 <Form.Control
                   ref={logoInputRef}
                   type="file"
@@ -424,19 +427,19 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                 />
                 <Form.Control.Feedback type="invalid">{errors.logo?.message}</Form.Control.Feedback>
                 {!errors.logo && savedLogoPath(existing) && !logo && (
-                  <Form.Text className="d-block text-truncate">Current: {savedLogoPath(existing)}</Form.Text>
+                  <Form.Text className="d-block text-truncate">{t('Current: {{file}}', { file: savedLogoPath(existing) })}</Form.Text>
                 )}
                 {!errors.logo && (
-                  <Form.Text>PNG, JPG, SVG or WEBP · max {formatFileSize(2 * 1024 * 1024)}</Form.Text>
+                  <Form.Text>{t('PNG, JPG, SVG or WEBP · max {{size}}', { size: formatFileSize(2 * 1024 * 1024) })}</Form.Text>
                 )}
                 {logo && (
                   <div className="ts-file-preview mt-2">
-                    {logoPreview && <img src={logoPreview} alt="Logo preview" className="ts-file-preview-img" />}
+                    {logoPreview && <img src={logoPreview} alt={t('Logo preview')} className="ts-file-preview-img" />}
                     <div className="ts-file-preview-meta">
                       <div className="text-truncate">{logo.name}</div>
                       <div className="fs-xs text-body-tertiary">{formatFileSize(logo.size)}</div>
                     </div>
-                    <IconAction danger icon={ACTION_ICONS.remove} label="Remove logo" onClick={removeLogo} />
+                    <IconAction danger icon={ACTION_ICONS.remove} label={t('Remove logo')} onClick={removeLogo} />
                   </div>
                 )}
               </Form.Group>
@@ -448,18 +451,18 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-person-lock text-primary" aria-hidden="true" />
-            Login credentials
+            {t('Login credentials')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={6} xxl={4} controlId="email">
-                <Form.Label className={labelClass('email')}>Email</Form.Label>
+                <Form.Label className={labelClass('email')}>{t('Email')}</Form.Label>
                 <Form.Control {...register('email')} type="email" autoComplete="off" isInvalid={Boolean(errors.email)} />
                 <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="username">
-                <FieldLabel required={isRequired('username')} help={FIELD_HELP.username}>User Name</FieldLabel>
+                <FieldLabel required={isRequired('username')} help={FIELD_HELP.username}>{t('User Name')}</FieldLabel>
                 <Form.Control {...register('username')} autoComplete="off" isInvalid={Boolean(errors.username)} />
                 <Form.Control.Feedback type="invalid">{errors.username?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -467,7 +470,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               {/* Only when adding: an existing customer's password is not changed here */}
               {!isEdit && (
                 <Form.Group as={Col} md={6} xxl={4} controlId="password">
-                  <Form.Label className={labelClass('password')}>Password</Form.Label>
+                  <Form.Label className={labelClass('password')}>{t('Password')}</Form.Label>
                   <InputGroup hasValidation>
                     <Form.Control
                       {...register('password')}
@@ -478,7 +481,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                     <Button
                       variant="ghost"
                       onClick={() => setShowPassword((show) => !show)}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-label={showPassword ? t('Hide password') : t('Show password')}
                       aria-pressed={showPassword}
                     >
                       <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
@@ -495,23 +498,23 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-geo-alt text-primary" aria-hidden="true" />
-            Address
+            {t('Address')}
           </Card.Header>
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={6} controlId="address1">
-                <Form.Label className={labelClass('address1')}>Address - 1</Form.Label>
+                <Form.Label className={labelClass('address1')}>{t('Address - 1')}</Form.Label>
                 <Form.Control {...register('address1')} autoComplete="address-line1" isInvalid={Boolean(errors.address1)} />
                 <Form.Control.Feedback type="invalid">{errors.address1?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} controlId="address2">
-                <Form.Label>Address - 2</Form.Label>
+                <Form.Label>{t('Address - 2')}</Form.Label>
                 <Form.Control {...register('address2')} autoComplete="address-line2" />
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={3} controlId="country">
-                <Form.Label className={labelClass('country')}>Country</Form.Label>
+                <Form.Label className={labelClass('country')}>{t('Country')}</Form.Label>
                 <Form.Select {...register('country', { onChange: handleCountryChange })} autoComplete="country" isInvalid={Boolean(errors.country)}>
                   {COUNTRIES.map((country) => (
                     <option key={country.code} value={country.code}>
@@ -523,10 +526,10 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={3} controlId="state">
-                <Form.Label className={labelClass('state')}>State</Form.Label>
+                <Form.Label className={labelClass('state')}>{t('State')}</Form.Label>
                 {states.length ? (
                   <Form.Select {...register('state')} isInvalid={Boolean(errors.state)}>
-                    <option value="">Select state</option>
+                    <option value="">{t('Select state')}</option>
                     {states.map((state) => (
                       <option key={state.code} value={state.code}>
                         {state.name}
@@ -540,13 +543,13 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={3} controlId="city">
-                <Form.Label className={labelClass('city')}>City</Form.Label>
+                <Form.Label className={labelClass('city')}>{t('City')}</Form.Label>
                 <Form.Control {...register('city')} autoComplete="address-level2" isInvalid={Boolean(errors.city)} />
                 <Form.Control.Feedback type="invalid">{errors.city?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={3} controlId="zipCode">
-                <FieldLabel required={isRequired('zipCode')} help={FIELD_HELP.zipCode}>Zip Code</FieldLabel>
+                <FieldLabel required={isRequired('zipCode')} help={FIELD_HELP.zipCode}>{t('Zip Code')}</FieldLabel>
                 <Form.Control {...register('zipCode')} autoComplete="postal-code" inputMode="numeric" maxLength={10} isInvalid={Boolean(errors.zipCode)} />
                 <Form.Control.Feedback type="invalid">{errors.zipCode?.message}</Form.Control.Feedback>
               </Form.Group>
@@ -563,13 +566,13 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <Card.Body>
             <Row className="g-3">
               <Form.Group as={Col} md={6} xxl={4} controlId="contactPerson">
-                <Form.Label className={labelClass('contactPerson')}>Contact Person</Form.Label>
+                <Form.Label className={labelClass('contactPerson')}>{t('Contact Person')}</Form.Label>
                 <Form.Control {...register('contactPerson')} autoComplete="name" isInvalid={Boolean(errors.contactPerson)} />
                 <Form.Control.Feedback type="invalid">{errors.contactPerson?.message}</Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="primaryPhone">
-                <Form.Label className={labelClass('primaryPhone')}>Primary Phone</Form.Label>
+                <Form.Label className={labelClass('primaryPhone')}>{t('Primary Phone')}</Form.Label>
                 <InputGroup hasValidation>
                   <InputGroup.Text>{dialCode}</InputGroup.Text>
                   <Form.Control {...register('primaryPhone')} type="tel" autoComplete="tel-national" placeholder="98765 43210" isInvalid={Boolean(errors.primaryPhone)} />
@@ -578,7 +581,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="secondaryPhone">
-                <Form.Label>Secondary Phone</Form.Label>
+                <Form.Label>{t('Secondary Phone')}</Form.Label>
                 <InputGroup hasValidation>
                   <InputGroup.Text>{dialCode}</InputGroup.Text>
                   <Form.Control {...register('secondaryPhone')} type="tel" autoComplete="tel-national" isInvalid={Boolean(errors.secondaryPhone)} />
@@ -587,7 +590,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="timeZone">
-                <FieldLabel required={isRequired('timeZone')} help={FIELD_HELP.timeZone}>Time Zone</FieldLabel>
+                <FieldLabel required={isRequired('timeZone')} help={FIELD_HELP.timeZone}>{t('Time Zone')}</FieldLabel>
                 <Form.Select {...register('timeZone')} isInvalid={Boolean(errors.timeZone)}>
                   {TIME_ZONES.map((zone) => (
                     <option key={zone} value={zone}>
@@ -599,27 +602,27 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="dayStartFrom">
-                <FieldLabel required={isRequired('dayStartFrom')} help={FIELD_HELP.dayStartFrom}>Day Start From</FieldLabel>
+                <FieldLabel required={isRequired('dayStartFrom')} help={FIELD_HELP.dayStartFrom}>{t('Day Start From')}</FieldLabel>
                 <Controller
                   name="dayStartFrom"
                   control={control}
                   render={({ field }) => <TimePicker {...field} isInvalid={Boolean(errors.dayStartFrom)} />}
                 />
                 <Form.Control.Feedback type="invalid">{errors.dayStartFrom?.message}</Form.Control.Feedback>
-                {!errors.dayStartFrom && <Form.Text>Production day begins at this time.</Form.Text>}
+                {!errors.dayStartFrom && <Form.Text>{t('Production day begins at this time.')}</Form.Text>}
               </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4} controlId="theme">
-                <Form.Label className={labelClass('theme')}>Theme</Form.Label>
+                <Form.Label className={labelClass('theme')}>{t('Theme')}</Form.Label>
                 <Form.Select {...register('theme')} isInvalid={Boolean(errors.theme)}>
                   {THEMES.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.label)}
                     </option>
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">{errors.theme?.message}</Form.Control.Feedback>
-                {!errors.theme && <Form.Text>Colour scheme the {page.noun} sees after signing in.</Form.Text>}
+                {!errors.theme && <Form.Text>{t(page.text.themeHint)}</Form.Text>}
               </Form.Group>
             </Row>
           </Card.Body>
@@ -629,24 +632,24 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         <Card className="mb-3">
           <Card.Header>
             <i className="bi bi-funnel text-primary" aria-hidden="true" />
-            Filters
+            {t('Filters')}
             <span className="ts-filter-count" aria-hidden="true">
               {filters.length}/{FILTER_NAMES.length}
             </span>
             <span className="ms-auto d-flex gap-1">
               <Button variant="link" size="sm" onClick={() => setValue('filters', FILTER_NAMES, { shouldDirty: true })} disabled={allFiltersChosen}>
-                Select all
+                {t('Select all')}
               </Button>
               <Button variant="link" size="sm" onClick={() => setValue('filters', [], { shouldDirty: true })} disabled={!filters.length}>
-                Clear
+                {t('Clear')}
               </Button>
             </span>
           </Card.Header>
           <Card.Body>
             <fieldset aria-describedby="filters-hint">
-              <legend className="visually-hidden">Filters</legend>
+              <legend className="visually-hidden">{t('Filters')}</legend>
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
+                <FieldLabel help={FIELD_HELP.filters}>{t(page.text.filtersLabel)}</FieldLabel>
                 <span id="filters-hint" className={`fs-sm ${errors.filters ? 'text-danger' : 'text-body-tertiary'}`}>
                   {errors.filters?.message || `${filters.length} of ${FILTER_NAMES.length} selected · shown on dashboards and reports`}
                 </span>
@@ -657,7 +660,7 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                   <label key={option.value} className={`ts-filter-chip${errors.filters ? ' is-invalid' : ''}`} htmlFor={`filter-${option.value}`}>
                     <input id={`filter-${option.value}`} type="checkbox" className="ts-filter-input" value={option.value} {...register('filters')} />
                     <i className={`bi ${option.icon} ts-filter-icon`} aria-hidden="true" />
-                    {option.label}
+                    {t(option.label)}
                     <i className="bi bi-check-lg ts-filter-check" aria-hidden="true" />
                   </label>
                 ))}
@@ -669,24 +672,24 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         {/* Actions */}
         <div className="ts-form-actions">
           <span className="ts-form-actions-note">
-            Fields marked <span className="text-danger">*</span> are required.
+            <Trans i18nKey="Fields marked <r>*</r> are required." components={{ r: <span className="text-danger" /> }} />
           </span>
           <Button variant="ghost" onClick={() => navigate(page.routes.list)} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button variant="ghost" onClick={() => reset()} disabled={isSubmitting}>
-            Reset
+            {t('Reset')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? `Update ${page.title}` : `Save ${page.title}`}
+                {t(isEdit ? page.text.update : page.text.save)}
               </>
             )}
           </Button>

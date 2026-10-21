@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ALL_WEEKDAYS, SHIFT_STATUS } from '@/constants/shifts'
 import { minutesBetween } from '@/utils/dateTime'
+import { tk, tkv } from '@/i18n/tk'
 
 // Lengths and limits of the shifts API (dto/shift_dto.go, migrations 019–020)
 export const MAX_LENGTH = { name: 100 }
@@ -31,19 +32,19 @@ const offset = (shiftStart, time) => (time === shiftStart ? 0 : minutesBetween(s
 export const shiftSchema = (breaksById) =>
   z
     .object({
-      userId: z.string().min(1, 'Customer is required'),
-      name: z.string().trim().min(1, 'Shift name is required').max(MAX_LENGTH.name, 'Shift name is too long'),
-      shiftType: z.string().min(1, 'Shift type is required'),
-      startTime: clock('Shift start time is required'),
-      endTime: clock('Shift end time is required'),
-      workingDays: z.array(z.number()).min(1, 'Select at least one working day'),
+      userId: z.string().min(1, tk('Customer is required')),
+      name: z.string().trim().min(1, tk('Shift name is required')).max(MAX_LENGTH.name, tk('Shift name is too long')),
+      shiftType: z.string().min(1, tk('Shift type is required')),
+      startTime: clock(tk('Shift start time is required')),
+      endTime: clock(tk('Shift end time is required')),
+      workingDays: z.array(z.number()).min(1, tk('Select at least one working day')),
       status: z.enum([SHIFT_STATUS.ACTIVE, SHIFT_STATUS.INACTIVE]),
-      breaks: z.array(z.object({ breakId: z.string().min(1, 'Select a break or remove this row') })).max(MAX_BREAKS, `Up to ${MAX_BREAKS} breaks`),
+      breaks: z.array(z.object({ breakId: z.string().min(1, tk('Select a break or remove this row')) })).max(MAX_BREAKS, tkv('Up to {{n}} breaks', { n: MAX_BREAKS })),
     })
     .superRefine((values, ctx) => {
       const issue = (message, path) => ctx.addIssue({ code: z.ZodIssueCode.custom, message, path })
       if (values.startTime && values.startTime === values.endTime) {
-        issue('End time must differ from the start time', ['endTime'])
+        issue(tk('End time must differ from the start time'), ['endTime'])
         return
       }
 
@@ -52,7 +53,7 @@ export const shiftSchema = (breaksById) =>
       values.breaks.forEach(({ breakId }, index) => {
         if (!breakId) return
         if (seen.has(breakId)) {
-          issue('This break is already added', ['breaks', index, 'breakId'])
+          issue(tk('This break is already added'), ['breaks', index, 'breakId'])
           return
         }
         seen.add(breakId)
@@ -61,7 +62,7 @@ export const shiftSchema = (breaksById) =>
         const from = offset(values.startTime, shiftBreak.startTime)
         const to = from + minutesBetween(shiftBreak.startTime, shiftBreak.endTime)
         if (to > minutesBetween(values.startTime, values.endTime)) {
-          issue('Not within the shift time', ['breaks', index, 'breakId'])
+          issue(tk('Not within the shift time'), ['breaks', index, 'breakId'])
           return
         }
         spans.push({ from, to, index })
@@ -69,7 +70,7 @@ export const shiftSchema = (breaksById) =>
 
       spans.sort((a, b) => a.from - b.from)
       spans.slice(1).forEach((span, position) => {
-        if (span.from < spans[position].to) issue('Overlaps another break', ['breaks', span.index, 'breakId'])
+        if (span.from < spans[position].to) issue(tk('Overlaps another break'), ['breaks', span.index, 'breakId'])
       })
     })
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { CloseButton } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 const ICONS = {
   success: 'bi-check-circle-fill',
@@ -13,6 +14,7 @@ const ICONS = {
 function ToastItem({ toast, onDismiss }) {
   const { id, type, title, message, duration, leaving } = toast
   const [paused, setPaused] = useState(false)
+  const { t } = useTranslation()
   const remaining = useRef(duration)
   const startedAt = useRef(0)
   const progressRef = useRef(null)
@@ -64,7 +66,7 @@ function ToastItem({ toast, onDismiss }) {
           {title && <div className="ts-toast-title">{title}</div>}
           <div className="ts-toast-message">{message}</div>
         </div>
-        <CloseButton className="ts-toast-close" onClick={close} aria-label="Dismiss notification" />
+        <CloseButton className="ts-toast-close" onClick={close} aria-label={t('Dismiss notification')} />
       </div>
       {duration > 0 && <div ref={progressRef} className="ts-toast-progress" />}
     </div>

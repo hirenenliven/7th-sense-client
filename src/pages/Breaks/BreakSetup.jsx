@@ -7,6 +7,7 @@ import { CUSTOMER_ROLE_ID, MANAGERS, PAGE_SIZES, ROLES, SUPERADMIN_ONLY } from '
 import useAuth from '@/hooks/useAuth'
 import { deleteBreak, getBreaks } from '@/services/breakService'
 import { getUsers } from '@/services/customerService'
+import i18n from '@/i18n'
 import { toast } from '@/utils/toast'
 import BreakFormModal from './BreakFormModal'
 import BreakRow from './BreakRow'
@@ -14,6 +15,7 @@ import { minutesBetween } from '@/utils/dateTime'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const matchesSearch = (shiftBreak, term) =>
   [shiftBreak.id, shiftBreak.name, shiftBreak.shiftName, shiftBreak.customerName, shiftBreak.startTime, shiftBreak.endTime].some((value) =>
@@ -25,6 +27,7 @@ const matchesSearch = (shiftBreak, term) =>
 // customer); everyone else sees their company's. Managers add (Add Break) and edit (a row's Edit)
 // in the Break modal, and delete.
 function BreakSetup() {
+  const { t } = useTranslation()
   const { user, hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const canManage = hasRole(MANAGERS)
@@ -66,7 +69,7 @@ function BreakSetup() {
     let active = true
     getUsers()
       .then((users) => active && setCustomers(users.filter((option) => option.roleId === CUSTOMER_ROLE_ID)))
-      .catch((err) => active && toast.error(err.message, { title: 'Could not load customers' }))
+      .catch((err) => active && toast.error(err.message, { title: i18n.t('Could not load customers') }))
     return () => {
       active = false
     }
@@ -93,15 +96,15 @@ function BreakSetup() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Break Name', sort: (row) => row.name },
-    ...(isSuperadmin ? [{ label: 'Customer Name', sort: (row) => row.customerName }] : []),
-    { label: 'Shift', sort: (row) => row.shiftName },
-    { label: 'Start Time', sort: (row) => row.startTime },
-    { label: 'End Time', sort: (row) => row.endTime },
-    { label: 'Length', sort: (row) => minutesBetween(row.startTime, row.endTime) },
-    { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Break Name'), sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: t('Customer Name'), sort: (row) => row.customerName }] : []),
+    { label: t('Shift'), sort: (row) => row.shiftName },
+    { label: t('Start Time'), sort: (row) => row.startTime },
+    { label: t('End Time'), sort: (row) => row.endTime },
+    { label: t('Length'), sort: (row) => minutesBetween(row.startTime, row.endTime) },
+    { label: t('Status'), sort: (row) => row.status },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -127,10 +130,10 @@ function BreakSetup() {
     try {
       await deleteBreak(pendingDelete.id)
       setBreaks((list) => list.filter((shiftBreak) => shiftBreak.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Break deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Break deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete break' })
+      toast.error(err.message, { title: t('Could not delete break') })
     } finally {
       setDeleting(false)
     }
@@ -138,17 +141,17 @@ function BreakSetup() {
 
 
   const renderList = () => {
-    if (loading) return <Loader text="Loading breaks…" />
+    if (loading) return <Loader text={t('Loading breaks…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load breaks.</b> {error}
+            <b>{t('Could not load breaks.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -158,7 +161,7 @@ function BreakSetup() {
       return (
         <div className="ts-empty">
           <i className="bi bi-cup-hot ts-empty-icon" aria-hidden="true" />
-          <p className="mb-0">No breaks yet.</p>
+          <p className="mb-0">{t('No breaks yet.')}</p>
         </div>
       )
     }
@@ -169,13 +172,13 @@ function BreakSetup() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, break, shift, customer, time…"
+              placeholder={t('Search ID, break, shift, customer, time…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search breaks"
+              aria-label={t('Search breaks')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -189,9 +192,9 @@ function BreakSetup() {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {filterOptions.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -231,7 +234,7 @@ function BreakSetup() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No breaks match these filters.</div>
+          <div className="ts-empty">{t('No breaks match these filters.')}</div>
         )}
       </>
     )
@@ -241,17 +244,17 @@ function BreakSetup() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Shift</div>
-          <h1>Breaks</h1>
+          <div className="ts-eyebrow">{t('Masters · Shift')}</div>
+          <h1>{t('Breaks')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s breaks and the shift that takes each.' : 'Your breaks and the shift that takes each.'}
+            {isSuperadmin ? t('Every customer’s breaks and the shift that takes each.') : t('Your breaks and the shift that takes each.')}
           </p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button onClick={handleAdd} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Break
+              {t('Add Break')}
             </Button>
           </div>
         )}
@@ -275,14 +278,21 @@ function BreakSetup() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete break"
-        confirmLabel="Delete"
+        title={t('Delete break')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete break <strong>{pendingDelete?.name}</strong>?
-        {pendingDelete?.shiftName && ` Shift ${pendingDelete.shiftName} will no longer take it.`}
+        {pendingDelete?.shiftName ? (
+          <Trans
+            i18nKey="Delete break <b>{{name}}</b>? Shift {{shift}} will no longer take it."
+            values={{ name: pendingDelete.name, shift: pendingDelete.shiftName }}
+            components={{ b: <strong /> }}
+          />
+        ) : (
+          <Trans i18nKey="Delete break <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
+        )}
       </ConfirmModal>
     </>
   )

@@ -13,6 +13,7 @@ import { toast } from '@/utils/toast'
 import StateFormModal from './StateFormModal'
 import StateRow from './StateRow'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 
@@ -22,6 +23,7 @@ const matchesSearch = (state, term) =>
 // Masters › States: the states assigned to the company with search, country filter and
 // paging. The superadmin adds them customer-wise (a country, then several of its states) and deletes.
 function StateList() {
+  const { t } = useTranslation()
   const [states, setStates] = useState([])
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(true)
@@ -71,12 +73,12 @@ function StateList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'State', sort: (row) => row.name },
-    { label: 'Country', sort: (row) => row.countryName },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canAssign ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('State'), sort: (row) => row.name },
+    { label: t('Country'), sort: (row) => row.countryName },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canAssign ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -94,27 +96,27 @@ function StateList() {
     try {
       await deleteUserState(pendingDelete.id, pendingDelete.userId)
       setStates((list) => list.filter((state) => state.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'State deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('State deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete state' })
+      toast.error(err.message, { title: t('Could not delete state') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading states…" />
+    if (loading) return <Loader text={t('Loading states…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load states.</b> {error}
+            <b>{t('Could not load states.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -133,7 +135,7 @@ function StateList() {
           </p>
           {canAssign && countries.length > 0 && (
             <Button size="sm" onClick={openAdd}>
-              Add states
+              {t('Add states')}
             </Button>
           )}
         </div>
@@ -146,13 +148,13 @@ function StateList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, state, country…"
+              placeholder={t('Search ID, state, country…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search states"
+              aria-label={t('Search states')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -165,9 +167,9 @@ function StateList() {
               setCountryFilter(event.target.value)
               setPage(1)
             }}
-            aria-label="Filter by country"
+            aria-label={t('Filter by country')}
           >
-            <option value="">All countries</option>
+            <option value="">{t('All countries')}</option>
             {countries.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -202,7 +204,7 @@ function StateList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No states match these filters.</div>
+          <div className="ts-empty">{t('No states match these filters.')}</div>
         )}
       </>
     )
@@ -212,15 +214,15 @@ function StateList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · States</div>
-          <h1>States</h1>
-          <p className="ts-page-subtitle">The states assigned to your organization and the country each belongs to.</p>
+          <div className="ts-eyebrow">{t('Masters · States')}</div>
+          <h1>{t('States')}</h1>
+          <p className="ts-page-subtitle">{t('The states assigned to your organization and the country each belongs to.')}</p>
         </div>
         <div className="ts-page-actions">
           {canAssign && (
             <Button onClick={openAdd} disabled={loading || Boolean(error) || !countries.length}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add States
+              {t('Add States')}
             </Button>
           )}
         </div>
@@ -241,13 +243,13 @@ function StateList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete state"
-        confirmLabel="Delete"
+        title={t('Delete state')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.name }} components={{ b: <strong /> }} />
         {' '}A state that still has cities cannot be deleted — delete those first.
       </ConfirmModal>
     </>

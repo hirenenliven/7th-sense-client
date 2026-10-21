@@ -14,11 +14,14 @@ import HolidayRow from './HolidayRow'
 import useTableSort from '@/hooks/useTableSort'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
+import { Trans, useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
+import { tk } from '@/i18n/tk'
 
 const TYPE_FILTERS = [
-  { value: '', label: 'Holidays and week offs' },
-  { value: HOLIDAY_TYPES.HOLIDAY, label: 'Holidays' },
-  { value: HOLIDAY_TYPES.WEEK_OFF, label: 'Week offs' },
+  { value: '', label: tk('Holidays and week offs') },
+  { value: HOLIDAY_TYPES.HOLIDAY, label: tk('Holidays') },
+  { value: HOLIDAY_TYPES.WEEK_OFF, label: tk('Week offs') },
 ]
 
 const matchesSearch = (holiday, term) =>
@@ -35,6 +38,7 @@ const matchesSearch = (holiday, term) =>
 // superadmin works on every customer's (filter by customer); everyone else sees their company's.
 // Managers add (Add Holiday) and edit (a row's Edit) in the Holiday modal, and delete.
 function HolidaySetup() {
+  const { t } = useTranslation()
   const { user, hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const canManage = hasRole(MANAGERS)
@@ -77,7 +81,7 @@ function HolidaySetup() {
     let active = true
     getUsers()
       .then((users) => active && setCustomers(users.filter((option) => option.roleId === CUSTOMER_ROLE_ID)))
-      .catch((err) => active && toast.error(err.message, { title: 'Could not load customers' }))
+      .catch((err) => active && toast.error(err.message, { title: i18n.t('Could not load customers') }))
     return () => {
       active = false
     }
@@ -108,14 +112,14 @@ function HolidaySetup() {
   const firstIndex = (currentPage - 1) * pageSize
   const columns = [
     'Sr. No.',
-    { label: 'Type', sort: (row) => row.holidayType },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Name', sort: (row) => row.name },
-    { label: 'Start Date', sort: (row) => row.startDate },
-    { label: 'End Date', sort: (row) => row.endDate },
-    { label: 'Day', sort: (row) => row.weekDay },
-    { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('Type'), sort: (row) => row.holidayType },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Name'), sort: (row) => row.name },
+    { label: t('Start Date'), sort: (row) => row.startDate },
+    { label: t('End Date'), sort: (row) => row.endDate },
+    { label: t('Day'), sort: (row) => row.weekDay },
+    { label: t('Status'), sort: (row) => row.status },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
@@ -147,10 +151,12 @@ function HolidaySetup() {
     try {
       await deleteHoliday(pendingDelete.id)
       setHolidays((list) => list.filter((holiday) => holiday.id !== pendingDelete.id))
-      toast.success(`The ${isWeekOff ? 'week off' : 'holiday'} has been deleted.`, { title: isWeekOff ? 'Week off deleted' : 'Holiday deleted' })
+      toast.success(isWeekOff ? t('The week off has been deleted.') : t('The holiday has been deleted.'), {
+        title: isWeekOff ? t('Week off deleted') : t('Holiday deleted'),
+      })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete' })
+      toast.error(err.message, { title: t('Could not delete') })
     } finally {
       setDeleting(false)
     }
@@ -158,17 +164,17 @@ function HolidaySetup() {
 
 
   const renderList = () => {
-    if (loading) return <Loader text="Loading holidays…" />
+    if (loading) return <Loader text={t('Loading holidays…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load holidays.</b> {error}
+            <b>{t('Could not load holidays.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -178,7 +184,7 @@ function HolidaySetup() {
       return (
         <div className="ts-empty">
           <i className="bi bi-calendar-event ts-empty-icon" aria-hidden="true" />
-          <p className="mb-0">No holidays or week offs yet.</p>
+          <p className="mb-0">{t('No holidays or week offs yet.')}</p>
         </div>
       )
     }
@@ -189,25 +195,25 @@ function HolidaySetup() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search name, customer, day, date…"
+              placeholder={t('Search name, customer, day, date…')}
               value={search}
               onChange={filterChange(setSearch)}
-              aria-label="Search holidays and week offs"
+              aria-label={t('Search holidays and week offs')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
             </InputGroup.Text>
           </InputGroup>
-          <Form.Select className="w-auto" value={typeFilter} onChange={filterChange(setTypeFilter)} aria-label="Filter by type">
+          <Form.Select className="w-auto" value={typeFilter} onChange={filterChange(setTypeFilter)} aria-label={t('Filter by type')}>
             {TYPE_FILTERS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.label)}
               </option>
             ))}
           </Form.Select>
           {isSuperadmin && (
-            <Form.Select className="w-auto" value={customerFilter} onChange={filterChange(setCustomerFilter)} aria-label="Filter by customer">
-              <option value="">All customers</option>
+            <Form.Select className="w-auto" value={customerFilter} onChange={filterChange(setCustomerFilter)} aria-label={t('Filter by customer')}>
+              <option value="">{t('All customers')}</option>
               {filterOptions.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -248,7 +254,7 @@ function HolidaySetup() {
             />
           </div>
         ) : (
-          <div className="ts-empty">Nothing matches these filters.</div>
+          <div className="ts-empty">{t('Nothing matches these filters.')}</div>
         )}
       </>
     )
@@ -256,24 +262,24 @@ function HolidaySetup() {
 
   const pendingIsWeekOff = pendingDelete?.holidayType === HOLIDAY_TYPES.WEEK_OFF
   const pendingLabel = pendingIsWeekOff
-    ? `the ${WEEKDAYS.find((day) => day.id === pendingDelete?.weekDay)?.label ?? ''} week off`
+    ? t('the {{day}} week off', { day: t(WEEKDAYS.find((day) => day.id === pendingDelete?.weekDay)?.label ?? '') })
     : pendingDelete?.name
 
   return (
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Shift</div>
-          <h1>Holiday / Week Off</h1>
+          <div className="ts-eyebrow">{t('Masters · Shift')}</div>
+          <h1>{t('Holiday / Week Off')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s holidays and weekly days off.' : 'Your holidays and weekly days off.'}
+            {isSuperadmin ? t('Every customer’s holidays and weekly days off.') : t('Your holidays and weekly days off.')}
           </p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button onClick={handleAdd} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Holiday
+              {t('Add Holiday')}
             </Button>
           </div>
         )}
@@ -297,13 +303,13 @@ function HolidaySetup() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title={pendingIsWeekOff ? 'Delete week off' : 'Delete holiday'}
-        confirmLabel="Delete"
+        title={pendingIsWeekOff ? t('Delete week off') : t('Delete holiday')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingLabel}</strong>?
+        <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingLabel }} components={{ b: <strong /> }} />
       </ConfirmModal>
     </>
   )

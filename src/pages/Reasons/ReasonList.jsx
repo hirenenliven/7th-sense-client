@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { Trans, useTranslation } from 'react-i18next'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import SortableHead from '@/components/common/SortableHead'
@@ -24,6 +25,8 @@ const matchesSearch = (reason, term) =>
 // admin) add (Add …) and edit (a row's Edit) in the reason modal, and delete.
 function ReasonList({ kind }) {
   const page = REASON_PAGES[kind]
+  const text = page.text
+  const { t } = useTranslation()
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const canManage = hasRole(MANAGERS)
@@ -79,12 +82,12 @@ function ReasonList({ kind }) {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(currentPageNo, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Reason Code', sort: (row) => row.reasonCode },
-    { label: 'Reason', sort: (row) => row.reason },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Reason Code'), sort: (row) => row.reasonCode },
+    { label: t('Reason'), sort: (row) => row.reason },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Status'), sort: (row) => row.status },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -111,27 +114,27 @@ function ReasonList({ kind }) {
     try {
       await page.remove(pendingDelete.id)
       setReasons((list) => list.filter((reason) => reason.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.reason} has been deleted.`, { title: `${page.singular} deleted` })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.reason }), { title: t(text.deleted) })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: `Could not delete ${page.noun}` })
+      toast.error(err.message, { title: t(text.deleteFailed) })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text={`Loading ${page.plural}…`} />
+    if (loading) return <Loader text={t(text.loading)} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load {page.plural}.</b> {error}
+            <b>{t(text.loadFailed)}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -141,10 +144,10 @@ function ReasonList({ kind }) {
       return (
         <div className="ts-empty">
           <i className={`bi ${page.icon} ts-empty-icon`} aria-hidden="true" />
-          <p className="mb-2">No {page.plural} yet.</p>
+          <p className="mb-2">{t(text.empty)}</p>
           {canManage && (
             <Button size="sm" onClick={handleAdd}>
-              Add the first {page.noun}
+              {t(text.addFirst)}
             </Button>
           )}
         </div>
@@ -157,13 +160,13 @@ function ReasonList({ kind }) {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, reason code, reason…"
+              placeholder={t('Search ID, reason code, reason…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label={`Search ${page.plural}`}
+              aria-label={t(text.search)}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -177,9 +180,9 @@ function ReasonList({ kind }) {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -218,7 +221,7 @@ function ReasonList({ kind }) {
             />
           </div>
         ) : (
-          <div className="ts-empty">No {page.plural} match these filters.</div>
+          <div className="ts-empty">{t(text.noMatch)}</div>
         )}
       </>
     )
@@ -228,15 +231,15 @@ function ReasonList({ kind }) {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">{page.eyebrow}</div>
-          <h1>{page.title}</h1>
-          <p className="ts-page-subtitle">{page.subtitle}</p>
+          <div className="ts-eyebrow">{t(text.eyebrow)}</div>
+          <h1>{t(text.title)}</h1>
+          <p className="ts-page-subtitle">{t(text.subtitle)}</p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button onClick={handleAdd} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add {page.singular}
+              {t(text.add)}
             </Button>
           </div>
         )}
@@ -252,14 +255,21 @@ function ReasonList({ kind }) {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title={`Delete ${page.noun}`}
-        confirmLabel="Delete"
+        title={t(text.deleteTitle)}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.reason}</strong>
-        {pendingDelete?.reasonCode ? ` (${pendingDelete.reasonCode})` : ''}?
+        {pendingDelete?.reasonCode ? (
+          <Trans
+            i18nKey="Delete <b>{{name}}</b> ({{code}})?"
+            values={{ name: pendingDelete.reason, code: pendingDelete.reasonCode }}
+            components={{ b: <strong /> }}
+          />
+        ) : (
+          <Trans i18nKey="Delete <b>{{name}}</b>?" values={{ name: pendingDelete?.reason }} components={{ b: <strong /> }} />
+        )}
       </ConfirmModal>
     </>
   )

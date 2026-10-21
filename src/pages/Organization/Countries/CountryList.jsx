@@ -12,6 +12,7 @@ import { toast } from '@/utils/toast'
 import CountryFormModal from './CountryFormModal'
 import CountryRow from './CountryRow'
 import { newestFirst } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 
@@ -21,6 +22,7 @@ const matchesSearch = (country, term) =>
 // Masters › Countries: the countries assigned to the company with search and paging.
 // The superadmin adds them customer-wise (several at once) and deletes.
 function CountryList() {
+  const { t } = useTranslation()
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -61,11 +63,11 @@ function CountryList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Country', sort: (row) => row.name },
-    { label: 'Customer', sort: (row) => customerLabel(row.userId) },
-    { label: 'Updated', sort: (row) => row.updatedAt },
-    ...(canAssign ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Country'), sort: (row) => row.name },
+    { label: t('Customer'), sort: (row) => customerLabel(row.userId) },
+    { label: t('Updated'), sort: (row) => row.updatedAt },
+    ...(canAssign ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -81,27 +83,27 @@ function CountryList() {
     try {
       await deleteUserCountry(pendingDelete.id, pendingDelete.userId)
       setCountries((list) => list.filter((country) => country.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Country deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Country deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete country' })
+      toast.error(err.message, { title: t('Could not delete country') })
     } finally {
       setDeleting(false)
     }
   }
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading countries…" />
+    if (loading) return <Loader text={t('Loading countries…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load countries.</b> {error}
+            <b>{t('Could not load countries.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -111,10 +113,10 @@ function CountryList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-globe2 ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">{canAssign ? 'No countries assigned yet.' : 'No countries have been assigned to your company yet.'}</p>
+          <p className="mb-2">{canAssign ? t('No countries assigned yet.') : t('No countries have been assigned to your company yet.')}</p>
           {canAssign && (
             <Button size="sm" onClick={() => setAdding(true)}>
-              Add countries
+              {t('Add countries')}
             </Button>
           )}
         </div>
@@ -127,13 +129,13 @@ function CountryList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, country…"
+              placeholder={t('Search ID, country…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search countries"
+              aria-label={t('Search countries')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -163,7 +165,7 @@ function CountryList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No countries match “{search.trim()}”.</div>
+          <div className="ts-empty">{t('No countries match “{{search}}”.', { search: search.trim() })}</div>
         )}
       </>
     )
@@ -173,15 +175,15 @@ function CountryList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Countries</div>
-          <h1>Countries</h1>
-          <p className="ts-page-subtitle">The countries assigned to your organization.</p>
+          <div className="ts-eyebrow">{t('Masters · Countries')}</div>
+          <h1>{t('Countries')}</h1>
+          <p className="ts-page-subtitle">{t('The countries assigned to your organization.')}</p>
         </div>
         <div className="ts-page-actions">
           {canAssign && (
             <Button onClick={() => setAdding(true)} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Countries
+              {t('Add Countries')}
             </Button>
           )}
         </div>
@@ -195,13 +197,17 @@ function CountryList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete country"
-        confirmLabel="Delete"
+        title={t('Delete country')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>? A country that still has states cannot be deleted — delete those first.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b>? A country that still has states cannot be deleted — delete those first."
+          values={{ name: pendingDelete?.name }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

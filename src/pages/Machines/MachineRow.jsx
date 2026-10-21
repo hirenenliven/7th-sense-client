@@ -6,10 +6,12 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
+import { useTranslation } from 'react-i18next'
 
 // showCustomer (superadmin): the customer column. Health is open to everyone; canEdit (managers) /
 // canDelete (superadmin) add the Edit / Delete actions.
 function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -29,7 +31,7 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdi
       <td className="text-body-secondary text-nowrap">{machine.installationDate ? formatDate(machine.installationDate) : '—'}</td>
       <td>
         <Badge bg="" className={machine.onlineStatus ? 'badge-soft-success' : 'badge-outline-muted'}>
-          {machine.onlineStatus ? 'Online' : 'Offline'}
+          {machine.onlineStatus ? t('Online') : t('Offline')}
         </Badge>
       </td>
       <td>
@@ -37,10 +39,10 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdi
       </td>
       <td className="border-start">
         <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.health} label={`${machine.name} health`} onClick={() => onHealth(machine)} />
-          {canEdit && <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />}
+          <IconAction icon={ACTION_ICONS.health} label={t('{{name}} health', { name: machine.name })} onClick={() => onHealth(machine)} />
+          {canEdit && <IconAction icon={ACTION_ICONS.edit} label={t('Edit {{name}}', { name: machine.name })} onClick={() => onEdit(machine)} />}
           {canEdit && canDelete && (
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
+            <IconAction danger icon={ACTION_ICONS.delete} label={t('Delete {{name}}', { name: machine.name })} onClick={() => onDelete(machine)} />
           )}
         </div>
       </td>

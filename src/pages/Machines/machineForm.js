@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { MACHINE_HEALTH_ALL, MACHINE_HEALTH_SENSORS } from '@/constants/machines'
 import { PATTERNS } from '@/utils/validators'
+import { tk } from '@/i18n/tk'
 
 // Lengths of the machines columns (dto/machine_dto.go)
 export const MAX_LENGTH = {
@@ -79,38 +80,38 @@ const coordinate = (limit, message) =>
 export const machineSchema = (isEdit) =>
   z
     .object({
-      userId: requiredId('Customer is required'),
-      name: z.string().trim().min(1, 'Machine name is required').regex(PATTERNS.machineName, 'Use letters, digits, spaces and _ . / ( ) # -'),
-      serialNumber: z.string().trim().min(1, 'Serial no. is required').regex(PATTERNS.serialNumber, 'Use letters, digits and / _ -'),
-      brandId: requiredId('Brand is required'),
-      controllerId: requiredId('Controller is required'),
-      modelId: requiredId('Model is required'),
-      controllerVersion: z.string().trim().min(1, 'Software version is required').regex(PATTERNS.controllerVersion, 'Up to 10 letters, digits and . _ -'),
+      userId: requiredId(tk('Customer is required')),
+      name: z.string().trim().min(1, tk('Machine name is required')).regex(PATTERNS.machineName, tk('Use letters, digits, spaces and _ . / ( ) # -')),
+      serialNumber: z.string().trim().min(1, tk('Serial no. is required')).regex(PATTERNS.serialNumber, tk('Use letters, digits and / _ -')),
+      brandId: requiredId(tk('Brand is required')),
+      controllerId: requiredId(tk('Controller is required')),
+      modelId: requiredId(tk('Model is required')),
+      controllerVersion: z.string().trim().min(1, tk('Software version is required')).regex(PATTERNS.controllerVersion, tk('Up to 10 letters, digits and . _ -')),
       accuracyId: z.string(),
       lineId: z.string(),
       isInsured: z.enum([YES, NO]),
       maintenanceRequired: z.enum([YES, NO]),
-      installationDate: z.string().min(1, 'Installation date is required'),
+      installationDate: z.string().min(1, tk('Installation date is required')),
       billDate: z.string(),
       warrantyDate: z.string(),
-      hourlyCost: z.string().trim().min(1, 'Hourly cost is required').regex(PATTERNS.money, 'Enter an amount such as 800 or 800.50'),
-      amc: z.string().trim().max(MAX_LENGTH.amc, 'AMC is too long'),
-      machineSystemType: z.string().min(1, 'Machine system type is required'),
-      securityMode: z.string().min(1, 'Security type is required'),
-      localIp: z.string().trim().min(1, 'Local IP is required').regex(PATTERNS.ipv4, 'Enter an IP such as 192.168.1.10'),
-      liveIp: z.string().trim().min(1, 'Live IP is required').regex(PATTERNS.ipv4, 'Enter an IP such as 103.81.119.106'),
+      hourlyCost: z.string().trim().min(1, tk('Hourly cost is required')).regex(PATTERNS.money, tk('Enter an amount such as 800 or 800.50')),
+      amc: z.string().trim().max(MAX_LENGTH.amc, tk('AMC is too long')),
+      machineSystemType: z.string().min(1, tk('Machine system type is required')),
+      securityMode: z.string().min(1, tk('Security type is required')),
+      localIp: z.string().trim().min(1, tk('Local IP is required')).regex(PATTERNS.ipv4, tk('Enter an IP such as 192.168.1.10')),
+      liveIp: z.string().trim().min(1, tk('Live IP is required')).regex(PATTERNS.ipv4, tk('Enter an IP such as 103.81.119.106')),
       port: z
         .string()
         .trim()
-        .min(1, 'Port is required')
-        .refine((value) => /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= 65535, 'Port is 1–65535'),
-      username: z.string().trim().min(1, 'User name is required').regex(PATTERNS.machineUsername, 'Up to 15 letters, digits, _ and .'),
+        .min(1, tk('Port is required'))
+        .refine((value) => /^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= 65535, tk('Port is 1–65535')),
+      username: z.string().trim().min(1, tk('User name is required')).regex(PATTERNS.machineUsername, tk('Up to 15 letters, digits, _ and .')),
       password: isEdit
-        ? z.string().max(MAX_LENGTH.password, 'Password is too long')
-        : z.string().min(1, 'Password is required').max(MAX_LENGTH.password, 'Password is too long'),
-      controllerVersionType: requiredId('Controller version is required'),
-      longitude: coordinate(180, 'Longitude is between -180 and 180'),
-      latitude: coordinate(90, 'Latitude is between -90 and 90'),
+        ? z.string().max(MAX_LENGTH.password, tk('Password is too long'))
+        : z.string().min(1, tk('Password is required')).max(MAX_LENGTH.password, tk('Password is too long')),
+      controllerVersionType: requiredId(tk('Controller version is required')),
+      longitude: coordinate(180, tk('Longitude is between -180 and 180')),
+      latitude: coordinate(90, tk('Latitude is between -90 and 90')),
       healthIds: z.array(z.number()),
     })
     .superRefine((values, ctx) => {
@@ -118,7 +119,7 @@ export const machineSchema = (isEdit) =>
       if (values.warrantyDate && values.installationDate && values.warrantyDate < values.installationDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Warranty ends before the installation date',
+          message: tk('Warranty ends before the installation date'),
           path: ['warrantyDate'],
         })
       }

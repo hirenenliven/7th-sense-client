@@ -9,6 +9,7 @@ import {
   getStates,
   isEnabledCountry,
 } from '@/constants/locations'
+import { tk } from '@/i18n/tk'
 import { PATTERNS } from '@/utils/validators'
 
 // Lengths of the clienteles columns (dto/clientele_dto.go, migrations 017–018)
@@ -39,25 +40,25 @@ export const INITIAL_VALUES = {
 // Mirrors the clienteles API rules (dto/clientele_dto.go)
 export const clienteleSchema = z
   .object({
-    userId: z.string().min(1, 'Customer is required'),
-    clientCode: z.string().trim().min(1, 'Client ID is required').max(MAX_LENGTH.clientCode, 'Client ID is too long'),
-    name: z.string().trim().min(1, 'Client name is required').max(MAX_LENGTH.name, 'Client name is too long'),
+    userId: z.string().min(1, tk('Customer is required')),
+    clientCode: z.string().trim().min(1, tk('Client ID is required')).max(MAX_LENGTH.clientCode, tk('Client ID is too long')),
+    name: z.string().trim().min(1, tk('Client name is required')).max(MAX_LENGTH.name, tk('Client name is too long')),
     email: z
       .string()
       .trim()
-      .max(MAX_LENGTH.email, 'Email is too long')
-      .refine((value) => !value || PATTERNS.email.test(value), 'Enter a valid email'),
-    contactNumber: z.string().trim().min(1, 'Contact number is required').regex(PATTERNS.phone, 'Enter a valid phone number'),
-    address: z.string().trim().min(1, 'Address is required').max(MAX_LENGTH.address, 'Address is too long'),
-    countryCode: z.string().min(1, 'Country is required'),
-    stateCode: z.string().min(1, 'State is required'),
-    city: z.string().trim().min(1, 'City is required').max(MAX_LENGTH.city, 'City is too long'),
+      .max(MAX_LENGTH.email, tk('Email is too long'))
+      .refine((value) => !value || PATTERNS.email.test(value), tk('Enter a valid email')),
+    contactNumber: z.string().trim().min(1, tk('Contact number is required')).regex(PATTERNS.phone, tk('Enter a valid phone number')),
+    address: z.string().trim().min(1, tk('Address is required')).max(MAX_LENGTH.address, tk('Address is too long')),
+    countryCode: z.string().min(1, tk('Country is required')),
+    stateCode: z.string().min(1, tk('State is required')),
+    city: z.string().trim().min(1, tk('City is required')).max(MAX_LENGTH.city, tk('City is too long')),
     status: z.enum([CLIENTELE_STATUS.ACTIVE, CLIENTELE_STATUS.INACTIVE]),
   })
   .superRefine((values, ctx) => {
     // The state must be one of the country's (a country change clears it, this catches stale values)
     if (values.stateCode && !getStates(values.countryCode).some((state) => state.code === values.stateCode)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Select a state of this country', path: ['stateCode'] })
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: tk('Select a state of this country'), path: ['stateCode'] })
     }
   })
 

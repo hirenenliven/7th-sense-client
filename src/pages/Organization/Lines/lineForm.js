@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches user_line.name VARCHAR(100) (dto/user_line_dto.go)
 export const NAME_MAX_LENGTH = 100
@@ -9,8 +10,8 @@ export const INITIAL_VALUES = {
 }
 
 export const lineSchema = z.object({
-  userShopId: z.string().min(1, 'Shop is required'),
-  name: z.string().trim().min(1, 'Line is required').max(NAME_MAX_LENGTH, 'Name is too long'),
+  userShopId: z.string().min(1, tk('Shop is required')),
+  name: z.string().trim().min(1, tk('Line is required')).max(NAME_MAX_LENGTH, tk('Name is too long')),
 })
 
 // ---------------------------------------------------------------------------

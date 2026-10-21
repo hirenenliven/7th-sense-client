@@ -17,6 +17,7 @@ import {
   tickFormatter,
 } from './healthSensors'
 import { todayIso } from '@/utils/dateTime'
+import { useTranslation } from 'react-i18next'
 
 const Y_HEADROOM = 1.08 // keeps the critical line below the top edge
 const Y_FLOOR = 0.9 // starts the axis a little under the lowest reading, so the line is not flattened
@@ -26,6 +27,7 @@ const Y_TICKS = 5
 // bands, and a range slider (Brush, with an overview of the line) to zoom into part of the range.
 // The date picker chooses the day (today by default); the range buttons look back from its last reading.
 function SensorTrendCard({ sensor, machineId }) {
+  const { t } = useTranslation()
   const today = todayIso()
   const [date, setDate] = useState(today)
   const points = useMemo(() => sensorDay(machineId, sensor.key, date), [machineId, sensor.key, date])
@@ -68,7 +70,7 @@ function SensorTrendCard({ sensor, machineId }) {
             <small>{sensor.unit}</small>
           </div>
           <div className="ts-chart-reading-meta">
-            <span>{date === today ? 'Current reading' : 'Last reading of the day'}</span>
+            <span>{date === today ? t('Current reading') : t('Last reading of the day')}</span>
             <span className="ts-chart-limit is-warning">Warning {withUnit(sensor.warning)}</span>
             <span className="ts-chart-limit is-critical">Critical {withUnit(sensor.critical)}</span>
           </div>
@@ -103,7 +105,7 @@ function SensorTrendCard({ sensor, machineId }) {
         limits={limits}
         brush
         brushKey={rangeKey}
-        emptyText="No readings in this range."
+        emptyText={t('No readings in this range.')}
       />
     </ChartCard>
   )

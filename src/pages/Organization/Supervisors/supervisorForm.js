@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { tk } from '@/i18n/tk'
 
 // Matches user_supervisor.name VARCHAR(100) (dto/user_supervisor_dto.go)
 export const NAME_MAX_LENGTH = 100
@@ -9,8 +10,8 @@ export const INITIAL_VALUES = {
 }
 
 export const supervisorSchema = z.object({
-  userCellId: z.string().min(1, 'Cell is required'),
-  name: z.string().trim().min(1, 'Supervisor is required').max(NAME_MAX_LENGTH, 'Name is too long'),
+  userCellId: z.string().min(1, tk('Cell is required')),
+  name: z.string().trim().min(1, tk('Supervisor is required')).max(NAME_MAX_LENGTH, tk('Name is too long')),
 })
 
 // ---------------------------------------------------------------------------

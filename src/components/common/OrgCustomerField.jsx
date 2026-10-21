@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { CUSTOMER_ROLE_ID } from '@/constants/app'
 import useOrgUser from '@/hooks/useOrgUser'
 import { customerName } from '@/pages/Customers/customerFormat'
@@ -16,6 +17,7 @@ const customerLabel = (user) => {
 // customer (its parents belong to it).
 function OrgCustomerField({ id, registration, locked = false, disabled = false, error }) {
   const { canPickUser, users, usersError } = useOrgUser()
+  const { t } = useTranslation()
 
   const customers = useMemo(
     () =>
@@ -29,9 +31,9 @@ function OrgCustomerField({ id, registration, locked = false, disabled = false, 
 
   return (
     <Form.Group controlId={id} className="mb-3">
-      <Form.Label className="required">Customer</Form.Label>
+      <Form.Label className="required">{t('Customer')}</Form.Label>
       <Form.Select {...registration} disabled={disabled || locked} isInvalid={Boolean(error)}>
-        <option value="">{usersError ? 'Customers unavailable' : 'Select customer'}</option>
+        <option value="">{usersError ? t('Customers unavailable') : t('Select customer')}</option>
         {customers.map((customer) => (
           <option key={customer.id} value={customer.id}>
             {customerLabel(customer)}
@@ -39,7 +41,7 @@ function OrgCustomerField({ id, registration, locked = false, disabled = false, 
         ))}
       </Form.Select>
       <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>
-      {!error && locked && <Form.Text>A saved row stays with its customer.</Form.Text>}
+      {!error && locked && <Form.Text>{t('A saved row stays with its customer.')}</Form.Text>}
     </Form.Group>
   )
 }

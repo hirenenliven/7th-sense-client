@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import FieldLabel from '@/components/common/FieldLabel'
 import { createController, updateController } from '@/services/catalogService'
 import { toast } from '@/utils/toast'
@@ -13,6 +14,7 @@ import { FIELD_HELP } from './controllerHelp'
 // `controller` = the controller being edited, null when adding.
 function ControllerFormModal({ show, controller, brands, defaultBrandId, onSaved, onHide }) {
   const isEdit = Boolean(controller)
+  const { t } = useTranslation()
 
   const {
     register,
@@ -33,27 +35,28 @@ function ControllerFormModal({ show, controller, brands, defaultBrandId, onSaved
     try {
       const payload = toControllerPayload(values)
       const saved = isEdit ? await updateController(controller.id, payload) : await createController(payload)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, {
-        title: isEdit ? 'Controller updated' : 'Controller added',
-      })
+      toast.success(
+        isEdit ? t('{{name}} has been updated.', { name: saved.name }) : t('{{name}} has been added.', { name: saved.name }),
+        { title: isEdit ? t('Controller updated') : t('Controller added') },
+      )
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save controller' })
+      toast.error(error.message, { title: t('Could not save controller') })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit controller' : 'Add controller'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit Controller') : t('Add Controller')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Controller' : 'Add Controller'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Controller') : t('Add Controller')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <Form.Group controlId="controller-brand" className="mb-3">
-            <FieldLabel required>Brand</FieldLabel>
+            <FieldLabel required>{t('Brand')}</FieldLabel>
             <Form.Select {...register('brandId')} isInvalid={Boolean(errors.brandId)}>
-              <option value="">Select brand</option>
+              <option value="">{t('Select brand')}</option>
               {brands.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.name}
@@ -65,14 +68,14 @@ function ControllerFormModal({ show, controller, brands, defaultBrandId, onSaved
 
           <Form.Group controlId="controller-name" className="mb-3">
             <FieldLabel required help={FIELD_HELP.name}>
-              Controller Name
+              {t('Controller Name')}
             </FieldLabel>
             <Form.Control {...register('name')} maxLength={MAX_LENGTH.name} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="controller-description">
-            <FieldLabel>Description</FieldLabel>
+            <FieldLabel>{t('Description')}</FieldLabel>
             <Form.Control
               as="textarea"
               rows={3}
@@ -86,18 +89,18 @@ function ControllerFormModal({ show, controller, brands, defaultBrandId, onSaved
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>

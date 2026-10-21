@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
+import { Trans, useTranslation } from 'react-i18next'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
@@ -22,6 +23,7 @@ const matchesSearch = (clientele, term) =>
 // (a row's Edit) in the Clientele modal, and delete.
 function ClienteleList() {
   const { hasRole } = useAuth()
+  const { t } = useTranslation()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const canManage = hasRole(MANAGERS)
 
@@ -58,9 +60,9 @@ function ClienteleList() {
   // Customer filter options: the customers that have clienteles
   const customers = useMemo(() => {
     const byId = new Map()
-    clienteles.forEach((clientele) => byId.set(clientele.userId, clientele.customerName || `Customer #${clientele.userId}`))
+    clienteles.forEach((clientele) => byId.set(clientele.userId, clientele.customerName || t('Customer #{{id}}', { id: clientele.userId })))
     return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
-  }, [clienteles])
+  }, [clienteles, t])
 
   const matched = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -76,14 +78,14 @@ function ClienteleList() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
   const columns = [
-    { label: 'ID', sort: (row) => row.id },
-    { label: 'Client ID', sort: (row) => row.clientCode },
-    { label: 'Client Name', sort: (row) => row.name },
-    ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
-    { label: 'Contact', sort: (row) => row.contactNumber },
-    { label: 'City', sort: (row) => row.city },
-    { label: 'Status', sort: (row) => row.status },
-    ...(canManage ? ['Actions'] : []),
+    { label: t('ID'), sort: (row) => row.id },
+    { label: t('Client ID'), sort: (row) => row.clientCode },
+    { label: t('Client Name'), sort: (row) => row.name },
+    ...(isSuperadmin ? [{ label: t('Customer'), sort: (row) => row.customerName }] : []),
+    { label: t('Contact'), sort: (row) => row.contactNumber },
+    { label: t('City'), sort: (row) => row.city },
+    { label: t('Status'), sort: (row) => row.status },
+    ...(canManage ? [t('Actions')] : []),
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -110,10 +112,10 @@ function ClienteleList() {
     try {
       await deleteClientele(pendingDelete.id)
       setClienteles((list) => list.filter((clientele) => clientele.id !== pendingDelete.id))
-      toast.success(`${pendingDelete.name} has been deleted.`, { title: 'Clientele deleted' })
+      toast.success(t('{{name}} has been deleted.', { name: pendingDelete.name }), { title: t('Clientele deleted') })
       setPendingDelete(null)
     } catch (err) {
-      toast.error(err.message, { title: 'Could not delete clientele' })
+      toast.error(err.message, { title: t('Could not delete clientele') })
     } finally {
       setDeleting(false)
     }
@@ -121,17 +123,17 @@ function ClienteleList() {
 
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading clienteles…" />
+    if (loading) return <Loader text={t('Loading clienteles…')} />
 
     if (error) {
       return (
         <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
           <span className="me-auto">
-            <b>Could not load clienteles.</b> {error}
+            <b>{t('Could not load clienteles.')}</b> {error}
           </span>
           <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
             <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
+            {t('Retry')}
           </Button>
         </Alert>
       )
@@ -141,10 +143,10 @@ function ClienteleList() {
       return (
         <div className="ts-empty">
           <i className="bi bi-person-vcard ts-empty-icon" aria-hidden="true" />
-          <p className="mb-2">No clienteles yet.</p>
+          <p className="mb-2">{t('No clienteles yet.')}</p>
           {canManage && (
             <Button size="sm" onClick={handleAdd}>
-              Add the first clientele
+              {t('Add the first clientele')}
             </Button>
           )}
         </div>
@@ -157,13 +159,13 @@ function ClienteleList() {
           <InputGroup className="flex-grow-1 w-auto">
             <Form.Control
               type="search"
-              placeholder="Search ID, client ID, name, email, phone, city…"
+              placeholder={t('Search ID, client ID, name, email, phone, city…')}
               value={search}
               onChange={(event) => {
                 setSearch(event.target.value)
                 setPage(1)
               }}
-              aria-label="Search clienteles"
+              aria-label={t('Search clienteles')}
             />
             <InputGroup.Text>
               <i className="bi bi-search" aria-hidden="true" />
@@ -177,9 +179,9 @@ function ClienteleList() {
                 setCustomerFilter(event.target.value)
                 setPage(1)
               }}
-              aria-label="Filter by customer"
+              aria-label={t('Filter by customer')}
             >
-              <option value="">All customers</option>
+              <option value="">{t('All customers')}</option>
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
@@ -218,7 +220,7 @@ function ClienteleList() {
             />
           </div>
         ) : (
-          <div className="ts-empty">No clienteles match these filters.</div>
+          <div className="ts-empty">{t('No clienteles match these filters.')}</div>
         )}
       </>
     )
@@ -228,17 +230,17 @@ function ClienteleList() {
     <>
       <header className="ts-page-header">
         <div>
-          <div className="ts-eyebrow">Masters · Clientele</div>
-          <h1>Clientele</h1>
+          <div className="ts-eyebrow">{t('Masters · Clientele')}</div>
+          <h1>{t('Clientele')}</h1>
           <p className="ts-page-subtitle">
-            {isSuperadmin ? 'Every customer’s clients and how to reach them.' : 'Your clients and how to reach them.'}
+            {isSuperadmin ? t('Every customer’s clients and how to reach them.') : t('Your clients and how to reach them.')}
           </p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
             <Button onClick={handleAdd} disabled={loading || Boolean(error)}>
               <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Add Clientele
+              {t('Add Clientele')}
             </Button>
           </div>
         )}
@@ -252,13 +254,17 @@ function ClienteleList() {
 
       <ConfirmModal
         show={Boolean(pendingDelete)}
-        title="Delete clientele"
-        confirmLabel="Delete"
+        title={t('Delete clientele')}
+        confirmLabel={t('Delete')}
         busy={deleting}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong> ({pendingDelete?.clientCode})? A clientele that parts use cannot be deleted.
+        <Trans
+          i18nKey="Delete <b>{{name}}</b> ({{code}})? A clientele that parts use cannot be deleted."
+          values={{ name: pendingDelete?.name, code: pendingDelete?.clientCode }}
+          components={{ b: <strong /> }}
+        />
       </ConfirmModal>
     </>
   )

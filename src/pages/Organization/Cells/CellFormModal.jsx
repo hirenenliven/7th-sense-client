@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@/i18n/zodResolver'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { createUserCell, updateUserCell } from '@/services/userCellService'
@@ -9,9 +9,11 @@ import useOrgUser from '@/hooks/useOrgUser'
 import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
 import { INITIAL_VALUES, NAME_MAX_LENGTH, cellSchema, toCellPayload, toFormValues } from './cellForm'
+import { useTranslation } from 'react-i18next'
 
 // Add / edit a cell: its line and name. `cell` = the cell being edited, null when adding.
 function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
+  const { t } = useTranslation()
   const isEdit = Boolean(cell)
 
   // The superadmin picks the customer on the form; others always save to their own company
@@ -49,18 +51,20 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
       const ownerId = canPickUser ? values.customerId : userId
       const payload = toCellPayload(values)
       const saved = isEdit ? await updateUserCell(cell.id, payload, ownerId) : await createUserCell(payload, ownerId)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'Cell updated' : 'Cell added' })
+      toast.success(isEdit ? t('{{name}} has been updated.', { name: saved.name }) : t('{{name}} has been added.', { name: saved.name }), {
+        title: isEdit ? t('Cell updated') : t('Cell added'),
+      })
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save cell' })
+      toast.error(error.message, { title: t('Could not save cell') })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit cell' : 'Add cell'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? t('Edit cell') : t('Add cell')}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit Cell' : 'Add Cell'}</Modal.Title>
+          <Modal.Title>{isEdit ? t('Edit Cell') : t('Add Cell')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -72,9 +76,9 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
             error={errors.customerId?.message}
           />
           <Form.Group controlId="cell-line" className="mb-3">
-            <Form.Label className="required">Line</Form.Label>
+            <Form.Label className="required">{t('Line')}</Form.Label>
             <Form.Select {...register('userLineId')} isInvalid={Boolean(errors.userLineId)}>
-              <option value="">Select line</option>
+              <option value="">{t('Select line')}</option>
               {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.shopName ? `${option.name} · ${option.shopName}` : option.name}
@@ -85,7 +89,7 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
           </Form.Group>
 
           <Form.Group controlId="cell-name">
-            <Form.Label className="required">Cell Name</Form.Label>
+            <Form.Label className="required">{t('Cell Name')}</Form.Label>
             <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
           </Form.Group>
@@ -93,18 +97,18 @@ function CellFormModal({ show, cell, lines, defaultLineId, onSaved, onHide }) {
 
         <Modal.Footer>
           <Button variant="ghost" onClick={onHide} disabled={isSubmitting}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" aria-hidden="true" />
-                Saving…
+                {t('Saving…')}
               </>
             ) : (
               <>
                 <i className="bi bi-check2 me-2" aria-hidden="true" />
-                {isEdit ? 'Update' : 'Save'}
+                {isEdit ? t('Update') : t('Save')}
               </>
             )}
           </Button>
