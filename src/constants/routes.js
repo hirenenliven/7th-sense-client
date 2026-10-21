@@ -37,6 +37,9 @@ export const ROUTES = {
   SHIFTS: '/masters/shifts',
   BREAKS: '/masters/breaks',
   HOLIDAYS: '/masters/holidays',
+  // Downtime: the reasons a machine was down / stood idle (pages/Reasons/, one page per kind)
+  DOWNTIME_REASONS: '/masters/downtime-reasons',
+  IDLE_REASONS: '/masters/idle-reasons',
   // Licence keys: the superadmin generates them for a customer; managers read their company's
   LICENCE_KEYS: '/masters/licence-keys',
   // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)

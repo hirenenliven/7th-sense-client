@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { SUPERADMIN_ONLY, MANAGERS } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { ACCOUNT_KIND } from '@/pages/Customers/accountPages'
+import { REASON_KIND } from '@/pages/Reasons/reasonPages'
 
 const Home = lazy(() => import('@/pages/Home/Home'))
 const About = lazy(() => import('@/pages/About/About'))
@@ -18,6 +19,7 @@ const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
 const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
 const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
 const HolidaySetup = lazy(() => import('@/pages/Holidays/HolidaySetup'))
+const ReasonList = lazy(() => import('@/pages/Reasons/ReasonList'))
 const LicenceKeySetup = lazy(() => import('@/pages/LicenceKeys/LicenceKeySetup'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
@@ -75,6 +77,10 @@ export const PAGES = [
   { path: ROUTES.SHIFTS, element: <ShiftSetup /> },
   { path: ROUTES.BREAKS, element: <BreakSetup /> },
   { path: ROUTES.HOLIDAYS, element: <HolidaySetup /> },
+  // Downtime › Downtime List / Idle List: everyone reads their company's; managers add, edit and delete
+  // (`key` gives each kind its own list state)
+  { path: ROUTES.DOWNTIME_REASONS, element: <ReasonList key={REASON_KIND.DOWNTIME} kind={REASON_KIND.DOWNTIME} /> },
+  { path: ROUTES.IDLE_REASONS, element: <ReasonList key={REASON_KIND.IDLE} kind={REASON_KIND.IDLE} /> },
   // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
   { path: ROUTES.LICENCE_KEYS, element: <LicenceKeySetup />, roles: MANAGERS },
   { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },

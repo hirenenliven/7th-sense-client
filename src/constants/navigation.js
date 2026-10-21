@@ -116,6 +116,15 @@ export const NAV_SECTIONS = [
           { key: 'holidays', label: 'Holiday / Week Off', path: ROUTES.HOLIDAYS },
         ],
       },
+      {
+        key: 'downtime',
+        label: 'Downtime',
+        icon: 'bi-exclamation-octagon',
+        children: [
+          { key: 'downtime-reasons', label: 'Downtime List', path: ROUTES.DOWNTIME_REASONS },
+          { key: 'idle-reasons', label: 'Idle List', path: ROUTES.IDLE_REASONS },
+        ],
+      },
       { key: 'licence-keys', label: 'Licence Keys', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: MANAGERS },
       {
         key: 'users',

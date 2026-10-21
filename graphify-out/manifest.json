@@ -198,16 +198,16 @@
     "semantic_hash": "362a20a3f425b46d2e0b399a9296b921"
   },
   "src/constants/navigation.js": {
-    "mtime": 1792056063.2520506,
-    "seen": 1792149093.2481754,
-    "ast_hash": "639f21c8ce208eb5850c9c813aa53d81",
-    "semantic_hash": "639f21c8ce208eb5850c9c813aa53d81"
+    "mtime": 1792556198.8756323,
+    "seen": 1792556233.7357683,
+    "ast_hash": "5e9f0c98678df649502774a81a01f2c0",
+    "semantic_hash": ""
   },
   "src/constants/routes.js": {
-    "mtime": 1792056063.1938443,
-    "seen": 1792149093.2481754,
-    "ast_hash": "7d90a4a4ea8e21356f027f8c5dc2c032",
-    "semantic_hash": "7d90a4a4ea8e21356f027f8c5dc2c032"
+    "mtime": 1792556198.8751252,
+    "seen": 1792556233.735771,
+    "ast_hash": "219a78d5a2ff40840f7428a28a0403ee",
+    "semantic_hash": ""
   },
   "src/constants/shifts.js": {
     "mtime": 1791974426.7509902,
@@ -996,9 +996,9 @@
     "semantic_hash": "890d654ac7f6567b8e14ae35b30a2573"
   },
   "src/routes/pages.jsx": {
-    "mtime": 1792490044.8767095,
-    "seen": 1792490086.789565,
-    "ast_hash": "3a2f443842c230d48992831a25026c76",
+    "mtime": 1792556198.9015973,
+    "seen": 1792556233.736171,
+    "ast_hash": "89a568fc016c4096c7ee8695a2389e2d",
     "semantic_hash": ""
   },
   "src/services/apiClient.js": {
@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1792150213.4572802,
-    "seen": 1792487784.5349603,
-    "ast_hash": "2e751235b713a5892748c63be3dbf687",
+    "mtime": 1792556225.838534,
+    "seen": 1792556233.7362447,
+    "ast_hash": "2f2476159082cce748d9ed42d7ed9910",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1371,6 +1371,54 @@
     "mtime": 1792494129.4519963,
     "seen": 1792494285.6608157,
     "ast_hash": "c9012c4c757a0cde2a5e88664377c793",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/ReasonFormModal.jsx": {
+    "mtime": 1792556184.7906837,
+    "seen": 1792556233.7361305,
+    "ast_hash": "6c443dc59135818a9c115622b5b9b123",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/ReasonList.jsx": {
+    "mtime": 1792556184.8399568,
+    "seen": 1792556233.736142,
+    "ast_hash": "05bc1b7be19f1ce2a382c8f9b4e00e85",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/ReasonRow.jsx": {
+    "mtime": 1792556153.820609,
+    "seen": 1792556233.7361443,
+    "ast_hash": "f83e3149b49b588d13b5f8e05b2649c5",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/reasonForm.js": {
+    "mtime": 1792556124.6480653,
+    "seen": 1792556233.7361462,
+    "ast_hash": "c3b471c0b13a5c849fa89948c3bc0105",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/reasonHelp.js": {
+    "mtime": 1792556124.7039118,
+    "seen": 1792556233.7361476,
+    "ast_hash": "c292a175e9ca990253b53a363edd9b3f",
+    "semantic_hash": ""
+  },
+  "src/pages/Reasons/reasonPages.js": {
+    "mtime": 1792556124.4570053,
+    "seen": 1792556233.7361498,
+    "ast_hash": "1f54b2f06240c98130d0fced3d43fd11",
+    "semantic_hash": ""
+  },
+  "src/services/downtimeReasonService.js": {
+    "mtime": 1792556124.1931152,
+    "seen": 1792556233.736188,
+    "ast_hash": "c0f74b3f2bcf19d0319bda41b1185902",
+    "semantic_hash": ""
+  },
+  "src/services/idleReasonService.js": {
+    "mtime": 1792556124.262558,
+    "seen": 1792556233.736192,
+    "ast_hash": "67574bfcb2d896320dcccdd746cc9e70",
     "semantic_hash": ""
   }
 }
