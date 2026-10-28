@@ -3,7 +3,7 @@ import { Brush, Line, LineChart, ReferenceArea, ReferenceLine, YAxis } from 'rec
 import PropTypes from 'prop-types'
 import ChartFrame from './ChartFrame'
 import { axisPropTypes, renderGrid, renderLegend, renderTooltip, renderXAxis, renderYAxis, seriesColor, seriesShape } from './chartParts'
-import { ACTIVE_DOT, ANIMATION_MS, BAND_OPACITY, CHART_MARGIN, LINE_WIDTH, STATUS_COLORS } from './chartTheme'
+import { ACTIVE_DOT, ANIMATION_MS, BAND_OPACITY, CHART_MARGIN, LINE_WIDTH, POINT_DOT, STATUS_COLORS } from './chartTheme'
 
 const BRUSH_HEIGHT = 36
 const BRUSH_TRAVELLER = 10
@@ -13,7 +13,8 @@ const LIMIT_DASH = '4 4'
 // Line chart of one or more series over x (a time scale with xType "time"). Optional:
 // - limits: dashed lines at warning / critical values, each shading a band up to `bandTo`;
 // - brush: a range slider with an overview of the first series (zoom into part of the range);
-//   `brushKey` resets it (e.g. when the time range changes).
+//   `brushKey` resets it (e.g. when the time range changes);
+// - dots: a dot on every point (few points, e.g. one per day).
 // A legend is shown for two or more series.
 function LineTrendChart({
   data,
@@ -30,6 +31,7 @@ function LineTrendChart({
   limits = [],
   brush = false,
   brushKey,
+  dots = false,
   size,
   emptyText,
 }) {
@@ -72,7 +74,7 @@ function LineTrendChart({
             stroke={seriesColor(item, index)}
             strokeWidth={LINE_WIDTH}
             strokeDasharray={item.dashed ? LIMIT_DASH : undefined}
-            dot={false}
+            dot={dots ? { ...POINT_DOT, fill: seriesColor(item, index) } : false}
             activeDot={ACTIVE_DOT}
             animationDuration={ANIMATION_MS}
           />
@@ -120,6 +122,7 @@ LineTrendChart.propTypes = {
   ),
   brush: PropTypes.bool,
   brushKey: PropTypes.string,
+  dots: PropTypes.bool,
   size: PropTypes.oneOf(['lg']),
 }
 

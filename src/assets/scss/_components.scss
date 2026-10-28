@@ -3443,6 +3443,9 @@ $ts-toast-colors: (
   &.ts-chart-date-range { width: $ts-chart-date-range-width; }
 }
 
+// Multi-select filter (MultiSelectPicker without chips) in a chart card's toolbar
+.ts-chart-filter { width: $ts-chart-filter-width; }
+
 .ts-chart-card-title {
   margin: 0;
   font-size: ts-rem(14);

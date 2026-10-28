@@ -15,6 +15,7 @@ const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
 const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
 const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
 const MachineHealth = lazy(() => import('@/pages/MachineHealth/MachineHealth'))
+const Productivity = lazy(() => import('@/pages/Productivity/Productivity'))
 const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
 const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
 const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
@@ -63,6 +64,8 @@ export const PAGES = [
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
   // Machine Health: every user, for the machines the server returns them
   { path: ROUTES.MACHINE_HEALTH, element: <MachineHealth /> },
+  // Productivity (OEE, finished cycles): every user, for the machines the server returns them
+  { path: ROUTES.MACHINE_PRODUCTIVITY, element: <Productivity /> },
   // Clientele and parts: everyone reads their company's; managers add, edit and delete
   { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
   { path: ROUTES.PARTS, element: <PartList /> },

@@ -1,5 +1,7 @@
 import { PICKER_LOCALE, parseIsoDate, shiftIsoDate } from '@/utils/dateTime'
-import { HYDRAULIC_OIL_TEMP, MACHINE_STATES, SPINDLE_LOAD, TEMPERATURE_GROUP, TREND_SENSORS } from './healthSensors'
+import { randomFor, round } from '@/utils/sampleData'
+import { MACHINE_MODES } from '@/constants/machines'
+import { HYDRAULIC_OIL_TEMP, SPINDLE_LOAD, TEMPERATURE_GROUP, TREND_SENSORS } from './healthSensors'
 
 // SAMPLE readings for the Machine Health charts. The server has no sensor-data API yet; replace these
 // functions with service calls (same shapes) when it does. Every value is seeded by the machine id and
@@ -12,31 +14,6 @@ const GROUP_STEP_HOURS = 3 // grouped temperatures: a snapshot every 3 h of the 
 const AVERAGE_DAYS = 7
 // Trend charts draw at most this many points; longer ranges are bucketed (peak kept, see pointsInRange)
 export const MAX_TREND_POINTS = 240
-
-// Small seeded PRNG (mulberry32): repeatable numbers for a seed
-const seededRandom = (seed) => {
-  let state = seed >>> 0
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0
-    let next = Math.imul(state ^ (state >>> 15), 1 | state)
-    next = (next + Math.imul(next ^ (next >>> 7), 61 | next)) ^ next
-    return ((next ^ (next >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-// FNV-1a: a string → 32-bit seed
-const hashSeed = (text) => {
-  let hash = 0x811c9dc5
-  for (let index = 0; index < text.length; index += 1) {
-    hash ^= text.charCodeAt(index)
-    hash = Math.imul(hash, 0x01000193)
-  }
-  return hash >>> 0
-}
-
-const randomFor = (machineId, isoDate, salt) => seededRandom(hashSeed(`${machineId}|${isoDate}|${salt}`))
-
-const round = (value, decimals) => Number(value.toFixed(decimals))
 
 // Shop-floor load over the day: low at night, highest mid-afternoon (0 … 1)
 const dayLoad = (time) => {
@@ -109,22 +86,23 @@ export const hourlyTemperatures = (machineId, isoDate) => {
   return rows
 }
 
-// A day's hours per machine state (they add up to 24)
+// A day's hours per machine mode (they add up to 24)
 const dayStates = (machineId, isoDate) => {
   const random = randomFor(machineId, isoDate, 'states')
-  const running = round(9 + random() * 10, 1)
-  const alarm = round(random() * 1.4, 1)
-  const idle = round(Math.min(24 - running - alarm, 1 + random() * 4), 1)
-  return { running, idle, alarm, off: round(24 - running - alarm - idle, 1) }
+  const production = round(9 + random() * 10, 1)
+  const downtime = round(random() * 1.4, 1)
+  const hold = round(random() * 1.2, 1)
+  const idle = round(Math.min(24 - production - downtime - hold, 1 + random() * 4), 1)
+  return { offline: round(24 - production - downtime - hold - idle, 1), production, idle, hold, downtime }
 }
 
-// Donut: [{ key, label, hours }] of one day, in MACHINE_STATES order
+// Donut: [{ key, label, hours }] of one day, in MACHINE_MODES order
 export const stateShare = (machineId, isoDate) => {
   const hours = dayStates(machineId, isoDate)
-  return MACHINE_STATES.map((state) => ({ key: state.key, label: state.label, hours: hours[state.key] }))
+  return MACHINE_MODES.map((mode) => ({ key: mode.key, label: mode.label, hours: hours[mode.key] }))
 }
 
-// One row per day from … to: state hours, run hours' 7-day average (counting the days before `from`)
+// One row per day from … to: mode hours, run hours' 7-day average (counting the days before `from`)
 // and their running total over the range
 export const dailyRows = (machineId, from, to) => {
   const rows = []
@@ -133,9 +111,9 @@ export const dailyRows = (machineId, from, to) => {
     const states = dayStates(machineId, isoDate)
     let week = 0
     for (let back = 0; back < AVERAGE_DAYS; back += 1) {
-      week += back === 0 ? states.running : dayStates(machineId, shiftIsoDate(isoDate, -back)).running
+      week += back === 0 ? states.production : dayStates(machineId, shiftIsoDate(isoDate, -back)).production
     }
-    total += states.running
+    total += states.production
     rows.push({
       label: dayLabel.format(parseIsoDate(isoDate)),
       ...states,
@@ -146,7 +124,7 @@ export const dailyRows = (machineId, from, to) => {
   return rows
 }
 
-export const runHours = (machineId, isoDate) => dayStates(machineId, isoDate).running
+export const runHours = (machineId, isoDate) => dayStates(machineId, isoDate).production
 
 // Subsystem scores (100 = healthy) for the radar
 export const subsystemScores = (machineId, isoDate) => {

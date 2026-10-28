@@ -29,6 +29,16 @@ export const MACHINE_STATUS = {
   INACTIVE: 'inactive',
 }
 
+// Machine mode (what a machine is doing), in this order everywhere it is listed or charted.
+// `color` is a chartTheme STATUS_COLORS key; Offline is the absence of work, drawn faded (`muted`).
+export const MACHINE_MODES = [
+  { key: 'offline', label: 'Offline', color: 'neutral', muted: true },
+  { key: 'production', label: 'In Production', color: 'good' },
+  { key: 'idle', label: 'Idle', color: 'warning' },
+  { key: 'hold', label: 'Hold', color: 'info' },
+  { key: 'downtime', label: 'Downtime', color: 'critical' },
+]
+
 // healthIds = 'All' or comma-separated ids of these sensors (old system: mm_health)
 export const MACHINE_HEALTH_ALL = 'All'
 

@@ -7,9 +7,9 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
 
-// showCustomer (superadmin): the customer column. Health is open to everyone; canEdit (managers) /
+// showCustomer (superadmin): the customer column. Health and Productivity are open to everyone; canEdit (managers) /
 // canDelete (superadmin) add the Edit / Delete actions.
-function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdit, onDelete }) {
+function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onProductivity, onEdit, onDelete }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -38,6 +38,11 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onEdi
       <td className="border-start">
         <div className="d-flex gap-1">
           <IconAction icon={ACTION_ICONS.health} label={`${machine.name} health`} onClick={() => onHealth(machine)} />
+          <IconAction
+            icon={ACTION_ICONS.productivity}
+            label={`${machine.name} productivity`}
+            onClick={() => onProductivity(machine)}
+          />
           {canEdit && <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />}
           {canEdit && canDelete && (
             <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
@@ -66,6 +71,7 @@ MachineRow.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   onHealth: PropTypes.func.isRequired,
+  onProductivity: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }

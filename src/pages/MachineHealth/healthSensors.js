@@ -73,14 +73,6 @@ export const TEMPERATURE_GROUP = [
 
 export const SPINDLE_LOAD = { label: 'Spindle Load', unit: '%', min: 0, max: 100, warning: 70, critical: 90 }
 
-// Machine states over a day: stacked bars and the donut
-export const MACHINE_STATES = [
-  { key: 'running', label: 'Running', color: 'good' },
-  { key: 'idle', label: 'Idle', color: 'warning' },
-  { key: 'alarm', label: 'Alarm', color: 'critical' },
-  { key: 'off', label: 'Off', color: 'neutral', muted: true }, // absence of work: drawn faded
-]
-
 // Trend time ranges (the last … of readings)
 const MINUTE_MS = 60_000
 const HOUR_MS = 60 * MINUTE_MS

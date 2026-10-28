@@ -21,6 +21,7 @@ export const NAV_SECTIONS = [
         children: [
           { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
           { key: 'machine-health', label: 'Machine Health', path: ROUTES.MACHINE_HEALTH },
+          { key: 'machine-productivity', label: 'Productivity', path: ROUTES.MACHINE_PRODUCTIVITY },
           { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
         ],
       },

@@ -12,6 +12,7 @@ import Speedometer from '@/components/charts/Speedometer'
 import StackedBarChart from '@/components/charts/StackedBarChart'
 import { STATUS_COLORS } from '@/components/charts/chartTheme'
 import Loader from '@/components/common/Loader'
+import { MACHINE_MODES } from '@/constants/machines'
 import { SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
@@ -30,7 +31,6 @@ import {
 import {
   DEFAULT_RANGE_DAYS,
   HEALTH_DATE_MIN,
-  MACHINE_STATES,
   MAX_RANGE_DAYS,
   SPINDLE_LOAD,
   TEMPERATURE_GROUP,
@@ -44,9 +44,9 @@ import SensorTrendCard from './SensorTrendCard'
 // Coloured left edge on a tile whose reading needs attention
 const KPI_EDGE = { warning: 'card-status-warning', critical: 'card-status-danger' }
 
-// Series of the summary charts (colours: categorical order, or the machine state's status colour)
-const STATE_SERIES = MACHINE_STATES.map(({ key, label, color, muted }) => ({ key, label, color: STATUS_COLORS[color], muted }))
-const RUN_HOURS = { key: 'running', label: 'Run hours' }
+// Series of the summary charts (colours: categorical order, or the machine mode's status colour)
+const STATE_SERIES = MACHINE_MODES.map(({ key, label, color, muted }) => ({ key, label, color: STATUS_COLORS[color], muted }))
+const RUN_HOURS = { key: 'production', label: 'Run hours' }
 const RUN_HOURS_AVERAGE = [{ key: 'average', label: '7-day average', dashed: true }]
 const RUN_HOURS_TOTAL = { key: 'cumulative', label: 'Total run hours' }
 const SCORE_SERIES = [{ key: 'score', label: 'Health score' }]
@@ -128,8 +128,8 @@ function MachineHealth() {
       value: state.hours,
     }))
     const total = parts.reduce((sum, part) => sum + part.value, 0)
-    const running = parts.find((part) => part.key === RUN_HOURS.key)?.value ?? 0
-    return { parts, share: `${total ? Math.round((running / total) * 100) : 0}%` }
+    const production = parts.find((part) => part.key === RUN_HOURS.key)?.value ?? 0
+    return { parts, share: `${total ? Math.round((production / total) * 100) : 0}%` }
   }, [selectedId, dates.machineTime])
 
   const subsystems = useMemo(
@@ -291,11 +291,11 @@ function MachineHealth() {
           <Col>
             <ChartCard
               title="Machine Time"
-              subtitle="Donut · hours per state"
+              subtitle="Donut · hours per machine mode"
               icon="bi-pie-chart"
               actions={dateFilter('machineTime', 'Machine time')}
             >
-              <DonutChart data={donut.parts} centre={{ value: donut.share, caption: 'running' }} valueFormatter={formatHours} />
+              <DonutChart data={donut.parts} centre={{ value: donut.share, caption: 'in production' }} valueFormatter={formatHours} />
             </ChartCard>
           </Col>
           <Col>

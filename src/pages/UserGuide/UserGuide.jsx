@@ -14,7 +14,7 @@ import { FIELD_HELP } from '@/pages/Customers/customerHelp'
 // One-line purpose per sidebar item (keyed by NAV_SECTIONS item key)
 const MODULE_PURPOSE = {
   dashboard: 'Start page with an overview of the plant.',
-  machines: 'Machine inventory, live health and machine groups.',
+  machines: 'Machine inventory, live health, productivity and machine groups.',
   production: 'Plan production runs and follow them live.',
   tools: 'Cutting-tool inventory and tool-life tracking.',
   reports: 'OEE, downtime and production reports.',

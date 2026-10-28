@@ -35,6 +35,7 @@ function MultiSelectPicker({
   emptyText = 'Nothing to select',
   disabled = false,
   isInvalid = false,
+  showPicked = true,
 }) {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
@@ -198,7 +199,7 @@ function MultiSelectPicker({
         </Dropdown.Menu>
       </Dropdown>
 
-      {pickedOptions.length > 0 && (
+      {showPicked && pickedOptions.length > 0 && (
         <div className="ts-multi-picked">
           <div className="ts-multi-picked-head">
             <span className="ts-multi-picked-title">
@@ -260,6 +261,8 @@ MultiSelectPicker.propTypes = {
   emptyText: PropTypes.string,
   disabled: PropTypes.bool,
   isInvalid: PropTypes.bool,
+  // false: no chip list under the field (a compact filter, e.g. in a chart toolbar)
+  showPicked: PropTypes.bool,
 }
 
 export default MultiSelectPicker

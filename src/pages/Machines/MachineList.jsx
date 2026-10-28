@@ -21,8 +21,9 @@ const VIEWS = [
   { key: 'cards', label: 'Card view', icon: 'bi-grid-3x3-gap' },
 ]
 
-// Machine Health opens on this machine (`?machineId=`)
+// Machine Health / Productivity open on this machine (`?machineId=`)
 const healthPath = (machine) => `${ROUTES.MACHINE_HEALTH}?machineId=${machine.id}`
+const productivityPath = (machine) => `${ROUTES.MACHINE_PRODUCTIVITY}?machineId=${machine.id}`
 
 const matchesSearch = (machine, term) =>
   [machine.id, machine.name, machine.serialNumber, machine.customerName, machine.modelName, machine.brandName, machine.controllerName, machine.lineName]
@@ -109,6 +110,7 @@ function MachineList() {
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleHealth = useCallback((machine) => navigate(healthPath(machine)), [navigate])
+  const handleProductivity = useCallback((machine) => navigate(productivityPath(machine)), [navigate])
 
   const handleEdit = useCallback(
     (machine) => navigate(generatePath(ROUTES.MACHINE_EDIT, { id: String(machine.id) })),
@@ -211,6 +213,7 @@ function MachineList() {
                       canEdit={canManage}
                       canDelete={isSuperadmin}
                       healthPath={healthPath(machine)}
+                      productivityPath={productivityPath(machine)}
                       onEdit={handleEdit}
                       onDelete={setPendingDelete}
                     />
@@ -229,6 +232,7 @@ function MachineList() {
                       canEdit={canManage}
                       canDelete={isSuperadmin}
                       onHealth={handleHealth}
+                      onProductivity={handleProductivity}
                       onEdit={handleEdit}
                       onDelete={setPendingDelete}
                     />

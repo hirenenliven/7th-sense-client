@@ -28,22 +28,22 @@ const KPIS = [
 ]
 
 const MACHINES = [
-  { id: 'NX-3222', serial: '#JM-1187', cell: 'Cell A', oee: 41, status: 'danger', label: 'Stopped' },
+  { id: 'NX-3222', serial: '#JM-1187', cell: 'Cell A', oee: 41, status: 'danger', label: 'Downtime' },
   { id: 'TMC-800', serial: '#JM-1042', cell: 'Cell B', oee: 63, status: 'warning', label: 'Watch' },
   { id: 'VMC-650', serial: '#JM-0981', cell: 'Cell A', oee: 74, status: 'serious', label: 'Slow' },
-  { id: 'AX-200', serial: '#JM-1210', cell: 'Cell C', oee: 88, status: 'success', label: 'Running' },
-  { id: 'DX-200', serial: '#JM-1301', cell: 'Cell C', oee: 0, status: 'secondary', label: 'No data' },
+  { id: 'AX-200', serial: '#JM-1210', cell: 'Cell C', oee: 88, status: 'success', label: 'In Production' },
+  { id: 'DX-200', serial: '#JM-1301', cell: 'Cell C', oee: 0, status: 'secondary', label: 'Offline' },
 ]
 
 const EXCEPTIONS = [
-  { who: 'NX-3222', why: 'Spindle vibration high — machine stopped.', cost: '₹8.3L', status: 'danger' },
+  { who: 'NX-3222', why: 'Spindle vibration high — machine in downtime.', cost: '₹8.3L', status: 'danger' },
   { who: 'TMC-800', why: 'Tool T12 at 94% of rated life.', cost: '₹1.1L', status: 'warning' },
 ]
 
 const FILTERS = [
   { key: 'all', label: 'All', count: 5 },
   { key: 'alert', label: 'Alerts', count: 3 },
-  { key: 'ok', label: 'Running', count: 1 },
+  { key: 'ok', label: 'In Production', count: 1 },
 ]
 
 const TABS = ['Machines', 'Lines', 'Shifts', 'Operators']

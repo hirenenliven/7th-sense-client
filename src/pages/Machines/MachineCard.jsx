@@ -8,8 +8,9 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
 
-// Card view of a machine (same data and actions as MachineRow); the footer links to its Machine Health page.
-function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, onEdit, onDelete }) {
+// Card view of a machine (same data and actions as MachineRow); the footer links to its Machine Health
+// and Productivity pages.
+function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, productivityPath, onEdit, onDelete }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
   const details = [
     ...(showCustomer ? [{ label: 'Customer', value: machine.customerName }] : []),
@@ -59,10 +60,14 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, on
           ))}
         </dl>
 
-        <div className="mt-auto">
+        <div className="mt-auto d-flex flex-wrap gap-2">
           <Button as={Link} to={healthPath} variant="ghost" size="sm">
             <i className={`bi ${ACTION_ICONS.health} me-2`} aria-hidden="true" />
             Health
+          </Button>
+          <Button as={Link} to={productivityPath} variant="ghost" size="sm">
+            <i className={`bi ${ACTION_ICONS.productivity} me-2`} aria-hidden="true" />
+            Productivity
           </Button>
         </div>
       </Card.Body>
@@ -88,6 +93,7 @@ MachineCard.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
   healthPath: PropTypes.string.isRequired,
+  productivityPath: PropTypes.string.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }

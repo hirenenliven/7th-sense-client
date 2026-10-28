@@ -7,6 +7,7 @@ export const ROUTES = {
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
   MACHINE_HEALTH: '/machines/health',
+  MACHINE_PRODUCTIVITY: '/machines/productivity',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
   PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',

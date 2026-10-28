@@ -21,16 +21,19 @@ import {
   BAR_RADIUS,
   CHART_MARGIN,
   LINE_WIDTH,
+  SEGMENT_GAP,
 } from './chartTheme'
 
 const LINE_DASH = '5 4'
 
 // Bars with lines over them on ONE y axis (same unit), e.g. daily values and their moving average.
 // Colours run through bars then lines in order; a `dashed` line reads as a reference (average, target).
+// `stacked`: the bars stack into one per x (parts of the line's total, e.g. a cycle's feed / rapid time).
 function BarLineChart({
   data,
   bars,
   lines,
+  stacked = false,
   xKey = 'label',
   xTickFormatter,
   yUnit,
@@ -55,7 +58,8 @@ function BarLineChart({
             dataKey={item.key}
             name={item.label}
             fill={seriesColor(item, index)}
-            radius={BAR_RADIUS}
+            {...(stacked ? { stackId: 'stack', ...SEGMENT_GAP } : {})}
+            radius={!stacked || index === bars.length - 1 ? BAR_RADIUS : 0}
             maxBarSize={BAR_MAX_SIZE}
             animationDuration={ANIMATION_MS}
           />
@@ -84,6 +88,7 @@ BarLineChart.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   bars: PropTypes.arrayOf(seriesShape).isRequired,
   lines: PropTypes.arrayOf(seriesShape).isRequired,
+  stacked: PropTypes.bool,
 }
 
 export default memo(BarLineChart)

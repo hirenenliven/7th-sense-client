@@ -5,11 +5,12 @@
 // Categorical series in this fixed order (never cycled): a 5th series needs a new chart, not a colour
 export const SERIES_COLORS = ['var(--ts-chart-1)', 'var(--ts-chart-2)', 'var(--ts-chart-3)', 'var(--ts-chart-4)']
 
-// States (good / warning / critical, machine running / idle / alarm / off) — never used as series colours
+// States (good / warning / critical / info; machine modes, see MACHINE_MODES) — never used as series colours
 export const STATUS_COLORS = {
   good: 'var(--ts-good)',
   warning: 'var(--ts-amber)',
   critical: 'var(--ts-red)',
+  info: 'var(--ts-blue)',
   neutral: 'var(--ts-neutral)',
 }
 

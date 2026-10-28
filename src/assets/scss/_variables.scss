@@ -205,6 +205,7 @@ $ts-chart-slide-alpha:   .1;          // range slider: picked span
 $ts-gauge-max-width:     ts-rem(340); // speedometer
 $ts-chart-date-width:    ts-rem(140); // date picker in a chart card header (DD-MM-YYYY + calendar button)
 $ts-chart-date-range-width: ts-rem(230); // date-range picker there (DD-MM-YYYY – DD-MM-YYYY)
+$ts-chart-filter-width:  ts-rem(220); // multi-select filter in a chart toolbar (machines, shifts)
 $ts-gauge-scale-inset:   ts-rem(10);  // 0 / 100 labels under the ends of the arc
 
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
