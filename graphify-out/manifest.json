@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1793681972.1754785,
-    "seen": 1793682010.8599164,
-    "ast_hash": "b7f34e96e23e4abf3658df6ae37b3eb1",
+    "mtime": 1793690868.5972824,
+    "seen": 1793690936.9787872,
+    "ast_hash": "6fc2dad10c4824ef7c8e0df508105b9f",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1422,15 +1422,15 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/Productivity.jsx": {
-    "mtime": 1793681145.0151691,
-    "seen": 1793681300.2031107,
-    "ast_hash": "542b9a0a0ce4bd0387accdef09f2a70d",
+    "mtime": 1793684798.1087854,
+    "seen": 1793688599.5476277,
+    "ast_hash": "3fcc98fb070080cd91b6cca48bda8319",
     "semantic_hash": ""
   },
   "src/pages/Productivity/productivitySettings.js": {
-    "mtime": 1793681899.8318722,
-    "seen": 1793682010.8597639,
-    "ast_hash": "c55301f2c5d36ef7bbbca324e3720df5",
+    "mtime": 1793684797.9353132,
+    "seen": 1793688599.54763,
+    "ast_hash": "8d899325ae7b97ad79dfbdd37d88ed78",
     "semantic_hash": ""
   },
   "src/utils/sampleData.js": {
@@ -1440,9 +1440,9 @@
     "semantic_hash": ""
   },
   "src/components/charts/ModeGanttChart.jsx": {
-    "mtime": 1793681921.7523768,
-    "seen": 1793682010.8592892,
-    "ast_hash": "7bff4a8f363884f9a866394d311a5a44",
+    "mtime": 1793688566.0657768,
+    "seen": 1793688599.5472994,
+    "ast_hash": "9585194fda03b0d3ba395163d4ccacb9",
     "semantic_hash": ""
   },
   "src/hooks/useLoad.js": {
@@ -1464,9 +1464,297 @@
     "semantic_hash": ""
   },
   "src/services/productivityService.js": {
-    "mtime": 1793681899.8298965,
-    "seen": 1793682010.8598623,
-    "ast_hash": "af63fcdbf55b0df57de97de0e2d708ca",
+    "mtime": 1793688566.0642695,
+    "seen": 1793688599.5476933,
+    "ast_hash": "0048af36ebfa58e514327f8c0a4780a1",
+    "semantic_hash": ""
+  },
+  "docs/adr/0001-react-vite-spa.md": {
+    "mtime": 1793690837.330605,
+    "seen": 1793690936.9787936,
+    "ast_hash": "8c0c953edfb19c96944e30c4de5da176",
+    "semantic_hash": ""
+  },
+  "docs/adr/0002-central-route-table-with-role-guards.md": {
+    "mtime": 1793690837.330605,
+    "seen": 1793690936.9787958,
+    "ast_hash": "1bfc36b8b098ec9e5caeb12282c6f7db",
+    "semantic_hash": ""
+  },
+  "docs/adr/0003-data-fetching-with-service-modules.md": {
+    "mtime": 1793690837.3321507,
+    "seen": 1793690936.9787972,
+    "ast_hash": "3b7261b2a55b7ea4f16d6840384b3235",
+    "semantic_hash": ""
+  },
+  "docs/adr/0004-axios-with-httponly-session-cookie.md": {
+    "mtime": 1793690837.3331752,
+    "seen": 1793690936.978799,
+    "ast_hash": "3534cbf60085d79e381b22a9c264d01c",
+    "semantic_hash": ""
+  },
+  "docs/adr/0005-forms-react-hook-form-zod.md": {
+    "mtime": 1793690837.3336847,
+    "seen": 1793690936.9788005,
+    "ast_hash": "65c03c2f475b12f5bde6e1672dc2fe1a",
+    "semantic_hash": ""
+  },
+  "docs/adr/0006-react-bootstrap-scss-tokens.md": {
+    "mtime": 1793690837.3336847,
+    "seen": 1793690936.9788024,
+    "ast_hash": "22cc1688d576de822da9f66101b5758e",
+    "semantic_hash": ""
+  },
+  "docs/adr/0007-recharts-for-charts.md": {
+    "mtime": 1793690837.3343122,
+    "seen": 1793690936.978804,
+    "ast_hash": "c199975a436749cebe0961df75c929c3",
+    "semantic_hash": ""
+  },
+  "docs/adr/0008-folder-structure-by-page.md": {
+    "mtime": 1793690837.3348203,
+    "seen": 1793690936.978806,
+    "ast_hash": "45894d5f7dcc38d6aaa778e048b1378f",
+    "semantic_hash": ""
+  },
+  "docs/adr/0009-page-wise-flow-documentation.md": {
+    "mtime": 1793690837.3348203,
+    "seen": 1793690936.9788074,
+    "ast_hash": "f7028bc907bce1e6da312a8938ef2a28",
+    "semantic_hash": ""
+  },
+  "docs/adr/README.md": {
+    "mtime": 1793690837.3362293,
+    "seen": 1793690936.978809,
+    "ast_hash": "d00eb43a59b2c95e15b31f9ef2bd21ef",
+    "semantic_hash": ""
+  },
+  "docs/pages/README.md": {
+    "mtime": 1793690736.6630056,
+    "seen": 1793690936.9788105,
+    "ast_hash": "a56b05ed9c96bfe4ca26ec11f630e557",
+    "semantic_hash": ""
+  },
+  "docs/pages/about.md": {
+    "mtime": 1793690695.037554,
+    "seen": 1793690936.9788125,
+    "ast_hash": "fd78db887f81c69ae70ccb107e01d3bf",
+    "semantic_hash": ""
+  },
+  "docs/pages/app-shell.md": {
+    "mtime": 1793690719.828273,
+    "seen": 1793690936.978814,
+    "ast_hash": "18bf6dd9091df2b1a67ff3effa6bcda2",
+    "semantic_hash": ""
+  },
+  "docs/pages/branch-form.md": {
+    "mtime": 1793690695.0594912,
+    "seen": 1793690936.9788156,
+    "ast_hash": "b979a1464aa415c6d4737aa9c39917f0",
+    "semantic_hash": ""
+  },
+  "docs/pages/branch-list.md": {
+    "mtime": 1793690695.055952,
+    "seen": 1793690936.978817,
+    "ast_hash": "eb41a0bffacc501ff45b7c3622415df5",
+    "semantic_hash": ""
+  },
+  "docs/pages/breaks.md": {
+    "mtime": 1793690695.1067436,
+    "seen": 1793690936.9788187,
+    "ast_hash": "121545b1061059fbe993601094d3f164",
+    "semantic_hash": ""
+  },
+  "docs/pages/clientele-list.md": {
+    "mtime": 1793690695.0802965,
+    "seen": 1793690936.9788203,
+    "ast_hash": "be0d30a14e37a88ada93f2964b9577f8",
+    "semantic_hash": ""
+  },
+  "docs/pages/coming-soon.md": {
+    "mtime": 1793690736.5182388,
+    "seen": 1793690936.9788222,
+    "ast_hash": "047610bdf1e28f1bc4cce042fdaae741",
+    "semantic_hash": ""
+  },
+  "docs/pages/controllers.md": {
+    "mtime": 1793690695.1263082,
+    "seen": 1793690936.9788237,
+    "ast_hash": "7336f704fdba6ae388bcf7b5a321a3f9",
+    "semantic_hash": ""
+  },
+  "docs/pages/customer-user-detail.md": {
+    "mtime": 1793690695.0530024,
+    "seen": 1793690936.9788253,
+    "ast_hash": "c6631b85f4bb348c78831b2fe538d340",
+    "semantic_hash": ""
+  },
+  "docs/pages/customer-user-form.md": {
+    "mtime": 1793690695.0495844,
+    "seen": 1793690936.9788275,
+    "ast_hash": "e4d7d262e5c8dcee31a8335fa3dc561a",
+    "semantic_hash": ""
+  },
+  "docs/pages/customer-user-list.md": {
+    "mtime": 1793690695.043653,
+    "seen": 1793690936.9788291,
+    "ast_hash": "a92a0eb5648bbc37ed3445e157acc069",
+    "semantic_hash": ""
+  },
+  "docs/pages/downtime-idle-reasons.md": {
+    "mtime": 1793690695.1175728,
+    "seen": 1793690936.9788306,
+    "ast_hash": "f308aa5a6a98a0c06c83caf98dab4272",
+    "semantic_hash": ""
+  },
+  "docs/pages/holidays.md": {
+    "mtime": 1793690695.1118588,
+    "seen": 1793690936.9788322,
+    "ast_hash": "38618188b85356f09a242cd6181dab9c",
+    "semantic_hash": ""
+  },
+  "docs/pages/home.md": {
+    "mtime": 1793690695.0365293,
+    "seen": 1793690936.9788337,
+    "ast_hash": "bfa01f963dae6e648515ea4583044ec5",
+    "semantic_hash": ""
+  },
+  "docs/pages/licence-keys.md": {
+    "mtime": 1793690695.1221416,
+    "seen": 1793690936.978835,
+    "ast_hash": "1dfdc7e38fcccc8aca1080d6129210c6",
+    "semantic_hash": ""
+  },
+  "docs/pages/login.md": {
+    "mtime": 1793690719.826239,
+    "seen": 1793690936.9788368,
+    "ast_hash": "6f8aae0680946acfb018122f73ea0fd2",
+    "semantic_hash": ""
+  },
+  "docs/pages/machine-form.md": {
+    "mtime": 1793690695.0672028,
+    "seen": 1793690936.978838,
+    "ast_hash": "447b0156fba079d7831442f80957096b",
+    "semantic_hash": ""
+  },
+  "docs/pages/machine-health.md": {
+    "mtime": 1793690719.82928,
+    "seen": 1793690936.9788404,
+    "ast_hash": "f8d3b623edc46faeeb622adcd07de979",
+    "semantic_hash": ""
+  },
+  "docs/pages/machine-list.md": {
+    "mtime": 1793690695.0623136,
+    "seen": 1793690936.9788415,
+    "ast_hash": "ace8c3356fec8ad6c097fc317eb635da",
+    "semantic_hash": ""
+  },
+  "docs/pages/models.md": {
+    "mtime": 1793690695.129851,
+    "seen": 1793690936.978843,
+    "ast_hash": "bbb7e957dbaea33278ccffe172bd0e9b",
+    "semantic_hash": ""
+  },
+  "docs/pages/not-found.md": {
+    "mtime": 1793690736.5605233,
+    "seen": 1793690936.9788444,
+    "ast_hash": "f63625ac3ca149eaec33a229d27dddc1",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-cells.md": {
+    "mtime": 1793690695.157779,
+    "seen": 1793690936.9788458,
+    "ast_hash": "7697a3bd4790c762f4b243bc983b43dd",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-cities.md": {
+    "mtime": 1793690695.1433609,
+    "seen": 1793690936.9788475,
+    "ast_hash": "369996598968da17a25d27928f2e32da",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-countries.md": {
+    "mtime": 1793690695.1362548,
+    "seen": 1793690936.978849,
+    "ast_hash": "6ca4186902bef352fd1d2b89c20a5a92",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-lines.md": {
+    "mtime": 1793690695.1537652,
+    "seen": 1793690936.9788504,
+    "ast_hash": "b665a8b123bf2d5d4bf80a34a0e14875",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-locations.md": {
+    "mtime": 1793690695.1470704,
+    "seen": 1793690936.9788516,
+    "ast_hash": "ef7c40d99d27ccebd8cdf267b9e1507a",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-shops.md": {
+    "mtime": 1793690695.1501553,
+    "seen": 1793690936.9788535,
+    "ast_hash": "9719764cff1e69bea6cefaaf17be10ad",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-states.md": {
+    "mtime": 1793690695.1398187,
+    "seen": 1793690936.978855,
+    "ast_hash": "5006274909b58c914fe09918c4074778",
+    "semantic_hash": ""
+  },
+  "docs/pages/org-supervisors.md": {
+    "mtime": 1793690695.1618135,
+    "seen": 1793690936.978856,
+    "ast_hash": "b605fe7de269b26054e1348f597249a6",
+    "semantic_hash": ""
+  },
+  "docs/pages/part-form.md": {
+    "mtime": 1793690695.0891879,
+    "seen": 1793690936.9788578,
+    "ast_hash": "584acb7c91c9be70686c322eed0b0067",
+    "semantic_hash": ""
+  },
+  "docs/pages/part-list.md": {
+    "mtime": 1793690695.0833883,
+    "seen": 1793690936.9788592,
+    "ast_hash": "18f0a609e8b5a24b6bf5649f2162e10f",
+    "semantic_hash": ""
+  },
+  "docs/pages/production-schedule-form.md": {
+    "mtime": 1793690695.0974853,
+    "seen": 1793690936.9788609,
+    "ast_hash": "3a8c7c90773216c7e99090923534b9a3",
+    "semantic_hash": ""
+  },
+  "docs/pages/production-schedule-list.md": {
+    "mtime": 1793690695.0918617,
+    "seen": 1793690936.9788623,
+    "ast_hash": "7bc144ff5c69301e84ab448ebaf14fac",
+    "semantic_hash": ""
+  },
+  "docs/pages/productivity.md": {
+    "mtime": 1793690719.82928,
+    "seen": 1793690936.9788642,
+    "ast_hash": "9fa39315ee24bc74d6b4f86e8b2b8688",
+    "semantic_hash": ""
+  },
+  "docs/pages/shifts.md": {
+    "mtime": 1793690695.102044,
+    "seen": 1793690936.9788654,
+    "ast_hash": "b096aaf1212799f840791070aea72404",
+    "semantic_hash": ""
+  },
+  "docs/pages/theme.md": {
+    "mtime": 1793690695.039077,
+    "seen": 1793690936.9788673,
+    "ast_hash": "f940ea4b7042b20fbd55ee00ba63656a",
+    "semantic_hash": ""
+  },
+  "docs/pages/user-guide.md": {
+    "mtime": 1793690695.1323793,
+    "seen": 1793690936.978869,
+    "ast_hash": "eac2687aba8a0bc307ba6d5d4688361a",
     "semantic_hash": ""
   }
 }

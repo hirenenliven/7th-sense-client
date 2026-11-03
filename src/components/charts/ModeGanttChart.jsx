@@ -137,7 +137,6 @@ ModeGanttChart.propTypes = {
       id: PropTypes.number,
       modeId: PropTypes.number.isRequired,
       modeName: PropTypes.string,
-      programName: PropTypes.string,
       startedAt: PropTypes.string.isRequired,
       endedAt: PropTypes.string,
     }),

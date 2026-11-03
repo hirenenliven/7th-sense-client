@@ -27,6 +27,8 @@ export const getOee = async ({ machineIds, from, to, shiftIds, program, schedule
 export const getCycleCounts = async ({ machineIds, from, to, shiftIds }) =>
   unwrap(await sharedGet(withQuery(`${PATH}/cycle-counts`, { machineIds: ids(machineIds), from, to, shiftIds: ids(shiftIds) }))) ?? []
 
-// { cycles (completed), summary, lastFinishedAt, programs }
+// { cycles: [{ endedAt, programName, durationSec, productionSec, holdSec, downtimeSec, offlineSec }]
+// (completed), summary: { cycleCount, completedCount, unfinishedCount, averageCycleSec,
+// averageProductionSec }, lastFinishedAt, programs }
 export const getFinishCycles = async ({ machineId, date, shiftIds, program }) =>
   unwrap(await sharedGet(withQuery(`${PATH}/finish-cycles`, { machineId, date, shiftIds: ids(shiftIds), program })))

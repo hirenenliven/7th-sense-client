@@ -48,14 +48,36 @@ export const PRODUCTIVITY_DATE_MIN = shiftIsoDate(todayIso(), -365)
 export const DEFAULT_RANGE_DAYS = 7
 export const MAX_RANGE_DAYS = 31
 
-// Cycle time in seconds: 27 → "27s", 750 → "12:30"
+// Cycle time in seconds: 27 → "27s", 750 → "12m 30s", 3900 → "1h 05m" (never "12:30", which reads
+// as a clock time next to the Finish Cycle Summary's clock axis)
 export const formatCycle = (seconds) => {
   const total = Math.round(seconds)
   if (total < 60) return `${total}s`
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+  const pad = (value) => String(value).padStart(2, '0')
+  if (total < 3600) return `${Math.floor(total / 60)}m ${pad(total % 60)}s`
+  return `${Math.floor(total / 3600)}h ${pad(Math.floor((total % 3600) / 60))}m`
 }
 
-export const percent = (value) => (value == null ? '—' : `${value.toFixed(1)}%`)
+// Finish Cycle Summary y axis: ticks on round time steps (seconds, then whole minutes, then hours)
+// so each label stays one short word that fits the axis ("45s", "15m", "2h")
+const CYCLE_TICK_STEPS = [5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600, 7200, 10800, 21600]
+const CYCLE_TICK_COUNT = 4
+
+export const cycleTicks = (maxSeconds) => {
+  const max = Math.max(maxSeconds, 1)
+  const step = CYCLE_TICK_STEPS.find((candidate) => candidate * CYCLE_TICK_COUNT >= max) ?? CYCLE_TICK_STEPS.at(-1)
+  const ticks = []
+  for (let value = 0; value < max + step; value += step) ticks.push(value)
+  return ticks
+}
+
+export const formatCycleTick = (seconds) => {
+  if (seconds < 60) return `${seconds}s`
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`
+  return `${Number((seconds / 3600).toFixed(1))}h`
+}
+
+export const percent =(value) => (value == null ? '—' : `${value.toFixed(1)}%`)
 
 const counts = new Intl.NumberFormat('en-IN')
 export const formatCount = (value) => counts.format(value)

@@ -36,7 +36,9 @@ import {
   PRODUCTIVITY_DATE_MIN,
   SCHEDULE_MODES,
   SHIFT_NOUN,
+  cycleTicks,
   formatCycle,
+  formatCycleTick,
   formatCount,
   formatCycles,
   percent,
@@ -47,6 +49,16 @@ const CYCLE_COUNT_SERIES = CYCLE_COUNTS.map(({ key, label, color }) => ({ key, l
 
 const dayLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month: 'short' })
 const clock = new Intl.DateTimeFormat(PICKER_LOCALE, { hour: '2-digit', minute: '2-digit' })
+// Finish Cycle Summary x axis: the clock time a cycle finished ("12:30 PM"; the tooltip adds seconds)
+const clock12 = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+const clock12Seconds = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+
+// Tooltip title of a finished cycle: "Finished 12:30:15 PM · O1234"
+const cycleTooltipLabel = (label, payload) => {
+  const row = payload?.[0]?.payload
+  if (!row) return label
+  return `Finished ${row.finishedAt}${row.program ? ` · ${row.program}` : ''}`
+}
 
 // Rows of a per-day chart get their axis label ("03 Nov")
 const withDayLabels = (rows) => rows.map((row) => ({ ...row, label: dayLabel.format(parseIsoDate(row.date)) }))
@@ -193,7 +205,8 @@ function Productivity() {
   const cycles = useMemo(
     () =>
       (cycleState.data?.cycles ?? []).map((cycle) => ({
-        label: clock.format(new Date(cycle.endedAt)),
+        label: clock12.format(new Date(cycle.endedAt)),
+        finishedAt: clock12Seconds.format(new Date(cycle.endedAt)),
         program: cycle.programName,
         cycle: cycle.durationSec,
         production: cycle.productionSec,
@@ -202,6 +215,17 @@ function Productivity() {
         offline: cycle.offlineSec,
       })),
     [cycleState.data],
+  )
+  // Highest bar or line point (a cycle's mode parts can add up to more than its duration)
+  const cycleYTicks = useMemo(
+    () =>
+      cycleTicks(
+        cycles.reduce(
+          (max, row) => Math.max(max, row.cycle, row.production + row.hold + row.downtime + row.offline),
+          0,
+        ),
+      ),
+    [cycles],
   )
 
   const countMachineIds = useMemo(() => pickedMachineIds(countMachines, selectedId), [countMachines, selectedId])
@@ -390,7 +414,7 @@ function Productivity() {
           <Col>
             <ChartCard
               title="Finish Cycle Summary"
-              subtitle="Stacked bar + line · each finished cycle of the day, time per machine mode"
+              subtitle="Cycle time vs clock time · each finished cycle of the day, time per machine mode"
               icon="bi-bar-chart-steps"
             >
               <div className="ts-toolbar">
@@ -427,8 +451,11 @@ function Productivity() {
                 bars={CYCLE_PARTS}
                 lines={CYCLE_TIME}
                 stacked
-                yTickFormatter={formatCycle}
+                yDomain={[0, cycleYTicks.at(-1)]}
+                yTicks={cycleYTicks}
+                yTickFormatter={formatCycleTick}
                 valueFormatter={formatCycle}
+                labelFormatter={cycleTooltipLabel}
                 emptyText={chartMessage(cycleState, 'No finished cycles for this day, shift and program.')}
               />
             </ChartCard>
