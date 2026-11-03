@@ -39,6 +39,17 @@ $ts-chart-2:   #e0700f;
 $ts-chart-3:   #6a5cd0;
 $ts-chart-4:   #0b8f80;
 
+// Machine modes (Gantt chart), a step darker for white
+$ts-mode-setup:        #2563eb;
+$ts-mode-loading:      #13809a;
+$ts-mode-production:   #1f9d32;
+$ts-mode-hold:         #7420c9;
+$ts-mode-idle:         #e07d0b;
+$ts-mode-downtime:     #e01414;
+$ts-mode-planned:      #96851a;
+$ts-mode-offline:      #77756c;
+$ts-mode-rapid:        #65a30d;
+
 // Shadows and overlays are lighter on a light page
 $ts-shadow-hover:   0 2px 12px rgba(0, 0, 0, .08);
 $ts-shadow-float:   0 8px 30px rgba(0, 0, 0, .12);

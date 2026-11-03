@@ -13,15 +13,19 @@ import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import { SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
+import useLoad from '@/hooks/useLoad'
 import { getMachines } from '@/services/machineService'
-import { shiftIsoDate, todayIso } from '@/utils/dateTime'
-import { cycleCountRows, finishedCycles, oeeRows, samplePrograms } from './productivitySampleData'
+import { getCycleCounts, getFinishCycles, getOee } from '@/services/productivityService'
+import { getShifts } from '@/services/shiftService'
+import { PICKER_LOCALE, parseIsoDate, shiftIsoDate, todayIso } from '@/utils/dateTime'
+import ModeTimelineCard from './ModeTimelineCard'
 import {
   ALL_PROGRAMS,
   CYCLE_COUNTS,
   CYCLE_PARTS,
   CYCLE_TIME,
   DEFAULT_RANGE_DAYS,
+  KPI_REFRESH_MS,
   DEFAULT_SCHEDULE_MODE,
   MACHINE_NOUN,
   MAX_RANGE_DAYS,
@@ -30,16 +34,31 @@ import {
   OEE_SERIES,
   OEE_TICKS,
   PRODUCTIVITY_DATE_MIN,
-  SAMPLE_SHIFTS,
   SCHEDULE_MODES,
   SHIFT_NOUN,
   formatCycle,
   formatCount,
   formatCycles,
   percent,
+  shiftOption,
 } from './productivitySettings'
 
 const CYCLE_COUNT_SERIES = CYCLE_COUNTS.map(({ key, label, color }) => ({ key, label, color: STATUS_COLORS[color] }))
+
+const dayLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month: 'short' })
+const clock = new Intl.DateTimeFormat(PICKER_LOCALE, { hour: '2-digit', minute: '2-digit' })
+
+// Rows of a per-day chart get their axis label ("03 Nov")
+const withDayLabels = (rows) => rows.map((row) => ({ ...row, label: dayLabel.format(parseIsoDate(row.date)) }))
+
+// Program names from the server as select options
+const programOptions = (names) => (names ?? []).map((name) => ({ value: name, label: name }))
+
+// Shift picks that are shifts of the current customer (a pick is dropped when the machine changes customer)
+const shiftsIn = (picked, options) => picked.filter((id) => options.some((option) => option.value === id))
+
+// Text in place of a chart: loading, the load error, or what an empty result means
+const chartMessage = (state, emptyText) => (state.loading ? 'Loading…' : state.error || emptyText)
 
 const machineLabel = (machine, withCustomer) =>
   withCustomer && machine.customerName ? `${machine.name} · ${machine.customerName}` : machine.name
@@ -74,9 +93,10 @@ ProgramSelect.propTypes = {
 }
 
 // Operations › Productivity: OEE and finished cycles of a machine (`?machineId=`, set by the All
-// Machines Productivity link; the first machine otherwise). Today's KPI tiles, then the OEE trend
+// Machines Productivity link; the first machine otherwise). Today's cycle counts, then the OEE trend
 // (one or more machines of the same customer, over a range of days) and the Finish Cycle Summary
-// (one day's cycles). Values are SAMPLE data (productivitySampleData.js) until the server has an API.
+// (one day's cycles). Live data from GET /productivity/* (what the CNC collector recorded); the
+// Machine Mode Timeline reloads itself (ModeTimelineCard).
 function Productivity() {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
@@ -137,59 +157,107 @@ function Productivity() {
         .map((item) => ({ value: String(item.id), label: item.name })),
     [machines, machine?.userId],
   )
-  const oeeMachineIds = useMemo(() => pickedMachineIds(oeeMachines, selectedId), [oeeMachines, selectedId])
-  const oeeProgramOptions = useMemo(() => {
-    const byName = new Map()
-    oeeMachineIds.forEach((id) => samplePrograms(id).forEach((option) => byName.set(option.value, option)))
-    return [...byName.values()].sort((a, b) => a.label.localeCompare(b.label))
-  }, [oeeMachineIds])
-  const oeeProgramPicked = programIn(oeeProgram, oeeProgramOptions)
-
-  const oee = useMemo(
-    () =>
-      oeeRows(oeeMachineIds, oeeRange.from, oeeRange.to, { schedule, shiftIds: oeeShifts, program: oeeProgramPicked }),
-    [oeeMachineIds, oeeRange, schedule, oeeShifts, oeeProgramPicked],
+  // Shift filters: the header machine's customer's shifts
+  const shiftsState = useLoad(
+    () => getShifts(isSuperadmin ? machine.userId : undefined),
+    machine ? `shifts|${machine.userId}` : null,
+  )
+  const shiftOptions = useMemo(
+    () => (shiftsState.data ?? []).filter((shift) => shift.userId === machine?.userId).map(shiftOption),
+    [shiftsState.data, machine?.userId],
   )
 
-  const cycleProgramOptions = useMemo(() => (selectedId == null ? [] : samplePrograms(selectedId)), [selectedId])
+  const oeeMachineIds = useMemo(() => pickedMachineIds(oeeMachines, selectedId), [oeeMachines, selectedId])
+  const oeeFilters = {
+    machineIds: oeeMachineIds,
+    from: oeeRange.from,
+    to: oeeRange.to,
+    shiftIds: shiftsIn(oeeShifts, shiftOptions),
+    program: oeeProgram,
+    schedule,
+  }
+  const oeeState = useLoad(() => getOee(oeeFilters), oeeMachineIds.length ? JSON.stringify(oeeFilters) : null)
+  const oeeProgramOptions = useMemo(() => programOptions(oeeState.data?.programs), [oeeState.data])
+  const oeeProgramPicked = programIn(oeeProgram, oeeProgramOptions)
+  const oee = useMemo(() => withDayLabels(oeeState.data?.rows ?? []), [oeeState.data])
+
+  const cycleFilters = {
+    machineId: selectedId,
+    date: cycleDate,
+    shiftIds: shiftsIn(cycleShifts, shiftOptions),
+    program: cycleProgram,
+  }
+  const cycleState = useLoad(() => getFinishCycles(cycleFilters), selectedId == null ? null : JSON.stringify(cycleFilters))
+  const cycleProgramOptions = useMemo(() => programOptions(cycleState.data?.programs), [cycleState.data])
   const cycleProgramPicked = programIn(cycleProgram, cycleProgramOptions)
   const cycles = useMemo(
     () =>
-      selectedId == null ? [] : finishedCycles(selectedId, cycleDate, { shiftIds: cycleShifts, program: cycleProgramPicked }),
-    [selectedId, cycleDate, cycleShifts, cycleProgramPicked],
+      (cycleState.data?.cycles ?? []).map((cycle) => ({
+        label: clock.format(new Date(cycle.endedAt)),
+        program: cycle.programName,
+        cycle: cycle.durationSec,
+        production: cycle.productionSec,
+        hold: cycle.holdSec,
+        downtime: cycle.downtimeSec,
+        offline: cycle.offlineSec,
+      })),
+    [cycleState.data],
   )
 
   const countMachineIds = useMemo(() => pickedMachineIds(countMachines, selectedId), [countMachines, selectedId])
+  const countFilters = {
+    machineIds: countMachineIds,
+    from: countRange.from,
+    to: countRange.to,
+    shiftIds: shiftsIn(countShifts, shiftOptions),
+  }
+  const countState = useLoad(() => getCycleCounts(countFilters), countMachineIds.length ? JSON.stringify(countFilters) : null)
   const counts = useMemo(() => {
-    const rows = cycleCountRows(countMachineIds, countRange.from, countRange.to, { shiftIds: countShifts })
+    const rows = withDayLabels(countState.data ?? [])
     // Legend: each series' total over the range ("Produced 1,357 cycles")
     const totals = Object.fromEntries(
       CYCLE_COUNTS.map((item) => [item.key, formatCycles(rows.reduce((sum, row) => sum + row[item.key], 0))]),
     )
     return { rows, totals }
-  }, [countMachineIds, countRange, countShifts])
+  }, [countState.data])
 
-  // KPI tiles: today, every shift and program, without schedule
+  // KPI tiles: today's plain counts for the header machine (every shift and program); no OEE maths
+  const todayState = useLoad(
+    () => getFinishCycles({ machineId: selectedId, date: today }),
+    selectedId == null ? null : `${selectedId}|${today}`,
+    { refreshMs: KPI_REFRESH_MS },
+  )
   const kpis = useMemo(() => {
-    if (selectedId == null) return []
-    const [day] = oeeRows([selectedId], today, today, { schedule: DEFAULT_SCHEDULE_MODE, shiftIds: [] })
-    const done = finishedCycles(selectedId, today, { shiftIds: [] })
-    const average = done.length ? done.reduce((sum, item) => sum + item.cycle, 0) / done.length : null
+    const day = todayState.data
+    if (!day) return []
+    const { summary } = day
+    const average = summary.completedCount ? summary.averageCycleSec : null
     return [
-      { key: 'oee', label: 'Today’s OEE', icon: 'bi-speedometer', value: percent(day.oee) },
-      { key: 'availability', label: 'Availability', icon: 'bi-clock-history', value: percent(day.availability) },
-      { key: 'performance', label: 'Performance', icon: 'bi-lightning-charge', value: percent(day.performance) },
-      { key: 'quality', label: 'Quality', icon: 'bi-patch-check', value: percent(day.quality) },
-      { key: 'cycles', label: 'Finished Cycles', icon: 'bi-check2-circle', value: String(done.length) },
+      { key: 'produced', label: 'Cycles Started', icon: 'bi-play-circle', value: formatCount(summary.cycleCount) },
+      { key: 'finished', label: 'Finished Cycles', icon: 'bi-check2-circle', value: formatCount(summary.completedCount) },
+      { key: 'unfinished', label: 'Unfinished Cycles', icon: 'bi-x-circle', value: formatCount(summary.unfinishedCount) },
+      {
+        key: 'finishRate',
+        label: 'Finish Rate',
+        icon: 'bi-percent',
+        value: summary.cycleCount ? percent((summary.completedCount / summary.cycleCount) * 100) : '—',
+      },
       {
         key: 'averageCycle',
         label: 'Avg. Cycle Time',
         icon: 'bi-stopwatch',
         value: average == null ? '—' : formatCycle(average),
-        unit: average == null ? undefined : 'min',
+        // Held / offline time makes a cycle longer than its cutting time
+        meta: average == null ? undefined : `${formatCycle(summary.averageProductionSec)} in production`,
+      },
+      {
+        key: 'lastCycle',
+        label: 'Last Cycle Finished',
+        icon: 'bi-clock',
+        value: day.lastFinishedAt ? clock.format(new Date(day.lastFinishedAt)) : '—',
       },
     ]
-  }, [selectedId, today])
+  }, [todayState.data])
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading machines…" />
@@ -224,12 +292,11 @@ function Productivity() {
 
     return (
       <>
-        <Alert variant="info" className="d-flex align-items-center gap-2">
-          <i className="bi bi-info-circle" aria-hidden="true" />
-          <span>
-            <b>Sample data.</b> These charts show example values until live production data is connected.
-          </span>
-        </Alert>
+        {todayState.error && (
+          <Alert variant="danger">
+            <b>Could not load today’s cycles.</b> {todayState.error}
+          </Alert>
+        )}
 
         <Row xs={1} sm={2} lg={3} xxl={6} className="g-3 mb-3">
           {kpis.map((kpi) => (
@@ -244,6 +311,7 @@ function Productivity() {
                     {kpi.value}
                     {kpi.unit && <small> {kpi.unit}</small>}
                   </div>
+                  {kpi.meta && <div className="ts-kpi-meta small text-body-secondary">{kpi.meta}</div>}
                 </Card.Body>
               </Card>
             </Col>
@@ -251,6 +319,9 @@ function Productivity() {
         </Row>
 
         <Row xs={1} className="g-3">
+          <Col>
+            <ModeTimelineCard key={selectedId} machineId={selectedId} min={PRODUCTIVITY_DATE_MIN} today={today} />
+          </Col>
           <Col>
             <ChartCard title="OEE" subtitle="Line · daily %, averaged over the machines and shifts picked" icon="bi-graph-up">
               <div className="ts-toolbar">
@@ -289,8 +360,8 @@ function Productivity() {
                 <div className="ts-chart-filter">
                   <MultiSelectPicker
                     id="oee-shifts"
-                    options={SAMPLE_SHIFTS}
-                    value={oeeShifts}
+                    options={shiftOptions}
+                    value={shiftsIn(oeeShifts, shiftOptions)}
                     onChange={setOeeShifts}
                     noun={SHIFT_NOUN}
                     placeholder="All shifts"
@@ -310,14 +381,16 @@ function Productivity() {
                 limits={OEE_LIMITS}
                 dots
                 size="lg"
-                emptyText={oeeMachineIds.length ? 'No OEE for these dates.' : 'Select at least one machine.'}
+                emptyText={
+                  oeeMachineIds.length ? chartMessage(oeeState, 'No OEE for these dates.') : 'Select at least one machine.'
+                }
               />
             </ChartCard>
           </Col>
           <Col>
             <ChartCard
               title="Finish Cycle Summary"
-              subtitle="Stacked bar + line · each finished cycle of the day, in minutes"
+              subtitle="Stacked bar + line · each finished cycle of the day, time per machine mode"
               icon="bi-bar-chart-steps"
             >
               <div className="ts-toolbar">
@@ -331,8 +404,8 @@ function Productivity() {
                 <div className="ts-chart-filter">
                   <MultiSelectPicker
                     id="cycle-shifts"
-                    options={SAMPLE_SHIFTS}
-                    value={cycleShifts}
+                    options={shiftOptions}
+                    value={shiftsIn(cycleShifts, shiftOptions)}
                     onChange={setCycleShifts}
                     noun={SHIFT_NOUN}
                     placeholder="All shifts"
@@ -354,9 +427,9 @@ function Productivity() {
                 bars={CYCLE_PARTS}
                 lines={CYCLE_TIME}
                 stacked
-                yUnit="m"
+                yTickFormatter={formatCycle}
                 valueFormatter={formatCycle}
-                emptyText="No finished cycles for this day, shift and program."
+                emptyText={chartMessage(cycleState, 'No finished cycles for this day, shift and program.')}
               />
             </ChartCard>
           </Col>
@@ -390,8 +463,8 @@ function Productivity() {
                 <div className="ts-chart-filter">
                   <MultiSelectPicker
                     id="count-shifts"
-                    options={SAMPLE_SHIFTS}
-                    value={countShifts}
+                    options={shiftOptions}
+                    value={shiftsIn(countShifts, shiftOptions)}
                     onChange={setCountShifts}
                     noun={SHIFT_NOUN}
                     placeholder="All shifts"
@@ -405,7 +478,9 @@ function Productivity() {
                 legendValues={counts.totals}
                 yTickFormatter={formatCount}
                 valueFormatter={formatCycles}
-                emptyText={countMachineIds.length ? 'No cycles for these dates.' : 'Select at least one machine.'}
+                emptyText={
+                  countMachineIds.length ? chartMessage(countState, 'No cycles for these dates.') : 'Select at least one machine.'
+                }
               />
             </ChartCard>
           </Col>

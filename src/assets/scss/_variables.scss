@@ -52,6 +52,18 @@ $ts-chart-2:   #dc6c12 !default; // orange
 $ts-chart-3:   #8a7de0 !default; // violet
 $ts-chart-4:   #1f9e8f !default; // teal
 
+// Machine modes (machine_modes ids) on the Productivity Gantt chart (ModeGanttChart), as on the
+// mode chart page; bright so short periods still show (light values: _tokens-light.scss)
+$ts-mode-setup:        #3b82f6 !default; // 1
+$ts-mode-loading:      #1f9bb3 !default; // 2 Loading / Unloading
+$ts-mode-production:   #2ecc40 !default; // 3
+$ts-mode-hold:         #8a2be2 !default; // 4
+$ts-mode-idle:         #f7931e !default; // 5
+$ts-mode-downtime:     #ff2020 !default; // 6
+$ts-mode-planned:      #b5a22a !default; // 7 Planned Downtime, 13 Leave Planned Downtime
+$ts-mode-offline:      #8a94a6 !default; // 9
+$ts-mode-rapid:        #84cc16 !default; // 12
+
 // Tint strengths used for soft backgrounds
 $ts-tint-row:    8%;  // highlighted table row
 $ts-tint-soft:   14%; // soft badges / subtle bg
@@ -155,7 +167,8 @@ $ts-page-max:      100%;
 $ts-gutter-x-sm:   ts-rem(12); // < md   (phones)
 $ts-gutter-x-md:   ts-rem(16); // md–xl  (tablets, laptops)
 $ts-gutter-x-lg:   ts-rem(20); // ≥ xl   (desktops)
-$ts-sidebar-width: 240px;
+// Scales with the viewport: ~208px at lg (992), ~224px at 1280, capped at ~228px
+$ts-sidebar-width: clamp(#{ts-rem(208)}, 5vw + #{ts-rem(160)}, #{ts-rem(228)});
 $ts-sidebar-max-width-mobile: 85vw;
 $ts-sidebar-bg:    $ts-appbar;
 $ts-sidebar-transition: .22s ease;
@@ -206,6 +219,13 @@ $ts-gauge-max-width:     ts-rem(340); // speedometer
 $ts-chart-date-width:    ts-rem(140); // date picker in a chart card header (DD-MM-YYYY + calendar button)
 $ts-chart-date-range-width: ts-rem(230); // date-range picker there (DD-MM-YYYY – DD-MM-YYYY)
 $ts-chart-filter-width:  ts-rem(220); // multi-select filter in a chart toolbar (machines, shifts)
+$ts-gantt-label-width:   ts-rem(200); // mode name + colour pill beside a Gantt row
+$ts-gantt-label-width-sm: ts-rem(130); // phones
+$ts-gantt-row-height:    ts-rem(50);  // one mode row of the Gantt chart (bar is 40% of it)
+$ts-gantt-axis-height:   ts-rem(44);  // time ticks above the rows
+$ts-gantt-pill-width:    ts-rem(6);   // colour pill after a mode name
+$ts-gantt-pill-height:   ts-rem(20);
+$ts-gantt-readout-min:   ts-rem(280); // hovered / current period box
 $ts-gauge-scale-inset:   ts-rem(10);  // 0 / 100 labels under the ends of the arc
 
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
@@ -250,6 +270,15 @@ $ts-tokens: (
   "chart-2": $ts-chart-2,
   "chart-3": $ts-chart-3,
   "chart-4": $ts-chart-4,
+  "mode-setup": $ts-mode-setup,
+  "mode-loading": $ts-mode-loading,
+  "mode-production": $ts-mode-production,
+  "mode-hold": $ts-mode-hold,
+  "mode-idle": $ts-mode-idle,
+  "mode-downtime": $ts-mode-downtime,
+  "mode-planned": $ts-mode-planned,
+  "mode-offline": $ts-mode-offline,
+  "mode-rapid": $ts-mode-rapid,
   "radius": $ts-radius,
   "radius-lg": $ts-radius-lg,
   "shadow-hover": $ts-shadow-hover,

@@ -144,8 +144,8 @@
     "semantic_hash": "fda5b0ea49b758be695e9a8e508e606e"
   },
   "src/components/layout/Sidebar.jsx": {
-    "mtime": 1792563259.9120061,
-    "seen": 1792563274.2791302,
+    "mtime": 1793594003.039529,
+    "seen": 1793681300.2028642,
     "ast_hash": "283fd89c4ee278b05603511af73fefa7",
     "semantic_hash": ""
   },
@@ -192,9 +192,9 @@
     "semantic_hash": "af528193a8972e7e8511a97e02cfdc3a"
   },
   "src/constants/machines.js": {
-    "mtime": 1793184275.3495703,
-    "seen": 1793184290.1134748,
-    "ast_hash": "882b4ba6eb55679ed48c360c02c405d4",
+    "mtime": 1793681972.1754785,
+    "seen": 1793682010.8593714,
+    "ast_hash": "d57813e9e51633203e1f100b35ccee75",
     "semantic_hash": ""
   },
   "src/constants/navigation.js": {
@@ -1134,9 +1134,9 @@
     "semantic_hash": "db8401a0b1945cdc6700ea197a95a22a"
   },
   "src/utils/dateTime.js": {
-    "mtime": 1792563260.0668488,
-    "seen": 1792563274.2794294,
-    "ast_hash": "b547fa6ef15523d27935731219675f00",
+    "mtime": 1793681201.646419,
+    "seen": 1793681300.2031872,
+    "ast_hash": "6ff9b4896cb590c8725271669f218246",
     "semantic_hash": ""
   },
   "src/utils/helpers.js": {
@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1792563259.857273,
-    "seen": 1792563274.2794495,
-    "ast_hash": "b4d231ae94684689ddd41af4f71401b4",
+    "mtime": 1793681972.1754785,
+    "seen": 1793682010.8599164,
+    "ast_hash": "b7f34e96e23e4abf3658df6ae37b3eb1",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1278,9 +1278,9 @@
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/MachineHealth.jsx": {
-    "mtime": 1793184275.503332,
-    "seen": 1793184290.1136024,
-    "ast_hash": "0b9ea9ccf1aa38409dfd55cab4b104a2",
+    "mtime": 1793681167.676929,
+    "seen": 1793681300.2029965,
+    "ast_hash": "aa9168c9025d7dd84412043b4672c71e",
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/SensorTrendCard.jsx": {
@@ -1332,8 +1332,8 @@
     "semantic_hash": ""
   },
   "src/components/charts/GroupedBarChart.jsx": {
-    "mtime": 1793184544.9332488,
-    "seen": 1793184555.216225,
+    "mtime": 1793184658.6209397,
+    "seen": 1793190006.086353,
     "ast_hash": "871ce32e3110bacee8a3a0e2b4c5c95e",
     "semantic_hash": ""
   },
@@ -1422,27 +1422,51 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/Productivity.jsx": {
-    "mtime": 1793184544.9590313,
-    "seen": 1793184555.216558,
-    "ast_hash": "060e508417a3e77e0245368b3f2f8bd8",
-    "semantic_hash": ""
-  },
-  "src/pages/Productivity/productivitySampleData.js": {
-    "mtime": 1793184498.4720752,
-    "seen": 1793184555.2165604,
-    "ast_hash": "09bde00925e96a28486173ca5bba97b0",
+    "mtime": 1793681145.0151691,
+    "seen": 1793681300.2031107,
+    "ast_hash": "542b9a0a0ce4bd0387accdef09f2a70d",
     "semantic_hash": ""
   },
   "src/pages/Productivity/productivitySettings.js": {
-    "mtime": 1793184498.4714801,
-    "seen": 1793184555.2165627,
-    "ast_hash": "599e27f392e3efdcb6947f0786aed1a1",
+    "mtime": 1793681899.8318722,
+    "seen": 1793682010.8597639,
+    "ast_hash": "c55301f2c5d36ef7bbbca324e3720df5",
     "semantic_hash": ""
   },
   "src/utils/sampleData.js": {
     "mtime": 1793183981.5676987,
     "seen": 1793184148.4169204,
     "ast_hash": "939f860ab8bb583136083dada6f5b7d8",
+    "semantic_hash": ""
+  },
+  "src/components/charts/ModeGanttChart.jsx": {
+    "mtime": 1793681921.7523768,
+    "seen": 1793682010.8592892,
+    "ast_hash": "7bff4a8f363884f9a866394d311a5a44",
+    "semantic_hash": ""
+  },
+  "src/hooks/useLoad.js": {
+    "mtime": 1793681048.204645,
+    "seen": 1793681300.2028987,
+    "ast_hash": "8dc184f7fb70873c2d95763e7ccf7ece",
+    "semantic_hash": ""
+  },
+  "src/pages/Productivity/ModeTimelineCard.jsx": {
+    "mtime": 1793681944.372485,
+    "seen": 1793682010.859759,
+    "ast_hash": "d8c6497c7e5f12147054ff3e8385d5e8",
+    "semantic_hash": ""
+  },
+  "src/services/machineHealthService.js": {
+    "mtime": 1793680967.6717603,
+    "seen": 1793681300.2031617,
+    "ast_hash": "7c503cde107e0aadca420d4bb6feb8b1",
+    "semantic_hash": ""
+  },
+  "src/services/productivityService.js": {
+    "mtime": 1793681899.8298965,
+    "seen": 1793682010.8598623,
+    "ast_hash": "af63fcdbf55b0df57de97de0e2d708ca",
     "semantic_hash": ""
   }
 }

@@ -154,3 +154,12 @@ export const formatClock12 = (value) => {
 
 // 480 → "08:00"
 export const formatHoursMinutes = (minutes) => `${pad2(Math.floor(minutes / 60))}:${pad2(minutes % 60)}`
+
+// 3725 (seconds) → "1h 02m"; under an hour "12m 05s" (machine mode times)
+export const formatModeDuration = (seconds) => {
+  const total = Math.max(0, Math.round(seconds))
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  if (hours) return `${hours}h ${pad2(minutes)}m`
+  return `${minutes}m ${pad2(total % 60)}s`
+}

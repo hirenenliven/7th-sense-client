@@ -16,8 +16,10 @@ import { MACHINE_MODES } from '@/constants/machines'
 import { SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
+import useLoad from '@/hooks/useLoad'
+import { getMachineTimeByDay } from '@/services/machineHealthService'
 import { getMachines } from '@/services/machineService'
-import { shiftIsoDate, todayIso } from '@/utils/dateTime'
+import { PICKER_LOCALE, parseIsoDate, shiftIsoDate, todayIso } from '@/utils/dateTime'
 import HealthStatusBadge from './HealthStatusBadge'
 import {
   dailyRows,
@@ -72,6 +74,10 @@ const initialDates = () => {
   )
 }
 
+// Machine Time by Day is live (GET /machine-health/machine-time-by-day): reloaded every minute
+const MACHINE_TIME_REFRESH_MS = 60_000
+const dayLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month: 'short' })
+
 const celsius = (value) => `${formatValue(value, 1)} °C`
 const outOf100 = (value) => `${value} / 100`
 
@@ -80,7 +86,8 @@ const machineLabel = (machine, withCustomer) =>
 
 // Operations › Machine Health: one machine's sensors (`?machineId=`, set by the All Machines Health
 // link; the first machine otherwise). Today's KPI tiles, then charts that each have a date filter (one
-// day or a range). Readings are SAMPLE data (healthSampleData.js) until the server has a sensor API.
+// day or a range). Machine Time by Day is live data; the other readings are SAMPLE data
+// (healthSampleData.js) until the server has a sensor API.
 function MachineHealth() {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
@@ -143,11 +150,21 @@ function MachineHealth() {
   const byDay = useMemo(() => {
     const rows = (range) => (selectedId == null ? [] : dailyRows(selectedId, range.from, range.to))
     return {
-      machineTime: rows(dates.machineTimeByDay),
       growth: rows(dates.runHoursGrowth),
       daily: rows(dates.runHoursDaily),
     }
-  }, [selectedId, dates.machineTimeByDay, dates.runHoursGrowth, dates.runHoursDaily])
+  }, [selectedId, dates.runHoursGrowth, dates.runHoursDaily])
+
+  const machineTimeRange = dates.machineTimeByDay
+  const machineTimeState = useLoad(
+    () => getMachineTimeByDay(selectedId, machineTimeRange.from, machineTimeRange.to),
+    selectedId == null ? null : `${selectedId}|${machineTimeRange.from}|${machineTimeRange.to}`,
+    { refreshMs: machineTimeRange.to === today ? MACHINE_TIME_REFRESH_MS : undefined },
+  )
+  const machineTimeRows = useMemo(
+    () => (machineTimeState.data ?? []).map((row) => ({ ...row, label: dayLabel.format(parseIsoDate(row.date)) })),
+    [machineTimeState.data],
+  )
 
   // KPI tiles: today's latest readings
   const kpis = useMemo(() => {
@@ -332,17 +349,20 @@ function MachineHealth() {
           <Col>
             <ChartCard
               title="Machine Time by Day"
-              subtitle="Stacked bar · 24 h per day"
+              subtitle="Stacked bar · live hours per machine mode, 24 h per day"
               icon="bi-bar-chart-steps"
               actions={dateFilter('machineTimeByDay', 'Machine time by day')}
             >
               <StackedBarChart
-                data={byDay.machineTime}
+                data={machineTimeRows}
                 series={STATE_SERIES}
                 yUnit="h"
                 yDomain={DAY_DOMAIN}
                 yTicks={DAY_HOURS}
                 valueFormatter={formatHours}
+                emptyText={
+                  machineTimeState.loading ? 'Loading…' : machineTimeState.error || 'No machine time for these dates.'
+                }
               />
             </ChartCard>
           </Col>

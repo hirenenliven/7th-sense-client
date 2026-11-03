@@ -3545,6 +3545,115 @@ $ts-toast-colors: (
   .bi { font-size: $ts-fs-xl; }
 }
 
+// Machine mode Gantt (components/charts/ModeGanttChart): toolbar (range, zoom, program, readout),
+// then a label column beside a horizontally scrolling plot (time axis on top, the "all modes" row,
+// then one row per mode)
+.ts-gantt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: $ts-space-2;
+  margin-bottom: $ts-space-3;
+}
+
+.ts-gantt-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ts-space-1 $ts-space-3;
+  padding: $ts-space-1 $ts-space-3;
+  font-size: $ts-fs-md;
+  color: $ts-ink-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-sm;
+
+  b { color: $ts-ink; font-weight: 600; }
+}
+
+.ts-gantt-info-sep { color: $ts-ink-3; }
+
+.ts-gantt-readout {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+  min-width: $ts-gantt-readout-min;
+  margin-left: auto;
+  padding: $ts-space-1 $ts-space-3;
+  font-size: $ts-fs-md;
+  color: $ts-ink-2;
+  border: 1px solid $ts-orange;
+  border-radius: $ts-radius-sm;
+
+  b { color: $ts-ink; font-weight: 600; }
+}
+
+.ts-gantt {
+  display: grid;
+  grid-template-columns: $ts-gantt-label-width-sm minmax(0, 1fr);
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-sm;
+
+  @include media-breakpoint-up(md) { grid-template-columns: $ts-gantt-label-width minmax(0, 1fr); }
+}
+
+.ts-gantt-labels {
+  border-right: 1px solid $ts-line;
+}
+
+.ts-gantt-axis-cell { height: $ts-gantt-axis-height; border-bottom: 1px solid $ts-line; }
+
+.ts-gantt-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $ts-space-3;
+  height: $ts-gantt-row-height;
+  padding: 0 $ts-space-3;
+  font-size: $ts-fs-md;
+  color: $ts-ink-2;
+  white-space: nowrap;
+
+  span { overflow: hidden; text-overflow: ellipsis; }
+}
+
+.ts-gantt-pill {
+  flex: none;
+  width: $ts-gantt-pill-width;
+  height: $ts-gantt-pill-height;
+}
+
+.ts-gantt-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.ts-gantt-plot { display: block; }
+
+.ts-gantt-axis {
+  display: block;
+  height: $ts-gantt-axis-height;
+  border-bottom: 1px solid $ts-line;
+
+  text { fill: $ts-ink-2; font-size: $ts-fs-sm; }
+  line { stroke: $ts-line; }
+}
+
+.ts-gantt-track {
+  display: block;
+  height: $ts-gantt-row-height;
+  border-bottom: 1px solid rgba($ts-line, .6);
+
+  .ts-gantt-grid { stroke: rgba($ts-line, .6); }
+  rect { cursor: pointer; }
+  rect:hover { opacity: .8; }
+}
+
+.ts-gantt-now {
+  stroke: $ts-ink;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
 // Legend text keeps the text colour (the swatch carries the series colour)
 .ts-chart-legend-text { color: $ts-ink-2; }
 

@@ -80,3 +80,21 @@ export const MACHINE_HEALTH_SENSORS = [
   { id: 38, label: 'Turning Chuck OD Sheet Pressure' },
   { id: 39, label: 'Turning Chuck OD Reset Pressure' },
 ]
+
+
+// Rows of the Productivity Gantt chart: each machine_modes id with its colour (--ts-mode-* CSS
+// variables, _variables.scss). `optional` rows show only while the window has a period in them.
+export const MACHINE_MODE_TYPES = [
+  { id: 2, label: 'Loading / Unloading Time', color: 'var(--ts-mode-loading)' },
+  { id: 3, label: 'In Production', color: 'var(--ts-mode-production)' },
+  { id: 4, label: 'Hold', color: 'var(--ts-mode-hold)' },
+  { id: 5, label: 'Idle', color: 'var(--ts-mode-idle)' },
+  { id: 6, label: 'Downtime', color: 'var(--ts-mode-downtime)' },
+  { id: 9, label: 'Offline', color: 'var(--ts-mode-offline)' },
+  { id: 7, label: 'Planned Downtime', color: 'var(--ts-mode-planned)' },
+  { id: 1, label: 'Setup', color: 'var(--ts-mode-setup)', optional: true },
+  { id: 12, label: 'Rapid Mode', color: 'var(--ts-mode-rapid)', optional: true },
+  { id: 13, label: 'Leave Planned Downtime', color: 'var(--ts-mode-planned)', optional: true },
+]
+export const UNKNOWN_MODE_COLOR = 'var(--ts-neutral)'
+export const modeTypeOf = (modeId) => MACHINE_MODE_TYPES.find((mode) => mode.id === modeId)
