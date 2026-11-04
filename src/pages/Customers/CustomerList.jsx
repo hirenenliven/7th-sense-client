@@ -20,7 +20,7 @@ const matchesSearch = (customer, term) =>
   [customer.id, customer.username, customerName(customer), ROLE_LABELS[customer.role], customer.email, customerMobile(customer)]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
-// Masters › Customers and Masters › Users (kind): the same list, on each kind's accounts
+// Account Center › Customer and Masters › Users (kind): the same list, on each kind's accounts
 function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const account = ACCOUNT_PAGES[kind]
   const navigate = useNavigate()
@@ -227,21 +227,33 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     )
   }
 
+  const addButton = (
+    <Button as={Link} to={account.routes.add}>
+      <i className="bi bi-plus-lg me-2" aria-hidden="true" />
+      Add New
+    </Button>
+  )
+
   return (
     <>
-      <header className="ts-page-header">
-        <div>
-          <div className="ts-eyebrow">{account.section}</div>
-          <h1>{account.listTitle}</h1>
-          <p className="ts-page-subtitle">{account.listSubtitle}</p>
+      {account.tabbed ? (
+        <div className="ts-tab-header">
+          <div>
+            <h2 className="ts-section-title">{account.listTitle}</h2>
+            <p className="ts-note mb-0">{account.listSubtitle}</p>
+          </div>
+          <div className="ts-page-actions">{addButton}</div>
         </div>
-        <div className="ts-page-actions">
-          <Button as={Link} to={account.routes.add}>
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            Add New
-          </Button>
-        </div>
-      </header>
+      ) : (
+        <header className="ts-page-header">
+          <div>
+            <div className="ts-eyebrow">{account.section}</div>
+            <h1>{account.listTitle}</h1>
+            <p className="ts-page-subtitle">{account.listSubtitle}</p>
+          </div>
+          <div className="ts-page-actions">{addButton}</div>
+        </header>
+      )}
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

@@ -225,11 +225,10 @@ function LineList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Lines</div>
-          <h1>Lines</h1>
-          <p className="ts-page-subtitle">Your lines and the shop each belongs to.</p>
+          <h2 className="ts-section-title">Lines</h2>
+          <p className="ts-note mb-0">Your lines and the shop each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function LineList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

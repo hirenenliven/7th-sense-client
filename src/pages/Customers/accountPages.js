@@ -13,8 +13,10 @@ export const ACCOUNT_PAGES = {
   [ACCOUNT_KIND.CUSTOMER]: {
     noun: 'customer',
     title: 'Customer',
-    section: 'Masters · Customers',
+    section: 'Account Center · Customers',
     icon: 'bi-building',
+    // The list is the Customer tab of System › Account Center: a tab header, not a page header
+    tabbed: true,
     listTitle: 'Manage Customer',
     listSubtitle: 'All customer accounts and their logins.',
     viewSubtitle: 'Customer account, company, address and settings.',

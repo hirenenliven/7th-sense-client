@@ -2,7 +2,7 @@
 
 - **Route:** `/about` · **Component:** [About.jsx](../../src/pages/About/About.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Shows the product / version information.
-- **Navigation:** Sidebar › System → About
+- **Navigation:** Home → About button (not in the sidebar)
 
 ## UI states
 

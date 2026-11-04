@@ -225,11 +225,10 @@ function LocationList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Locations</div>
-          <h1>Locations</h1>
-          <p className="ts-page-subtitle">Your locations and the branch each belongs to.</p>
+          <h2 className="ts-section-title">Locations</h2>
+          <p className="ts-note mb-0">Your locations and the branch each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function LocationList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

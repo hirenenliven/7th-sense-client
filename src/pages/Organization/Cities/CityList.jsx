@@ -225,11 +225,10 @@ function CityList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Cities</div>
-          <h1>Cities</h1>
-          <p className="ts-page-subtitle">Your cities and the state each belongs to.</p>
+          <h2 className="ts-section-title">Cities</h2>
+          <p className="ts-note mb-0">Your cities and the state each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function CityList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

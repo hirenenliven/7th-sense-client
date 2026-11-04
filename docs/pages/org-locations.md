@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/locations` · **Component:** [LocationList.jsx](../../src/pages/Organization/Locations/LocationList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 4: locations of a branch.
-- **Navigation:** Cities → Locations → Shops
+- **Navigation:** Sidebar › Masters › Organization → **Location** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

@@ -1,8 +1,8 @@
 # Machine health
 
-- **Route:** `/machines/health` · **Component:** [MachineHealth.jsx](../../src/pages/MachineHealth/MachineHealth.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/monitoring/health` · **Component:** [MachineHealth.jsx](../../src/pages/MachineHealth/MachineHealth.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Health dashboard of one machine; the Machine Time by Day chart is live from the server (other sensor charts still use sample data).
-- **Navigation:** All Machines / sidebar → Machine Health (?machineId)
+- **Navigation:** Sidebar › Operations › Monitoring → [Machines](monitoring-machines.md) tab (Health action) → **Machine Health** tab (?machineId; [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): page header + tabs, this screen is the tab body; the tab is the route and keeps `?machineId`)
 
 ## On page load
 
@@ -83,4 +83,5 @@ sequenceDiagram
 
 ## Decisions
 
+- [ADR 0012: Monitoring tabbed page](../adr/0012-monitoring-tabbed-page.md)
 - [Client ADR index](../adr/README.md)

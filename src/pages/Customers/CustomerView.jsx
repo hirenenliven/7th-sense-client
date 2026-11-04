@@ -50,7 +50,7 @@ DetailCard.propTypes = {
   items: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)).isRequired,
 }
 
-// Masters › Customers › View and Masters › Users › View (kind): everything GET /users/{id} returns.
+// Account Center › Customer › View and Masters › Users › View (kind): everything GET /users/{id} returns.
 // profile, companyProfile and address may each be null. Users also show their role and machines.
 function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const account = ACCOUNT_PAGES[kind]

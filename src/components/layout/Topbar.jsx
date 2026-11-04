@@ -117,9 +117,9 @@ function Topbar() {
               <div className="fs-xs">{ROLE_LABELS[user?.role] ?? user?.role}</div>
             </Dropdown.Header>
             <Dropdown.Divider />
-            <Dropdown.Item as={Link} to={ROUTES.ACCOUNT}>
-              <i className="bi bi-shield-lock" aria-hidden="true" />
-              Account Center
+            <Dropdown.Item as={Link} to={ROUTES.USER_GUIDE}>
+              <i className="bi bi-book" aria-hidden="true" />
+              User Guide
             </Dropdown.Item>
             <Dropdown.Item as="button" onClick={handleSignOut} disabled={signingOut}>
               <i className="bi bi-box-arrow-right" aria-hidden="true" />

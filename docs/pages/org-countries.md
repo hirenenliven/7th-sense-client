@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/countries` · **Component:** [CountryList.jsx](../../src/pages/Organization/Countries/CountryList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 1: the company's countries.
-- **Navigation:** Sidebar › Masters › Organization → Countries → States
+- **Navigation:** Sidebar › Masters › Organization → **Country** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

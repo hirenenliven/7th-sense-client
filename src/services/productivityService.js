@@ -1,7 +1,7 @@
 import { sharedGet, withQuery } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
-// Operations › Productivity charts, from what the CNC collector recorded (mode periods, cycles) for
+// Operations › Monitoring › Productivity charts, from what the CNC collector recorded (mode periods, cycles) for
 // the machines the user may read. Dates are YYYY-MM-DD; id lists are sent comma-separated.
 const PATH = '/productivity'
 
@@ -13,6 +13,12 @@ const ids = (list) => (list?.length ? list.join(',') : undefined)
 // startedAt, endedAt (null while open), durationSec }], totals }
 export const getModeTimeline = async (machineId, { date, minutes }) =>
   unwrap(await sharedGet(withQuery(`${PATH}/mode-timeline`, { machineId, date, minutes })))
+
+// Time per mode over the days from … to (or one `date`), or over every recorded period (`all`),
+// summed by the server with the periods clipped to the range:
+// { from (null when nothing is recorded), to, serverTime, totals: [{ modeId, modeName, durationSec }] }
+export const getModeTotals = async (machineId, { date, from, to, all }) =>
+  unwrap(await sharedGet(withQuery(`${PATH}/mode-totals`, { machineId, date, from, to, all: all ? 'true' : undefined })))
 
 // { rows: [{ date, availability, performance, quality, oee }], programs } — performance / quality /
 // oee are null on a day without closed cycles

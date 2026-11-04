@@ -16,6 +16,9 @@ const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
 const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
 const MachineHealth = lazy(() => import('@/pages/MachineHealth/MachineHealth'))
 const Productivity = lazy(() => import('@/pages/Productivity/Productivity'))
+// Operations › Monitoring: one tabbed page (Machines, Productivity, Machine Health)
+const MonitoringPage = lazy(() => import('@/pages/Monitoring/MonitoringPage'))
+const MonitoringMachines = lazy(() => import('@/pages/Monitoring/MonitoringMachines'))
 const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
 const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
 const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
@@ -29,7 +32,11 @@ const AddProductionSchedule = lazy(() => import('@/pages/ProductionSchedules/Add
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
+// System › Account Center: one tabbed page (Customer, Licence Key, Clientele, Machine Catalog)
+const AccountCenterPage = lazy(() => import('@/pages/AccountCenter/AccountCenterPage'))
 // Masters › Country … Supervisor (Org prefix keeps them apart from Masters › Branches)
+// Masters › Organization: one tabbed page; each tab is its own route and lazily loaded list
+const OrganizationPage = lazy(() => import('@/pages/Organization/OrganizationPage'))
 const OrgCountryList = lazy(() => import('@/pages/Organization/Countries/CountryList'))
 const OrgStateList = lazy(() => import('@/pages/Organization/States/StateList'))
 const OrgCityList = lazy(() => import('@/pages/Organization/Cities/CityList'))
@@ -47,7 +54,9 @@ export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase /> },
-  { path: ROUTES.CUSTOMERS, element: <CustomerList />, roles: SUPERADMIN_ONLY },
+  // System › Account Center: `/account-center` opens the first tab the role may see
+  { path: ROUTES.ACCOUNT_CENTER, element: <AccountCenterPage /> },
+  { path: ROUTES.CUSTOMERS, element: <AccountCenterPage><CustomerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_VIEW, element: <CustomerView />, roles: SUPERADMIN_ONLY },
@@ -56,18 +65,19 @@ export const PAGES = [
   { path: ROUTES.USER_ADD, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
   { path: ROUTES.USER_EDIT, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
   { path: ROUTES.USER_VIEW, element: <CustomerView kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
-  { path: ROUTES.BRANCHES, element: <BranchList /> },
+  { path: ROUTES.BRANCHES, element: <OrganizationPage><BranchList /></OrganizationPage> },
   { path: ROUTES.BRANCH_ADD, element: <AddBranch />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.BRANCH_EDIT, element: <AddBranch />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MACHINES, element: <MachineList /> },
   { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
-  // Machine Health: every user, for the machines the server returns them
-  { path: ROUTES.MACHINE_HEALTH, element: <MachineHealth /> },
-  // Productivity (OEE, finished cycles): every user, for the machines the server returns them
-  { path: ROUTES.MACHINE_PRODUCTIVITY, element: <Productivity /> },
+  // Operations › Monitoring (Machines, Productivity, Machine Health tabs): every user, for the
+  // machines the server returns them
+  { path: ROUTES.MONITORING, element: <MonitoringPage><MonitoringMachines /></MonitoringPage> },
+  { path: ROUTES.MACHINE_PRODUCTIVITY, element: <MonitoringPage><Productivity /></MonitoringPage> },
+  { path: ROUTES.MACHINE_HEALTH, element: <MonitoringPage><MachineHealth /></MonitoringPage> },
   // Clientele and parts: everyone reads their company's; managers add, edit and delete
-  { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
+  { path: ROUTES.CLIENTELES, element: <AccountCenterPage><ClienteleList /></AccountCenterPage> },
   { path: ROUTES.PARTS, element: <PartList /> },
   { path: ROUTES.PART_ADD, element: <AddPart />, roles: MANAGERS },
   { path: ROUTES.PART_EDIT, element: <AddPart />, roles: MANAGERS },
@@ -85,18 +95,18 @@ export const PAGES = [
   { path: ROUTES.DOWNTIME_REASONS, element: <ReasonList key={REASON_KIND.DOWNTIME} kind={REASON_KIND.DOWNTIME} /> },
   { path: ROUTES.IDLE_REASONS, element: <ReasonList key={REASON_KIND.IDLE} kind={REASON_KIND.IDLE} /> },
   // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
-  { path: ROUTES.LICENCE_KEYS, element: <LicenceKeySetup />, roles: MANAGERS },
-  { path: ROUTES.CONTROLLERS, element: <ControllerList />, roles: SUPERADMIN_ONLY },
-  { path: ROUTES.MODELS, element: <ModelList />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: MANAGERS },
+  { path: ROUTES.CONTROLLERS, element: <AccountCenterPage><ControllerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MODELS, element: <AccountCenterPage><ModelList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },
-  { path: ROUTES.ORG_COUNTRIES, element: <OrgCountryList /> },
-  { path: ROUTES.ORG_STATES, element: <OrgStateList /> },
-  { path: ROUTES.ORG_CITIES, element: <OrgCityList /> },
-  { path: ROUTES.ORG_LOCATIONS, element: <OrgLocationList /> },
-  { path: ROUTES.ORG_SHOPS, element: <OrgShopList /> },
-  { path: ROUTES.ORG_LINES, element: <OrgLineList /> },
-  { path: ROUTES.ORG_CELLS, element: <OrgCellList /> },
-  { path: ROUTES.ORG_SUPERVISORS, element: <OrgSupervisorList /> },
+  { path: ROUTES.ORG_COUNTRIES, element: <OrganizationPage><OrgCountryList /></OrganizationPage> },
+  { path: ROUTES.ORG_STATES, element: <OrganizationPage><OrgStateList /></OrganizationPage> },
+  { path: ROUTES.ORG_CITIES, element: <OrganizationPage><OrgCityList /></OrganizationPage> },
+  { path: ROUTES.ORG_LOCATIONS, element: <OrganizationPage><OrgLocationList /></OrganizationPage> },
+  { path: ROUTES.ORG_SHOPS, element: <OrganizationPage><OrgShopList /></OrganizationPage> },
+  { path: ROUTES.ORG_LINES, element: <OrganizationPage><OrgLineList /></OrganizationPage> },
+  { path: ROUTES.ORG_CELLS, element: <OrganizationPage><OrgCellList /></OrganizationPage> },
+  { path: ROUTES.ORG_SUPERVISORS, element: <OrganizationPage><OrgSupervisorList /></OrganizationPage> },
 ]
 
 export const BUILT_PATHS = new Set(PAGES.map((page) => page.path))

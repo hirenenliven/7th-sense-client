@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/supervisors` · **Component:** [SupervisorList.jsx](../../src/pages/Organization/Supervisors/SupervisorList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 8: supervisors of a cell.
-- **Navigation:** Cells → Supervisors
+- **Navigation:** Sidebar › Masters › Organization → **Supervisor** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

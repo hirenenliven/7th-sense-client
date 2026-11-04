@@ -23,7 +23,7 @@ const compareText = (a, b) => (a ?? '').localeCompare(b ?? '', undefined, { sens
 const byBrandControllerName = (a, b) =>
   compareText(a.brandName, b.brandName) || compareText(a.controllerName, b.controllerName) || compareText(a.name, b.name)
 
-// Masters › Machine Catalog › Models (superadmin): the machine models of each controller with
+// Account Center › Machine Catalog › Models (superadmin): the machine models of each controller with
 // search, controller filter, paging, add / edit and delete. Every user sees them in the machine form.
 function ModelList() {
   const [models, setModels] = useState([])
@@ -214,11 +214,10 @@ function ModelList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Machine Catalog</div>
-          <h1>Models</h1>
-          <p className="ts-page-subtitle">Machine models of each controller, offered in the machine form.</p>
+          <h2 className="ts-section-title">Models</h2>
+          <p className="ts-note mb-0">Machine models of each controller, offered in the machine form.</p>
         </div>
         <div className="ts-page-actions">
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
@@ -226,7 +225,7 @@ function ModelList() {
             Add Model
           </Button>
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

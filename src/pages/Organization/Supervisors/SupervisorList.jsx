@@ -225,11 +225,10 @@ function SupervisorList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Supervisors</div>
-          <h1>Supervisors</h1>
-          <p className="ts-page-subtitle">Your supervisors and the cell each belongs to.</p>
+          <h2 className="ts-section-title">Supervisors</h2>
+          <p className="ts-note mb-0">Your supervisors and the cell each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function SupervisorList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

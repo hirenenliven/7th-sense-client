@@ -171,11 +171,10 @@ function CountryList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Countries</div>
-          <h1>Countries</h1>
-          <p className="ts-page-subtitle">The countries assigned to your organization.</p>
+          <h2 className="ts-section-title">Countries</h2>
+          <p className="ts-note mb-0">The countries assigned to your organization.</p>
         </div>
         <div className="ts-page-actions">
           {canAssign && (
@@ -185,7 +184,7 @@ function CountryList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

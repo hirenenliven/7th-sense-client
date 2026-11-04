@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/clienteles` · **Component:** [ClienteleList.jsx](../../src/pages/Clienteles/ClienteleList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Lists the company's clientele (their customers); managers add, edit and delete in a modal.
-- **Navigation:** Sidebar › Masters → Clientele
+- **Navigation:** Sidebar › System › Account Center → **Clientele** tab ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
 
 ## On page load
 
@@ -212,4 +212,5 @@ sequenceDiagram
 
 ## Decisions
 
+- [ADR 0011: tabbed page](../adr/0011-business-setup-tabbed-page.md), [ADR 0014: renamed Account Center](../adr/0014-account-center.md)
 - [Client ADR index](../adr/README.md)

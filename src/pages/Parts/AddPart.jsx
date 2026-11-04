@@ -104,7 +104,7 @@ function AddPart() {
     }
   }, [userId, canPickCustomer])
 
-  // The customer's clienteles (Masters › Clientele)
+  // The customer's clienteles (Account Center › Clientele)
   useEffect(() => {
     if (!userId) {
       setClienteles({ items: [], loading: false })

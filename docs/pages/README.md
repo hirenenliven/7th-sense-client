@@ -30,18 +30,24 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 |---|---|---|---|---|
 | All machines | `/machines` | Yes | every logged-in role | [machine-list.md](machine-list.md) |
 | Add / edit machine | `/machines/add` · `/machines/:id/edit` | Yes | managers | [machine-form.md](machine-form.md) |
-| Machine health | `/machines/health` | Yes | every logged-in role | [machine-health.md](machine-health.md) |
-| Productivity | `/machines/productivity` | Yes | every logged-in role | [productivity.md](productivity.md) |
 | Production schedules | `/production/schedule` | Yes | every logged-in role | [production-schedule-list.md](production-schedule-list.md) |
 | Add / edit production schedule | `/production/schedule/add` · `/production/schedule/:id/edit` | Yes | managers | [production-schedule-form.md](production-schedule-form.md) |
+
+## Operations › Monitoring
+
+One page, [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): a tab per screen (`constants/monitoring.js`), each tab its own route below; the Productivity / Health tabs keep `?machineId`. Sidebar: one Monitoring item (opens the Machines tab). See [ADR 0012](../adr/0012-monitoring-tabbed-page.md), [ADR 0013](../adr/0013-monitoring-machine-list.md).
+
+| Page | Route | Auth required | Roles | Flow doc |
+|---|---|---|---|---|
+| Machines (tab) | `/monitoring` | Yes | every logged-in role | [monitoring-machines.md](monitoring-machines.md) |
+| Productivity (tab) | `/monitoring/productivity` | Yes | every logged-in role | [productivity.md](productivity.md) |
+| Machine health (tab) | `/monitoring/health` | Yes | every logged-in role | [machine-health.md](machine-health.md) |
 
 ## Masters
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
-| Branches | `/masters/branches` | Yes | every logged-in role | [branch-list.md](branch-list.md) |
 | Add / edit branch | `/masters/branches/add` · `/masters/branches/:id/edit` | Yes | superadmin | [branch-form.md](branch-form.md) |
-| Clientele | `/masters/clienteles` | Yes | every logged-in role | [clientele-list.md](clientele-list.md) |
 | Parts | `/masters/parts` | Yes | every logged-in role | [part-list.md](part-list.md) |
 | Add / edit part | `/masters/parts/add` · `/masters/parts/:id/edit` | Yes | managers | [part-form.md](part-form.md) |
 
@@ -61,37 +67,42 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 
 ## Masters › Organization
 
+One page, [OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): a tab per level (`constants/organization.js`), each tab its own route below (sidebar: one Organization item). See [ADR 0010](../adr/0010-organization-tabbed-page.md).
+
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | Countries | `/organization/countries` | Yes | every logged-in role | [org-countries.md](org-countries.md) |
 | States | `/organization/states` | Yes | every logged-in role | [org-states.md](org-states.md) |
 | Cities | `/organization/cities` | Yes | every logged-in role | [org-cities.md](org-cities.md) |
+| Branches (tab) | `/masters/branches` | Yes | every logged-in role | [branch-list.md](branch-list.md) |
 | Locations | `/organization/locations` | Yes | every logged-in role | [org-locations.md](org-locations.md) |
 | Shops | `/organization/shops` | Yes | every logged-in role | [org-shops.md](org-shops.md) |
 | Lines | `/organization/lines` | Yes | every logged-in role | [org-lines.md](org-lines.md) |
 | Cells | `/organization/cells` | Yes | every logged-in role | [org-cells.md](org-cells.md) |
 | Supervisors | `/organization/supervisors` | Yes | every logged-in role | [org-supervisors.md](org-supervisors.md) |
 
-## Admin
+## Masters › Users
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
-| Licence keys | `/masters/licence-keys` | Yes | managers | [licence-keys.md](licence-keys.md) |
+| Users list | `/masters/users` | Yes | managers | [customer-user-list.md](customer-user-list.md) |
+| Add / edit user | `/masters/users/add` · `/masters/users/:id/edit` | Yes | managers | [customer-user-form.md](customer-user-form.md) |
+| User detail | `/masters/users/:id` | Yes | managers | [customer-user-detail.md](customer-user-detail.md) |
 
-## Admin › Accounts
+## System › Account Center
 
-| Page | Route | Auth required | Roles | Flow doc |
-|---|---|---|---|---|
-| Customers / Users list | `/masters/customers` · `/masters/users` | Yes | superadmin; managers | [customer-user-list.md](customer-user-list.md) |
-| Add / edit customer or user | `/masters/customers/add` · `/masters/customers/:id/edit` · `/masters/users/add` · `/masters/users/:id/edit` | Yes | superadmin; managers | [customer-user-form.md](customer-user-form.md) |
-| Customer / user detail | `/masters/customers/:id` · `/masters/users/:id` | Yes | superadmin; managers | [customer-user-detail.md](customer-user-detail.md) |
-
-## Admin › Machine catalog
+One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): a tab per screen (`constants/accountCenter.js`, only the tabs the role may open), each tab its own route below; Machine Catalog has Controllers / Models pills. Sidebar: one Account Center item (`/account-center` opens the first tab the role may see). See [ADR 0011](../adr/0011-business-setup-tabbed-page.md) and [ADR 0014](../adr/0014-account-center.md) (formerly Business Setup).
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
-| Controllers | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
-| Machine models | `/masters/models` | Yes | superadmin | [models.md](models.md) |
+| Account Center (redirect) | `/account-center` | Yes | every logged-in role | this section |
+| Customers (tab) | `/masters/customers` | Yes | superadmin | [customer-user-list.md](customer-user-list.md) |
+| Add / edit customer | `/masters/customers/add` · `/masters/customers/:id/edit` | Yes | superadmin | [customer-user-form.md](customer-user-form.md) |
+| Customer detail | `/masters/customers/:id` | Yes | superadmin | [customer-user-detail.md](customer-user-detail.md) |
+| Licence keys (tab) | `/masters/licence-keys` | Yes | managers | [licence-keys.md](licence-keys.md) |
+| Clientele (tab) | `/masters/clienteles` | Yes | every logged-in role | [clientele-list.md](clientele-list.md) |
+| Controllers (Machine Catalog tab) | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
+| Machine models (Machine Catalog tab) | `/masters/models` | Yes | superadmin | [models.md](models.md) |
 
 ## System
 

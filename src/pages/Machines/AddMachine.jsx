@@ -141,7 +141,7 @@ function AddMachine() {
   const loadLines = useMemo(() => (userId ? () => getUserLines(null, userId).then((list) => [...list].sort(byName)) : null), [userId])
   const lines = useOptions(loadLines, 'lines')
 
-  // Catalog: Brand → Controller → Model (Masters › Machine Catalog)
+  // Catalog: Brand → Controller → Model (Account Center › Machine Catalog)
   const brandControllers = useMemo(
     () => controllers.items.filter((option) => String(option.brandId) === brandId),
     [controllers.items, brandId],

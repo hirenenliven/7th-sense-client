@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/lines` · **Component:** [LineList.jsx](../../src/pages/Organization/Lines/LineList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 6: lines of a shop.
-- **Navigation:** Shops → Lines → Cells
+- **Navigation:** Sidebar › Masters › Organization → **Line** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

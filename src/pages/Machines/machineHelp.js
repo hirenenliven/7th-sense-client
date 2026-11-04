@@ -7,11 +7,11 @@ export const FIELD_HELP = {
   },
   controllerId: {
     title: 'Controller',
-    content: 'Controllers of the selected brand (Masters › Machine Catalog › Controllers). Pick the brand first.',
+    content: 'Controllers of the selected brand (Account Center › Machine Catalog › Controllers). Pick the brand first.',
   },
   modelId: {
     title: 'Model Name',
-    content: 'Machine models of the selected controller (Masters › Machine Catalog › Models). Pick the controller first.',
+    content: 'Machine models of the selected controller (Account Center › Machine Catalog › Models). Pick the controller first.',
   },
   lineId: {
     title: 'Machine Line No.',

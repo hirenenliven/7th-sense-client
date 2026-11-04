@@ -210,11 +210,10 @@ function StateList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · States</div>
-          <h1>States</h1>
-          <p className="ts-page-subtitle">The states assigned to your organization and the country each belongs to.</p>
+          <h2 className="ts-section-title">States</h2>
+          <p className="ts-note mb-0">The states assigned to your organization and the country each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canAssign && (
@@ -224,7 +223,7 @@ function StateList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

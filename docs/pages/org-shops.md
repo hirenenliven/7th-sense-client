@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/shops` · **Component:** [ShopList.jsx](../../src/pages/Organization/Shops/ShopList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 5: shops of a location.
-- **Navigation:** Locations → Shops → Lines
+- **Navigation:** Sidebar › Masters › Organization → **Shop** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

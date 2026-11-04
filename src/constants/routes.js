@@ -6,8 +6,11 @@ export const ROUTES = {
   MACHINES: '/machines',
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
-  MACHINE_HEALTH: '/machines/health',
-  MACHINE_PRODUCTIVITY: '/machines/productivity',
+  // Operations › Monitoring tabs (constants/monitoring.js): the machine list, then a machine's
+  // Productivity / Health (`?machineId=`). Kept apart from the machine set-up under /machines.
+  MONITORING: '/monitoring',
+  MACHINE_PRODUCTIVITY: '/monitoring/productivity',
+  MACHINE_HEALTH: '/monitoring/health',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
   PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',
@@ -61,7 +64,9 @@ export const ROUTES = {
   ORG_SUPERVISORS: '/organization/supervisors',
 
   // System
-  ACCOUNT: '/account',
+  // Account Center: opens the first tab the user may see (Customer, Licence Key, Clientele, Machine
+  // Catalog keep their own routes above, see constants/accountCenter.js)
+  ACCOUNT_CENTER: '/account-center',
   THEME: '/theme',
   ABOUT: '/about',
   USER_GUIDE: '/user-guide',

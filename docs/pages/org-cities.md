@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/cities` · **Component:** [CityList.jsx](../../src/pages/Organization/Cities/CityList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 3: cities of a state.
-- **Navigation:** States → Cities → Locations
+- **Navigation:** Sidebar › Masters › Organization → **City** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

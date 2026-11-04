@@ -17,7 +17,7 @@ const matchesSearch = (clientele, term) =>
   [clientele.id, clientele.clientCode, clientele.name, clientele.email, clientele.contactNumber, clientele.city, clientele.stateName, clientele.countryName, clientele.customerName]
     .some((value) => String(value ?? '').toLowerCase().includes(term))
 
-// Masters › Clientele. The superadmin sees every customer's clienteles (filter by customer);
+// Account Center › Clientele. The superadmin sees every customer's clienteles (filter by customer);
 // everyone else their company's. Managers (superadmin, customer, admin) add (Add Clientele) and edit
 // (a row's Edit) in the Clientele modal, and delete.
 function ClienteleList() {
@@ -226,11 +226,10 @@ function ClienteleList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Clientele</div>
-          <h1>Clientele</h1>
-          <p className="ts-page-subtitle">
+          <h2 className="ts-section-title">Clientele</h2>
+          <p className="ts-note mb-0">
             {isSuperadmin ? 'Every customer’s clients and how to reach them.' : 'Your clients and how to reach them.'}
           </p>
         </div>
@@ -242,7 +241,7 @@ function ClienteleList() {
             </Button>
           </div>
         )}
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

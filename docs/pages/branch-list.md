@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/branches` · **Component:** [BranchList.jsx](../../src/pages/Branches/BranchList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Lists branches; the superadmin adds, edits and deletes them.
-- **Navigation:** Sidebar › Masters → Branches → Add / Edit
+- **Navigation:** Sidebar › Masters › Organization → **Branch** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route) → Add / Edit
 
 ## On page load
 

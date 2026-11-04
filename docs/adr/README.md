@@ -13,5 +13,10 @@ Client (frontend) decisions, one file each (Michael Nygard template). Never edit
 | 0007 | [Recharts for charts, plain SVG for the Gantt](0007-recharts-for-charts.md) | Accepted (Inferred from existing code) | 2026-11-03 |
 | 0008 | [Folder structure by page and by concern](0008-folder-structure-by-page.md) | Accepted (Inferred from existing code) | 2026-11-03 |
 | 0009 | [Page-wise flow documentation in docs/pages](0009-page-wise-flow-documentation.md) | Accepted | 2026-11-03 |
+| 0010 | [Organization levels on one tabbed page, a route per tab](0010-organization-tabbed-page.md) | Accepted | 2026-11-03 |
+| 0011 | [Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page](0011-business-setup-tabbed-page.md) | Superseded by 0014 | 2026-11-03 |
+| 0012 | [Monitoring: Productivity and Machine Health on one tabbed page](0012-monitoring-tabbed-page.md) | Superseded by 0013 | 2026-11-03 |
+| 0013 | [Monitoring starts with a machine list; All Machines is set-up only](0013-monitoring-machine-list.md) | Accepted | 2026-11-04 |
+| 0014 | [Business Setup renamed Account Center; old Account Center item removed](0014-account-center.md) | Accepted | 2026-11-04 |
 
 New ADR: copy the newest file, take the next number, status "Proposed" until agreed, then "Accepted"; add a row here.

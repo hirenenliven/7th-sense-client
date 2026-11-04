@@ -1,16 +1,12 @@
-import { memo } from 'react'
-import { Badge, Button, Card } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Badge, Card } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import IconAction from '@/components/common/IconAction'
 import StatusBadge from '@/components/common/StatusBadge'
-import { ACTION_ICONS } from '@/constants/icons'
 import { MACHINE_STATUS } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
 
-// Card view of a machine (same data and actions as MachineRow); the footer links to its Machine Health
-// and Productivity pages.
-function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, productivityPath, onEdit, onDelete }) {
+// Card view of a machine (same data as MachineRow). The page passes `actions` (header icons, e.g. Edit /
+// Delete on All Machines) and `footer` (e.g. Productivity / Health links on Monitoring).
+function MachineCard({ machine, showCustomer, actions, footer }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
   const details = [
     ...(showCustomer ? [{ label: 'Customer', value: machine.customerName }] : []),
@@ -34,14 +30,7 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, pr
               {machine.serialNumber && ` · ${machine.serialNumber}`}
             </div>
           </div>
-          {canEdit && (
-            <div className="d-flex gap-1 flex-shrink-0">
-              <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />
-              {canDelete && (
-                <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
-              )}
-            </div>
-          )}
+          {actions && <div className="d-flex gap-1 flex-shrink-0">{actions}</div>}
         </div>
 
         <div className="d-flex flex-wrap gap-2">
@@ -60,16 +49,7 @@ function MachineCard({ machine, showCustomer, canEdit, canDelete, healthPath, pr
           ))}
         </dl>
 
-        <div className="mt-auto d-flex flex-wrap gap-2">
-          <Button as={Link} to={healthPath} variant="ghost" size="sm">
-            <i className={`bi ${ACTION_ICONS.health} me-2`} aria-hidden="true" />
-            Health
-          </Button>
-          <Button as={Link} to={productivityPath} variant="ghost" size="sm">
-            <i className={`bi ${ACTION_ICONS.productivity} me-2`} aria-hidden="true" />
-            Productivity
-          </Button>
-        </div>
+        {footer && <div className="mt-auto d-flex flex-wrap gap-2">{footer}</div>}
       </Card.Body>
     </Card>
   )
@@ -90,12 +70,8 @@ MachineCard.propTypes = {
     status: PropTypes.string,
   }).isRequired,
   showCustomer: PropTypes.bool.isRequired,
-  canEdit: PropTypes.bool.isRequired,
-  canDelete: PropTypes.bool.isRequired,
-  healthPath: PropTypes.string.isRequired,
-  productivityPath: PropTypes.string.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  actions: PropTypes.node,
+  footer: PropTypes.node,
 }
 
-export default memo(MachineCard)
+export default MachineCard

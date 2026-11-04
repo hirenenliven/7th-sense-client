@@ -84,8 +84,8 @@ const outOf100 = (value) => `${value} / 100`
 const machineLabel = (machine, withCustomer) =>
   withCustomer && machine.customerName ? `${machine.name} · ${machine.customerName}` : machine.name
 
-// Operations › Machine Health: one machine's sensors (`?machineId=`, set by the All Machines Health
-// link; the first machine otherwise). Today's KPI tiles, then charts that each have a date filter (one
+// Operations › Monitoring › Machine Health: one machine's sensors (`?machineId=`, set by the Monitoring › Machines
+// Health link; the first machine otherwise). Today's KPI tiles, then charts that each have a date filter (one
 // day or a range). Machine Time by Day is live data; the other readings are SAMPLE data
 // (healthSampleData.js) until the server has a sensor API.
 function MachineHealth() {
@@ -404,11 +404,10 @@ function MachineHealth() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Operations · Machines</div>
-          <h1>Machine Health</h1>
-          <p className="ts-page-subtitle">
+          <h2 className="ts-section-title">Machine Health</h2>
+          <p className="ts-note mb-0">
             {machine ? `${machine.name}: sensor readings, limits and trends.` : 'Sensor readings, limits and trends of a machine.'}
           </p>
         </div>
@@ -428,7 +427,7 @@ function MachineHealth() {
             </Form.Select>
           </div>
         )}
-      </header>
+      </div>
 
       {renderBody()}
     </>

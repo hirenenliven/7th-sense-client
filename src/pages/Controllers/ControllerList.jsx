@@ -21,7 +21,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 
 const byBrandThenName = (a, b) =>
   (a.brandName ?? '').localeCompare(b.brandName ?? '', undefined, { sensitivity: 'base' }) || byName(a, b)
 
-// Masters › Machine Catalog › Controllers (superadmin): the controllers of each brand with
+// Account Center › Machine Catalog › Controllers (superadmin): the controllers of each brand with
 // search, brand filter, paging, add / edit and delete. Every user sees them in the machine form.
 function ControllerList() {
   const [controllers, setControllers] = useState([])
@@ -213,11 +213,10 @@ function ControllerList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Machine Catalog</div>
-          <h1>Controllers</h1>
-          <p className="ts-page-subtitle">CNC controllers of each brand, offered in the machine form.</p>
+          <h2 className="ts-section-title">Controllers</h2>
+          <p className="ts-note mb-0">CNC controllers of each brand, offered in the machine form.</p>
         </div>
         <div className="ts-page-actions">
           <Button onClick={openAdd} disabled={loading || Boolean(error) || !canAdd}>
@@ -225,7 +224,7 @@ function ControllerList() {
             Add Controller
           </Button>
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

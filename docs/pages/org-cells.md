@@ -2,7 +2,7 @@
 
 - **Route:** `/organization/cells` · **Component:** [CellList.jsx](../../src/pages/Organization/Cells/CellList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 7: cells of a line.
-- **Navigation:** Lines → Cells → Supervisors
+- **Navigation:** Sidebar › Masters › Organization → **Cell** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
 ## On page load
 

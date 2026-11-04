@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/licence-keys` · **Component:** [LicenceKeySetup.jsx](../../src/pages/LicenceKeys/LicenceKeySetup.jsx) · **Auth:** protected (superadmin, customer, admin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Licence keys of a company: the superadmin generates, edits and deletes; customers and admins read theirs.
-- **Navigation:** Sidebar › Masters → Licence Keys
+- **Navigation:** Sidebar › System › Account Center → **Licence Key** tab ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
 
 ## On page load
 
@@ -252,4 +252,5 @@ sequenceDiagram
 
 ## Decisions
 
+- [ADR 0011: tabbed page](../adr/0011-business-setup-tabbed-page.md), [ADR 0014: renamed Account Center](../adr/0014-account-center.md)
 - [Client ADR index](../adr/README.md)

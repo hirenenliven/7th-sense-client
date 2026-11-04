@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/models` · **Component:** [ModelList.jsx](../../src/pages/Models/ModelList.jsx) · **Auth:** protected (superadmin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Machine catalog: machine models of a controller (superadmin).
-- **Navigation:** Controllers → Models
+- **Navigation:** Sidebar › System › Account Center → **Machine Catalog** tab → **Models** pill ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
 
 ## On page load
 
@@ -191,4 +191,5 @@ sequenceDiagram
 
 ## Decisions
 
+- [ADR 0011: tabbed page](../adr/0011-business-setup-tabbed-page.md), [ADR 0014: renamed Account Center](../adr/0014-account-center.md)
 - [Client ADR index](../adr/README.md)

@@ -35,4 +35,8 @@ export const isPathActive = (path, pathname) =>
   Boolean(matchPath({ path, end: true }, pathname))
 
 export const hasActiveChild = (item, pathname) =>
-  Boolean(item.children?.some((child) => isPathActive(child.path, pathname)))
+  Boolean(
+    item.children?.some(
+      (child) => isPathActive(child.path, pathname) || child.activePaths?.some((path) => isPathActive(path, pathname)),
+    ),
+  )

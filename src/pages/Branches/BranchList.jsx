@@ -215,11 +215,10 @@ function BranchList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Branches</div>
-          <h1>Manage Branch</h1>
-          <p className="ts-page-subtitle">All branches, their tax details and owning customers.</p>
+          <h2 className="ts-section-title">Branches</h2>
+          <p className="ts-note mb-0">All branches, their tax details and owning customers.</p>
         </div>
         {canManage && (
           <div className="ts-page-actions">
@@ -229,7 +228,7 @@ function BranchList() {
             </Button>
           </div>
         )}
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

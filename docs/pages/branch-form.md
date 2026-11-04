@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/branches/add` · `/masters/branches/:id/edit` · **Component:** [AddBranch.jsx](../../src/pages/Branches/AddBranch.jsx) · **Auth:** protected (superadmin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Add or edit a branch (superadmin).
-- **Navigation:** Branches → form → back to Branches
+- **Navigation:** Organization › Branch tab → form (own page, no tabs) → back to the Branch tab
 
 ## On page load
 

@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/customers` · `/masters/users` (kind `user`) · **Component:** [CustomerList.jsx](../../src/pages/Customers/CustomerList.jsx) · **Auth:** protected (superadmin; superadmin, customer, admin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Lists customers (superadmin) or the users of a company (managers); search, open, edit or delete one.
-- **Navigation:** Sidebar › Masters → list → Add / View / Edit
+- **Navigation:** customers: Sidebar › System › Account Center → **Customer** tab ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route) → Add / View / Edit; users: Sidebar › Masters › Users → list → Add / View / Edit
 
 ## On page load
 
@@ -190,4 +190,5 @@ sequenceDiagram
 
 ## Decisions
 
+- [ADR 0011: tabbed page](../adr/0011-business-setup-tabbed-page.md), [ADR 0014: renamed Account Center](../adr/0014-account-center.md)
 - [Client ADR index](../adr/README.md)

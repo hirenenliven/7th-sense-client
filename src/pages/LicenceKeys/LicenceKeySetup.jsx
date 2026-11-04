@@ -27,7 +27,7 @@ const STATUS_FILTERS = [
 const matchesSearch = (licenceKey, term) =>
   [licenceKey.licenceKey, licenceKey.customerName].some((value) => String(value ?? '').toLowerCase().includes(term))
 
-// Masters › Licence Keys: the Generate Licence Key card (superadmin) above the list of saved keys.
+// Account Center › Licence Key: the Generate Licence Key card (superadmin) above the list of saved keys.
 // The superadmin generates keys for a customer, edits (customer, status) and deletes them and sees
 // every customer's (filter by customer); a customer and its admins read their company's.
 function LicenceKeySetup() {
@@ -248,15 +248,14 @@ function LicenceKeySetup() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters</div>
-          <h1>Licence Keys</h1>
-          <p className="ts-page-subtitle">
+          <h2 className="ts-section-title">Licence Keys</h2>
+          <p className="ts-note mb-0">
             {isSuperadmin ? 'Generate licence keys for a customer and manage every customer’s keys.' : 'Your company’s licence keys.'}
           </p>
         </div>
-      </header>
+      </div>
 
       {isSuperadmin && <LicenceKeyGenerator customers={customers} onSaved={handleCreated} />}
 

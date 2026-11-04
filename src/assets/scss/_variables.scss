@@ -95,6 +95,18 @@ $ts-shift-breaks-visible: 4;
 $ts-status-dot-size: ts-rem(7);
 $ts-status-halo: ts-rem(3);
 $ts-status-ring: ts-rem(1.5);
+// Monitoring › Machines card (MonitorMachineCard): Active strip, picture column, name, mode bar
+$ts-monitor-strip-width: ts-rem(26);
+$ts-monitor-strip-bar-height: ts-rem(24);
+$ts-monitor-strip-bar-width: ts-rem(6);
+$ts-monitor-media-width: ts-rem(150);
+$ts-monitor-picture-height: ts-rem(96);
+$ts-monitor-offline-dot: ts-rem(9);
+$ts-monitor-name-size: ts-rem(26);
+$ts-machine-mode-bar-width: ts-rem(24);
+$ts-machine-mode-bar-height: ts-rem(6);
+// User Guide: setup step number
+$ts-guide-step-size: ts-rem(26);
 $ts-num-lg: ts-rem(40);
 $ts-num-xl: ts-rem(52);
 
@@ -193,6 +205,9 @@ $ts-pager-size:      ts-rem(30);  // square page button
 $ts-sort-icon-size:  ts-rem(11);  // sort arrow in a sortable column header
 $ts-table-edge-x:    ts-rem(16);  // first / last cell padding inside a table panel
 $ts-table-band:      mix($ts-panel-2, $ts-panel, 55%); // table head + footer band
+// Rule between a list (table rows / card grid) and its pagination footer: a step stronger than
+// $ts-line so it reads as the end of the list (derived, so light theme follows its own tokens)
+$ts-table-footer-rule: mix($ts-ink-3, $ts-line, 40%);
 // List table panel (with pagination): its maximum height — the screen less the top bar, page header and
 // toolbar above it — kept between a floor (short screens / phones) and a ceiling (tall screens)
 $ts-table-panel-height: clamp(#{ts-rem(360)}, calc(100dvh - #{ts-rem(290)}), #{ts-rem(1100)});

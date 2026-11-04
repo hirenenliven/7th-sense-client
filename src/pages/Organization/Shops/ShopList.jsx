@@ -225,11 +225,10 @@ function ShopList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Shops</div>
-          <h1>Shops</h1>
-          <p className="ts-page-subtitle">Your shops and the location each belongs to.</p>
+          <h2 className="ts-section-title">Shops</h2>
+          <p className="ts-note mb-0">Your shops and the location each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function ShopList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>

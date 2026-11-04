@@ -1,15 +1,13 @@
-import { memo } from 'react'
 import { Badge } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import IconAction from '@/components/common/IconAction'
 import StatusBadge from '@/components/common/StatusBadge'
-import { ACTION_ICONS } from '@/constants/icons'
-import { MACHINE_STATUS } from '@/constants/machines'
+import { MACHINE_STATUS, modeTypeOf } from '@/constants/machines'
 import { formatDate } from '@/utils/helpers'
+import MachineMode from './MachineMode'
 
-// showCustomer (superadmin): the customer column. Health and Productivity are open to everyone; canEdit (managers) /
-// canDelete (superadmin) add the Edit / Delete actions.
-function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onProductivity, onEdit, onDelete }) {
+// showCustomer (superadmin): the customer column. showMode: the mode it is in now. `actions`: the page's buttons for this machine (All
+// Machines: Edit / Delete; Monitoring: Productivity / Health); none = no Actions cell.
+function MachineRow({ machine, showCustomer, showMode = false, actions }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -27,6 +25,11 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onPro
       </td>
       <td className="text-body-secondary">{machine.lineName || '—'}</td>
       <td className="text-body-secondary text-nowrap">{machine.installationDate ? formatDate(machine.installationDate) : '—'}</td>
+      {showMode && (
+        <td className="text-nowrap">
+          {modeTypeOf(machine.modeId) ? <MachineMode modeId={machine.modeId} /> : <span className="text-body-secondary">—</span>}
+        </td>
+      )}
       <td>
         <Badge bg="" className={machine.onlineStatus ? 'badge-soft-success' : 'badge-outline-muted'}>
           {machine.onlineStatus ? 'Online' : 'Offline'}
@@ -35,20 +38,11 @@ function MachineRow({ machine, showCustomer, canEdit, canDelete, onHealth, onPro
       <td>
         <StatusBadge active={isActive} />
       </td>
-      <td className="border-start">
-        <div className="d-flex gap-1">
-          <IconAction icon={ACTION_ICONS.health} label={`${machine.name} health`} onClick={() => onHealth(machine)} />
-          <IconAction
-            icon={ACTION_ICONS.productivity}
-            label={`${machine.name} productivity`}
-            onClick={() => onProductivity(machine)}
-          />
-          {canEdit && <IconAction icon={ACTION_ICONS.edit} label={`Edit ${machine.name}`} onClick={() => onEdit(machine)} />}
-          {canEdit && canDelete && (
-            <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => onDelete(machine)} />
-          )}
-        </div>
-      </td>
+      {actions && (
+        <td className="border-start">
+          <div className="d-flex gap-1">{actions}</div>
+        </td>
+      )}
     </tr>
   )
 }
@@ -66,14 +60,11 @@ MachineRow.propTypes = {
     installationDate: PropTypes.string,
     onlineStatus: PropTypes.bool,
     status: PropTypes.string,
+    modeId: PropTypes.number,
   }).isRequired,
   showCustomer: PropTypes.bool.isRequired,
-  canEdit: PropTypes.bool.isRequired,
-  canDelete: PropTypes.bool.isRequired,
-  onHealth: PropTypes.func.isRequired,
-  onProductivity: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  showMode: PropTypes.bool,
+  actions: PropTypes.node,
 }
 
-export default memo(MachineRow)
+export default MachineRow

@@ -1,9 +1,13 @@
-import { SUPERADMIN_ONLY, MANAGERS } from './app'
+import { MANAGERS } from './app'
 import { ROUTES } from './routes'
+import { ORGANIZATION_PATHS } from './organization'
+import { ACCOUNT_CENTER_PATHS } from './accountCenter'
+import { MONITORING_PATHS } from './monitoring'
 
 // Sidebar menu. An item has either a `path` (link) or `children` (submenu).
 // `icon` is a Bootstrap Icons class: https://icons.getbootstrap.com
 // `roles` (optional, also on children): only these roles see the item; children inherit it.
+// `activePaths` (optional, links only): other routes that also mark the link active.
 export const NAV_SECTIONS = [
   {
     key: 'main',
@@ -20,9 +24,8 @@ export const NAV_SECTIONS = [
         icon: 'bi-cpu',
         children: [
           { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
-          { key: 'machine-health', label: 'Machine Health', path: ROUTES.MACHINE_HEALTH },
-          { key: 'machine-productivity', label: 'Productivity', path: ROUTES.MACHINE_PRODUCTIVITY },
-          { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
+          { key: 'monitoring', label: 'Monitoring', path: ROUTES.MONITORING, activePaths: MONITORING_PATHS },
+          // { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
         ],
       },
       {
@@ -31,8 +34,7 @@ export const NAV_SECTIONS = [
         icon: 'bi-gear-wide-connected',
         children: [
           { key: 'production-schedule', label: 'Schedule', path: ROUTES.PRODUCTION_SCHEDULE },
-          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS },
-          { key: 'production-monitor', label: 'Live Monitor', path: ROUTES.PRODUCTION_MONITOR },
+          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS }
         ],
       },
       {
@@ -60,44 +62,14 @@ export const NAV_SECTIONS = [
     key: 'masters',
     title: 'Masters',
     items: [
+      // Country … Supervisor and Branches: one tabbed page (constants/organization.js)
       {
-        key: 'customers',
-        label: 'Customers',
-        icon: 'bi-building',
-        roles: SUPERADMIN_ONLY,
-        children: [
-          { key: 'customer-list', label: 'Customer List', path: ROUTES.CUSTOMERS },
-          { key: 'customer-add', label: 'Add Customer', path: ROUTES.CUSTOMER_ADD },
-        ],
-      },
-      {
-        key: 'catalog',
-        label: 'Machine Catalog',
-        icon: 'bi-motherboard',
-        roles: SUPERADMIN_ONLY,
-        children: [
-          { key: 'controllers', label: 'Controllers', path: ROUTES.CONTROLLERS },
-          { key: 'models', label: 'Models', path: ROUTES.MODELS },
-        ],
-      },
-      { key: 'countries', label: 'Country', icon: 'bi-globe2', path: ROUTES.ORG_COUNTRIES },
-      { key: 'states', label: 'State', icon: 'bi-map', path: ROUTES.ORG_STATES },
-      { key: 'cities', label: 'City', icon: 'bi-pin-map', path: ROUTES.ORG_CITIES },
-      {
-        key: 'branches',
-        label: 'Branches',
+        key: 'organization',
+        label: 'Organization',
         icon: 'bi-diagram-3',
-        children: [
-          { key: 'branch-list', label: 'Branch List', path: ROUTES.BRANCHES },
-          { key: 'branch-add', label: 'Add Branch', path: ROUTES.BRANCH_ADD, roles: SUPERADMIN_ONLY },
-        ],
+        path: ROUTES.ORG_COUNTRIES,
+        activePaths: ORGANIZATION_PATHS,
       },
-      { key: 'locations', label: 'Location', icon: 'bi-geo-alt', path: ROUTES.ORG_LOCATIONS },
-      { key: 'shops', label: 'Shop', icon: 'bi-shop', path: ROUTES.ORG_SHOPS },
-      { key: 'lines', label: 'Line', icon: 'bi-distribute-horizontal', path: ROUTES.ORG_LINES },
-      { key: 'cells', label: 'Cell', icon: 'bi-grid-3x3-gap', path: ROUTES.ORG_CELLS },
-      { key: 'supervisors', label: 'Supervisor', icon: 'bi-person-badge', path: ROUTES.ORG_SUPERVISORS },
-      { key: 'clientele', label: 'Clientele', icon: 'bi-person-vcard', path: ROUTES.CLIENTELES },
       {
         key: 'parts',
         label: 'Parts',
@@ -126,7 +98,6 @@ export const NAV_SECTIONS = [
           { key: 'idle-reasons', label: 'Idle List', path: ROUTES.IDLE_REASONS },
         ],
       },
-      { key: 'licence-keys', label: 'Licence Keys', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: MANAGERS },
       {
         key: 'users',
         label: 'Users',
@@ -144,10 +115,16 @@ export const NAV_SECTIONS = [
     key: 'system',
     title: 'System',
     items: [
-      { key: 'account', label: 'Account Center', icon: 'bi-shield-lock', path: ROUTES.ACCOUNT },
+      // Customer, Licence Key, Clientele and Machine Catalog: one tabbed page (constants/accountCenter.js)
+      {
+        key: 'account-center',
+        label: 'Account Center',
+        icon: 'bi-buildings',
+        path: ROUTES.ACCOUNT_CENTER,
+        activePaths: ACCOUNT_CENTER_PATHS,
+      },
       { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME },
       { key: 'user-guide', label: 'User Guide', icon: 'bi-book', path: ROUTES.USER_GUIDE },
-      { key: 'about', label: 'About', icon: 'bi-info-circle', path: ROUTES.ABOUT },
     ],
   },
 ]

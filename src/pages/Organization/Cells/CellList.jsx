@@ -225,11 +225,10 @@ function CellList() {
 
   return (
     <>
-      <header className="ts-page-header">
+      <div className="ts-tab-header">
         <div>
-          <div className="ts-eyebrow">Masters · Cells</div>
-          <h1>Cells</h1>
-          <p className="ts-page-subtitle">Your cells and the line each belongs to.</p>
+          <h2 className="ts-section-title">Cells</h2>
+          <p className="ts-note mb-0">Your cells and the line each belongs to.</p>
         </div>
         <div className="ts-page-actions">
           {canEdit && (
@@ -239,7 +238,7 @@ function CellList() {
             </Button>
           )}
         </div>
-      </header>
+      </div>
 
       <Card>
         <Card.Body>{renderBody()}</Card.Body>
