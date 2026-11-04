@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1793690868.5972824,
-    "seen": 1793690936.9787872,
-    "ast_hash": "6fc2dad10c4824ef7c8e0df508105b9f",
+    "mtime": 1793691217.2531345,
+    "seen": 1793691721.9710474,
+    "ast_hash": "86c2e2529f4bfd2e8a56acdb88f55da0",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1530,9 +1530,9 @@
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1793690736.6630056,
-    "seen": 1793690936.9788105,
-    "ast_hash": "a56b05ed9c96bfe4ca26ec11f630e557",
+    "mtime": 1793691217.1746895,
+    "seen": 1793691721.9710758,
+    "ast_hash": "69ec20c8b5cd9f29780a761759168929",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1755,6 +1755,12 @@
     "mtime": 1793690695.1323793,
     "seen": 1793690936.978869,
     "ast_hash": "eac2687aba8a0bc307ba6d5d4688361a",
+    "semantic_hash": ""
+  },
+  "docs/README.md": {
+    "mtime": 1793691215.6024597,
+    "seen": 1793691721.9710543,
+    "ast_hash": "b8c70c1389fb955e70866f23f976b4ae",
     "semantic_hash": ""
   }
 }
