@@ -59,10 +59,11 @@ export const SETUP_STEPS = [
     key: 'catalog',
     title: 'Machine catalog is ready',
     who: 'team',
-    path: ROUTES.CONTROLLERS,
+    path: ROUTES.BRANDS,
     summary: 'Brands, their controllers and the machine models, so your machines can be picked from lists.',
     steps: [
-      'Account Center › Machine Catalog › Controllers: add the controllers of each brand.',
+      'Account Center › Machine Catalog › Brands: add the machine brands.',
+      'Machine Catalog › Controllers: add the controllers of each brand.',
       'Machine Catalog › Models: add the machine models of each controller.',
     ],
     tips: ['If your machine model is missing from Add Machine, ask your account team to add it to the catalog.'],
@@ -194,13 +195,13 @@ export const SETUP_STEPS = [
     title: 'Watch your machines live',
     who: 'everyone',
     path: ROUTES.MONITORING,
-    summary: 'Operations › Monitoring › Machines: every machine with its current mode; open Productivity or Health.',
+    summary: 'Operations › Monitoring: every machine with its current mode; open one for its Productivity and Machine Health tabs.',
     steps: [
       'The list shows each machine’s mode (In Production, Idle, Downtime, Offline …) and refreshes every 30 seconds. A red dot means offline.',
       'Productivity: today’s cycles, OEE and time per mode, the mode timeline (last minutes or a whole day) and the OEE trend.',
       'Machine Health: Machine Time by Day is live; the sensor charts are previews until sensor data is connected.',
     ],
-    tips: ['Use the machine list at the top of Productivity / Health to switch machines without going back.'],
+    tips: ['Use the Machine list button (back arrow) at the top of a machine to pick another machine.'],
   },
 ]
 
@@ -221,7 +222,7 @@ export const SCREENS = [
     area: 'Operations',
     items: [
       { key: 'all-machines', title: 'All Machines', path: ROUTES.MACHINES, who: 'managers', text: 'Machine set-up as a table or cards: add and edit (customer, admin), delete (account team). Live data is under Monitoring.' },
-      { key: 'monitoring', title: 'Monitoring', path: ROUTES.MONITORING, who: 'everyone', text: 'Machines tab with the current mode of each machine, then Productivity and Machine Health of one machine.' },
+      { key: 'monitoring', title: 'Monitoring', path: ROUTES.MONITORING, who: 'everyone', text: 'Machine list with the current mode of each machine; open one for its Productivity and Machine Health tabs, with a back arrow to the list.' },
       { key: 'schedule', title: 'Production › Schedule', path: ROUTES.PRODUCTION_SCHEDULE, who: 'managers', text: 'Production plans per machine and day; open one to edit its jobs.' },
     ],
   },

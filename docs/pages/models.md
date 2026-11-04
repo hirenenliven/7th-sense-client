@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/models` · **Component:** [ModelList.jsx](../../src/pages/Models/ModelList.jsx) · **Auth:** protected (superadmin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Machine catalog: machine models of a controller (superadmin).
-- **Navigation:** Sidebar › System › Account Center → **Machine Catalog** tab → **Models** pill ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
+- **Navigation:** Sidebar › System › Account Center → **Machine Catalog** tab → **Models** tab (second tab row: Brands, Controllers, Models; [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
 
 ## On page load
 

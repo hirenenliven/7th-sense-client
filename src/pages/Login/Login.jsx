@@ -1,7 +1,7 @@
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Button, Form, Spinner } from 'react-bootstrap'
+import { Alert, Button, Form, InputGroup, Spinner } from 'react-bootstrap'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import BrandLogo from '@/components/common/BrandLogo'
 import Loader from '@/components/common/Loader'
@@ -27,6 +27,7 @@ function Login() {
   const { user, isChecking, login } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
 
   // The login screen is always dark, whatever theme the user chose; leaving it shows their theme
   // again. Layout effect: switches before paint, so a light user never sees a light login flash.
@@ -100,15 +101,26 @@ function Login() {
 
             <Form.Group className="mb-3" controlId="password">
               <Form.Label>Password</Form.Label>
-              <Form.Control
-                {...register('password')}
-                type="password"
-                autoComplete="current-password"
-                autoFocus={Boolean(rememberedUsername)}
-                maxLength={72}
-                isInvalid={Boolean(errors.password)}
-              />
-              <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+              {/* The eye button shows / hides the typed password */}
+              <InputGroup hasValidation>
+                <Form.Control
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  autoFocus={Boolean(rememberedUsername)}
+                  maxLength={72}
+                  isInvalid={Boolean(errors.password)}
+                />
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowPassword((show) => !show)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                >
+                  <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
+                </Button>
+                <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+              </InputGroup>
             </Form.Group>
 
             <div className="d-flex align-items-center justify-content-between mb-4">

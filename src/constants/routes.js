@@ -6,11 +6,11 @@ export const ROUTES = {
   MACHINES: '/machines',
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
-  // Operations › Monitoring tabs (constants/monitoring.js): the machine list, then a machine's
-  // Productivity / Health (`?machineId=`). Kept apart from the machine set-up under /machines.
+  // Operations › Monitoring (constants/monitoring.js): the machine list, then one machine's
+  // Productivity / Health tabs. Kept apart from the machine set-up under /machines.
   MONITORING: '/monitoring',
-  MACHINE_PRODUCTIVITY: '/monitoring/productivity',
-  MACHINE_HEALTH: '/monitoring/health',
+  MACHINE_PRODUCTIVITY: '/monitoring/:machineId/productivity',
+  MACHINE_HEALTH: '/monitoring/:machineId/health',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
   PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',
@@ -31,6 +31,7 @@ export const ROUTES = {
   BRANCH_ADD: '/masters/branches/add',
   BRANCH_EDIT: '/masters/branches/:id/edit',
   // Machine catalog (superadmin): Brand → Controller → Model
+  BRANDS: '/masters/brands',
   CONTROLLERS: '/masters/controllers',
   MODELS: '/masters/models',
   CLIENTELES: '/masters/clienteles',

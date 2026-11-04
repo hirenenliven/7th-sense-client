@@ -13,9 +13,9 @@ import useMachines from '@/pages/Machines/useMachines'
 import useMachineView from '@/pages/Machines/useMachineView'
 import MonitorMachineCard from './MonitorMachineCard'
 
-// Operations › Monitoring › Machines (first tab): every machine the user may see with the mode it is
-// in now (reloaded every MONITOR_REFRESH_MS), and only Productivity and Health (each opens that tab
-// on the machine, `?machineId=`). Adding, editing and deleting machines stays on All Machines.
+// Operations › Monitoring (main screen): every machine the user may see with the mode it is in now
+// (reloaded every MONITOR_REFRESH_MS), and only Productivity and Health (each opens that machine's
+// tab, MonitoringMachine). Adding, editing and deleting machines stays on All Machines.
 const renderCard = (machine, showCustomer) => <MonitorMachineCard machine={machine} showCustomer={showCustomer} />
 
 function MonitoringMachines() {
@@ -46,17 +46,18 @@ function MonitoringMachines() {
 
   return (
     <>
-      <div className="ts-tab-header">
+      <header className="ts-page-header">
         <div>
-          <h2 className="ts-section-title">Machines</h2>
-          <p className="ts-note mb-0">
+          <div className="ts-eyebrow">Operations · Monitoring</div>
+          <h1>Monitoring</h1>
+          <p className="ts-page-subtitle">
             {isSuperadmin ? 'Every customer’s machines.' : 'Your machines.'} Open one to see its productivity or health.
           </p>
         </div>
         <div className="ts-page-actions">
           <MachineViewToggle view={view} onChange={changeView} />
         </div>
-      </div>
+      </header>
 
       <Card>
         <Card.Body>

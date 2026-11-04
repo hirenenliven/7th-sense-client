@@ -1,18 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Col, Form, Row } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import ChartCard from '@/components/charts/ChartCard'
 import ChartDateFilter from '@/components/charts/ChartDateFilter'
 import LineTrendChart from '@/components/charts/LineTrendChart'
-import Loader from '@/components/common/Loader'
 import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import { SUPERADMIN_ONLY } from '@/constants/app'
 import { modeTypeOf } from '@/constants/machines'
-import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import useLoad from '@/hooks/useLoad'
-import { getMachines } from '@/services/machineService'
 import { getOee } from '@/services/productivityService'
 import { getShifts } from '@/services/shiftService'
 import { PICKER_LOCALE, parseIsoDate, shiftIsoDate, todayIso } from '@/utils/dateTime'
@@ -48,9 +44,6 @@ const shiftsIn = (picked, options) => picked.filter((id) => options.some((option
 // Text in place of a chart: loading, the load error, or what an empty result means
 const chartMessage = (state, emptyText) => (state.loading ? 'Loading…' : state.error || emptyText)
 
-const machineLabel = (machine, withCustomer) =>
-  withCustomer && machine.customerName ? `${machine.name} · ${machine.customerName}` : machine.name
-
 // A machine pick belongs to the header machine it was made for (`forId`); for another machine it
 // starts again as that machine alone
 const pickedMachineIds = (pick, selectedId) =>
@@ -80,21 +73,15 @@ ProgramSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
 }
 
-// Operations › Monitoring › Productivity: a machine's productivity (`?machineId=`, set by the Monitoring
-// › Machines Productivity link; the first machine otherwise). Today's Cycles, OEE and Machine Modes cards
-// (SummaryCards), the Machine Mode Timeline (ModeTimelineCard; both reload themselves), then the OEE
-// trend (one or more machines of the same customer, over a range of days). Live data from
-// GET /productivity/* (what the CNC collector recorded).
-function Productivity() {
+// Operations › Monitoring › a machine › Productivity tab (MonitoringMachine passes the machine and
+// the machines the user may read). Today's Cycles, OEE and Machine Modes cards (SummaryCards), the
+// Machine Mode Timeline (ModeTimelineCard; both reload themselves), then the OEE trend (one or more
+// machines of the same customer, over a range of days). Live data from GET /productivity/* (what
+// the CNC collector recorded).
+function Productivity({ machine, machines }) {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const machineId = searchParams.get('machineId')
-
-  const [machines, setMachines] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [reloadKey, setReloadKey] = useState(0)
+  const selectedId = machine.id
   const today = todayIso()
 
   // OEE filters
@@ -104,46 +91,23 @@ function Productivity() {
   const [oeeShifts, setOeeShifts] = useState([])
   const [oeeProgram, setOeeProgram] = useState(ALL_PROGRAMS)
 
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError('')
-    getMachines()
-      .then((list) => active && setMachines(list))
-      .catch((err) => active && setError(err.message))
-      .finally(() => active && setLoading(false))
-    return () => {
-      active = false
-    }
-  }, [reloadKey])
-
-  const machine = machines.find((item) => String(item.id) === machineId) ?? machines[0]
-  const selectedId = machine?.id
-
-  // Keep the URL on the machine shown (no id, or one this user cannot see)
-  useEffect(() => {
-    if (selectedId != null && String(selectedId) !== machineId) {
-      setSearchParams({ machineId: String(selectedId) }, { replace: true })
-    }
-  }, [selectedId, machineId, setSearchParams])
-
-  // OEE compares machines of the header machine's customer; a pick starts as that machine. Each
+  // OEE compares machines of the machine's customer; a pick starts as that machine. Each
   // option shows the machine's current mode, so the search finds machines by mode too
   const customerMachineOptions = useMemo(
     () =>
       machines
-        .filter((item) => item.userId === machine?.userId)
+        .filter((item) => item.userId === machine.userId)
         .map((item) => ({ value: String(item.id), label: item.name, hint: modeTypeOf(item.modeId)?.label })),
-    [machines, machine?.userId],
+    [machines, machine.userId],
   )
-  // Shift filters: the header machine's customer's shifts
+  // Shift filters: the machine's customer's shifts
   const shiftsState = useLoad(
     () => getShifts(isSuperadmin ? machine.userId : undefined),
-    machine ? `shifts|${machine.userId}` : null,
+    `shifts|${machine.userId}`,
   )
   const shiftOptions = useMemo(
-    () => (shiftsState.data ?? []).filter((shift) => shift.userId === machine?.userId).map(shiftOption),
-    [shiftsState.data, machine?.userId],
+    () => (shiftsState.data ?? []).filter((shift) => shift.userId === machine.userId).map(shiftOption),
+    [shiftsState.data, machine.userId],
   )
 
   const oeeMachineIds = useMemo(() => pickedMachineIds(oeeMachines, selectedId), [oeeMachines, selectedId])
@@ -161,36 +125,6 @@ function Productivity() {
   const oee = useMemo(() => withDayLabels(oeeState.data?.rows ?? []), [oeeState.data])
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading machines…" />
-
-    if (error) {
-      return (
-        <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
-          <span className="me-auto">
-            <b>Could not load machines.</b> {error}
-          </span>
-          <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
-            <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
-          </Button>
-        </Alert>
-      )
-    }
-
-    if (!machine) {
-      return (
-        <Card>
-          <Card.Body className="ts-empty">
-            <i className="bi bi-graph-up-arrow ts-empty-icon" aria-hidden="true" />
-            <p className="mb-2">No machines to show productivity for.</p>
-            <Button as={Link} to={ROUTES.MACHINES} size="sm" variant="ghost">
-              All Machines
-            </Button>
-          </Card.Body>
-        </Card>
-      )
-    }
-
     return (
       <>
         <Row xs={1} className="g-3">
@@ -276,30 +210,19 @@ function Productivity() {
         <div>
           <h2 className="ts-section-title">Productivity</h2>
           <p className="ts-note mb-0">
-            {machine ? `${machine.name}: today's summary, machine modes and OEE.` : 'Summary, machine modes and OEE of a machine.'}
+            {machine.name}: today&apos;s summary, machine modes and OEE.
           </p>
         </div>
-        {machines.length > 0 && (
-          <div className="ts-page-actions">
-            <Form.Select
-              className="w-auto"
-              value={selectedId ?? ''}
-              onChange={(event) => setSearchParams({ machineId: event.target.value })}
-              aria-label="Machine"
-            >
-              {machines.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {machineLabel(item, isSuperadmin)}
-                </option>
-              ))}
-            </Form.Select>
-          </div>
-        )}
       </div>
 
       {renderBody()}
     </>
   )
+}
+
+Productivity.propTypes = {
+  machine: PropTypes.shape({ id: PropTypes.number.isRequired, name: PropTypes.string, userId: PropTypes.number }).isRequired,
+  machines: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.number.isRequired, userId: PropTypes.number })).isRequired,
 }
 
 export default Productivity

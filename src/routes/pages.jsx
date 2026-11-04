@@ -14,11 +14,8 @@ const BranchList = lazy(() => import('@/pages/Branches/BranchList'))
 const AddBranch = lazy(() => import('@/pages/Branches/AddBranch'))
 const MachineList = lazy(() => import('@/pages/Machines/MachineList'))
 const AddMachine = lazy(() => import('@/pages/Machines/AddMachine'))
-const MachineHealth = lazy(() => import('@/pages/MachineHealth/MachineHealth'))
-const Productivity = lazy(() => import('@/pages/Productivity/Productivity'))
-// Operations › Monitoring: one tabbed page (Machines, Productivity, Machine Health)
+// Operations › Monitoring: one page (machine list, then a machine's Productivity / Machine Health)
 const MonitoringPage = lazy(() => import('@/pages/Monitoring/MonitoringPage'))
-const MonitoringMachines = lazy(() => import('@/pages/Monitoring/MonitoringMachines'))
 const ClienteleList = lazy(() => import('@/pages/Clienteles/ClienteleList'))
 const ShiftSetup = lazy(() => import('@/pages/Shifts/ShiftSetup'))
 const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
@@ -29,6 +26,7 @@ const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ProductionScheduleList = lazy(() => import('@/pages/ProductionSchedules/ProductionScheduleList'))
 const AddProductionSchedule = lazy(() => import('@/pages/ProductionSchedules/AddProductionSchedule'))
+const BrandList = lazy(() => import('@/pages/Brands/BrandList'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
@@ -53,7 +51,7 @@ const OrgSupervisorList = lazy(() => import('@/pages/Organization/Supervisors/Su
 export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
-  { path: ROUTES.THEME, element: <ThemeShowcase /> },
+  { path: ROUTES.THEME, element: <ThemeShowcase />, roles: SUPERADMIN_ONLY },
   // System › Account Center: `/account-center` opens the first tab the role may see (managers and up)
   { path: ROUTES.ACCOUNT_CENTER, element: <AccountCenterPage />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMERS, element: <AccountCenterPage><CustomerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
@@ -71,11 +69,11 @@ export const PAGES = [
   { path: ROUTES.MACHINES, element: <MachineList /> },
   { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
-  // Operations › Monitoring (Machines, Productivity, Machine Health tabs): every user, for the
-  // machines the server returns them
-  { path: ROUTES.MONITORING, element: <MonitoringPage><MonitoringMachines /></MonitoringPage> },
-  { path: ROUTES.MACHINE_PRODUCTIVITY, element: <MonitoringPage><Productivity /></MonitoringPage> },
-  { path: ROUTES.MACHINE_HEALTH, element: <MonitoringPage><MachineHealth /></MonitoringPage> },
+  // Operations › Monitoring: one page (machine list, then a machine's Productivity / Health tabs);
+  // every user, for the machines the server returns them
+  { path: ROUTES.MONITORING, element: <MonitoringPage /> },
+  { path: ROUTES.MACHINE_PRODUCTIVITY, element: <MonitoringPage /> },
+  { path: ROUTES.MACHINE_HEALTH, element: <MonitoringPage /> },
   // Clientele and parts: everyone reads their company's; managers add, edit and delete
   { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
   { path: ROUTES.PARTS, element: <PartList /> },
@@ -96,6 +94,7 @@ export const PAGES = [
   { path: ROUTES.IDLE_REASONS, element: <ReasonList key={REASON_KIND.IDLE} kind={REASON_KIND.IDLE} /> },
   // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
   { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.BRANDS, element: <AccountCenterPage><BrandList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CONTROLLERS, element: <AccountCenterPage><ControllerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <AccountCenterPage><ModelList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },

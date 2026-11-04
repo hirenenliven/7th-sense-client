@@ -198,15 +198,15 @@
     "semantic_hash": ""
   },
   "src/constants/navigation.js": {
-    "mtime": 1793784736.2423978,
-    "seen": 1793785673.4154046,
-    "ast_hash": "83a467462831349c2b3270f0e35f4ef2",
+    "mtime": 1793787520.138243,
+    "seen": 1793788966.064308,
+    "ast_hash": "37a6ea09eed88a4147debabad27944c6",
     "semantic_hash": ""
   },
   "src/constants/routes.js": {
-    "mtime": 1793785549.6564658,
-    "seen": 1793785673.4154084,
-    "ast_hash": "479880bdf36a8c26d4234e33828984e2",
+    "mtime": 1793788936.1504767,
+    "seen": 1793788966.0643115,
+    "ast_hash": "15b16e1587fb11ffcc7d4b734f7fb17e",
     "semantic_hash": ""
   },
   "src/constants/shifts.js": {
@@ -996,9 +996,9 @@
     "semantic_hash": ""
   },
   "src/routes/pages.jsx": {
-    "mtime": 1793783520.1985655,
-    "seen": 1793783598.7542927,
-    "ast_hash": "b392aa994a7f6cfd20bfc69fee6a56c7",
+    "mtime": 1793788943.755814,
+    "seen": 1793788966.0646045,
+    "ast_hash": "f4e1dbb66253215606fde371a0c31296",
     "semantic_hash": ""
   },
   "src/services/apiClient.js": {
@@ -1026,10 +1026,10 @@
     "semantic_hash": "6e7e4f3f6f6d89a06c70650e93123b52"
   },
   "src/services/catalogService.js": {
-    "mtime": 1791950941.9489925,
-    "seen": 1792149093.2481754,
-    "ast_hash": "807e63fd53be27bc30b0790fa7b39b48",
-    "semantic_hash": "807e63fd53be27bc30b0790fa7b39b48"
+    "mtime": 1793788936.149474,
+    "seen": 1793788966.064613,
+    "ast_hash": "f89da4ffc0f9525cfb3c44ab6c256f52",
+    "semantic_hash": ""
   },
   "src/services/clienteleService.js": {
     "mtime": 1791971916.2816782,
@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1793785653.1994097,
-    "seen": 1793785673.4157631,
-    "ast_hash": "4981c33c68e65d324f7e276c9ed2279a",
+    "mtime": 1793789019.1007335,
+    "seen": 1793789049.3935568,
+    "ast_hash": "f001c2c75b69a38f2bd74ef2150c1b6b",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1278,9 +1278,9 @@
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/MachineHealth.jsx": {
-    "mtime": 1793767336.0385218,
-    "seen": 1793767419.1703372,
-    "ast_hash": "62396d150867ba6e1341423c6c62809b",
+    "mtime": 1793787271.2281435,
+    "seen": 1793787456.8029878,
+    "ast_hash": "c3e7f0c8e31d28d89affd16ff554d09a",
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/SensorTrendCard.jsx": {
@@ -1422,9 +1422,9 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/Productivity.jsx": {
-    "mtime": 1793773753.6426747,
-    "seen": 1793773997.7080472,
-    "ast_hash": "bba9b37d6d358c8f2882e09629b8779b",
+    "mtime": 1793787252.8140116,
+    "seen": 1793787456.8031318,
+    "ast_hash": "8f466d5327f3986b8e79f0f141e02154",
     "semantic_hash": ""
   },
   "src/pages/Productivity/productivitySettings.js": {
@@ -1524,15 +1524,15 @@
     "semantic_hash": ""
   },
   "docs/adr/README.md": {
-    "mtime": 1793785653.1474106,
-    "seen": 1793785673.415803,
-    "ast_hash": "4cf4db8faddcb225b4c8c23e9491efde",
+    "mtime": 1793787430.5080783,
+    "seen": 1793787456.8032827,
+    "ast_hash": "20e6ea5502889e91ea389d4deb39d58a",
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1793785653.1474106,
-    "seen": 1793785673.4158046,
-    "ast_hash": "7adb057ab787dfe5966c35811128f6e9",
+    "mtime": 1793789019.0881827,
+    "seen": 1793789049.3936021,
+    "ast_hash": "4cfbdcac09835905e9c28d56f1c55eef",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1578,9 +1578,9 @@
     "semantic_hash": ""
   },
   "docs/pages/controllers.md": {
-    "mtime": 1793768505.0772512,
-    "seen": 1793768539.0144165,
-    "ast_hash": "5ea75ed3a9faf8c046e44a444782c2f9",
+    "mtime": 1793789019.0881827,
+    "seen": 1793789049.3936193,
+    "ast_hash": "9e6e851703e835dad2476e85b1b07881",
     "semantic_hash": ""
   },
   "docs/pages/customer-user-detail.md": {
@@ -1638,9 +1638,9 @@
     "semantic_hash": ""
   },
   "docs/pages/machine-health.md": {
-    "mtime": 1793767378.4661448,
-    "seen": 1793767419.1706195,
-    "ast_hash": "c68be16747778de15d583de341b11652",
+    "mtime": 1793787407.503383,
+    "seen": 1793787456.8033175,
+    "ast_hash": "2cb9a5cb1b4ea604de6d79bff294c0a8",
     "semantic_hash": ""
   },
   "docs/pages/machine-list.md": {
@@ -1650,9 +1650,9 @@
     "semantic_hash": ""
   },
   "docs/pages/models.md": {
-    "mtime": 1793768505.0824113,
-    "seen": 1793768539.014438,
-    "ast_hash": "9f8a640390c0511ee576c58de57b617e",
+    "mtime": 1793789019.0892777,
+    "seen": 1793789049.393665,
+    "ast_hash": "51c63d30866e66f1440455807378d104",
     "semantic_hash": ""
   },
   "docs/pages/not-found.md": {
@@ -1734,9 +1734,9 @@
     "semantic_hash": ""
   },
   "docs/pages/productivity.md": {
-    "mtime": 1793777487.8107889,
-    "seen": 1793782274.799236,
-    "ast_hash": "126e5776907b37fe6cb603882d6ab1dd",
+    "mtime": 1793787407.4589167,
+    "seen": 1793787456.8033488,
+    "ast_hash": "a2edb324df2da916458af50479a317c6",
     "semantic_hash": ""
   },
   "docs/pages/shifts.md": {
@@ -1794,15 +1794,15 @@
     "semantic_hash": ""
   },
   "src/constants/monitoring.js": {
-    "mtime": 1793768047.7713826,
-    "seen": 1793768140.6133683,
-    "ast_hash": "052fe765ae6c83cf2d1f6cedcb392a4f",
+    "mtime": 1793787520.1377337,
+    "seen": 1793788966.0643063,
+    "ast_hash": "9f3be9def6eb50d86ea46aef34aab1d6",
     "semantic_hash": ""
   },
   "src/pages/Monitoring/MonitoringPage.jsx": {
-    "mtime": 1793767326.5021362,
-    "seen": 1793767419.170374,
-    "ast_hash": "18c2b58c2ecd6910ebd086443e866b5b",
+    "mtime": 1793787174.2192874,
+    "seen": 1793787456.8030381,
+    "ast_hash": "79c70ad1f57a9f28ae7ef366d75424ed",
     "semantic_hash": ""
   },
   "docs/adr/0012-monitoring-tabbed-page.md": {
@@ -1836,21 +1836,21 @@
     "semantic_hash": ""
   },
   "src/pages/Monitoring/MonitoringMachines.jsx": {
-    "mtime": 1793769356.4067693,
-    "seen": 1793769438.826526,
-    "ast_hash": "e207a709e17f8e1d5c284cc32e9b7f99",
+    "mtime": 1793787192.4102006,
+    "seen": 1793787456.8030365,
+    "ast_hash": "7b359bca2703577a7038549a42765a23",
     "semantic_hash": ""
   },
   "docs/adr/0013-monitoring-machine-list.md": {
-    "mtime": 1793767403.90182,
-    "seen": 1793767419.1705854,
-    "ast_hash": "6ee8c068962aa897d106a3acdda95dec",
+    "mtime": 1793787430.425289,
+    "seen": 1793787456.8032696,
+    "ast_hash": "57108ebcfc2290bb47d4a4dc7f104c67",
     "semantic_hash": ""
   },
   "docs/pages/monitoring-machines.md": {
-    "mtime": 1793773946.7372372,
-    "seen": 1793773997.7082245,
-    "ast_hash": "a5e77be085591f81f5bf52b82e8257bb",
+    "mtime": 1793787395.5818808,
+    "seen": 1793787456.8033226,
+    "ast_hash": "5e121c1c01338b5b62c5a463df4482cd",
     "semantic_hash": ""
   },
   "src/pages/Machines/MachineMode.jsx": {
@@ -1872,15 +1872,15 @@
     "semantic_hash": ""
   },
   "src/constants/accountCenter.js": {
-    "mtime": 1793783111.1067894,
-    "seen": 1793783200.001108,
-    "ast_hash": "2f70226949dc98933d95b35edf4a882e",
+    "mtime": 1793788936.1746871,
+    "seen": 1793788966.064294,
+    "ast_hash": "6aad7e45dd1eb390028aa8919f5bcef9",
     "semantic_hash": ""
   },
   "src/pages/AccountCenter/AccountCenterPage.jsx": {
-    "mtime": 1793782193.8516378,
-    "seen": 1793782274.798225,
-    "ast_hash": "68cc4a30017159289ecab2a28e88f65a",
+    "mtime": 1793788936.1761875,
+    "seen": 1793788966.0643437,
+    "ast_hash": "f711e257476da879f2788bfe7250447e",
     "semantic_hash": ""
   },
   "docs/adr/0014-account-center.md": {
@@ -1890,9 +1890,9 @@
     "semantic_hash": ""
   },
   "src/pages/UserGuide/userGuideContent.js": {
-    "mtime": 1793783587.1888728,
-    "seen": 1793783598.75428,
-    "ast_hash": "d47b398dfd11466bc0acbfb62d00a243",
+    "mtime": 1793788950.3271594,
+    "seen": 1793788966.0645995,
+    "ast_hash": "b7212eb3bc5f177120e9b913b0c96e5f",
     "semantic_hash": ""
   },
   "docs/adr/0015-clientele-masters-page.md": {
@@ -1923,6 +1923,54 @@
     "mtime": 1793785613.287604,
     "seen": 1793785673.415801,
     "ast_hash": "86581a0c7b37e36beba571a4626a09b4",
+    "semantic_hash": ""
+  },
+  "src/pages/Monitoring/MonitoringMachine.jsx": {
+    "mtime": 1793787174.3169792,
+    "seen": 1793787456.803034,
+    "ast_hash": "adac8d5d24727da174e805933fdec611",
+    "semantic_hash": ""
+  },
+  "docs/adr/0019-monitoring-machine-view.md": {
+    "mtime": 1793787421.7886927,
+    "seen": 1793787456.8032806,
+    "ast_hash": "9b1719ced7911f35da1b39fae4997079",
+    "semantic_hash": ""
+  },
+  "src/pages/Brands/BrandFormModal.jsx": {
+    "mtime": 1793788923.0860581,
+    "seen": 1793788966.0643547,
+    "ast_hash": "7b203cab716d0ef10075c3a83560c99a",
+    "semantic_hash": ""
+  },
+  "src/pages/Brands/BrandList.jsx": {
+    "mtime": 1793788923.3439128,
+    "seen": 1793788966.0643563,
+    "ast_hash": "ad0b9f3cea38a2fc5109ff1de324dd30",
+    "semantic_hash": ""
+  },
+  "src/pages/Brands/BrandRow.jsx": {
+    "mtime": 1793788923.3021328,
+    "seen": 1793788966.064358,
+    "ast_hash": "c983456636385170c270fbee8690ca39",
+    "semantic_hash": ""
+  },
+  "src/pages/Brands/brandForm.js": {
+    "mtime": 1793788922.9882712,
+    "seen": 1793788966.0643594,
+    "ast_hash": "3054e13ce6c6f23c978cc9100618f206",
+    "semantic_hash": ""
+  },
+  "src/pages/Brands/brandHelp.js": {
+    "mtime": 1793788923.0392377,
+    "seen": 1793788966.0643606,
+    "ast_hash": "797d7698061732102585724075200f84",
+    "semantic_hash": ""
+  },
+  "docs/pages/brands.md": {
+    "mtime": 1793789018.2988908,
+    "seen": 1793789049.3936121,
+    "ast_hash": "657487380b321689485582e2635c8ec5",
     "semantic_hash": ""
   }
 }

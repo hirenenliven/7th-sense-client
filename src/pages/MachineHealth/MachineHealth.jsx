@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Alert, Card, Col, Row } from 'react-bootstrap'
+import PropTypes from 'prop-types'
 import AreaGrowthChart from '@/components/charts/AreaGrowthChart'
 import BarLineChart from '@/components/charts/BarLineChart'
 import ChartCard from '@/components/charts/ChartCard'
@@ -11,14 +11,9 @@ import RadarScoreChart from '@/components/charts/RadarScoreChart'
 import Speedometer from '@/components/charts/Speedometer'
 import StackedBarChart from '@/components/charts/StackedBarChart'
 import { STATUS_COLORS } from '@/components/charts/chartTheme'
-import Loader from '@/components/common/Loader'
 import { MACHINE_MODES } from '@/constants/machines'
-import { SUPERADMIN_ONLY } from '@/constants/app'
-import { ROUTES } from '@/constants/routes'
-import useAuth from '@/hooks/useAuth'
 import useLoad from '@/hooks/useLoad'
 import { getMachineTimeByDay } from '@/services/machineHealthService'
-import { getMachines } from '@/services/machineService'
 import { PICKER_LOCALE, parseIsoDate, shiftIsoDate, todayIso } from '@/utils/dateTime'
 import HealthStatusBadge from './HealthStatusBadge'
 import {
@@ -81,48 +76,14 @@ const dayLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month:
 const celsius = (value) => `${formatValue(value, 1)} °C`
 const outOf100 = (value) => `${value} / 100`
 
-const machineLabel = (machine, withCustomer) =>
-  withCustomer && machine.customerName ? `${machine.name} · ${machine.customerName}` : machine.name
-
-// Operations › Monitoring › Machine Health: one machine's sensors (`?machineId=`, set by the Monitoring › Machines
-// Health link; the first machine otherwise). Today's KPI tiles, then charts that each have a date filter (one
-// day or a range). Machine Time by Day is live data; the other readings are SAMPLE data
-// (healthSampleData.js) until the server has a sensor API.
-function MachineHealth() {
-  const { hasRole } = useAuth()
-  const isSuperadmin = hasRole(SUPERADMIN_ONLY)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const machineId = searchParams.get('machineId')
-
-  const [machines, setMachines] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [reloadKey, setReloadKey] = useState(0)
+// Operations › Monitoring › a machine › Machine Health tab (MonitoringMachine passes the machine).
+// Today's KPI tiles, then charts that each have a date filter (one day or a range). Machine Time by
+// Day is live data; the other readings are SAMPLE data (healthSampleData.js) until the server has a
+// sensor API.
+function MachineHealth({ machine }) {
+  const selectedId = machine.id
   const [dates, setDates] = useState(initialDates)
   const today = todayIso()
-
-  useEffect(() => {
-    let active = true
-    setLoading(true)
-    setError('')
-    getMachines()
-      .then((list) => active && setMachines(list))
-      .catch((err) => active && setError(err.message))
-      .finally(() => active && setLoading(false))
-    return () => {
-      active = false
-    }
-  }, [reloadKey])
-
-  const machine = machines.find((item) => String(item.id) === machineId) ?? machines[0]
-  const selectedId = machine?.id
-
-  // Keep the URL on the machine shown (no id, or one this user cannot see)
-  useEffect(() => {
-    if (selectedId != null && String(selectedId) !== machineId) {
-      setSearchParams({ machineId: String(selectedId) }, { replace: true })
-    }
-  }, [selectedId, machineId, setSearchParams])
 
   // Each chart's data for its own date / range
   const load = useMemo(() => (selectedId == null ? 0 : spindleLoad(selectedId, dates.load)), [selectedId, dates.load])
@@ -214,36 +175,6 @@ function MachineHealth() {
   )
 
   const renderBody = () => {
-    if (loading) return <Loader text="Loading machines…" />
-
-    if (error) {
-      return (
-        <Alert variant="danger" className="d-flex flex-wrap align-items-center gap-2 mb-0">
-          <span className="me-auto">
-            <b>Could not load machines.</b> {error}
-          </span>
-          <Button variant="ghost" size="sm" onClick={() => setReloadKey((key) => key + 1)}>
-            <i className="bi bi-arrow-clockwise me-1" aria-hidden="true" />
-            Retry
-          </Button>
-        </Alert>
-      )
-    }
-
-    if (!machine) {
-      return (
-        <Card>
-          <Card.Body className="ts-empty">
-            <i className="bi bi-heart-pulse ts-empty-icon" aria-hidden="true" />
-            <p className="mb-2">No machines to show health for.</p>
-            <Button as={Link} to={ROUTES.MACHINES} size="sm" variant="ghost">
-              All Machines
-            </Button>
-          </Card.Body>
-        </Card>
-      )
-    }
-
     return (
       <>
         <Alert variant="info" className="d-flex align-items-center gap-2">
@@ -408,30 +339,18 @@ function MachineHealth() {
         <div>
           <h2 className="ts-section-title">Machine Health</h2>
           <p className="ts-note mb-0">
-            {machine ? `${machine.name}: sensor readings, limits and trends.` : 'Sensor readings, limits and trends of a machine.'}
+            {machine.name}: sensor readings, limits and trends.
           </p>
         </div>
-        {machines.length > 0 && (
-          <div className="ts-page-actions">
-            <Form.Select
-              className="w-auto"
-              value={selectedId ?? ''}
-              onChange={(event) => setSearchParams({ machineId: event.target.value })}
-              aria-label="Machine"
-            >
-              {machines.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {machineLabel(item, isSuperadmin)}
-                </option>
-              ))}
-            </Form.Select>
-          </div>
-        )}
       </div>
 
       {renderBody()}
     </>
   )
+}
+
+MachineHealth.propTypes = {
+  machine: PropTypes.shape({ id: PropTypes.number.isRequired, name: PropTypes.string }).isRequired,
 }
 
 export default MachineHealth

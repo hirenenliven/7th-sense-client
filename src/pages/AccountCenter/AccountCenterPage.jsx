@@ -44,7 +44,7 @@ function AccountCenterPage({ children }) {
       </Nav>
 
       {subTabs && (
-        <Nav variant="pills" className="mb-4" as="nav" aria-label="Machine catalog">
+        <Nav variant="tabs" className="mb-4" as="nav" aria-label="Machine catalog">
           {subTabs.map((screen) => (
             <Nav.Item key={screen.key}>
               <Nav.Link as={Link} to={screen.path} active={isPathActive(screen.path, pathname)}>

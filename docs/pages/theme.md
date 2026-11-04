@@ -1,8 +1,8 @@
 # Theme showcase
 
-- **Route:** `/theme` · **Component:** [ThemeShowcase.jsx](../../src/pages/ThemeShowcase/ThemeShowcase.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/theme` · **Component:** [ThemeShowcase.jsx](../../src/pages/ThemeShowcase/ThemeShowcase.jsx) · **Auth:** protected (superadmin only, `SUPERADMIN_ONLY`; other roles get Forbidden) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Showcase of the design tokens and components (developer reference).
-- **Navigation:** Sidebar › System → Theme
+- **Navigation:** Sidebar › System → Theme Showcase (shown to the superadmin only)
 
 ## UI states
 

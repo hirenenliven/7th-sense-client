@@ -24,10 +24,11 @@ export const NAV_SECTIONS = [
         icon: 'bi-cpu',
         children: [
           { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
-          { key: 'monitoring', label: 'Monitoring', path: ROUTES.MONITORING, activePaths: MONITORING_PATHS },
           // { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
         ],
       },
+      // Machine list → a machine's Productivity / Health: one page (pages/Monitoring), no submenu
+      { key: 'monitoring', label: 'Monitoring', icon: 'bi-activity', path: ROUTES.MONITORING, activePaths: MONITORING_PATHS },
       {
         key: 'production',
         label: 'Production',
@@ -126,7 +127,8 @@ export const NAV_SECTIONS = [
         roles: SUPERADMIN_ONLY,
         activePaths: ACCOUNT_CENTER_PATHS,
       },
-      { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME },
+      // Developer reference of the design tokens and components: superadmin only
+      { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME, roles: SUPERADMIN_ONLY },
       { key: 'user-guide', label: 'User Guide', icon: 'bi-book', path: ROUTES.USER_GUIDE },
     ],
   },

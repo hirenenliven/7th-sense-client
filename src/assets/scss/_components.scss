@@ -774,6 +774,49 @@ fieldset:disabled .btn {
   &.active { border-color: $ts-orange; }
 }
 
+// Icon toggle inside a field (show / hide password: <InputGroup><Form.Control /><Button variant="ghost">):
+// the button reads as part of the input (same fill and border, no divider or shadow), a muted
+// icon that turns accent on hover and while pressed; the border follows the field's focus / error
+.input-group > .form-control + .btn-ghost {
+  --bs-btn-color: #{$ts-ink-3};
+  --bs-btn-bg: #{$input-bg};
+  --bs-btn-border-color: #{$input-border-color};
+  --bs-btn-hover-color: #{$ts-orange};
+  --bs-btn-hover-bg: #{$input-bg};
+  --bs-btn-hover-border-color: #{$input-border-color};
+  --bs-btn-active-color: #{$ts-orange};
+  --bs-btn-active-bg: #{$input-bg};
+  --bs-btn-active-border-color: #{$input-border-color};
+
+  min-width: $ts-btn-height;
+  padding-inline: $ts-space-3;
+  border-left: 0;
+  box-shadow: none;
+  font-size: $ts-fs-lg;
+  transition: color .15s ease, border-color .15s ease;
+
+  &:hover:not(:disabled, .disabled) { box-shadow: none; }
+
+  &[aria-pressed="true"] { color: $ts-orange; }
+
+  // The input loses its right edge so the two read as one field
+  &:focus-visible {
+    z-index: 5;
+    border-color: $input-focus-border-color;
+    box-shadow: 0 0 0 $input-btn-focus-width $input-btn-focus-color;
+  }
+}
+
+.input-group > .form-control:has(+ .btn-ghost) { border-right: 0; }
+
+.input-group > .form-control:focus + .btn-ghost { border-color: $input-focus-border-color; }
+
+.input-group > .form-control.is-invalid + .btn-ghost { border-color: $form-invalid-border-color; }
+
+@media (prefers-reduced-motion: reduce) {
+  .input-group > .form-control + .btn-ghost { transition: none; }
+}
+
 // Count badge inside a button
 .btn .badge {
   margin-left: $ts-space-1;
@@ -2691,6 +2734,21 @@ $ts-toast-colors: (
     &:focus { border-color: $ts-orange; }
     &.is-invalid { border-color: $ts-red; }
   }
+
+  // Show / hide password: takes the login field's fill and borderless edge
+  .input-group > .form-control + .btn-ghost {
+    --bs-btn-bg: #{$ts-login-field-bg};
+    --bs-btn-hover-bg: #{$ts-login-field-bg};
+    --bs-btn-active-bg: #{$ts-login-field-bg};
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-border-color: transparent;
+
+    padding-inline: $ts-space-4;
+  }
+
+  .input-group > .form-control:focus + .btn-ghost { border-color: $ts-orange; }
+  .input-group > .form-control.is-invalid + .btn-ghost { border-color: $ts-red; }
 
   // Autofill keeps the field colour (Chrome paints its own otherwise)
   .form-control:-webkit-autofill,

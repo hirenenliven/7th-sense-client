@@ -1,8 +1,8 @@
-# Monitoring › Machines
+# Monitoring (machine list)
 
 - **Route:** `/monitoring` · **Component:** [MonitoringMachines.jsx](../../src/pages/Monitoring/MonitoringMachines.jsx) inside [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
-- **Purpose:** The first Monitoring tab. It lists the machines the user may see (table or cards) with the mode each one is in now, and offers only **Productivity** and **Health** for each. Machine set-up (add, edit, delete) is on [All Machines](machine-list.md).
-- **Navigation:** Sidebar › Operations › Monitoring → **Machines** tab → Productivity ([productivity.md](productivity.md)) / Health ([machine-health.md](machine-health.md))
+- **Purpose:** The main Monitoring screen (no tabs). It lists the machines the user may see (table or cards) with the mode each one is in now, and offers only **Productivity** and **Health** for each. Machine set-up (add, edit, delete) is on [All Machines](machine-list.md).
+- **Navigation:** Sidebar › Operations › **Monitoring** (its own item, no submenu) → a machine's Productivity / Health → that machine's view with Productivity ([productivity.md](productivity.md)) and Machine Health ([machine-health.md](machine-health.md)) tabs and a **Machine list** back arrow to return here. Page header "Operations · Monitoring" with the table / cards toggle.
 
 ## On page load
 
@@ -48,7 +48,7 @@ The list is [MachineBrowser.jsx](../../src/pages/Machines/MachineBrowser.jsx), t
 
 ## Open productivity / health
 
-Table: the Productivity and Health icons in the Actions column. Cards: the Productivity and Health buttons in the footer. Each one navigates to `/monitoring/productivity?machineId=<id>` or `/monitoring/health?machineId=<id>` (`machineMonitorPath` in [monitoring.js](../../src/constants/monitoring.js)). That tab then loads the machine as described in its own page doc.
+Table: the Productivity and Health icons in the Actions column. Cards: the Productivity and Health buttons in the footer. Each one navigates to `/monitoring/<id>/productivity` or `/monitoring/<id>/health` (`machineMonitorPath` in [monitoring.js](../../src/constants/monitoring.js)). [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx) sees the `:machineId` and shows [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) instead of this list: the machine header, the back arrow and the tabs, then the tab screen as described in its own page doc.
 
 ## UI states
 
@@ -58,9 +58,9 @@ Table: the Productivity and Health icons in the Actions column. Cards: the Produ
 
 ## Rules & edge cases
 
-- Every role sees this tab, but only for the machines the server returns them. There is no Add, Edit or Delete here.
+- Every role sees this screen, but only for the machines the server returns them. There is no Add, Edit or Delete here.
 - The mode is the `machines.mode_id` the CNC collector last wrote (`GET /machines` returns it as `modeId`). It is as fresh as the last 30-second reload.
-- The Machines tab link drops `?machineId`; the Productivity / Health tab links keep it.
+- The machine view's tabs keep the machine (`/monitoring/<id>/…`); the **Machine list** button goes back to `/monitoring`. A machine the user cannot read shows "Machine not found" with a link back.
 
 ## API calls on this page
 
@@ -79,4 +79,4 @@ Table: the Productivity and Health icons in the Actions column. Cards: the Produ
 
 ## Decisions
 
-- [ADR 0012](../adr/0012-monitoring-tabbed-page.md) (tabbed page), [ADR 0013](../adr/0013-monitoring-machine-list.md) (machine list first; set-up kept on All Machines)
+- [ADR 0019](../adr/0019-monitoring-machine-view.md) (machine list, then the machine's tabs with a back arrow; replaces [ADR 0012](../adr/0012-monitoring-tabbed-page.md) / [0013](../adr/0013-monitoring-machine-list.md); set-up stays on All Machines)

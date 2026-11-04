@@ -80,7 +80,7 @@ Workflow**
 
 ## Account Center (system)
 
-- One page, System › Account Center (`pages/AccountCenter/AccountCenterPage.jsx`, ADR 0011 → 0014; formerly Business Setup): tabs Customer, Licence Key, Machine Catalog (`ACCOUNT_CENTER_TABS` in `constants/accountCenter.js`, filtered by each tab's `roles`; Machine Catalog has Controllers / Models `subTabs` as pills). Same pattern as Organization: each tab keeps its own route, `PAGES` wraps it as `<AccountCenterPage><XList /></AccountCenterPage>`, the screens render a `.ts-tab-header`. Sidebar: one Account Center item in the System section, superadmin only (ADR 0016; every tab is `SUPERADMIN_ONLY`; `ROUTES.ACCOUNT_CENTER` = `/account-center` redirects to the first tab; `activePaths: ACCOUNT_CENTER_PATHS`). Add / Edit / View Customer stay separate pages. The Customer list is tabbed only for customers (`ACCOUNT_PAGES[kind].tabbed`); the Users list keeps its page header.
+- One page, System › Account Center (`pages/AccountCenter/AccountCenterPage.jsx`, ADR 0011 → 0014; formerly Business Setup): tabs Customer, Licence Key, Machine Catalog (`ACCOUNT_CENTER_TABS` in `constants/accountCenter.js`, filtered by each tab's `roles`; Machine Catalog has Brands / Controllers / Models `subTabs`, a second `Nav variant="tabs"` row). Same pattern as Organization: each tab keeps its own route, `PAGES` wraps it as `<AccountCenterPage><XList /></AccountCenterPage>`, the screens render a `.ts-tab-header`. Sidebar: one Account Center item in the System section, superadmin only (ADR 0016; every tab is `SUPERADMIN_ONLY`; `ROUTES.ACCOUNT_CENTER` = `/account-center` redirects to the first tab; `activePaths: ACCOUNT_CENTER_PATHS`). Add / Edit / View Customer stay separate pages. The Customer list is tabbed only for customers (`ACCOUNT_PAGES[kind].tabbed`); the Users list keeps its page header.
 
 ## Customers and users
 
@@ -104,7 +104,7 @@ Workflow**
 
 ## Machine catalog
 
-- Brand → Controller → Model (`services/catalogService.js`). Account Center › Machine Catalog (Controllers, Models) is superadmin-only: `roles: SUPERADMIN_ONLY` on the pages and the tab (server: `superAdminOnly` routes). Every user reads the lists for the machine form, which filters controllers by brand and models by controller.
+- Brand → Controller → Model (`services/catalogService.js`). Account Center › Machine Catalog (Brands `pages/Brands/`, Controllers, Models; opens on Brands) is superadmin-only: `roles: SUPERADMIN_ONLY` on the pages and the tab (server: `superAdminOnly` routes). Every user reads the lists for the machine form, which filters controllers by brand and models by controller.
 
 ## Clientele and parts
 
@@ -140,7 +140,7 @@ Workflow**
 
 ## Productivity and machine health (live data)
 
-- One page, Operations › Monitoring (`pages/Monitoring/MonitoringPage.jsx`, ADR 0012 → 0013): tabs Machines, Productivity, Machine Health (`MONITORING_TABS` in `constants/monitoring.js`; routes `/monitoring`, `/monitoring/productivity`, `/monitoring/health`), same pattern as Organization. The Machines tab (`MonitoringMachines.jsx`) is the machine list with only Productivity / Health actions (`machineMonitorPath`), reloaded every `MONITOR_REFRESH_MS`. Cards are `MonitorMachineCard`: Active strip, `MachineSilhouette` picture + "Machine # id", red dot when offline, name / model / controller, current mode (`MachineMode`: `modeId` → `MACHINE_MODE_TYPES` colour bar + label). The table adds a Mode column (`showMode`); the Productivity / Health tab links keep `?machineId`, and each screen keeps its machine select in its `.ts-tab-header`. Sidebar: one Monitoring item in Operations (opens the Machines tab, `activePaths: MONITORING_PATHS`).
+- One page, Operations › Monitoring (`pages/Monitoring/MonitoringPage.jsx`, ADR 0019; top-level sidebar item in Operations, not under Machines, `activePaths: MONITORING_PATHS`): `/monitoring` is the machine list (`MonitoringMachines.jsx`, page header, only Productivity / Health actions via `machineMonitorPath`, reloaded every `MONITOR_REFRESH_MS`). A picked machine (`/monitoring/:machineId/productivity|health`) shows `MonitoringMachine.jsx`: page header with the machine name + a **Machine list** back-arrow button, then the Productivity / Machine Health tabs (`MONITORING_MACHINE_TABS` in `constants/monitoring.js`; the tab is the route). It loads the machines once (`useMachines`) and passes `machine` (+ `machines` for the OEE picker) to `Productivity` / `MachineHealth`, which are plain components (no machine select, no URL handling); an unknown id shows "Machine not found". Cards are `MonitorMachineCard`: Active strip, `MachineSilhouette` picture + "Machine # id", red dot when offline, name / model / controller, current mode (`MachineMode`: `modeId` → `MACHINE_MODE_TYPES` colour bar + label). The table adds a Mode column (`showMode`), and the search also matches the mode name.
 
 - All Machines (`pages/Machines/MachineList.jsx`) is set-up only: Edit / Delete, no Productivity / Health links. Both lists share `MachineBrowser` (search, customer filter, sort, paging, table / cards; the page passes `rowActions` / `cardActions` / `cardFooter` or `renderCard`), `useMachines({ refreshMs })` and `useMachineView(storageKey)`.
 

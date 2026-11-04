@@ -1,8 +1,8 @@
 # Machine health
 
-- **Route:** `/monitoring/health` · **Component:** [MachineHealth.jsx](../../src/pages/MachineHealth/MachineHealth.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/monitoring/:machineId/health` · **Component:** [MachineHealth.jsx](../../src/pages/MachineHealth/MachineHealth.jsx) inside [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) ([MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Health dashboard of one machine; the Machine Time by Day chart is live from the server (other sensor charts still use sample data).
-- **Navigation:** Sidebar › Operations › Monitoring → [Machines](monitoring-machines.md) tab (Health action) → **Machine Health** tab (?machineId; [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): page header + tabs, this screen is the tab body; the tab is the route and keeps `?machineId`)
+- **Navigation:** Sidebar › Operations › **Monitoring** → [machine list](monitoring-machines.md) → a machine's Health action → **Machine Health** tab (same machine view as [Productivity](productivity.md): machine name header, **Machine list** back arrow, Productivity / Machine Health tabs; no machine select).
 
 ## On page load
 
@@ -11,6 +11,7 @@ sequenceDiagram
   autonumber
   actor User
   participant Page as MachineHealth.jsx
+  participant Shell as MonitoringMachine.jsx
   participant machineHealthService
   participant machineService
   participant API as Go router (/api/v1)
@@ -20,14 +21,8 @@ sequenceDiagram
   participant MachineService
   participant MachineRepository
   participant DB as PostgreSQL
-  User->>Page: opens page
-  Page->>machineHealthService: getMachineTimeByDay()
-  machineHealthService->>API: GET /api/v1/machine-health/machine-time-by-day
-  API->>DashboardHandler: GetMachineTimeByDay()
-  DashboardHandler->>DashboardService: None()
-  DashboardService-->>DashboardHandler: result
-  DashboardHandler-->>Page: 200 JSON envelope
-  Page->>machineService: getMachines()
+  User->>Shell: opens a machine (/monitoring/:machineId/…)
+  Shell->>machineService: getMachines()
   machineService->>API: GET /api/v1/machines
   API->>MachineHandler: GetAll()
   MachineHandler->>MachineService: GetAll()
@@ -35,7 +30,14 @@ sequenceDiagram
   MachineRepository->>DB: user_machine_access, machines, users
   DB-->>MachineRepository: rows
   MachineService-->>MachineHandler: result
-  MachineHandler-->>Page: 200 JSON envelope
+  MachineHandler-->>Shell: 200 JSON envelope
+  Shell->>Page: machine (props)
+  Page->>machineHealthService: getMachineTimeByDay()
+  machineHealthService->>API: GET /api/v1/machine-health/machine-time-by-day
+  API->>DashboardHandler: GetMachineTimeByDay()
+  DashboardHandler->>DashboardService: None()
+  DashboardService-->>DashboardHandler: result
+  DashboardHandler-->>Page: 200 JSON envelope
   Page-->>User: updates the screen
 ```
 
@@ -45,7 +47,7 @@ sequenceDiagram
 2. [machineHealthService.js](../../src/services/machineHealthService.js) → getMachineTimeByDay(): calls `GET /api/v1/machine-health/machine-time-by-day`
 3. [dashboard_routes.go](../../../7th-sense-server/internal/routes/dashboard_routes.go) → `GET /v1/machine-health/machine-time-by-day` → DashboardHandler.GetMachineTimeByDay
 4. [dashboard_handler.go](../../../7th-sense-server/internal/handler/dashboard_handler.go) → GetMachineTimeByDay(): query machineId, from, to; calls the service
-5. [MachineHealth.jsx](../../src/pages/MachineHealth/MachineHealth.jsx) → useEffect(): runs on load `getMachines()`
+5. [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) → [useMachines.js](../../src/pages/Machines/useMachines.js) → useEffect(): runs on load `getMachines()`, finds `:machineId` (else "Machine not found") and passes `machine` to MachineHealth
 6. [machineService.js](../../src/services/machineService.js) → getMachines(): calls `GET /api/v1/machines`
 7. [machine_routes.go](../../../7th-sense-server/internal/routes/machine_routes.go) → `GET /v1/machines` → MachineHandler.GetAll
 8. [machine_handler.go](../../../7th-sense-server/internal/handler/machine_handler.go) → GetAll(): query userId; calls the service
@@ -72,7 +74,7 @@ sequenceDiagram
 
 ## State & storage
 
-- URL param `?machineId=`
+- Route param `:machineId` (read by [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx)); MachineHealth gets the machine as a prop
 - `useAuth()` (logged-in user, roles)
 - `useLoad()` (fetch + optional polling)
 - Local component state (`useState`) for filters, form and modal
@@ -83,5 +85,5 @@ sequenceDiagram
 
 ## Decisions
 
-- [ADR 0012: Monitoring tabbed page](../adr/0012-monitoring-tabbed-page.md)
+- [ADR 0019: Monitoring machine list, then the machine's tabs with a back arrow](../adr/0019-monitoring-machine-view.md) (replaces [ADR 0012](../adr/0012-monitoring-tabbed-page.md) / [0013](../adr/0013-monitoring-machine-list.md))
 - [Client ADR index](../adr/README.md)

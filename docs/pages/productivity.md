@@ -1,8 +1,8 @@
 # Productivity
 
-- **Route:** `/monitoring/productivity` · **Component:** [Productivity.jsx](../../src/pages/Productivity/Productivity.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/monitoring/:machineId/productivity` · **Component:** [Productivity.jsx](../../src/pages/Productivity/Productivity.jsx) inside [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) ([MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Live productivity of one machine: today's Cycles and OEE cards, the Machine Modes card (Today by default, or Yesterday / Last 7 days / Last 30 days / All time), mode Gantt timeline and the OEE trend.
-- **Navigation:** Sidebar › Operations › Monitoring → [Machines](monitoring-machines.md) tab (Productivity action) → **Productivity** tab (?machineId; [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): page header + tabs, this screen is the tab body; the tab is the route and keeps `?machineId`)
+- **Navigation:** Sidebar › Operations › **Monitoring** → [machine list](monitoring-machines.md) → a machine's Productivity action → **Productivity** tab. The machine view has a page header (machine name, "Machine # id · model · customer"), a **Machine list** back-arrow button and the Productivity / Machine Health tabs (the tab is the route; both carry the machine id). There is no machine select: go back to the list to pick another machine.
 
 ## On page load
 
@@ -11,6 +11,7 @@ sequenceDiagram
   autonumber
   actor User
   participant Page as Productivity.jsx
+  participant Shell as MonitoringMachine.jsx
   participant Summary as SummaryCards.jsx
   participant machineService
   participant productivityService
@@ -25,8 +26,8 @@ sequenceDiagram
   participant MachineRepository
   participant ShiftRepository
   participant DB as PostgreSQL
-  User->>Page: opens page
-  Page->>machineService: getMachines()
+  User->>Shell: opens a machine (/monitoring/:machineId/…)
+  Shell->>machineService: getMachines()
   machineService->>API: GET /api/v1/machines
   API->>MachineHandler: GetAll()
   MachineHandler->>MachineService: GetAll()
@@ -34,7 +35,8 @@ sequenceDiagram
   MachineRepository->>DB: user_machine_access, machines, users
   DB-->>MachineRepository: rows
   MachineService-->>MachineHandler: result
-  MachineHandler-->>Page: 200 JSON envelope
+  MachineHandler-->>Shell: 200 JSON envelope
+  Shell->>Page: machine, machines (props)
   Summary->>productivityService: getFinishCycles() + getOee() (today) + getModeTotals() (Today)
   productivityService->>API: GET /api/v1/productivity/finish-cycles, /oee, /mode-totals
   API->>DashboardHandler: GetFinishCycles() / GetOEE() / GetModeTotals()
@@ -67,7 +69,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [Productivity.jsx](../../src/pages/Productivity/Productivity.jsx) → useEffect(): runs on load `getMachines()`
+1. [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) → [useMachines.js](../../src/pages/Machines/useMachines.js) → useEffect(): runs on load `getMachines()`, finds `:machineId` (else "Machine not found") and passes `machine` + `machines` (OEE machine picker) to Productivity
 2. [machineService.js](../../src/services/machineService.js) → getMachines(): calls `GET /api/v1/machines`
 3. [machine_routes.go](../../../7th-sense-server/internal/routes/machine_routes.go) → `GET /v1/machines` → MachineHandler.GetAll
 4. [machine_handler.go](../../../7th-sense-server/internal/handler/machine_handler.go) → GetAll(): query userId; calls the service
@@ -139,7 +141,7 @@ sequenceDiagram
 
 - Every user may open the page, for the machines the server returns them; a machine they may not read → 404 "Machine not found".
 - Dates: at most 31 days per range; mode timeline `minutes` 1–1440.
-- The OEE trend compares machines of the header machine's customer; shift options are that customer's shifts. The machine picker shows each machine's current mode (`modeId` → `MACHINE_MODE_TYPES`, as of page load) and its search matches the name or the mode (e.g. "Idle").
+- The OEE trend compares machines of the machine's customer; shift options are that customer's shifts. The machine picker shows each machine's current mode (`modeId` → `MACHINE_MODE_TYPES`, as of page load) and its search matches the name or the mode (e.g. "Idle").
 - The Finish Cycle Summary and Finished / Unfinished Cycles charts are hidden (`GET /productivity/cycle-counts` is no longer called; the endpoint and `getCycleCounts()` stay).
 - The Machine Modes card shows only `SUMMARY_MODE_IDS` (no Setup, Rapid Mode, Planned / Leave Planned Downtime); a mode with no time in the period shows `0m 00s`, and its share is of all recorded time in the period (hidden modes included).
 - Machine Modes periods: Today and Yesterday are one day; Last 7 / 30 days end today; All time has no date limit and its subtitle says since when data exists. The period resets to Today when the machine changes.
@@ -163,7 +165,7 @@ sequenceDiagram
 
 ## State & storage
 
-- URL param `?machineId=`
+- Route param `:machineId` (read by [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx)); Productivity gets the machine as a prop
 - `useAuth()` (logged-in user, roles)
 - `useLoad()` (fetch + optional polling)
 - Local component state (`useState`) for filters, form and modal
@@ -174,5 +176,5 @@ sequenceDiagram
 
 ## Decisions
 
-- [ADR 0012: Monitoring tabbed page](../adr/0012-monitoring-tabbed-page.md)
+- [ADR 0019: Monitoring machine list, then the machine's tabs with a back arrow](../adr/0019-monitoring-machine-view.md) (replaces [ADR 0012](../adr/0012-monitoring-tabbed-page.md) / [0013](../adr/0013-monitoring-machine-list.md))
 - [Client ADR index](../adr/README.md)

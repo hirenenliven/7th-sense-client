@@ -1,7 +1,7 @@
 # 0013. Monitoring starts with a machine list; All Machines is set-up only
 
 - **Date:** 2026-11-04
-- **Status:** Accepted (supersedes [0012](0012-monitoring-tabbed-page.md))
+- **Status:** Superseded by [0019](0019-monitoring-machine-view.md) (supersedes [0012](0012-monitoring-tabbed-page.md))
 
 ## Context
 
