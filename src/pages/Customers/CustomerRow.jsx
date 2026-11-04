@@ -7,9 +7,10 @@ import { ROLE_LABELS, USER_STATUS } from '@/constants/app'
 import { ACCOUNT_KIND } from './accountPages'
 import { customerMobile, customerName } from './customerFormat'
 
-// One account of CustomerList. Users show their role; customers their statement and the
-// customer-only actions (settings, log in as).
-function CustomerRow({ kind = ACCOUNT_KIND.CUSTOMER, customer, statusBusy, onToggleStatus, onView, onEdit, onDelete, onUnavailable }) {
+// One account of CustomerList. Users show their role; customers the customer-only settings
+// action, and their View logs in as the customer in a new tab. `customerLabel`: the user's company, shown only in the superadmin's
+// Users list.
+function CustomerRow({ kind = ACCOUNT_KIND.CUSTOMER, customer, customerLabel, statusBusy, onToggleStatus, onView, onEdit, onDelete, onUnavailable }) {
   const isUser = kind === ACCOUNT_KIND.USER
   const name = customerName(customer)
   const isActive = customer.status !== USER_STATUS.INACTIVE
@@ -20,6 +21,7 @@ function CustomerRow({ kind = ACCOUNT_KIND.CUSTOMER, customer, statusBusy, onTog
       <td>{customer.username}</td>
       <td className="fw-semibold">{name}</td>
       {isUser && <td>{ROLE_LABELS[customer.role] ?? customer.role}</td>}
+      {customerLabel !== undefined && <td>{customerLabel}</td>}
       <td className="text-body-secondary">{customer.email}</td>
       <td className="text-nowrap text-body-secondary">{customerMobile(customer)}</td>
       <td>
@@ -32,21 +34,17 @@ function CustomerRow({ kind = ACCOUNT_KIND.CUSTOMER, customer, statusBusy, onTog
           aria-label={`${name} is ${isActive ? 'active' : 'inactive'}`}
         />
       </td>
-      {!isUser && (
-        <td>
-          <IconAction icon={ACTION_ICONS.statement} label={`Statement of ${name}`} onClick={() => onUnavailable('Statement')} />
-        </td>
-      )}
       <td>
-        <IconAction icon={ACTION_ICONS.view} label={`View ${name}`} onClick={() => onView(customer)} />
+        <IconAction
+          icon={ACTION_ICONS.view}
+          label={isUser ? `View ${name}` : `Log in as ${name} (new tab)`}
+          onClick={() => onView(customer)}
+        />
       </td>
       <td className="border-start">
         <div className="d-flex gap-1">
           {!isUser && (
-            <>
-              <IconAction icon={ACTION_ICONS.settings} label={`Settings for ${name}`} onClick={() => onUnavailable('Customer settings')} />
-              <IconAction icon={ACTION_ICONS.loginAs} label={`Log in as ${name}`} onClick={() => onUnavailable('Log in as customer')} />
-            </>
+            <IconAction icon={ACTION_ICONS.settings} label={`Settings for ${name}`} onClick={() => onUnavailable('Customer settings')} />
           )}
           <IconAction icon={ACTION_ICONS.edit} label={`Edit ${name}`} onClick={() => onEdit(customer)} />
           <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${name}`} onClick={() => onDelete(customer)} />
@@ -65,6 +63,7 @@ CustomerRow.propTypes = {
     email: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
+  customerLabel: PropTypes.string,
   statusBusy: PropTypes.bool.isRequired,
   onToggleStatus: PropTypes.func.isRequired,
   onView: PropTypes.func.isRequired,

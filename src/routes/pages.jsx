@@ -32,7 +32,7 @@ const AddProductionSchedule = lazy(() => import('@/pages/ProductionSchedules/Add
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
-// System › Account Center: one tabbed page (Customer, Licence Key, Clientele, Machine Catalog)
+// System › Account Center: one tabbed page (Customer, Licence Key, Machine Catalog)
 const AccountCenterPage = lazy(() => import('@/pages/AccountCenter/AccountCenterPage'))
 // Masters › Country … Supervisor (Org prefix keeps them apart from Masters › Branches)
 // Masters › Organization: one tabbed page; each tab is its own route and lazily loaded list
@@ -54,8 +54,8 @@ export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase /> },
-  // System › Account Center: `/account-center` opens the first tab the role may see
-  { path: ROUTES.ACCOUNT_CENTER, element: <AccountCenterPage /> },
+  // System › Account Center: `/account-center` opens the first tab the role may see (managers and up)
+  { path: ROUTES.ACCOUNT_CENTER, element: <AccountCenterPage />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMERS, element: <AccountCenterPage><CustomerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_ADD, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CUSTOMER_EDIT, element: <AddCustomer />, roles: SUPERADMIN_ONLY },
@@ -77,7 +77,7 @@ export const PAGES = [
   { path: ROUTES.MACHINE_PRODUCTIVITY, element: <MonitoringPage><Productivity /></MonitoringPage> },
   { path: ROUTES.MACHINE_HEALTH, element: <MonitoringPage><MachineHealth /></MonitoringPage> },
   // Clientele and parts: everyone reads their company's; managers add, edit and delete
-  { path: ROUTES.CLIENTELES, element: <AccountCenterPage><ClienteleList /></AccountCenterPage> },
+  { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
   { path: ROUTES.PARTS, element: <PartList /> },
   { path: ROUTES.PART_ADD, element: <AddPart />, roles: MANAGERS },
   { path: ROUTES.PART_EDIT, element: <AddPart />, roles: MANAGERS },
@@ -95,7 +95,7 @@ export const PAGES = [
   { path: ROUTES.DOWNTIME_REASONS, element: <ReasonList key={REASON_KIND.DOWNTIME} kind={REASON_KIND.DOWNTIME} /> },
   { path: ROUTES.IDLE_REASONS, element: <ReasonList key={REASON_KIND.IDLE} kind={REASON_KIND.IDLE} /> },
   // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
-  { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: MANAGERS },
+  { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CONTROLLERS, element: <AccountCenterPage><ControllerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <AccountCenterPage><ModelList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },

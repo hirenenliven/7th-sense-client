@@ -9,7 +9,7 @@ import { ACCOUNT_CENTER_TABS } from '@/constants/accountCenter'
 
 const isTabActive = (tab, pathname) => (tab.subTabs ?? [tab]).some((screen) => isPathActive(screen.path, pathname))
 
-// System › Account Center: Customer, Licence Key, Clientele and Machine Catalog on one page as tabs
+// System › Account Center: Customer, Licence Key and Machine Catalog on one page as tabs
 // (ACCOUNT_CENTER_TABS, only the ones the role may open). The tab is the route; `children` is that
 // tab's screen, which keeps its own data, filters, modals and access rules. Without `children`
 // (`/account-center`) it opens the first tab the user may see.
@@ -28,7 +28,7 @@ function AccountCenterPage({ children }) {
         <div>
           <div className="ts-eyebrow">System · Account Center</div>
           <h1>Account Center</h1>
-          <p className="ts-page-subtitle">Customers, licence keys, clientele and the machine catalog.</p>
+          <p className="ts-page-subtitle">Customers, licence keys and the machine catalog.</p>
         </div>
       </header>
 

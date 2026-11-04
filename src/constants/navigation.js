@@ -1,4 +1,4 @@
-import { MANAGERS } from './app'
+import { MANAGERS, SUPERADMIN_ONLY } from './app'
 import { ROUTES } from './routes'
 import { ORGANIZATION_PATHS } from './organization'
 import { ACCOUNT_CENTER_PATHS } from './accountCenter'
@@ -70,6 +70,8 @@ export const NAV_SECTIONS = [
         path: ROUTES.ORG_COUNTRIES,
         activePaths: ORGANIZATION_PATHS,
       },
+      // The customer's clients (parts are made for a clientele): its own page, no submenu
+      { key: 'clientele', label: 'Clientele', icon: 'bi-person-vcard', path: ROUTES.CLIENTELES },
       {
         key: 'parts',
         label: 'Parts',
@@ -102,11 +104,11 @@ export const NAV_SECTIONS = [
         key: 'users',
         label: 'Users',
         icon: 'bi-people',
+        // Company members: a customer / admin sees the users created for its company, the superadmin every company's
         roles: MANAGERS,
         children: [
           { key: 'user-list', label: 'User List', path: ROUTES.USERS },
-          { key: 'user-add', label: 'Add User', path: ROUTES.USER_ADD },
-          { key: 'roles', label: 'Roles & Permissions', path: ROUTES.ROLES },
+          { key: 'user-add', label: 'Add User', path: ROUTES.USER_ADD }
         ],
       },
     ],
@@ -115,12 +117,13 @@ export const NAV_SECTIONS = [
     key: 'system',
     title: 'System',
     items: [
-      // Customer, Licence Key, Clientele and Machine Catalog: one tabbed page (constants/accountCenter.js)
+      // Customer, Licence Key and Machine Catalog: one tabbed page, superadmin only (constants/accountCenter.js)
       {
         key: 'account-center',
         label: 'Account Center',
         icon: 'bi-buildings',
         path: ROUTES.ACCOUNT_CENTER,
+        roles: SUPERADMIN_ONLY,
         activePaths: ACCOUNT_CENTER_PATHS,
       },
       { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME },

@@ -5,14 +5,18 @@ import PropTypes from 'prop-types'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
-import { PAGE_SIZES, ROLE_LABELS, USER_STATUS } from '@/constants/app'
+import { PAGE_SIZES, ROLE_LABELS, SUPERADMIN_ONLY, USER_STATUS } from '@/constants/app'
 import { deleteUser, getUserById, getUsers, updateUser } from '@/services/customerService'
+import { loginAs } from '@/services/authService'
+import { loginAsUrl } from '@/utils/loginAs'
 import { toast } from '@/utils/toast'
 import { ACCOUNT_KIND, ACCOUNT_PAGES, isAccountOfKind } from './accountPages'
 import CustomerRow from './CustomerRow'
 import { toFormValues, toUserPayload } from './customerForm'
 import { customerMobile, customerName } from './customerFormat'
 import useTableSort from '@/hooks/useTableSort'
+import useAuth from '@/hooks/useAuth'
+import useOrgUser from '@/hooks/useOrgUser'
 import SortableHead from '@/components/common/SortableHead'
 import { newestFirst } from '@/utils/helpers'
 
@@ -24,6 +28,10 @@ const matchesSearch = (customer, term) =>
 function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const account = ACCOUNT_PAGES[kind]
   const navigate = useNavigate()
+  const { hasRole } = useAuth()
+  const { customerLabel } = useOrgUser()
+  // The superadmin's Users list has every company's members: show whose each one is
+  const showCustomer = kind === ACCOUNT_KIND.USER && hasRole(SUPERADMIN_ONLY)
 
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -67,10 +75,10 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     { label: 'User Name', sort: (row) => row.username },
     { label: kind === ACCOUNT_KIND.USER ? 'Name' : 'Customer Name', sort: (row) => customerName(row) },
     ...(kind === ACCOUNT_KIND.USER ? [{ label: 'Role', sort: (row) => ROLE_LABELS[row.role] ?? row.role }] : []),
+    ...(showCustomer ? [{ label: 'Customer', sort: (row) => customerLabel(row.companyId) }] : []),
     { label: 'Email', sort: (row) => row.email },
     { label: 'Mobile Number', sort: (row) => customerMobile(row) },
     { label: 'Status', sort: (row) => row.status },
-    ...(kind === ACCOUNT_KIND.USER ? [] : ['Statement']),
     'View',
     'Actions',
   ]
@@ -110,8 +118,30 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     [kind],
   )
 
+  // Customers: View logs the superadmin in as the customer in a new tab, which opens on the
+  // dashboard with the customer's own session (utils/loginAs.js). The tab is opened before the
+  // request, while the click still counts, so the browser does not block it. Users: the detail page.
   const handleView = useCallback(
-    (customer) => navigate(generatePath(ACCOUNT_PAGES[kind].routes.view, { id: String(customer.id) })),
+    (customer) => {
+      if (kind === ACCOUNT_KIND.CUSTOMER) {
+        const tab = window.open('', '_blank')
+        if (!tab) {
+          toast.error('Allow pop-ups for this site to open the customer in a new tab.', { title: 'Could not open a tab' })
+          return
+        }
+        loginAs(customer.id)
+          .then(({ sessionKey }) => {
+            tab.opener = null
+            tab.location.replace(loginAsUrl(sessionKey))
+          })
+          .catch((err) => {
+            tab.close()
+            toast.error(err.message, { title: 'Could not log in as customer' })
+          })
+        return
+      }
+      navigate(generatePath(ACCOUNT_PAGES[kind].routes.view, { id: String(customer.id) }))
+    },
     [navigate, kind],
   )
 
@@ -197,6 +227,7 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
                     key={customer.id}
                     kind={kind}
                     customer={customer}
+                    customerLabel={showCustomer ? customerLabel(customer.companyId) : undefined}
                     statusBusy={statusBusyIds.has(customer.id)}
                     onToggleStatus={handleToggleStatus}
                     onView={handleView}

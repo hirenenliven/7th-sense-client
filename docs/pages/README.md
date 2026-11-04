@@ -48,6 +48,7 @@ One page, [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): a
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | Add / edit branch | `/masters/branches/add` · `/masters/branches/:id/edit` | Yes | superadmin | [branch-form.md](branch-form.md) |
+| Clientele | `/masters/clienteles` | Yes | every logged-in role | [clientele-list.md](clientele-list.md) |
 | Parts | `/masters/parts` | Yes | every logged-in role | [part-list.md](part-list.md) |
 | Add / edit part | `/masters/parts/add` · `/masters/parts/:id/edit` | Yes | managers | [part-form.md](part-form.md) |
 
@@ -91,16 +92,15 @@ One page, [OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.j
 
 ## System › Account Center
 
-One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): a tab per screen (`constants/accountCenter.js`, only the tabs the role may open), each tab its own route below; Machine Catalog has Controllers / Models pills. Sidebar: one Account Center item (`/account-center` opens the first tab the role may see). See [ADR 0011](../adr/0011-business-setup-tabbed-page.md) and [ADR 0014](../adr/0014-account-center.md) (formerly Business Setup).
+One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): a tab per screen (`constants/accountCenter.js`, only the tabs the role may open), each tab its own route below; Machine Catalog has Controllers / Models pills. Sidebar: one Account Center item, superadmin only ([ADR 0016](../adr/0016-account-center-superadmin-only.md); `/account-center` opens the Customer tab). See [ADR 0011](../adr/0011-business-setup-tabbed-page.md), [ADR 0014](../adr/0014-account-center.md) (formerly Business Setup) and [ADR 0015](../adr/0015-clientele-masters-page.md) (Clientele moved to Masters).
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
-| Account Center (redirect) | `/account-center` | Yes | every logged-in role | this section |
+| Account Center (redirect) | `/account-center` | Yes | superadmin | this section |
 | Customers (tab) | `/masters/customers` | Yes | superadmin | [customer-user-list.md](customer-user-list.md) |
 | Add / edit customer | `/masters/customers/add` · `/masters/customers/:id/edit` | Yes | superadmin | [customer-user-form.md](customer-user-form.md) |
 | Customer detail | `/masters/customers/:id` | Yes | superadmin | [customer-user-detail.md](customer-user-detail.md) |
-| Licence keys (tab) | `/masters/licence-keys` | Yes | managers | [licence-keys.md](licence-keys.md) |
-| Clientele (tab) | `/masters/clienteles` | Yes | every logged-in role | [clientele-list.md](clientele-list.md) |
+| Licence keys (tab) | `/masters/licence-keys` | Yes | superadmin | [licence-keys.md](licence-keys.md) |
 | Controllers (Machine Catalog tab) | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
 | Machine models (Machine Catalog tab) | `/masters/models` | Yes | superadmin | [models.md](models.md) |
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import AuthContext from './AuthContext'
 import { onUnauthorized } from '@/services/apiClient'
 import * as authService from '@/services/authService'
+import { clearLoginAs } from '@/utils/loginAs'
 import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
 
@@ -42,6 +43,8 @@ function AuthProvider({ children }) {
             title: 'Signed out',
           })
         }
+        // A "log in as" tab whose session ended goes back to a normal tab (login screen)
+        clearLoginAs()
         setUser(null)
       }),
     [user],
@@ -54,10 +57,13 @@ function AuthProvider({ children }) {
     return loggedIn
   }, [])
 
+  // In a "log in as" tab this ends only the customer session of the tab (the server clears its
+  // own cookie); the superadmin's session in the other tabs stays.
   const logout = useCallback(async () => {
     try {
       await authService.logout()
     } finally {
+      clearLoginAs()
       setUser(null)
     }
   }, [])

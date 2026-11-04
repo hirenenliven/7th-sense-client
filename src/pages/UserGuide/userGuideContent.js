@@ -48,7 +48,7 @@ export const SETUP_STEPS = [
     title: 'Licence keys are issued',
     who: 'team',
     path: ROUTES.LICENCE_KEYS,
-    summary: 'Keys and their subscription period. You can read your keys under Account Center › Licence Key.',
+    summary: 'Keys and their subscription period, managed by the account team under Account Center › Licence Key.',
     steps: [
       'Account Center › Licence Key › Generate Licence Key: pick the customer and the number of keys (1 to 100), then Generate Key.',
       'Choose a Subscription Duration per key (or "Set all"), then Save. Generated keys are kept only after Save.',
@@ -157,7 +157,7 @@ export const SETUP_STEPS = [
     title: 'Add your clientele',
     who: 'managers',
     path: ROUTES.CLIENTELES,
-    summary: 'Account Center › Clientele: the clients you make parts for.',
+    summary: 'Masters › Clientele: the clients you make parts for.',
     steps: ['Add each client with its client ID, address and contact. The contact number is typed without the country code.'],
     tips: ['A clientele that parts use cannot be deleted or moved to another customer.'],
   },
@@ -229,16 +229,17 @@ export const SCREENS = [
     area: 'Masters',
     items: [
       { key: 'organization', title: 'Organization', path: ROUTES.ORG_COUNTRIES, who: 'managers', text: 'A tab per level: Country, State (account team), City, Branch (account team), Location, Shop, Line, Cell, Supervisor.' },
+      { key: 'clientele', title: 'Clientele', path: ROUTES.CLIENTELES, who: 'managers', text: 'The clients you make parts for, with their address and contact.' },
       { key: 'parts', title: 'Parts', path: ROUTES.PARTS, who: 'managers', text: 'Parts with their clientele, processes, applicable machines and drawings.' },
       { key: 'shift', title: 'Shift', path: ROUTES.SHIFTS, who: 'managers', text: 'Shifts (cards with their breaks), Breaks, and Holiday / Week Off.' },
       { key: 'downtime', title: 'Downtime', path: ROUTES.DOWNTIME_REASONS, who: 'managers', text: 'Downtime List and Idle List: the reasons picked when a machine is down or idle.' },
-      { key: 'users', title: 'Users', path: ROUTES.USERS, who: 'managers', text: 'Your company’s users, their role, branch and machines. Open one to see all details.' },
+      { key: 'users', title: 'Users', path: ROUTES.USERS, who: 'managers', text: 'Your company’s users: the users created for your company, their role, branch and machines (the account team sees every company’s). Open one to see all details.' },
     ],
   },
   {
     area: 'System',
     items: [
-      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'managers', text: 'Customer and Machine Catalog (account team), Licence Key (read for customers and admins), Clientele.' },
+      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'team', text: 'Customer list (the main customer accounts), Licence Key and Machine Catalog.' },
       { key: 'user-guide', title: 'User Guide', path: ROUTES.USER_GUIDE, who: 'everyone', text: 'This page.' },
     ],
   },

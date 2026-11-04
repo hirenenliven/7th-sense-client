@@ -130,6 +130,7 @@ sequenceDiagram
 **Rules & edge cases**
 
 - Any 401 from the API (expired or missing session) fires `onUnauthorized` in [apiClient.js](../../src/services/apiClient.js); [AuthProvider.jsx](../../src/context/AuthProvider.jsx) drops the user and the routes redirect to `/login`.
+- In a "log in as customer" tab ([customer-user-list.md](customer-user-list.md#view-customer-log-in-as)) every call goes to `/api/as/<key>/v1` ([loginAs.js](../../src/utils/loginAs.js)); logout ends only that tab's session, drops its key and shows the login screen. The superadmin's session is untouched.
 - [ProtectedRoute.jsx](../../src/routes/ProtectedRoute.jsx) renders `Forbidden` when the user's role is not in the route's `roles`.
 - The theme is read from the user (`GET /me`) after login and saved with `PUT /me/theme` when changed ([theme.js](../../src/utils/theme.js)); saves are queued so the last choice wins.
 

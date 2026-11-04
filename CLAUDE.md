@@ -80,13 +80,15 @@ Workflow**
 
 ## Account Center (system)
 
-- One page, System › Account Center (`pages/AccountCenter/AccountCenterPage.jsx`, ADR 0011 → 0014; formerly Business Setup): tabs Customer, Licence Key, Clientele, Machine Catalog (`ACCOUNT_CENTER_TABS` in `constants/accountCenter.js`, filtered by each tab's `roles`; Machine Catalog has Controllers / Models `subTabs` as pills). Same pattern as Organization: each tab keeps its own route, `PAGES` wraps it as `<AccountCenterPage><XList /></AccountCenterPage>`, the screens render a `.ts-tab-header`. Sidebar: one Account Center item in the System section (`ROUTES.ACCOUNT_CENTER` = `/account-center` redirects to the first tab the role may see; `activePaths: ACCOUNT_CENTER_PATHS`). Add / Edit / View Customer stay separate pages. The Customer list is tabbed only for customers (`ACCOUNT_PAGES[kind].tabbed`); the Users list keeps its page header.
+- One page, System › Account Center (`pages/AccountCenter/AccountCenterPage.jsx`, ADR 0011 → 0014; formerly Business Setup): tabs Customer, Licence Key, Machine Catalog (`ACCOUNT_CENTER_TABS` in `constants/accountCenter.js`, filtered by each tab's `roles`; Machine Catalog has Controllers / Models `subTabs` as pills). Same pattern as Organization: each tab keeps its own route, `PAGES` wraps it as `<AccountCenterPage><XList /></AccountCenterPage>`, the screens render a `.ts-tab-header`. Sidebar: one Account Center item in the System section, superadmin only (ADR 0016; every tab is `SUPERADMIN_ONLY`; `ROUTES.ACCOUNT_CENTER` = `/account-center` redirects to the first tab; `activePaths: ACCOUNT_CENTER_PATHS`). Add / Edit / View Customer stay separate pages. The Customer list is tabbed only for customers (`ACCOUNT_PAGES[kind].tabbed`); the Users list keeps its page header.
 
 ## Customers and users
 
-- A customer is a company; Masters › Users manages its members (admin, supervisor, operator, QC, shop head). Customers are superadmin-only (`SUPERADMIN_ONLY`); Users are for `USER_MANAGERS` (superadmin, customer, admin) and the server limits each to their own company.
+- A customer is a company; Masters › Users manages its members (admin, supervisor, operator, QC, shop head). Customers are superadmin-only (`SUPERADMIN_ONLY`); Masters › Users is for `MANAGERS` and lists company members only (`GET /users?membersOnly=true`, ADR 0016): the server limits a customer / admin to their own company's users, the superadmin sees every company's (Customer column). The Account Center Customer list sends `?filterRole=customer`.
 
 - Users reuse the Customer pages: `<CustomerList|AddCustomer|CustomerView kind={ACCOUNT_KIND.USER} />` (`pages/Customers/accountPages.js` holds the per-kind wording and routes). The user form adds an Access card: Role (`GET /roles` — only the roles the logged-in user may give), Customer (superadmin only) and Machines (`machineIds`; hidden for admins, who see every company machine).
+
+- Log in as customer (ADR 0018, server ADR 0008): View on an Account Center › Customer row opens an empty tab, calls `POST /auth/login-as` and sends the tab to `/#loginAs=<sessionKey>`; `takeLoginAsFromUrl()` (main.jsx) keeps the key in that tab's sessionStorage and drops the hash, so the tab shows the dashboard as the customer like a normal login (no special route or badge). That tab calls the API under `/api/as/<sessionKey>/v1` (`apiBaseUrl()`, used by the axios interceptor and file links: build API URLs with it, not `env.apiBaseUrl`). Its own HttpOnly cookie means logout in either tab never ends the other.
 
 - Role and company come from the session (`useAuth().user`), never from a request parameter; the server enforces every rule, the UI only hides what a role cannot use.
 
@@ -106,7 +108,7 @@ Workflow**
 
 ## Clientele and parts
 
-- Both belong to a customer (company) and use the Machine page pattern (`pages/Clienteles/`, `pages/Parts/`): everyone reads their company's, `MANAGERS` add / edit / delete; the superadmin picks the customer on the form, others always save to their own company.
+- Both belong to a customer (company) and use the Machine page pattern (`pages/Clienteles/`, `pages/Parts/`). Clientele is its own Masters sidebar item (no submenu, `.ts-page-header`; ADR 0015), not an Account Center tab: everyone reads their company's, `MANAGERS` add / edit / delete; the superadmin picks the customer on the form, others always save to their own company.
 
 - A part needs a clientele and applicable machines of its customer: both lists load after the customer is known (controlled selects) and are cleared when it changes. A clientele that parts use cannot be deleted.
 
@@ -126,9 +128,9 @@ Workflow**
 
 ## Licence keys
 
-- Account Center › Licence Key (`pages/LicenceKeys/`, `services/licenceKeyService.js`, tab and page `roles: MANAGERS`): the superadmin's Generate Licence Key card (`LicenceKeyGenerator`) sits above the list. Generate Key calls `POST /licence-keys/generate {count}` (keys shown, not saved); the keys are a `useFieldArray` (`keys: [{licenceKey, duration}]`) with a Subscription Duration select per key (`LICENCE_DURATIONS` in `licenceKeyForm.js`, mirrors server `dto.LicenceKeyDurations`; default Considerable Trial, "Set all" select); Save posts `{userId, licenceKeys: keys}` (all or none). Changing No. Of Key clears the generated keys. The server stores the end date (`expiresOn`, null = Life Time; `isExpired`).
+- Account Center › Licence Key (`pages/LicenceKeys/`, `services/licenceKeyService.js`, tab and page `roles: SUPERADMIN_ONLY`, ADR 0016): the superadmin's Generate Licence Key card (`LicenceKeyGenerator`) sits above the list. Generate Key calls `POST /licence-keys/generate {count}` (keys shown, not saved); the keys are a `useFieldArray` (`keys: [{licenceKey, duration}]`) with a Subscription Duration select per key (`LICENCE_DURATIONS` in `licenceKeyForm.js`, mirrors server `dto.LicenceKeyDurations`; default Considerable Trial, "Set all" select); Save posts `{userId, licenceKeys: keys}` (all or none). Changing No. Of Key clears the generated keys. The server stores the end date (`expiresOn`, null = Life Time; `isExpired`).
 
-- List: superadmin sees every customer's (Customer column + filter), edits customer / duration / status in `LicenceKeyFormModal` (the key never changes) and deletes; customers and admins only read their company's. Keys look like `K7M2Q-XR9TB-4HWZP-N8CDF` (server-generated, `font-monospace`; Duration / Expires On columns, Expired filter).
+- List: superadmin sees every customer's (Customer column + filter), edits customer / duration / status in `LicenceKeyFormModal` (the key never changes) and deletes; customers and admins don't see the tab (the API still lets them read their company's). Keys look like `K7M2Q-XR9TB-4HWZP-N8CDF` (server-generated, `font-monospace`; Duration / Expires On columns, Expired filter).
 
 ## Production schedule
 

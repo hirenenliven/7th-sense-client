@@ -1,7 +1,7 @@
 # Licence keys
 
-- **Route:** `/masters/licence-keys` · **Component:** [LicenceKeySetup.jsx](../../src/pages/LicenceKeys/LicenceKeySetup.jsx) · **Auth:** protected (superadmin, customer, admin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
-- **Purpose:** Licence keys of a company: the superadmin generates, edits and deletes; customers and admins read theirs.
+- **Route:** `/masters/licence-keys` · **Component:** [LicenceKeySetup.jsx](../../src/pages/LicenceKeys/LicenceKeySetup.jsx) · **Auth:** protected (superadmin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Purpose:** Licence keys of every company: the superadmin generates, edits and deletes them. Customers and admins no longer see this tab ([ADR 0016](../adr/0016-account-center-superadmin-only.md); the API still lets them read theirs).
 - **Navigation:** Sidebar › System › Account Center → **Licence Key** tab ([AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPage.jsx): page header + tabs (only the ones the role may open), this screen is the tab body; the tab is the route)
 
 ## On page load

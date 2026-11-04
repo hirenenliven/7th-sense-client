@@ -1,7 +1,7 @@
 # 0014. Business Setup renamed Account Center; old Account Center item removed
 
 - **Date:** 2026-11-04
-- **Status:** Accepted (supersedes [0011](0011-business-setup-tabbed-page.md))
+- **Status:** Accepted (supersedes [0011](0011-business-setup-tabbed-page.md)); the Clientele tab is superseded by [0015](0015-clientele-masters-page.md); access amended by [0016](0016-account-center-superadmin-only.md)
 
 ## Context
 

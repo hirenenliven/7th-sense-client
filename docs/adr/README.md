@@ -17,6 +17,10 @@ Client (frontend) decisions, one file each (Michael Nygard template). Never edit
 | 0011 | [Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page](0011-business-setup-tabbed-page.md) | Superseded by 0014 | 2026-11-03 |
 | 0012 | [Monitoring: Productivity and Machine Health on one tabbed page](0012-monitoring-tabbed-page.md) | Superseded by 0013 | 2026-11-03 |
 | 0013 | [Monitoring starts with a machine list; All Machines is set-up only](0013-monitoring-machine-list.md) | Accepted | 2026-11-04 |
-| 0014 | [Business Setup renamed Account Center; old Account Center item removed](0014-account-center.md) | Accepted | 2026-11-04 |
+| 0014 | [Business Setup renamed Account Center; old Account Center item removed](0014-account-center.md) | Accepted (Clientele tab superseded by 0015; access amended by 0016) | 2026-11-04 |
+| 0015 | [Clientele is a Masters page, not an Account Center tab](0015-clientele-masters-page.md) | Accepted | 2026-11-04 |
+| 0016 | [Account Center is superadmin only; Users lists company members only](0016-account-center-superadmin-only.md) | Accepted | 2026-11-04 |
+| 0017 | [Log in as customer in a new tab, on the tab's own API path](0017-login-as-customer-tab.md) | Superseded by 0018 | 2026-11-04 |
+| 0018 | [Log in as customer opens the dashboard directly (no /login-as page)](0018-login-as-without-route.md) | Accepted | 2026-11-04 |
 
 New ADR: copy the newest file, take the next number, status "Proposed" until agreed, then "Accepted"; add a row here.

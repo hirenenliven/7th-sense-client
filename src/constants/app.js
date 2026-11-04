@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   REMEMBERED_USERNAME: 'ts.login.username', // set when "Remember" is ticked on the login screen
   MACHINE_VIEW: 'ts.machines.view', // All Machines: 'table' or 'cards'
   MONITORING_VIEW: 'ts.monitoring.view', // Monitoring › Machines: 'table' or 'cards'
+  LOGIN_AS: 'ts.loginAs', // sessionStorage: this tab's "log in as customer" session key (utils/loginAs.js)
 }
 
 // UI themes (users API `theme`, user_profiles.theme). Light is built from theme-light.scss.

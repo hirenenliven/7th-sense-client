@@ -7,7 +7,7 @@ export const FIELD_HELP = {
   },
   clienteleId: {
     title: 'Clientele',
-    content: "The customer's client the part is made for (Account Center › Clientele). Pick the customer first.",
+    content: "The customer's client the part is made for (Masters › Clientele). Pick the customer first.",
   },
   partCount: {
     title: 'Part Count',

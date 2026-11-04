@@ -32,15 +32,14 @@ export const ACCOUNT_PAGES = {
     listTitle: 'Manage Users',
     listSubtitle: 'Users of the company, their roles and the machines they can access.',
     viewSubtitle: 'User account, role, machine access, address and settings.',
-    // The server returns only the company's users to a customer or admin; the superadmin also
-    // gets customers, which the list leaves out (users have a companyId, customers do not).
-    listQuery: {},
+    // GET /users?membersOnly=true: company members only (no customers, no superadmin). The server
+    // also limits a customer or admin to the users of its own company; the superadmin gets every company's.
+    listQuery: { membersOnly: true },
     routes: { list: ROUTES.USERS, add: ROUTES.USER_ADD, edit: ROUTES.USER_EDIT, view: ROUTES.USER_VIEW },
   },
 }
 
-// Accounts of a kind in a GET /users list. Customers are already filtered by the server
-// (listQuery); users need it for the superadmin, who also gets customers and itself.
-// Uses companyId / roleId, which every users response has.
+// Accounts of a kind in a GET /users list. The server already filters both kinds (listQuery);
+// this keeps the list right if a row slips through. Uses companyId / roleId, which every users response has.
 export const isAccountOfKind = (account, kind) =>
   kind === ACCOUNT_KIND.USER ? account.companyId != null : account.roleId === CUSTOMER_ROLE_ID

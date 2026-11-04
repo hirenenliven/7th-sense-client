@@ -64,8 +64,8 @@ export const ROUTES = {
   ORG_SUPERVISORS: '/organization/supervisors',
 
   // System
-  // Account Center: opens the first tab the user may see (Customer, Licence Key, Clientele, Machine
-  // Catalog keep their own routes above, see constants/accountCenter.js)
+  // Account Center: opens the first tab the user may see (Customer, Licence Key, Machine Catalog
+  // keep their own routes above, see constants/accountCenter.js)
   ACCOUNT_CENTER: '/account-center',
   THEME: '/theme',
   ABOUT: '/about',

@@ -1,6 +1,6 @@
 # Customer / user detail
 
-- **Route:** `/masters/customers/:id` · `/masters/users/:id` (kind `user`) · **Component:** [CustomerView.jsx](../../src/pages/Customers/CustomerView.jsx) · **Auth:** protected (superadmin; superadmin, customer, admin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/masters/customers/:id` · `/masters/users/:id` (kind `user`) · **Component:** [CustomerView.jsx](../../src/pages/Customers/CustomerView.jsx) · **Auth:** protected (customers: superadmin; users: superadmin, customer, admin — [ADR 0016](../adr/0016-account-center-superadmin-only.md)) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Read-only view of one customer or user and what belongs to it.
 - **Navigation:** Customer / user list → detail → Edit
 

@@ -1,5 +1,5 @@
 import apiClient, { sharedGet, withQuery } from './apiClient'
-import env from '@/config/env'
+import { apiBaseUrl } from '@/utils/loginAs'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
@@ -42,4 +42,4 @@ export const uploadPartDrawing = async (file) => {
 }
 
 // Opens in a new tab; the session cookie goes with it (same origin)
-export const partDrawingUrl = (partId, processId) => `${env.apiBaseUrl}${PATH}/${partId}/processes/${processId}/drawing`
+export const partDrawingUrl = (partId, processId) => `${apiBaseUrl()}${PATH}/${partId}/processes/${processId}/drawing`

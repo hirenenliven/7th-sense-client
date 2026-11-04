@@ -1,6 +1,6 @@
 # Add / edit customer or user
 
-- **Route:** `/masters/customers/add` · `/masters/customers/:id/edit` · `/masters/users/add` (kind `user`) · `/masters/users/:id/edit` (kind `user`) · **Component:** [AddCustomer.jsx](../../src/pages/Customers/AddCustomer.jsx) · **Auth:** protected (superadmin; superadmin, customer, admin) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/masters/customers/add` · `/masters/customers/:id/edit` · `/masters/users/add` (kind `user`) · `/masters/users/:id/edit` (kind `user`) · **Component:** [AddCustomer.jsx](../../src/pages/Customers/AddCustomer.jsx) · **Auth:** protected (customers: superadmin; users: superadmin, customer, admin — [ADR 0016](../adr/0016-account-center-superadmin-only.md)) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Add or edit a customer (company) or one of its users, with role, branch and assigned machines.
 - **Navigation:** Customer / user list → form → back to the list
 

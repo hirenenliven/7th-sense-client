@@ -1,14 +1,13 @@
-import { SUPERADMIN_ONLY, MANAGERS } from './app'
+import { SUPERADMIN_ONLY } from './app'
 import { ROUTES } from './routes'
 
-// System › Account Center: Customer, Licence Key, Clientele and Machine Catalog on one page, a tab
-// each. Each tab keeps its own route, so links, Back and reloads open that tab.
+// System › Account Center: Customer, Licence Key and Machine Catalog on one page, a tab each
+// (superadmin only; customers manage their own users under Masters › Users). Each tab keeps its own route, so links, Back and reloads open that tab.
 // `roles` (optional): only these roles see the tab (same rule as the tab's route in PAGES).
 // `subTabs` (optional): screens of one tab, shown as pills under the tabs.
 export const ACCOUNT_CENTER_TABS = [
   { key: 'customers', label: 'Customer', icon: 'bi-building', path: ROUTES.CUSTOMERS, roles: SUPERADMIN_ONLY },
-  { key: 'licence-keys', label: 'Licence Key', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: MANAGERS },
-  { key: 'clientele', label: 'Clientele', icon: 'bi-person-vcard', path: ROUTES.CLIENTELES },
+  { key: 'licence-keys', label: 'Licence Key', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: SUPERADMIN_ONLY },
   {
     key: 'catalog',
     label: 'Machine Catalog',

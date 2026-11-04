@@ -180,7 +180,7 @@ $ts-gutter-x-sm:   ts-rem(12); // < md   (phones)
 $ts-gutter-x-md:   ts-rem(16); // md–xl  (tablets, laptops)
 $ts-gutter-x-lg:   ts-rem(20); // ≥ xl   (desktops)
 // Scales with the viewport: ~208px at lg (992), ~224px at 1280, capped at ~228px
-$ts-sidebar-width: clamp(#{ts-rem(208)}, 5vw + #{ts-rem(160)}, #{ts-rem(228)});
+$ts-sidebar-width: clamp(#{ts-rem(192)}, 4vw + #{ts-rem(148)}, #{ts-rem(212)});
 $ts-sidebar-max-width-mobile: 85vw;
 $ts-sidebar-bg:    $ts-appbar;
 $ts-sidebar-transition: .22s ease;

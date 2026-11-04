@@ -1,5 +1,6 @@
 import axios from 'axios'
 import env from '@/config/env'
+import { apiBaseUrl } from '@/utils/loginAs'
 
 const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
@@ -11,6 +12,9 @@ const apiClient = axios.create({
 
 // Authentication: the server sets an HttpOnly session cookie at login, and the browser sends it
 // with every same-origin /api request. No token is stored or attached here.
+// A "log in as customer" tab calls /api/as/<sessionKey>/v1 instead, where its own cookie lives
+// (utils/loginAs.js), so it never uses or ends the superadmin's session.
+apiClient.interceptors.request.use((config) => ({ ...config, baseURL: apiBaseUrl() }))
 
 const GENERIC_ERROR = 'Something went wrong'
 

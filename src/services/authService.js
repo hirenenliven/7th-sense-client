@@ -14,6 +14,10 @@ export const login = async ({ username, password, remember }) =>
 // The logged-in user; rejects with statusCode 401 when there is no valid session.
 export const getSession = async () => unwrap(await apiClient.get(`${AUTH_PATH}/me`))
 
+// Superadmin only: starts a session of the customer for this tab ("log in as", utils/loginAs.js).
+// Returns { sessionKey, user }; the session token itself is set as an HttpOnly cookie.
+export const loginAs = async (customerId) => unwrap(await apiClient.post(`${AUTH_PATH}/login-as`, { customerId }))
+
 export const logout = async () => {
   await apiClient.post(`${AUTH_PATH}/logout`)
 }
