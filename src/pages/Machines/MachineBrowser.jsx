@@ -12,9 +12,19 @@ import { newestFirst } from '@/utils/helpers'
 import MachineCard from './MachineCard'
 import MachineRow from './MachineRow'
 
-const matchesSearch = (machine, term) =>
-  [machine.id, machine.name, machine.serialNumber, machine.customerName, machine.modelName, machine.brandName, machine.controllerName, machine.lineName]
-    .some((value) => String(value ?? '').toLowerCase().includes(term))
+// With the mode shown (`withMode`), its label ("In Production", "Idle"…) is searched too
+const matchesSearch = (machine, term, withMode) =>
+  [
+    machine.id,
+    machine.name,
+    machine.serialNumber,
+    machine.customerName,
+    machine.modelName,
+    machine.brandName,
+    machine.controllerName,
+    machine.lineName,
+    withMode ? modeTypeOf(machine.modeId)?.label : null,
+  ].some((value) => String(value ?? '').toLowerCase().includes(term))
 
 // The machine list shared by All Machines (set-up: Edit / Delete) and Monitoring › Machines
 // (Productivity / Health): search, customer filter (superadmin), sortable table or cards, paging.
@@ -44,9 +54,9 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
     const term = search.trim().toLowerCase()
     return machines.filter(
       (machine) =>
-        (!customerFilter || String(machine.userId) === customerFilter) && (!term || matchesSearch(machine, term)),
+        (!customerFilter || String(machine.userId) === customerFilter) && (!term || matchesSearch(machine, term, showMode)),
     )
-  }, [machines, search, customerFilter])
+  }, [machines, search, customerFilter, showMode])
   // Latest entry first (a row just added shows on top)
   const filtered = useMemo(() => newestFirst(matched), [matched])
 
@@ -93,7 +103,7 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
         <InputGroup className="flex-grow-1 w-auto">
           <Form.Control
             type="search"
-            placeholder="Search ID, machine, serial no., customer, model…"
+            placeholder={showMode ? 'Search ID, machine, mode, customer, model…' : 'Search ID, machine, serial no., customer, model…'}
             value={search}
             onChange={(event) => {
               setSearch(event.target.value)

@@ -139,7 +139,7 @@ sequenceDiagram
 
 - Every user may open the page, for the machines the server returns them; a machine they may not read → 404 "Machine not found".
 - Dates: at most 31 days per range; mode timeline `minutes` 1–1440.
-- The OEE trend compares machines of the header machine's customer; shift options are that customer's shifts.
+- The OEE trend compares machines of the header machine's customer; shift options are that customer's shifts. The machine picker shows each machine's current mode (`modeId` → `MACHINE_MODE_TYPES`, as of page load) and its search matches the name or the mode (e.g. "Idle").
 - The Finish Cycle Summary and Finished / Unfinished Cycles charts are hidden (`GET /productivity/cycle-counts` is no longer called; the endpoint and `getCycleCounts()` stay).
 - The Machine Modes card shows only `SUMMARY_MODE_IDS` (no Setup, Rapid Mode, Planned / Leave Planned Downtime); a mode with no time in the period shows `0m 00s`, and its share is of all recorded time in the period (hidden modes included).
 - Machine Modes periods: Today and Yesterday are one day; Last 7 / 30 days end today; All time has no date limit and its subtitle says since when data exists. The period resets to Today when the machine changes.

@@ -8,6 +8,7 @@ import LineTrendChart from '@/components/charts/LineTrendChart'
 import Loader from '@/components/common/Loader'
 import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import { SUPERADMIN_ONLY } from '@/constants/app'
+import { modeTypeOf } from '@/constants/machines'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import useLoad from '@/hooks/useLoad'
@@ -126,12 +127,13 @@ function Productivity() {
     }
   }, [selectedId, machineId, setSearchParams])
 
-  // OEE compares machines of the header machine's customer; a pick starts as that machine
+  // OEE compares machines of the header machine's customer; a pick starts as that machine. Each
+  // option shows the machine's current mode, so the search finds machines by mode too
   const customerMachineOptions = useMemo(
     () =>
       machines
         .filter((item) => item.userId === machine?.userId)
-        .map((item) => ({ value: String(item.id), label: item.name })),
+        .map((item) => ({ value: String(item.id), label: item.name, hint: modeTypeOf(item.modeId)?.label })),
     [machines, machine?.userId],
   )
   // Shift filters: the header machine's customer's shifts

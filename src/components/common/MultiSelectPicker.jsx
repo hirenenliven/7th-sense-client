@@ -21,7 +21,7 @@ const toGroups = (list) =>
 
 // Searchable multi-select (the MachinePicker dropdown with a search box): pick any number of
 // options at once. Options may carry a `group` (e.g. the country of a state): consecutive options
-// of one group get a heading. value = picked option values, kept in option order. The open list has
+// of one group get a heading; a `hint` (e.g. a machine's mode) is shown after the label and searched. value = picked option values, kept in option order. The open list has
 // a search, an "All" row and a footer with the count and Clear; the picked options are listed below
 // the field as neutral chips (under the same group headings), each removable.
 function MultiSelectPicker({
@@ -68,7 +68,9 @@ function MultiSelectPicker({
   const shown = useMemo(
     () =>
       term
-        ? options.filter((option) => option.label.toLowerCase().includes(term) || option.group?.toLowerCase().includes(term))
+        ? options.filter((option) =>
+            [option.label, option.group, option.hint].some((text) => text?.toLowerCase().includes(term)),
+          )
         : options,
     [options, term],
   )
@@ -176,7 +178,16 @@ function MultiSelectPicker({
                   <Form.Check
                     className={`ts-multi-option${picked.has(option.value) ? ' is-checked' : ''}`}
                     id={`${id}-${index}-${option.label}`}
-                    label={option.label}
+                    label={
+                      option.hint ? (
+                        <>
+                          <span>{option.label}</span>
+                          <span className="ts-multi-menu-meta">{option.hint}</span>
+                        </>
+                      ) : (
+                        option.label
+                      )
+                    }
                     checked={picked.has(option.value)}
                     onChange={() => toggle(option.value)}
                   />
@@ -250,7 +261,13 @@ function MultiSelectPicker({
 MultiSelectPicker.propTypes = {
   id: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(
-    PropTypes.shape({ value: PropTypes.string.isRequired, label: PropTypes.string.isRequired, group: PropTypes.string }),
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      group: PropTypes.string,
+      // Shown muted after the label in the list and matched by the search (e.g. a machine's mode)
+      hint: PropTypes.string,
+    }),
   ).isRequired,
   value: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,

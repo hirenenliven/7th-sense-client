@@ -44,7 +44,7 @@ What each view shows:
 - **Cards** ([MonitorMachineCard.jsx](../../src/pages/Monitoring/MonitorMachineCard.jsx)): an Active / Inactive strip on the left (green / red bar). Next to it, a machine picture with a "Machine # id" tab underneath; machines have no photo, so this is [MachineSilhouette.jsx](../../src/pages/Monitoring/MachineSilhouette.jsx), coloured by the theme. A red dot marks an offline machine (`onlineStatus` false). On the right: the name, model, brand and controller, the customer (superadmin only), and the current mode (`modeId`, shown with [MachineMode.jsx](../../src/pages/Machines/MachineMode.jsx): a bar in the `--ts-mode-*` colour plus the `MACHINE_MODE_TYPES` label, hidden when the mode is unknown). Last come the Health and Productivity links. There are no set-up actions.
 - **Table:** the All Machines columns plus a **Mode** column (sortable by mode name, "—" when unknown) and the Productivity / Health icons.
 
-The list is [MachineBrowser.jsx](../../src/pages/Machines/MachineBrowser.jsx), the same component All Machines uses. It handles search, the customer filter (superadmin only), sorting, paging and the table / card view. All of this runs in the browser; no further API calls.
+The list is [MachineBrowser.jsx](../../src/pages/Machines/MachineBrowser.jsx), the same component All Machines uses. It handles search (here also by the current mode, e.g. "Idle", because `showMode` is on), the customer filter (superadmin only), sorting, paging and the table / card view. All of this runs in the browser; no further API calls.
 
 ## Open productivity / health
 
