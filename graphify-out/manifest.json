@@ -516,9 +516,9 @@
     "semantic_hash": ""
   },
   "src/pages/Home/Home.jsx": {
-    "mtime": 1792563259.9664786,
-    "seen": 1792563274.2792351,
-    "ast_hash": "6f6ddc53f90b3515007799f95ac0c821",
+    "mtime": 1793856947.6609554,
+    "seen": 1793857153.609131,
+    "ast_hash": "ab7627cabf4595cb987879ef14e1f9e6",
     "semantic_hash": ""
   },
   "src/pages/LicenceKeys/LicenceKeyFormModal.jsx": {
@@ -1200,9 +1200,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1793796041.5569174,
-    "seen": 1793852151.0356731,
-    "ast_hash": "5ef3b128fdc27e44b23509a41ed0bc2e",
+    "mtime": 1793857133.433136,
+    "seen": 1793857153.6094184,
+    "ast_hash": "fd171dbef25396b3b791d9384be07b53",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1422,15 +1422,15 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/Productivity.jsx": {
-    "mtime": 1793787252.8140116,
-    "seen": 1793787456.8031318,
-    "ast_hash": "8f466d5327f3986b8e79f0f141e02154",
+    "mtime": 1793855158.3144038,
+    "seen": 1793856921.6305914,
+    "ast_hash": "f89346cb5affde327cab358c43526d5d",
     "semantic_hash": ""
   },
   "src/pages/Productivity/productivitySettings.js": {
-    "mtime": 1793851833.860577,
-    "seen": 1793852151.0355725,
-    "ast_hash": "48775c589d6bd04950757e97784d3559",
+    "mtime": 1793855148.8915904,
+    "seen": 1793856921.630612,
+    "ast_hash": "1b21fe8c160f7070a77b84cccb68cfd8",
     "semantic_hash": ""
   },
   "src/utils/sampleData.js": {
@@ -1464,9 +1464,9 @@
     "semantic_hash": ""
   },
   "src/services/productivityService.js": {
-    "mtime": 1793795924.4400544,
-    "seen": 1793796001.9848175,
-    "ast_hash": "25cc541856971ca6403857cfb9599433",
+    "mtime": 1793856829.0940783,
+    "seen": 1793856921.630672,
+    "ast_hash": "30a6fce3e4b8b0bf4339f8e4ef7be38d",
     "semantic_hash": ""
   },
   "docs/adr/0001-react-vite-spa.md": {
@@ -1524,15 +1524,15 @@
     "semantic_hash": ""
   },
   "docs/adr/README.md": {
-    "mtime": 1793787430.5080783,
-    "seen": 1793787456.8032827,
-    "ast_hash": "20e6ea5502889e91ea389d4deb39d58a",
+    "mtime": 1793857120.4996426,
+    "seen": 1793857153.609462,
+    "ast_hash": "66ffe336cbc4f91e0d5e0758e9c85aa0",
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1793795571.4262109,
-    "seen": 1793796001.984926,
-    "ast_hash": "452d6cbb11f3bf25e432e1fb4c7bd130",
+    "mtime": 1793857120.4975712,
+    "seen": 1793857153.6094635,
+    "ast_hash": "b431e9a29098fc7c5df1b6a5313a5e87",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1614,9 +1614,9 @@
     "semantic_hash": ""
   },
   "docs/pages/home.md": {
-    "mtime": 1793690695.0365293,
-    "seen": 1793690936.9788337,
-    "ast_hash": "bfa01f963dae6e648515ea4583044ec5",
+    "mtime": 1793856947.7399635,
+    "seen": 1793857153.6094894,
+    "ast_hash": "aa5a2ae8fb697b14cc68b466c35ca4b3",
     "semantic_hash": ""
   },
   "docs/pages/licence-keys.md": {
@@ -1734,9 +1734,9 @@
     "semantic_hash": ""
   },
   "docs/pages/productivity.md": {
-    "mtime": 1793787407.4589167,
-    "seen": 1793787456.8033488,
-    "ast_hash": "a2edb324df2da916458af50479a317c6",
+    "mtime": 1793855181.419716,
+    "seen": 1793856921.6308193,
+    "ast_hash": "37fa3ece97177455efa4836c7ec9f337",
     "semantic_hash": ""
   },
   "docs/pages/shifts.md": {
@@ -1764,9 +1764,9 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/SummaryCards.jsx": {
-    "mtime": 1793771846.1596336,
-    "seen": 1793771917.4884279,
-    "ast_hash": "7d39600aafaab271ccfa75f2d36145d5",
+    "mtime": 1793855148.938303,
+    "seen": 1793856921.630593,
+    "ast_hash": "454c33f35ebf86f05cd8402fee4a6a89",
     "semantic_hash": ""
   },
   "src/constants/organization.js": {
@@ -1848,9 +1848,9 @@
     "semantic_hash": ""
   },
   "docs/pages/monitoring-machines.md": {
-    "mtime": 1793851913.0335448,
-    "seen": 1793852151.0357563,
-    "ast_hash": "0e7b5e664a72f668614e1039accf6ea5",
+    "mtime": 1793857120.4986334,
+    "seen": 1793857153.609503,
+    "ast_hash": "211f250b7ebc04800f163930261c49d4",
     "semantic_hash": ""
   },
   "src/pages/Machines/MachineMode.jsx": {
@@ -1992,9 +1992,9 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/VirtualScreen.jsx": {
-    "mtime": 1793795504.5955749,
-    "seen": 1793795543.799642,
-    "ast_hash": "29efaf92c72507bc30f4f39b46121add",
+    "mtime": 1793856946.5608306,
+    "seen": 1793857153.60931,
+    "ast_hash": "671b3180e3478b31970fff43061f2e07",
     "semantic_hash": ""
   },
   "src/pages/Monitoring/MachineMetrics.jsx": {
@@ -2016,15 +2016,63 @@
     "semantic_hash": ""
   },
   "docs/pages/machine-tools-virtual-screen.md": {
-    "mtime": 1793795571.2727313,
-    "seen": 1793796001.9849644,
-    "ast_hash": "2f561ebaf44509f08594f0a1b314747d",
+    "mtime": 1793857120.4969876,
+    "seen": 1793857153.6095,
+    "ast_hash": "44bdd29317d5f4c41ca50d4e7dcad627",
     "semantic_hash": ""
   },
   "src/components/common/TableNoResults.jsx": {
     "mtime": 1793852018.8475337,
     "seen": 1793852151.03525,
     "ast_hash": "62c3f182e759a8ab70aa82b5931ed417",
+    "semantic_hash": ""
+  },
+  "src/pages/Home/HomeCards.jsx": {
+    "mtime": 1793856818.5772948,
+    "seen": 1793856921.630425,
+    "ast_hash": "b5838d010883eabb436c16c4075cee8e",
+    "semantic_hash": ""
+  },
+  "src/pages/Home/HomeLists.jsx": {
+    "mtime": 1793856818.657243,
+    "seen": 1793856921.630427,
+    "ast_hash": "171d5115e9d982bea1b6e7b2e2ca44f4",
+    "semantic_hash": ""
+  },
+  "src/pages/Home/homeSettings.js": {
+    "mtime": 1793856760.1331806,
+    "seen": 1793856921.6304283,
+    "ast_hash": "e0410fa3bf081afc3967dea2bc919f56",
+    "semantic_hash": ""
+  },
+  "src/pages/Productivity/VirtualScreenParts.jsx": {
+    "mtime": 1793856893.0836885,
+    "seen": 1793856921.6306,
+    "ast_hash": "51ce30e87e7fe7d3ee36fd26e7ac6b98",
+    "semantic_hash": ""
+  },
+  "src/pages/Productivity/virtualScreenSettings.js": {
+    "mtime": 1793856946.5613434,
+    "seen": 1793857153.6093156,
+    "ast_hash": "423b14262ca56486f4759c35276b3bb6",
+    "semantic_hash": ""
+  },
+  "src/services/dashboardService.js": {
+    "mtime": 1793856759.9013593,
+    "seen": 1793856921.6306565,
+    "ast_hash": "5d4eb2c28a8e75c1f44b7f17d46e3cc3",
+    "semantic_hash": ""
+  },
+  "docs/adr/0020-virtual-screen-polling.md": {
+    "mtime": 1793857106.4722507,
+    "seen": 1793857153.60946,
+    "ast_hash": "0dbb4abb3a4648eec8adfd5eeac9853a",
+    "semantic_hash": ""
+  },
+  "docs/pages/virtual-screen.md": {
+    "mtime": 1793857106.4156284,
+    "seen": 1793857153.6095338,
+    "ast_hash": "0bfcded56c5683fe646fd1a43dddc149",
     "semantic_hash": ""
   }
 }

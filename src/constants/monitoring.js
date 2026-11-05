@@ -18,5 +18,11 @@ export const MONITORING_PATHS = [ROUTES.MONITORING, ...MONITORING_MACHINE_TABS.m
 // Monitoring › Machines reloads the list this often (current mode, connection)
 export const MONITOR_REFRESH_MS = 30_000
 
+// Monitoring › Machines opened with its search filled in (`?search=`), e.g. a mode name from a Home
+// fleet tile: the list matches it like typed text
+export const MONITORING_SEARCH_PARAM = 'search'
+export const monitoringSearchPath = (text) =>
+  `${ROUTES.MONITORING}?${new URLSearchParams({ [MONITORING_SEARCH_PARAM]: text })}`
+
 // A machine's tab (`path` is one of the MONITORING_MACHINE_TABS paths, e.g. ROUTES.MACHINE_PRODUCTIVITY)
 export const machineMonitorPath = (path, machine) => generatePath(path, { machineId: String(machine.id) })

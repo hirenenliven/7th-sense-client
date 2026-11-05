@@ -4266,3 +4266,202 @@ $ts-toast-colors: (
   font-size: $ts-chart-tick-size;
   color: $ts-ink-3;
 }
+
+// -----------------------------------------------------------------------------
+// Monitoring › Virtual Screen (pages/Productivity/VirtualScreen.jsx, VirtualScreenParts.jsx): the
+// machine's controller screen. Spindle load uses .ts-gauge; overrides are ring dials, axis loads
+// vertical bars, batch / cycle a thick progress bar with tenth ticks.
+// -----------------------------------------------------------------------------
+
+.ts-vs-label {
+  display: block;
+  font-size: ts-rem(11);
+  font-weight: 600;
+  letter-spacing: $ts-ls-wide;
+  text-transform: uppercase;
+  color: $ts-ink-2;
+}
+
+.ts-vs-reading {
+  display: flex;
+  flex-direction: column;
+  gap: ts-rem(4);
+  min-width: 0;
+
+  .ts-number small { margin-left: ts-rem(3); }
+}
+
+.ts-vs-reading-value { color: $ts-ink; }
+
+.ts-vs-dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $ts-space-2;
+  text-align: center;
+}
+
+.ts-vs-dial-face {
+  position: relative;
+  width: 100%;
+  max-width: $ts-vs-dial-size;
+  aspect-ratio: 1;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.ts-vs-dial-track,
+.ts-vs-dial-value {
+  fill: none;
+  stroke-width: $ts-vs-dial-stroke;
+  stroke-linecap: round;
+}
+
+.ts-vs-dial-track { stroke: $ts-panel-2; }
+
+.ts-vs-dial-value { transition: stroke-dasharray $ts-transition; }
+
+.ts-vs-dial-tick {
+  stroke: $ts-ink-2;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ts-vs-dial-readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-vs-dial-scale {
+  font-size: $ts-chart-tick-size;
+  color: $ts-ink-3;
+}
+
+.ts-vs-dial-extra { font-size: $ts-fs-lg; }
+
+.ts-vs-axes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $ts-space-2;
+}
+
+.ts-vs-axes-bars {
+  display: flex;
+  justify-content: center;
+  gap: ts-rem(18);
+}
+
+.ts-vs-axis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ts-rem(6);
+
+  svg {
+    width: $ts-vs-axis-width;
+    height: $ts-vs-axis-height;
+
+    rect { transition: y $ts-transition, height $ts-transition; }
+  }
+}
+
+.ts-vs-axis-track { fill: $ts-panel-2; }
+
+.ts-vs-axis-name {
+  font-weight: 700;
+  color: $ts-ink;
+}
+
+.ts-vs-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: ts-rem(6);
+
+  span {
+    width: $ts-vs-tick-width;
+    height: $ts-vs-tick-height;
+    border-radius: $ts-radius-pill;
+    background: $ts-line;
+  }
+}
+
+.ts-vs-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $ts-space-2 ts-rem(40);
+}
+
+// -----------------------------------------------------------------------------
+// Home dashboard tiles (pages/Home/HomeCards.jsx KpiTile): a quiet panel-coloured icon badge; the
+// tile's tone (`.ts-tone-<name>`, status colours or a machine mode) colours only the icon / dot
+// and the bar, so colour marks meaning, not decoration. Light mode follows its own tokens.
+// -----------------------------------------------------------------------------
+
+$ts-tile-tones: (
+  "good": $ts-good,
+  "warning": $ts-amber,
+  "critical": $ts-red,
+  "info": $ts-blue,
+  "neutral": $ts-ink-2,
+  "mode-1": $ts-mode-setup,
+  "mode-2": $ts-mode-loading,
+  "mode-3": $ts-mode-production,
+  "mode-4": $ts-mode-hold,
+  "mode-5": $ts-mode-idle,
+  "mode-6": $ts-mode-downtime,
+  "mode-7": $ts-mode-planned,
+  "mode-9": $ts-mode-offline,
+  "mode-12": $ts-mode-rapid,
+  "mode-13": $ts-mode-planned,
+);
+
+@each $name, $color in $ts-tile-tones {
+  .ts-tone-#{$name} { --ts-tone: #{$color}; }
+}
+
+.ts-home-tile {
+  .ts-kpi-value { margin-top: $ts-space-3; }
+  .progress-bar { background-color: var(--ts-tone); }
+}
+
+.ts-home-tile-head {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-2;
+  min-width: 0;
+
+  .ts-kpi-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.ts-home-tile-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: $ts-home-tile-icon-size;
+  height: $ts-home-tile-icon-size;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+  background: $ts-panel-2;
+  color: var(--ts-tone);
+  font-size: $ts-home-tile-icon-font;
+
+  .ts-dot {
+    width: $ts-home-tile-dot;
+    height: $ts-home-tile-dot;
+  }
+}

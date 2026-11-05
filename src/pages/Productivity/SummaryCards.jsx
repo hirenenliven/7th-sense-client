@@ -13,6 +13,7 @@ import {
   KPI_REFRESH_MS,
   MODE_RANGES,
   SUMMARY_MODE_IDS,
+  SUMMARY_MODE_PARTS,
   formatCount,
   formatCycle,
   percent,
@@ -24,6 +25,14 @@ const sinceLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', mont
 
 // Seconds per mode id from the server's totals
 const modeSeconds = (data) => Object.fromEntries(data.totals.map((total) => [total.modeId, total.durationSec]))
+
+// Seconds of a summary tile: its mode, plus the modes it includes (SUMMARY_MODE_PARTS)
+const tileSeconds = (seconds, modeId) =>
+  (SUMMARY_MODE_PARTS[modeId] ?? [modeId]).reduce((sum, id) => sum + (seconds[id] ?? 0), 0)
+
+// Seconds the totals cover (from … to, never after now): shares are of this whole span, so time
+// with no record (before collection started) is not shared out among the modes
+const spanSeconds = (data) => (data.from ? (new Date(data.to) - new Date(data.from)) / 1000 : 0)
 
 const tileShape = PropTypes.shape({
   key: PropTypes.string.isRequired,
@@ -129,8 +138,14 @@ function SummaryCards({ machineId, today }) {
     if (!oeeState.data) return null
     const day = oeeState.data.rows?.[0]
     return [
-      { key: 'availability', label: 'Availability', icon: 'bi-power', value: percent(day?.availability) },
-      { key: 'productivity', label: 'Productivity', icon: 'bi-speedometer2', value: percent(day?.performance) },
+      {
+        key: 'availability',
+        label: 'Availability',
+        icon: 'bi-power',
+        value: percent(day?.availability),
+        meta: 'Utilization: run time of the day so far',
+      },
+      { key: 'performance', label: 'Performance', icon: 'bi-speedometer2', value: percent(day?.performance) },
       { key: 'quality', label: 'Quality', icon: 'bi-patch-check', value: percent(day?.quality) },
       { key: 'oee', label: 'OEE', icon: 'bi-graph-up', value: percent(day?.oee) },
     ]
@@ -139,14 +154,17 @@ function SummaryCards({ machineId, today }) {
   const modeTiles = useMemo(() => {
     if (!modeState.data) return null
     const seconds = modeSeconds(modeState.data)
-    const recorded = Object.values(seconds).reduce((sum, value) => sum + value, 0)
-    return SUMMARY_MODES.map((mode) => ({
-      key: `mode-${mode.id}`,
-      label: mode.label,
-      color: mode.color,
-      value: formatModeDuration(seconds[mode.id] ?? 0),
-      meta: recorded ? `${percent(((seconds[mode.id] ?? 0) / recorded) * 100)} of ${modeRange.noun}` : undefined,
-    }))
+    const span = spanSeconds(modeState.data)
+    return SUMMARY_MODES.map((mode) => {
+      const modeTotal = tileSeconds(seconds, mode.id)
+      return {
+        key: `mode-${mode.id}`,
+        label: mode.label,
+        color: mode.color,
+        value: formatModeDuration(modeTotal),
+        meta: span > 0 ? `${percent(Math.min(100, (modeTotal / span) * 100))} of ${modeRange.noun}` : undefined,
+      }
+    })
   }, [modeState.data, modeRange.noun])
 
   // All time: since when (the first recorded period); other periods name themselves

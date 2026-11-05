@@ -135,7 +135,7 @@ function Productivity({ machine, machines }) {
             <ModeTimelineCard key={selectedId} machineId={selectedId} min={PRODUCTIVITY_DATE_MIN} today={today} />
           </Col>
           <Col>
-            <ChartCard title="OEE" subtitle="Line · daily %, averaged over the machines and shifts picked" icon="bi-graph-up">
+            <ChartCard title="OEE" subtitle="Line · daily %, the machines and shifts picked together, weighted by their time" icon="bi-graph-up">
               <div className="ts-toolbar">
                 <Form.Select
                   className="w-auto"

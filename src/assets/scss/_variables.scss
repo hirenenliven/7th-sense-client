@@ -251,6 +251,19 @@ $ts-gantt-pill-height:   ts-rem(20);
 $ts-gantt-readout-min:   ts-rem(280); // hovered / current period box
 $ts-gauge-scale-inset:   ts-rem(10);  // 0 / 100 labels under the ends of the arc
 
+// Home dashboard tiles (pages/Home/HomeCards.jsx)
+$ts-home-tile-icon-size: ts-rem(32); // tinted icon badge
+$ts-home-tile-icon-font: ts-rem(15);
+$ts-home-tile-dot:       ts-rem(9);  // mode dot inside the badge
+
+// Monitoring › Virtual Screen (pages/Productivity/VirtualScreen*.jsx)
+$ts-vs-dial-size:        ts-rem(150); // override dial (spindle / feed)
+$ts-vs-dial-stroke:      10;          // ring width, SVG units of the 120-unit dial
+$ts-vs-axis-width:       ts-rem(28);  // one axis load bar
+$ts-vs-axis-height:      ts-rem(120);
+$ts-vs-tick-width:       ts-rem(3);   // tenth ticks under a progress bar
+$ts-vs-tick-height:      ts-rem(6);
+
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
 $ts-login-bg:        #15181d !default; // page behind the rings
 $ts-login-ring:      #232a35 !default; // ring arcs

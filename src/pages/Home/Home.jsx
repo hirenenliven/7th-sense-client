@@ -1,35 +1,139 @@
-import { Button, Card, Col, Row } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import env from '@/config/env'
-import { ROUTES } from '@/constants/routes'
+import { useMemo, useState } from 'react'
+import { Alert, Col, Form, Row } from 'react-bootstrap'
+import ChartDateFilter from '@/components/charts/ChartDateFilter'
+import Loader from '@/components/common/Loader'
+import { CUSTOMER_ROLE_ID, SUPERADMIN_ONLY } from '@/constants/app'
+import { MONITOR_REFRESH_MS } from '@/constants/monitoring'
+import useAuth from '@/hooks/useAuth'
+import useLoad from '@/hooks/useLoad'
+import useOrgUser from '@/hooks/useOrgUser'
+import { customerName } from '@/pages/Customers/customerFormat'
+import { PRODUCTIVITY_DATE_MIN } from '@/pages/Productivity/productivitySettings'
+import { getHomeDashboard } from '@/services/dashboardService'
+import { PICKER_LOCALE, parseIsoDate, todayIso } from '@/utils/dateTime'
+import { DayCard, FleetCard, HourlyCard, TimeCard } from './HomeCards'
+import { AlarmsCard, AttentionCard, LowestOeeCard } from './HomeLists'
 
+const dayTitle = new Intl.DateTimeFormat(PICKER_LOCALE, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
+
+const customerOptionLabel = (user) => (customerName(user) === '—' ? user.username : customerName(user))
+
+// Main › Dashboard (/): every active machine the user may read, together, from GET
+// /dashboard/home (one request; reloaded every MONITOR_REFRESH_MS while it shows today). Fleet
+// now (connection and mode counts), the day's OEE / utilization / parts vs plan / cycles, where
+// the time went, parts per hour, machines needing attention, the lowest OEE and the top alarms.
+// The superadmin can narrow it to one customer.
 function Home() {
+  const { hasRole } = useAuth()
+  const isSuperadmin = hasRole(SUPERADMIN_ONLY)
+  const { users } = useOrgUser()
+  const today = todayIso()
+  const [date, setDate] = useState(today)
+  const [customerId, setCustomerId] = useState('')
+
+  const customers = useMemo(
+    () =>
+      users
+        .filter((user) => user.roleId === CUSTOMER_ROLE_ID)
+        .sort((a, b) => customerOptionLabel(a).localeCompare(customerOptionLabel(b), undefined, { sensitivity: 'base' })),
+    [users],
+  )
+
+  const pickedCustomer = customers.find((customer) => String(customer.id) === customerId)
+  const scopeLabel = !isSuperadmin
+    ? 'your machines'
+    : pickedCustomer
+      ? `${customerOptionLabel(pickedCustomer)}’s machines`
+      : 'every customer’s machines'
+
+  const isToday = date === today
+  const query = { date, userId: isSuperadmin ? customerId : '' }
+  const homeState = useLoad(() => getHomeDashboard(query), JSON.stringify(query), {
+    refreshMs: isToday ? MONITOR_REFRESH_MS : undefined,
+  })
+  const home = homeState.data
+
+  // Today's charts stop at the current hour; a past day shows all 24
+  const lastHour = isToday && home ? new Date(home.serverTime).getHours() : 23
+  const dayNoun = isToday ? 'the day so far' : 'the day'
+
+  const renderBody = () => {
+    if (homeState.loading) return <Loader text="Loading dashboard…" />
+    if (!home) return <Alert variant="danger">{homeState.error}</Alert>
+    return (
+      <Row xs={1} className="g-3">
+        {homeState.error && (
+          <Col>
+            <Alert variant="warning" className="mb-0">
+              Could not refresh: {homeState.error}
+            </Alert>
+          </Col>
+        )}
+        <Col>
+          <FleetCard fleet={home.fleet} />
+        </Col>
+        <Col>
+          <DayCard home={home} dayNoun={dayNoun} />
+        </Col>
+        <Col>
+          <Row xs={1} lg={2} className="g-3">
+            <Col lg={5}>
+              <TimeCard time={home.time} />
+            </Col>
+            <Col lg={7}>
+              <HourlyCard hourly={home.hourly} lastHour={lastHour} />
+            </Col>
+          </Row>
+        </Col>
+        <Col>
+          <Row xs={1} lg={2} className="g-3">
+            <Col>
+              <AttentionCard machines={home.machines} serverTime={home.serverTime} showCustomer={isSuperadmin} />
+            </Col>
+            <Col>
+              <LowestOeeCard machines={home.machines} showCustomer={isSuperadmin} />
+            </Col>
+          </Row>
+        </Col>
+        <Col>
+          <AlarmsCard alarms={home.alarms} />
+        </Col>
+      </Row>
+    )
+  }
+
   return (
     <>
-      <div className="p-5 mb-4 bg-body-secondary rounded-3 shadow-sm">
-        <h1 className="display-5 fw-bold">Welcome to {env.appName}</h1>
-        <p className="fs-5 text-muted">
-          React + Vite + Bootstrap starter. Start building in <code>src/pages</code>.
-        </p>
-        <Button as={Link} to={ROUTES.ABOUT} variant="primary" size="lg">
-          Learn more
-        </Button>
-      </div>
+      <header className="ts-page-header">
+        <div>
+          <div className="ts-eyebrow">Main · Dashboard</div>
+          <h1>Dashboard</h1>
+          <p className="ts-page-subtitle">
+            {isToday ? 'Today' : dayTitle.format(parseIsoDate(date))} ·{' '}
+            {scopeLabel}, live from the CNC collector.
+          </p>
+        </div>
+        <div className="ts-page-actions">
+          {isSuperadmin && (
+            <Form.Select
+              className="w-auto"
+              value={customerId}
+              onChange={(event) => setCustomerId(event.target.value)}
+              aria-label="Customer"
+            >
+              <option value="">All customers</option>
+              {customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customerOptionLabel(customer)}
+                </option>
+              ))}
+            </Form.Select>
+          )}
+          <ChartDateFilter value={date} onChange={setDate} min={PRODUCTIVITY_DATE_MIN} max={today} label="Dashboard date" />
+        </div>
+      </header>
 
-      <Row xs={1} md={3} className="g-4">
-        {['Components', 'Pages', 'Services'].map((title) => (
-          <Col key={title}>
-            <Card className="h-100 shadow-sm">
-              <Card.Body>
-                <Card.Title>{title}</Card.Title>
-                <Card.Text className="text-muted">
-                  Organize your {title.toLowerCase()} inside their dedicated folder.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {renderBody()}
     </>
   )
 }

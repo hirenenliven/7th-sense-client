@@ -71,7 +71,7 @@ export const KPI_REFRESH_MS = 60_000
 // Machine Modes card: the period its totals cover (GET /productivity/mode-totals). `query(today)`
 // gives the request's dates; `noun` ends the share line ("12.5% of the day").
 export const MODE_RANGES = [
-  { value: 'today', label: 'Today', noun: 'the day', query: (today) => ({ date: today }) },
+  { value: 'today', label: 'Today', noun: 'the day so far', query: (today) => ({ date: today }) },
   { value: 'yesterday', label: 'Yesterday', noun: 'the day', query: (today) => ({ date: shiftIsoDate(today, -1) }) },
   { value: 'week', label: 'Last 7 days', noun: 'the 7 days', query: (today) => ({ from: shiftIsoDate(today, -6), to: today }) },
   { value: 'month', label: 'Last 30 days', noun: 'the 30 days', query: (today) => ({ from: shiftIsoDate(today, -29), to: today }) },
@@ -81,6 +81,9 @@ export const DEFAULT_MODE_RANGE = MODE_RANGES[0].value
 // Machine Modes card, in this order (machine_modes ids): In Production, Hold, Loading / Unloading,
 // Idle, Downtime, Offline. Setup, Rapid Mode and the planned downtimes are not shown.
 export const SUMMARY_MODE_IDS = [3, 4, 2, 5, 6, 9]
+// Modes a tile adds up: In Production includes Rapid Mode (12), as OEE run time does (server
+// runModes), so the tile matches the availability %
+export const SUMMARY_MODE_PARTS = { 3: [3, 12] }
 
 // A customer shift as a filter option: "Shift A (06:00 – 14:00)"
 export const shiftOption = (shift) => ({ value: String(shift.id), label: `${shift.name} (${shift.startTime} – ${shift.endTime})` })

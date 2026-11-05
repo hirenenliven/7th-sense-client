@@ -42,7 +42,8 @@ One page, [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): t
 | Machine list | `/monitoring` | Yes | every logged-in role | [monitoring-machines.md](monitoring-machines.md) |
 | Productivity (machine tab) | `/monitoring/:machineId/productivity` | Yes | every logged-in role | [productivity.md](productivity.md) |
 | Machine health (machine tab) | `/monitoring/:machineId/health` | Yes | every logged-in role | [machine-health.md](machine-health.md) |
-| Tool List / Tool Life / Virtual Screen (machine tabs, not built yet) | `/monitoring/:machineId/tools` · `/tool-life` · `/virtual-screen` | Placeholder | every logged-in role | [machine-tools-virtual-screen.md](machine-tools-virtual-screen.md) |
+| Virtual Screen (machine tab) | `/monitoring/:machineId/virtual-screen` | Yes | every logged-in role | [virtual-screen.md](virtual-screen.md) |
+| Tool List / Tool Life (machine tabs, not built yet) | `/monitoring/:machineId/tools` · `/tool-life` | Placeholder | every logged-in role | [machine-tools-virtual-screen.md](machine-tools-virtual-screen.md) |
 
 ## Masters
 

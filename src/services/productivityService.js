@@ -44,3 +44,13 @@ export const getFinishCycles = async ({ machineId, date, shiftIds, program }) =>
 // without closed cycles), cycleCount, completedCount, unfinishedCount }]
 export const getMachineSummaries = async ({ date } = {}) =>
   unwrap(await sharedGet(withQuery(`${PATH}/machine-summaries`, { date }))) ?? []
+
+// Monitoring › Virtual Screen: what one machine is doing now. { machineId, serverTime, online,
+// modeId, modeName, modeSince, programName, opMode, live: { spindleLoad, spindleSpeed,
+// spindleOverride, feedOverride, feedRate, feedUnit, axisLoadX, axisLoadY, axisLoadZ, toolNumber,
+// emergency, updatedAt } (values null when never read), alarm: { code, message, at, active } | null,
+// cycle: { programName, startedAt, elapsedSec, standardCycleSec } | null, job: { jobId, scheduleDate,
+// startTime, endTime, quantity, completedCycles, partName, processName, clienteleName,
+// standardCycleSec } | null }
+export const getVirtualScreen = async (machineId) =>
+  unwrap(await sharedGet(withQuery(`${PATH}/virtual-screen`, { machineId })))

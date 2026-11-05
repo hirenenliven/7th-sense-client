@@ -34,7 +34,8 @@ const matchesSearch = (machine, term, withMode) =>
 // `showMode` adds the Mode column (the mode the machine is in now). A page can also bring its own
 // table: `tableColumns(showCustomer)` (useTableSort columns) with `renderRow(machine, showCustomer,
 // actions)`. The card view's frame is flattened by the theme (.ts-table-panel:has(> .row)), so the
-// cards are the only framed surface.
+// cards are the only framed surface. `initialSearch` opens it with the search filled in (Monitoring's
+// `?search=`); `onSearchChange(text)` hears every change of the search box.
 function MachineBrowser({
   machines,
   loading,
@@ -49,14 +50,21 @@ function MachineBrowser({
   tableColumns,
   renderRow,
   showMode = false,
+  initialSearch = '',
+  onSearchChange,
 }) {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
 
-  const [search, setSearch] = useState('')
+  const [search, setSearchText] = useState(initialSearch)
   const [customerFilter, setCustomerFilter] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
   const [page, setPage] = useState(1)
+
+  const setSearch = (text) => {
+    setSearchText(text)
+    onSearchChange?.(text)
+  }
 
   // Customer filter options: the customers that have machines
   const customers = useMemo(() => {
@@ -234,6 +242,8 @@ MachineBrowser.propTypes = {
   tableColumns: PropTypes.func,
   renderRow: PropTypes.func,
   showMode: PropTypes.bool,
+  initialSearch: PropTypes.string,
+  onSearchChange: PropTypes.func,
 }
 
 export default MachineBrowser

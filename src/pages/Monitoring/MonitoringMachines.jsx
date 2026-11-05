@@ -1,10 +1,10 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Card } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import IconAction from '@/components/common/IconAction'
 import { STORAGE_KEYS, SUPERADMIN_ONLY } from '@/constants/app'
 import { ACTION_ICONS } from '@/constants/icons'
-import { MONITOR_REFRESH_MS, machineMonitorPath } from '@/constants/monitoring'
+import { MONITORING_SEARCH_PARAM, MONITOR_REFRESH_MS, machineMonitorPath } from '@/constants/monitoring'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import useLoad from '@/hooks/useLoad'
@@ -25,6 +25,12 @@ import { monitorColumns } from './monitorTable'
 
 function MonitoringMachines() {
   const navigate = useNavigate()
+  // `?search=` (a Home fleet tile's mode name) fills the search box once; typing drops it from the URL
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [initialSearch] = useState(() => searchParams.get(MONITORING_SEARCH_PARAM) ?? '')
+  const dropSearchParam = useCallback(() => {
+    if (searchParams.has(MONITORING_SEARCH_PARAM)) setSearchParams({}, { replace: true })
+  }, [searchParams, setSearchParams])
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
 
@@ -103,6 +109,8 @@ function MonitoringMachines() {
             tableColumns={tableColumns}
             renderRow={renderRow}
             showMode
+            initialSearch={initialSearch}
+            onSearchChange={dropSearchParam}
             empty={
               <div className="ts-empty">
                 <i className="bi bi-cpu ts-empty-icon" aria-hidden="true" />
