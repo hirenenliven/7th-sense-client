@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { PAGE_SIZES, ROLE_LABELS, SUPERADMIN_ONLY, USER_STATUS } from '@/constants/app'
 import { deleteUser, getUserById, getUsers, updateUser } from '@/services/customerService'
 import { loginAs } from '@/services/authService'
@@ -84,6 +85,12 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setPage(1)
+  }
 
   const setCustomerStatus = (id, status) =>
     setCustomers((list) => list.map((customer) => (customer.id === id ? { ...customer, status } : customer)))
@@ -217,27 +224,30 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
           </InputGroup>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((customer) => (
-                  <CustomerRow
-                    key={customer.id}
-                    kind={kind}
-                    customer={customer}
-                    customerLabel={showCustomer ? customerLabel(customer.companyId) : undefined}
-                    statusBusy={statusBusyIds.has(customer.id)}
-                    onToggleStatus={handleToggleStatus}
-                    onView={handleView}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                    onUnavailable={handleUnavailable}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((customer) => (
+                <CustomerRow
+                  key={customer.id}
+                  kind={kind}
+                  customer={customer}
+                  customerLabel={showCustomer ? customerLabel(customer.companyId) : undefined}
+                  statusBusy={statusBusyIds.has(customer.id)}
+                  onToggleStatus={handleToggleStatus}
+                  onView={handleView}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                  onUnavailable={handleUnavailable}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message={`No ${account.noun}s match “${search.trim()}”.`} onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -248,12 +258,8 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">
-            No {account.noun}s match “{search.trim()}”.
-          </div>
-        )}
+          )}
+        </div>
       </>
     )
   }

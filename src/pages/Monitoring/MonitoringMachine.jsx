@@ -14,6 +14,9 @@ import { isPathActive } from '@/utils/navigation'
 const TAB_SCREENS = {
   productivity: lazy(() => import('@/pages/Productivity/Productivity')),
   health: lazy(() => import('@/pages/MachineHealth/MachineHealth')),
+  tools: lazy(() => import('@/pages/Productivity/ToolList')),
+  'tool-life': lazy(() => import('@/pages/Productivity/ToolLife')),
+  'virtual-screen': lazy(() => import('@/pages/Productivity/VirtualScreen')),
 }
 
 const loadingCard = (
@@ -25,7 +28,8 @@ const loadingCard = (
 )
 
 // Operations › Monitoring › one machine: a back arrow to the machine list, the machine's name, then
-// its Productivity and Machine Health tabs (MONITORING_MACHINE_TABS; the tab is the route). The
+// its Productivity, Machine Health, Tool List, Tool Life and Virtual Screen tabs
+// (MONITORING_MACHINE_TABS; the tab is the route). The
 // machines the user may read are loaded once: the machine shown, and the OEE trend's machine picker
 // (`machines`). A machine the user cannot read (or no longer there) shows "Machine not found".
 function MonitoringMachine({ machineId }) {
@@ -39,7 +43,7 @@ function MonitoringMachine({ machineId }) {
   const TabScreen = TAB_SCREENS[activeTab.key]
   const subtitle = machine
     ? [`Machine # ${machine.id}`, machine.modelName, isSuperadmin && machine.customerName].filter(Boolean).join(' · ')
-    : 'Productivity and health of one machine.'
+    : 'Productivity, health and tools of one machine.'
 
   const renderBody = () => {
     if (loading) return <Loader text="Loading machine…" />

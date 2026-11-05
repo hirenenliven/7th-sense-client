@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { MANAGERS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import useAuth from '@/hooks/useAuth'
 import { deleteClientele, getClienteles } from '@/services/clienteleService'
@@ -87,6 +88,13 @@ function ClienteleList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setCustomerFilter('')
+    setPage(1)
+  }
 
   const handleAdd = () => {
     setEditingId(null)
@@ -189,23 +197,26 @@ function ClienteleList() {
           )}
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((clientele) => (
-                  <ClienteleRow
-                    key={clientele.id}
-                    clientele={clientele}
-                    showCustomer={isSuperadmin}
-                    canManage={canManage}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((clientele) => (
+                <ClienteleRow
+                  key={clientele.id}
+                  clientele={clientele}
+                  showCustomer={isSuperadmin}
+                  canManage={canManage}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="No clienteles match these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -216,10 +227,8 @@ function ClienteleList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No clienteles match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

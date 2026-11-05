@@ -18,35 +18,9 @@ export const NAV_SECTIONS = [
     key: 'operations',
     title: 'Operations',
     items: [
-      {
-        key: 'machines',
-        label: 'Machines',
-        icon: 'bi-cpu',
-        children: [
-          { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
-          // { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
-        ],
-      },
-      // Machine list → a machine's Productivity / Health: one page (pages/Monitoring), no submenu
+      // Machine list → a machine's Productivity / Health / Tool List / Tool Life / Virtual Screen:
+      // one page (pages/Monitoring), no submenu
       { key: 'monitoring', label: 'Monitoring', icon: 'bi-activity', path: ROUTES.MONITORING, activePaths: MONITORING_PATHS },
-      {
-        key: 'production',
-        label: 'Production',
-        icon: 'bi-gear-wide-connected',
-        children: [
-          { key: 'production-schedule', label: 'Schedule', path: ROUTES.PRODUCTION_SCHEDULE },
-          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS }
-        ],
-      },
-      {
-        key: 'tools',
-        label: 'Tool',
-        icon: 'bi-tools',
-        children: [
-          { key: 'tool-list', label: 'Tool List', path: ROUTES.TOOLS },
-          { key: 'tool-life', label: 'Tool Life', path: ROUTES.TOOL_LIFE },
-        ],
-      },
       {
         key: 'reports',
         label: 'Reports',
@@ -70,6 +44,24 @@ export const NAV_SECTIONS = [
         icon: 'bi-diagram-3',
         path: ROUTES.ORG_COUNTRIES,
         activePaths: ORGANIZATION_PATHS,
+      },
+      {
+        key: 'machines',
+        label: 'Machines',
+        icon: 'bi-cpu',
+        children: [
+          { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
+          // { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
+        ],
+      },
+      {
+        key: 'production',
+        label: 'Production Schedule',
+        icon: 'bi-gear-wide-connected',
+        children: [
+          { key: 'production-schedule', label: 'Schedule', path: ROUTES.PRODUCTION_SCHEDULE },
+          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS }
+        ],
       },
       // The customer's clients (parts are made for a clientele): its own page, no submenu
       { key: 'clientele', label: 'Clientele', icon: 'bi-person-vcard', path: ROUTES.CLIENTELES },

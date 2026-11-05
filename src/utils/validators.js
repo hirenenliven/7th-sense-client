@@ -23,6 +23,7 @@ export const PATTERNS = {
 }
 
 export const PASSWORD_MIN_LENGTH = 8
+export const PASSWORD_MAX_LENGTH = 72 // bcrypt uses only the first 72 bytes (server rule)
 
 export const isBlank = (value) => value === null || value === undefined || String(value).trim() === ''
 

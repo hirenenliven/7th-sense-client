@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserLine, getUserLines } from '@/services/userLineService'
@@ -82,6 +83,13 @@ function LineList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setShopFilter('')
+    setPage(1)
+  }
 
   // Every line belongs to a shop
   const canAdd = shops.length > 0
@@ -190,21 +198,24 @@ function LineList() {
           </Form.Select>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((line) => (
-                  <LineRow
-                    key={line.id}
-                    line={line}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((line) => (
+                <LineRow
+                  key={line.id}
+                  line={line}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="No lines match these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -215,10 +226,8 @@ function LineList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No lines match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

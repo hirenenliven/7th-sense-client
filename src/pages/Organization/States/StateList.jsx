@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { PAGE_SIZES } from '@/constants/app'
 import { deleteUserState, getUserStates } from '@/services/userStateService'
 import { getUserCountries } from '@/services/userCountryService'
@@ -80,6 +81,13 @@ function StateList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setCountryFilter('')
+    setPage(1)
+  }
 
   const openAdd = () => setAdding(true)
 
@@ -176,20 +184,23 @@ function StateList() {
           </Form.Select>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((state) => (
-                  <StateRow
-                    key={state.id}
-                    state={state}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((state) => (
+                <StateRow
+                  key={state.id}
+                  state={state}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="No states match these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -200,10 +211,8 @@ function StateList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No states match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

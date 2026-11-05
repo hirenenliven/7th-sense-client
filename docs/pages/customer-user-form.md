@@ -153,13 +153,14 @@ sequenceDiagram
 7. [customerService.js](../../src/services/customerService.js) → updateUser(): calls `PUT /api/v1/users/{id}`
 8. [user_routes.go](../../../7th-sense-server/internal/routes/user_routes.go) → `PUT /v1/users/{id}` (managersOnly: superadmin, customer, admin) → UserHandler.Update
 9. [user_handler.go](../../../7th-sense-server/internal/handler/user_handler.go) → Update(): reads {id}; decodes `dto.UpdateUserRequest` and runs its Validate(); calls the service
-10. [user_service.go](../../../7th-sense-server/internal/service/user_service.go) → Update(): Replaces the user and its customer details. Customer details the user does not have yet are created.
+10. [user_service.go](../../../7th-sense-server/internal/service/user_service.go) → Update(): Replaces the user and its customer details. Customer details the user does not have yet are created. A typed new password is bcrypt-hashed and saved; a blank one keeps the current password.
 
 **Rules & edge cases**
 
 - Only superadmin, customer and admin may do this (server `managersOnly`, others 403); the page hides the controls for other roles.
 - Server validation (`dto.CreateUserRequest.Validate`): Please enter valid password.
-- Server validation (`dto.UpdateUserRequest.Validate`): Please enter valid status.
+- Server validation (`dto.UpdateUserRequest.Validate`): Please enter valid password (when one is sent); Please enter valid status.
+- Password: required when adding (8–72 characters). When editing, the **New Password** field starts empty with an eye button to show / hide it; a typed value (8–72 characters) is sent as `password` and replaces the current password, blank sends no `password` and keeps it ([customerForm.js](../../src/pages/Customers/customerForm.js) → toUserPayload()).
 
 ## Change theme
 

@@ -19,6 +19,8 @@ export const OEE_SERIES = [
 export const OEE_DOMAIN = [0, 100]
 export const OEE_TICKS = [0, 20, 40, 60, 80, 100]
 export const WORLD_CLASS_OEE = 85
+// Below this OEE reads as low (red); between it and world class as fair (amber)
+export const FAIR_OEE = 60
 export const OEE_LIMITS = [{ value: WORLD_CLASS_OEE, label: `World class ${WORLD_CLASS_OEE}%`, status: 'good' }]
 
 export const SHIFT_NOUN = { one: 'shift', many: 'shifts' }

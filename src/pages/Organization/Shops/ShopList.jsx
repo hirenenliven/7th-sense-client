@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { PAGE_SIZES } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import { deleteUserShop, getUserShops } from '@/services/userShopService'
@@ -82,6 +83,13 @@ function ShopList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setLocationFilter('')
+    setPage(1)
+  }
 
   // Every shop belongs to a location
   const canAdd = locations.length > 0
@@ -190,21 +198,24 @@ function ShopList() {
           </Form.Select>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((shop) => (
-                  <ShopRow
-                    key={shop.id}
-                    shop={shop}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((shop) => (
+                <ShopRow
+                  key={shop.id}
+                  shop={shop}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="No shops match these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -215,10 +226,8 @@ function ShopList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No shops match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

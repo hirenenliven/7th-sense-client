@@ -38,3 +38,9 @@ export const getCycleCounts = async ({ machineIds, from, to, shiftIds }) =>
 // averageProductionSec }, lastFinishedAt, programs }
 export const getFinishCycles = async ({ machineId, date, shiftIds, program }) =>
   unwrap(await sharedGet(withQuery(`${PATH}/finish-cycles`, { machineId, date, shiftIds: ids(shiftIds), program })))
+
+// Every machine the user may read with its OEE parts and cycle counts of one day (default today):
+// [{ machineId, availability (null before any planned time), performance, quality, oee (null
+// without closed cycles), cycleCount, completedCount, unfinishedCount }]
+export const getMachineSummaries = async ({ date } = {}) =>
+  unwrap(await sharedGet(withQuery(`${PATH}/machine-summaries`, { date }))) ?? []

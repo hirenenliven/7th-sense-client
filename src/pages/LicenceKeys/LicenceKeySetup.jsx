@@ -4,6 +4,7 @@ import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import SortableHead from '@/components/common/SortableHead'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { CUSTOMER_ROLE_ID, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import useAuth from '@/hooks/useAuth'
 import useTableSort from '@/hooks/useTableSort'
@@ -111,6 +112,14 @@ function LicenceKeySetup() {
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
 
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setStatusFilter('')
+    setCustomerFilter('')
+    setPage(1)
+  }
+
   const handleCreated = useCallback((saved) => {
     setPage(1) // new rows are on top of page 1
     setLicenceKeys((list) => [...list, ...saved])
@@ -209,25 +218,28 @@ function LicenceKeySetup() {
           )}
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((licenceKey, index) => (
-                  <LicenceKeyRow
-                    key={licenceKey.id}
-                    licenceKey={licenceKey}
-                    number={firstIndex + index + 1}
-                    showCustomer={isSuperadmin}
-                    canManage={isSuperadmin}
-                    onCopy={handleCopy}
-                    onEdit={setEditing}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((licenceKey, index) => (
+                <LicenceKeyRow
+                  key={licenceKey.id}
+                  licenceKey={licenceKey}
+                  number={firstIndex + index + 1}
+                  showCustomer={isSuperadmin}
+                  canManage={isSuperadmin}
+                  onCopy={handleCopy}
+                  onEdit={setEditing}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="Nothing matches these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -238,10 +250,8 @@ function LicenceKeySetup() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">Nothing matches these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

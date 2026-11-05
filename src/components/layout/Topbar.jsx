@@ -93,12 +93,13 @@ function Topbar() {
           <i className={`bi ${isLight ? 'bi-moon-stars' : 'bi-sun'}`} aria-hidden="true" />
         </Button>
 
-        <Button variant="plain" className="btn-icon position-relative" aria-label="Notifications">
+        {/* <Button variant="plain" className="btn-icon position-relative" aria-label="Notifications">
           <i className="bi bi-bell" aria-hidden="true" />
           <span className="ts-notify-dot" />
-        </Button>
+        </Button> */}
 
-        <Dropdown align="end">
+        {/* The menu is as wide as the name button above it (.ts-user-menu) */}
+        <Dropdown align="end" className="ts-user-menu">
           <Dropdown.Toggle
             variant="plain"
             className="ts-user-toggle"
@@ -106,7 +107,7 @@ function Topbar() {
             aria-busy={signingOut}
             disabled={signingOut}
           >
-            <span className="d-none d-md-inline">{signingOut ? 'Signing out…' : displayName(user)}</span>
+            <span className="ts-user-name d-none d-md-inline">{signingOut ? 'Signing out…' : displayName(user)}</span>
             <span className="ts-avatar" aria-hidden="true">
               {signingOut ? <Spinner animation="border" size="sm" /> : <i className="bi bi-person-fill" />}
             </span>

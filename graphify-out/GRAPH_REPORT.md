@@ -1,141 +1,134 @@
-# Graph Report - 7th-sense-client  (2026-11-04)
+# Graph Report - 7th-sense-client  (2026-11-05)
 
 ## Corpus Check
-- 325 files · ~177,180 words
+- 334 files · ~180,425 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 1873 nodes · 6258 edges · 108 communities (107 shown, 1 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 394 edges (avg confidence: 0.93)
+- 1907 nodes · 6439 edges · 102 communities (98 shown, 4 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 400 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ecf23772`
+- Built from commit: `3ec5f56e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Login.jsx
-- customerForm.js
+- ClienteleFormModal.jsx
 - BarLineChart.jsx
-- ProductionScheduleList.jsx
+- licenceKeyService.js
 - Productivity.jsx
 - react
-- toast
-- ShiftFormModal.jsx
-- AddBranch.jsx
+- BrandFormModal.jsx
+- HolidayFormModal.jsx
+- ControllerFormModal.jsx
 - Project Docs & Conventions
 - dateTime.js
-- TimePicker.jsx
+- dateTime.js
 - StateFormModal.jsx
-- Machine models
+- Speedometer.jsx
 - ESLint Dev Dependencies
 - AddProductionSchedule.jsx
-- chartTheme.js
+- MainLayout.jsx
 - Runtime Dependencies
 - healthSampleData.js
-- AddPart
+- AddPart.jsx
 - 0001. Single-page app with React 19 and Vite
-- AddCustomer.jsx
-- ClienteleFormModal.jsx
-- helpers.js
+- getUsers
+- catalogService.js
+- MonitorMachineCard.jsx
 - SupervisorFormModal.jsx
 - jsconfig Aliases
 - userCountryService.js
-- AddPart.jsx
-- BreakFormModal.jsx
+- AddPart
+- MonitoringMachine.jsx
 - package.json
 - Seven Logo Asset
-- apiClient.js
+- Add / edit part
 - Login Logo Asset
-- pages.jsx
-- app.js
-- Cells
-- catalogService.js
+- SidebarItem.jsx
+- Machine health
+- userCellService.js
+- PlannedTab
 - Parts
 - ProtectedRoute
 - healthSensors.js
-- Loader
-- All machines
-- DatePicker.jsx
+- holidayService.js
+- Controllers
+- Add / edit machine
 - ShiftCard.jsx
-- Clientele
+- ProcessFields.jsx
 - adr/README.md
 - Downtime / idle reasons
-- FieldLabel
+- Machine models
 - AddMachine.jsx
-- Locations
+- LineFormModal.jsx
 - Holidays / week off
-- react-bootstrap
-- ModelFormModal.jsx
-- Loader
+- userLocationService.js
+- BreakFormModal.jsx
+- ShiftFormModal.jsx
 - CityFormModal.jsx
 - Production schedules
 - UserGuide.jsx
-- userSupervisorService.js
+- Theme showcase
 - Monitoring › Machines
-- Add / edit branch
+- AddBranch.jsx
 - 0011. Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page
-- apiClient
+- withQuery
 - States
-- App shell (session, logout, theme)
+- chartLegend.jsx
 - LicenceKeyGenerator.jsx
 - useLoad
 - 0008. Folder structure by page and by concern
 - User guide
-- clienteleService.js
+- ChartTooltip.jsx
 - 0006. React-Bootstrap with SCSS design tokens
 - toast.js
-- Client documentation
+- SummaryCards.jsx
 - sharedGet
 - Breaks
-- App.jsx
-- Brands
+- Tool List, Tool Life and Virtual Screen (machine tabs)
 - CountryFormModal.jsx
-- Machine health
-- shiftService.js
-- HolidayFormModal.jsx
-- 0017. Log in as customer in a new tab, on the tab's own API path
-- 0014. Business Setup renamed Account Center; old Account Center item removed
-- Customers / Users list
-- userLineService.js
-- Shops
-- useTableSort
-- customerName
-- LineFormModal.jsx
-- Cities
-- 0005. Forms with react-hook-form and zod
-- Login
-- 0009. Page-wise flow documentation in docs/pages
-- userCityService.js
-- 0004. Axios client with the HttpOnly session cookie
-- userCellService.js
-- userLocationService.js
-- 0015. Clientele is a Masters page, not an Account Center tab
-- LocationFormModal.jsx
-- userShopService.js
-- ModelList.jsx
-- SortableHead
 - 0003. Server state via service modules and useLoad, Context only for the session
-- Add / edit production schedule
-- validators.js
-- DrawingUpload.jsx
+- shiftService.js
+- SidebarProvider.jsx
+- userLineService.js
+- userShopService.js
+- ModelFormModal.jsx
 - CellFormModal.jsx
+- vite.config.js
+- 0005. Forms with react-hook-form and zod
+- AuthProvider.jsx
+- 0009. Page-wise flow documentation in docs/pages
+- 0002. React Router with one route table and role guards
+- theme.js
+- Locations
+- LocationFormModal.jsx
+- Brands
+- ModeGanttChart.jsx
+- Add / edit production schedule
+- apiBaseUrl
+- react-bootstrap
+- constants/navigation.js
+- scripts
+- Client documentation
 - ShopFormModal.jsx
 - 0016. Account Center is superadmin only; Users lists company members only
 
 ## God Nodes (most connected - your core abstractions)
 1. `react` - 130 edges
-2. `prop-types` - 105 edges
-3. `react-bootstrap` - 92 edges
+2. `prop-types` - 112 edges
+3. `react-bootstrap` - 96 edges
 4. `useAuth()` - 83 edges
 5. `Loader()` - 77 edges
-6. `withQuery()` - 73 edges
+6. `withQuery()` - 74 edges
 7. `useOrgUser()` - 66 edges
-8. `sharedGet()` - 64 edges
+8. `sharedGet()` - 65 edges
 9. `toast` - 52 edges
-10. `ProtectedRoute()` - 47 edges
+10. `ProtectedRoute()` - 48 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Open productivity / health` --references--> `machineMonitorPath()`  [INFERRED]
@@ -157,266 +150,262 @@
 - **Customer-scoped master data with role-based access** — claude_masters_customer_pattern, claude_role_based_access, claude_production_schedule, claude_licence_keys, claude_shifts_breaks [INFERRED 0.85]
 - **Dark/light dual theme system** — theme_design_tokens, theme_light_theme_second_build, theme_theme_switching, 7thsense_ui_review [INFERRED 0.85]
 
-## Communities (108 total, 1 thin omitted)
+## Communities (102 total, 4 thin omitted)
 
 ### Community 0 - "Login.jsx"
-Cohesion: 0.05
-Nodes (63): 0010. Organization levels on one tabbed page, a route per tab, Alternatives considered, Consequences, Context, Decision, bootstrap-icons, @fontsource-variable/roboto, react-dom (+55 more)
+Cohesion: 0.19
+Nodes (11): BrandLogo(), LOGO_MARKUP, env, Login(), redirectTarget(), CENTER, LoginBackdrop(), RINGS (+3 more)
 
-### Community 1 - "customerForm.js"
-Cohesion: 0.23
-Nodes (14): getCountryCode(), getStateCode(), FILTER_NAMES, INITIAL_VALUES, nullIfBlank(), REQUIRED_FIELDS, splitName(), toApiPhone() (+6 more)
+### Community 1 - "ClienteleFormModal.jsx"
+Cohesion: 0.06
+Nodes (66): API calls on this page, Clientele, Decisions, Delete clientele, On page load, Save clientele (add / edit form), Shared components used, State & storage (+58 more)
 
 ### Community 2 - "BarLineChart.jsx"
-Cohesion: 0.26
-Nodes (27): recharts, AreaGrowthChart(), BarLineChart(), ChartFrame(), axisPropTypes, renderGrid(), renderLegend(), renderTooltip() (+19 more)
+Cohesion: 0.19
+Nodes (38): recharts, AreaGrowthChart(), BarLineChart(), ChartFrame(), axisPropTypes, renderGrid(), renderLegend(), renderTooltip() (+30 more)
 
-### Community 3 - "ProductionScheduleList.jsx"
-Cohesion: 0.60
-Nodes (5): matchesSearch(), ProductionScheduleList(), scheduleDates(), ProductionScheduleList, deleteProductionSchedule()
+### Community 3 - "licenceKeyService.js"
+Cohesion: 0.16
+Nodes (18): API calls on this page, Decisions, Delete licence key, Generate licence keys, Licence keys, On page load, Save licence key (add / edit form), Save licence keys (add / edit form) (+10 more)
 
 ### Community 4 - "Productivity.jsx"
-Cohesion: 0.08
-Nodes (48): ChartCard(), ModeTimelineCard(), readoutClock, readoutTime, chartMessage(), dayLabel, pickedMachineIds(), Productivity() (+40 more)
+Cohesion: 0.11
+Nodes (31): readoutClock, readoutTime, chartMessage(), dayLabel, pickedMachineIds(), Productivity(), programIn(), programOptions() (+23 more)
 
 ### Community 5 - "react"
-Cohesion: 0.08
-Nodes (56): 0013. Monitoring starts with a machine list; All Machines is set-up only, Alternatives considered, Consequences, Context, Decision, Decision, Shared components used, prop-types (+48 more)
+Cohesion: 0.12
+Nodes (40): prop-types, react, IconAction(), LiveClock(), StatusBadge(), CLOCK_TICK_MS, ACTION_ICONS, OrgUserContext (+32 more)
 
-### Community 6 - "toast"
-Cohesion: 0.16
-Nodes (19): ConfirmModal(), MANAGERS, BrandList(), byName(), matchesSearch(), BreakSetup(), matchesSearch(), HolidaySetup() (+11 more)
+### Community 6 - "BrandFormModal.jsx"
+Cohesion: 0.35
+Nodes (8): brandSchema, INITIAL_VALUES, MAX_LENGTH, toBrandPayload(), toFormValues(), BrandFormModal(), FIELD_HELP, createBrand()
 
-### Community 7 - "ShiftFormModal.jsx"
+### Community 7 - "HolidayFormModal.jsx"
 Cohesion: 0.20
-Nodes (17): ALL_WEEKDAYS, BREAK_NAME_SUGGESTIONS, SHIFT_TYPES, WEEKDAYS, clock(), EMPTY_BREAK_ROW, INITIAL_VALUES, MAX_BREAKS (+9 more)
+Nodes (14): ALL_WEEKDAYS, BREAK_NAME_SUGGESTIONS, HOLIDAY_TYPES, SHIFT_STATUS, SHIFT_TYPES, WEEKDAYS, holidaySchema, INITIAL_VALUES (+6 more)
 
-### Community 8 - "AddBranch.jsx"
-Cohesion: 0.15
-Nodes (23): Save branch (add / edit form), BRANCH_STATUS, AddBranch(), labelClass(), branchSchema, COLOR_PICKER_FALLBACK, INITIAL_VALUES, optional() (+15 more)
+### Community 8 - "ControllerFormModal.jsx"
+Cohesion: 0.35
+Nodes (8): controllerSchema, INITIAL_VALUES, MAX_LENGTH, toControllerPayload(), toFormValues(), ControllerFormModal(), FIELD_HELP, updateController()
 
 ### Community 9 - "Project Docs & Conventions"
 Cohesion: 0.11
 Nodes (22): Frontend Engineering Agent Configuration, API Integration via Axios apiClient, 7thSense UI/UX & Navigation Review (frozen sim data), AI Insights & Copilot (frozen insights), OEE (Availability / Performance / Quality), Review Screens (Overview, Cockpit, Live Screen, Tools & Health, Reliability & Energy, Quality, AI Insights, Customer Care, Setup), CLAUDE.md Project Instructions, API Response Envelope {statusCode, success, message, data} (+14 more)
 
 ### Community 10 - "dateTime.js"
-Cohesion: 0.13
-Nodes (32): ChartDateFilter(), DatePicker(), DateRangePicker(), DEFAULT_PRESETS, earlier(), later(), normalizeRange(), RangePanel() (+24 more)
+Cohesion: 0.11
+Nodes (42): ChartDateFilter(), clamp(), DateCalendar(), DatePicker(), dayLabel, keyToDay(), monthGrid(), monthName (+34 more)
 
-### Community 11 - "TimePicker.jsx"
-Cohesion: 0.14
-Nodes (20): assignRef(), PickerField(), POPPER_CONFIG, centerOption(), HOURS, MINUTES, TimeColumn(), TimePanel() (+12 more)
+### Community 11 - "dateTime.js"
+Cohesion: 0.13
+Nodes (20): centerOption(), HOURS, MINUTES, TimeColumn(), TimePanel(), TimePicker(), EXCEPTIONS, FILTERS (+12 more)
 
 ### Community 12 - "StateFormModal.jsx"
-Cohesion: 0.19
-Nodes (16): country-region-data, ALL_COUNTRIES, byName, findLibraryCountry(), getLibraryStateNames(), fromStateKey(), INITIAL_VALUES, keepStatesOf() (+8 more)
+Cohesion: 0.16
+Nodes (19): country-region-data, MultiSelectPicker(), summary(), toGroups(), ALL_COUNTRIES, byName, findLibraryCountry(), getLibraryStateNames() (+11 more)
 
-### Community 13 - "Machine models"
-Cohesion: 0.29
-Nodes (7): API calls on this page, Decisions, Delete model, Machine models, Shared components used, State & storage, UI states
+### Community 13 - "Speedometer.jsx"
+Cohesion: 0.24
+Nodes (9): STATUS_COLORS, TRACK_COLOR, clamp(), Needle(), PIE_PROPS, polar(), Speedometer(), TRACK_RADIUS (+1 more)
 
 ### Community 14 - "ESLint Dev Dependencies"
 Cohesion: 0.18
 Nodes (11): devDependencies, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, globals, sass, @types/react (+3 more)
 
 ### Community 15 - "AddProductionSchedule.jsx"
-Cohesion: 0.14
-Nodes (24): Save production schedule (add / edit form), AddProductionSchedule(), byLabel(), EMPTY_LISTS, ITEM_SELECTS, userLabel(), EMPTY_ITEM, idText() (+16 more)
+Cohesion: 0.09
+Nodes (37): Save production schedule (add / edit form), react-hook-form, FieldLabel(), StatusToggle(), AddProductionSchedule(), byLabel(), EMPTY_LISTS, ITEM_SELECTS (+29 more)
 
-### Community 16 - "chartTheme.js"
-Cohesion: 0.10
-Nodes (24): LEGEND_BOTTOM_PROPS, LEGEND_PROPS, AREA_OPACITY, BAND_OPACITY, GRID_PROPS, MUTED_OPACITY, SEGMENT_GAP, SERIES_COLORS (+16 more)
+### Community 16 - "MainLayout.jsx"
+Cohesion: 0.44
+Nodes (7): Footer(), AppShell(), Sidebar(), displayName(), Topbar(), useSidebar(), filterNavByRole()
 
 ### Community 17 - "Runtime Dependencies"
 Cohesion: 0.12
 Nodes (16): dependencies, axios, bootstrap, bootstrap-icons, country-region-data, @fontsource-variable/roboto, @hookform/resolvers, libphonenumber-js (+8 more)
 
 ### Community 18 - "healthSampleData.js"
-Cohesion: 0.18
-Nodes (22): buildDay(), dailyRows(), dayLabel, dayLoad(), dayStates(), dayWindow(), hourLabel, hourlyTemperatures() (+14 more)
+Cohesion: 0.17
+Nodes (21): buildDay(), dailyRows(), dayLabel, dayLoad(), dayStates(), dayWindow(), hourLabel, hourlyTemperatures() (+13 more)
 
-### Community 19 - "AddPart"
+### Community 19 - "AddPart.jsx"
 Cohesion: 0.16
-Nodes (18): Add / edit part, API calls on this page, Decisions, Save part (add / edit form), Shared components used, State & storage, UI states, Upload part drawing (+10 more)
+Nodes (18): byName(), DRAWING_RULES, EMPTY_PROCESS, INITIAL_VALUES, MAX_PART_COUNT, MAX_PROCESSES, PART_STATUS, partSchema (+10 more)
 
 ### Community 20 - "0001. Single-page app with React 19 and Vite"
 Cohesion: 0.33
 Nodes (5): 0001. Single-page app with React 19 and Vite, Alternatives considered, Consequences, Context, Decision
 
-### Community 21 - "AddCustomer.jsx"
-Cohesion: 0.19
-Nodes (21): On page load, On page load, Save user (add / edit form), On page load, AddCustomer(), getCustomerSchema(), isFieldRequired(), savedLogoPath() (+13 more)
+### Community 21 - "getUsers"
+Cohesion: 0.10
+Nodes (21): API calls on this page, App shell (session, logout, theme), Change theme, Decisions, On page load, Shared components used, State & storage, UI states (+13 more)
 
-### Community 22 - "ClienteleFormModal.jsx"
-Cohesion: 0.16
-Nodes (24): libphonenumber-js, COUNTRIES, DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, ENABLED_COUNTRIES, getCountryName(), getDialCode(), getStateName() (+16 more)
+### Community 22 - "catalogService.js"
+Cohesion: 0.39
+Nodes (8): On page load, On page load, createController(), getBrands(), getModels(), unwrap(), unwrapList(), updateBrand()
 
-### Community 23 - "helpers.js"
-Cohesion: 0.17
-Nodes (18): On page load, byName(), CityList(), matchesSearch(), byName(), CountryList(), matchesSearch(), byName() (+10 more)
+### Community 23 - "MonitorMachineCard.jsx"
+Cohesion: 0.18
+Nodes (20): MACHINE_STATUS, modeTypeOf(), MachineMode(), MachineRow(), MachineViewToggle(), MACHINE_VIEWS, MachineCycles(), MachineOee() (+12 more)
 
 ### Community 24 - "SupervisorFormModal.jsx"
-Cohesion: 0.42
-Nodes (7): INITIAL_VALUES, NAME_MAX_LENGTH, supervisorSchema, toFormValues(), toSupervisorPayload(), recordShape, SupervisorFormModal()
+Cohesion: 0.14
+Nodes (22): API calls on this page, Decisions, Delete user supervisor, On page load, Save user supervisor (add / edit form), Shared components used, State & storage, Supervisors (+14 more)
 
 ### Community 25 - "jsconfig Aliases"
 Cohesion: 0.33
 Nodes (5): compilerOptions, baseUrl, jsx, paths, include
 
 ### Community 26 - "userCountryService.js"
-Cohesion: 0.22
-Nodes (9): API calls on this page, Countries, Decisions, Delete user country, On page load, Save user country (add / edit form), Shared components used, State & storage (+1 more)
+Cohesion: 0.18
+Nodes (14): API calls on this page, Countries, Decisions, Delete user country, On page load, Save user country (add / edit form), Shared components used, State & storage (+6 more)
 
-### Community 27 - "AddPart.jsx"
-Cohesion: 0.14
-Nodes (26): react-hook-form, AddPart(), byName(), MachinePicker(), summary(), EMPTY_PROCESS, EMPTY_SUB_PROGRAM, INITIAL_VALUES (+18 more)
+### Community 27 - "AddPart"
+Cohesion: 0.31
+Nodes (12): Save part (add / edit form), On page load, On page load, AddPart(), createPart(), getPartById(), getParts(), partDrawingUrl() (+4 more)
 
-### Community 28 - "BreakFormModal.jsx"
-Cohesion: 0.23
-Nodes (14): Save break (add / edit form), SHIFT_STATUS, breakSchema, INITIAL_VALUES, MAX_LENGTH, toBreakPayload(), toFormValues(), BreakFormModal() (+6 more)
+### Community 28 - "MonitoringMachine.jsx"
+Cohesion: 0.10
+Nodes (25): 0012. Monitoring: Productivity and Machine Health on one tabbed page, Alternatives considered, Consequences, Context, Decision, 0013. Monitoring starts with a machine list; All Machines is set-up only, Alternatives considered, Consequences (+17 more)
 
 ### Community 29 - "package.json"
-Cohesion: 0.08
-Nodes (25): name, private, scripts, build, build:theme, dev, lint, preview (+17 more)
+Cohesion: 0.14
+Nodes (15): name, private, type, version, axios, bootstrap, eslint, @eslint/js (+7 more)
 
 ### Community 30 - "Seven Logo Asset"
 Cohesion: 0.67
 Nodes (4): 7th Sense Logo (seven-logo.svg), 7th Sense Brand Identity, Brand Orange #f7941d, Stylized '7' Line Mark (nested strokes with dot accents)
 
-### Community 31 - "apiClient.js"
-Cohesion: 0.13
-Nodes (19): ADR-0018, Decision, Decision, Click Log out, env, AuthContext, AuthProvider(), onUnauthorized() (+11 more)
+### Community 31 - "Add / edit part"
+Cohesion: 0.22
+Nodes (9): Add / edit part, API calls on this page, Decisions, On page load, Shared components used, State & storage, UI states, Upload part drawing (+1 more)
 
 ### Community 32 - "Login Logo Asset"
 Cohesion: 0.67
 Nodes (3): 7th Sense Brand Orange (#f79420 / #f7941d), 7th Sense Login Logo (SVG), Stylized Orange '7' Line Mark (#f79420)
 
-### Community 33 - "pages.jsx"
-Cohesion: 0.13
-Nodes (13): ORGANIZATION_TABS, About, AccountCenterPage, AddCustomer, AddPart, BrandList, ClienteleList, CustomerList (+5 more)
+### Community 33 - "SidebarItem.jsx"
+Cohesion: 0.42
+Nodes (7): isAlsoActive(), linkClass(), navLeafShape, SidebarItem(), flattenNav(), hasActiveChild(), isPathActive()
 
-### Community 34 - "app.js"
-Cohesion: 0.22
-Nodes (15): ALL_MACHINE_ROLES, CUSTOMER_ROLE_ID, ROLE_LABELS, ROLES, USER_STATUS, ACCOUNT_KIND, ACCOUNT_PAGES, isAccountOfKind() (+7 more)
-
-### Community 35 - "Cells"
+### Community 34 - "Machine health"
 Cohesion: 0.25
-Nodes (8): API calls on this page, Cells, Decisions, Delete user cell, On page load, Shared components used, State & storage, UI states
+Nodes (8): API calls on this page, Decisions, Live updates, Machine health, On page load, Shared components used, State & storage, UI states
 
-### Community 36 - "catalogService.js"
-Cohesion: 0.21
-Nodes (16): Save controller (add / edit form), Save model (add / edit form), brandSchema, INITIAL_VALUES, MAX_LENGTH, toBrandPayload(), toFormValues(), BrandFormModal() (+8 more)
+### Community 35 - "userCellService.js"
+Cohesion: 0.18
+Nodes (15): API calls on this page, Cells, Decisions, Delete user cell, On page load, Save user cell (add / edit form), Shared components used, State & storage (+7 more)
+
+### Community 36 - "PlannedTab"
+Cohesion: 0.46
+Nodes (4): PlannedTab(), ToolLife(), ToolList(), VirtualScreen()
 
 ### Community 37 - "Parts"
 Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Delete part, On page load, Parts, Shared components used, State & storage, UI states
+Nodes (8): API calls on this page, Decisions, Delete part, Parts, Shared components used, State & storage, UI states, deletePart()
 
 ### Community 38 - "ProtectedRoute"
-Cohesion: 0.05
-Nodes (48): 0002. React Router with one route table and role guards, Alternatives considered, Consequences, Context, Decision, About, Decisions, State & storage (+40 more)
+Cohesion: 0.07
+Nodes (38): Decision, About, Decisions, State & storage, UI states, Coming soon (unbuilt sidebar links), Decisions, On page load (+30 more)
 
 ### Community 39 - "healthSensors.js"
-Cohesion: 0.08
-Nodes (35): niceTicks(), STEP_MULTIPLES, pointsInRange(), clock, clockSeconds, dayClock, DEFAULT_RANGE, DEFAULT_RANGE_DAYS (+27 more)
+Cohesion: 0.09
+Nodes (39): ChartCard(), niceTicks(), STEP_MULTIPLES, MACHINE_MODES, pointsInRange(), clock, clockSeconds, dayClock (+31 more)
 
-### Community 40 - "Loader"
-Cohesion: 0.15
-Nodes (24): Loader(), pageItems(), TablePagination(), PAGE_SIZES, LicenceKeySetup(), matchesSearch(), STATUS_FILTERS, MachineBrowser() (+16 more)
+### Community 40 - "holidayService.js"
+Cohesion: 0.52
+Nodes (6): Save holiday (add / edit form), createHoliday(), getHolidays(), unwrap(), unwrapList(), updateHoliday()
 
-### Community 41 - "All machines"
-Cohesion: 0.22
-Nodes (9): All machines, API calls on this page, Decisions, Delete machine, Edit machine, On page load, Shared components used, State & storage (+1 more)
+### Community 41 - "Controllers"
+Cohesion: 0.20
+Nodes (10): API calls on this page, Controllers, Decisions, Delete controller, On page load, Save controller (add / edit form), Shared components used, State & storage (+2 more)
 
-### Community 42 - "DatePicker.jsx"
-Cohesion: 0.21
-Nodes (14): clamp(), DateCalendar(), dayLabel, keyToDay(), monthGrid(), monthName, MONTHS, monthTitle (+6 more)
+### Community 42 - "Add / edit machine"
+Cohesion: 0.29
+Nodes (6): Add / edit machine, API calls on this page, Decisions, Shared components used, State & storage, UI states
 
 ### Community 43 - "ShiftCard.jsx"
-Cohesion: 0.22
-Nodes (15): itemMinutes(), MAX_LENGTH, MAX_QUANTITY, FIELD_HELP, optionShape, ScheduleJobFields(), Clock(), minutesBetween() (+7 more)
+Cohesion: 0.35
+Nodes (11): itemMinutes(), ScheduleJobFields(), Clock(), minutesBetween(), ShiftCard(), toMinutes(), typeLabel(), clockToMinutes() (+3 more)
 
-### Community 44 - "Clientele"
-Cohesion: 0.29
-Nodes (7): API calls on this page, Clientele, Decisions, Delete clientele, Shared components used, State & storage, UI states
+### Community 44 - "ProcessFields.jsx"
+Cohesion: 0.17
+Nodes (14): MACHINE_ACCURACIES, checkDrawing, DrawingUpload(), MachinePicker(), summary(), EMPTY_SUB_PROGRAM, MAX_LENGTH, MAX_SUB_PROGRAMS (+6 more)
 
 ### Community 46 - "Downtime / idle reasons"
 Cohesion: 0.13
 Nodes (25): API calls on this page, Decisions, Delete downtime reason, Delete idle reason, Downtime / idle reasons, On page load, Save downtime reason (add / edit form), Save idle reason (add / edit form) (+17 more)
 
-### Community 47 - "FieldLabel"
-Cohesion: 0.27
-Nodes (9): FieldLabel(), InfoTooltip(), controllerSchema, INITIAL_VALUES, MAX_LENGTH, toControllerPayload(), toFormValues(), ControllerFormModal() (+1 more)
+### Community 47 - "Machine models"
+Cohesion: 0.29
+Nodes (7): API calls on this page, Decisions, Delete model, Machine models, Shared components used, State & storage, UI states
 
 ### Community 48 - "AddMachine.jsx"
-Cohesion: 0.05
-Nodes (66): 0007. Recharts for charts, plain SVG for the Gantt, Alternatives considered, Consequences, Context, Decision, On page load, Add / edit machine, API calls on this page (+58 more)
+Cohesion: 0.07
+Nodes (50): Save machine (add / edit form), All machines, API calls on this page, Decisions, Delete machine, Edit machine, On page load, Shared components used (+42 more)
 
-### Community 49 - "Locations"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Delete user location, Locations, On page load, Shared components used, State & storage, UI states
+### Community 49 - "LineFormModal.jsx"
+Cohesion: 0.42
+Nodes (7): INITIAL_VALUES, lineSchema, NAME_MAX_LENGTH, toFormValues(), toLinePayload(), LineFormModal(), recordShape
 
 ### Community 50 - "Holidays / week off"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Delete holiday, Holidays / week off, On page load, Shared components used, State & storage, UI states
+Cohesion: 0.22
+Nodes (9): API calls on this page, Decisions, Delete holiday, Holidays / week off, On page load, Shared components used, State & storage, UI states (+1 more)
 
-### Community 51 - "react-bootstrap"
-Cohesion: 0.12
-Nodes (25): react-bootstrap, react-router-dom, ACCOUNT_CENTER_PATHS, ACCOUNT_CENTER_TABS, SUPERADMIN_ONLY, MONITOR_REFRESH_MS, MONITORING_MACHINE_TABS, MONITORING_PATHS (+17 more)
+### Community 51 - "userLocationService.js"
+Cohesion: 0.60
+Nodes (5): Save user location (add / edit form), createUserLocation(), unwrap(), unwrapList(), updateUserLocation()
 
-### Community 52 - "ModelFormModal.jsx"
-Cohesion: 0.32
-Nodes (9): ControllerOptions(), groupByBrand(), INITIAL_VALUES, modelSchema, NAME_MAX_LENGTH, toFormValues(), toModelPayload(), ModelFormModal() (+1 more)
+### Community 52 - "BreakFormModal.jsx"
+Cohesion: 0.22
+Nodes (14): On page load, Save break (add / edit form), breakSchema, INITIAL_VALUES, MAX_LENGTH, toBreakPayload(), toFormValues(), BreakFormModal() (+6 more)
 
-### Community 53 - "Loader"
-Cohesion: 0.35
-Nodes (8): INITIAL_VALUES, MAX_LENGTH, REASON_STATUS, reasonSchema, toFormValues(), toReasonPayload(), ReasonFormModal(), FIELD_HELP
+### Community 53 - "ShiftFormModal.jsx"
+Cohesion: 0.28
+Nodes (13): clock(), EMPTY_BREAK_ROW, INITIAL_VALUES, MAX_BREAKS, MAX_LENGTH, offset(), shiftSchema(), toFormValues() (+5 more)
 
 ### Community 54 - "CityFormModal.jsx"
-Cohesion: 0.42
-Nodes (7): citySchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCityPayload(), toFormValues(), CityFormModal(), recordShape
+Cohesion: 0.38
+Nodes (8): citySchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCityPayload(), toFormValues(), CityFormModal(), recordShape, withCustomer()
 
 ### Community 55 - "Production schedules"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Delete production schedule, On page load, Production schedules, Shared components used, State & storage, UI states
+Cohesion: 0.22
+Nodes (9): API calls on this page, Decisions, Delete production schedule, On page load, Production schedules, Shared components used, State & storage, UI states (+1 more)
 
 ### Community 56 - "UserGuide.jsx"
-Cohesion: 0.18
-Nodes (18): navLinks(), NUMBERED_STEPS, OpenLink(), SectionCard(), SECTIONS, SetupStep(), textOf(), UserGuide() (+10 more)
+Cohesion: 0.17
+Nodes (19): InfoTooltip(), navLinks(), NUMBERED_STEPS, OpenLink(), SectionCard(), SECTIONS, SetupStep(), textOf() (+11 more)
 
-### Community 57 - "userSupervisorService.js"
-Cohesion: 0.20
-Nodes (16): API calls on this page, Decisions, Delete user supervisor, On page load, Save user supervisor (add / edit form), Shared components used, State & storage, Supervisors (+8 more)
+### Community 57 - "Theme showcase"
+Cohesion: 0.40
+Nodes (5): Decisions, Shared components used, State & storage, Theme showcase, UI states
 
 ### Community 58 - "Monitoring › Machines"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Monitoring (machine list), On page load, Open productivity / health, Rules & edge cases, State & storage, UI states
+Cohesion: 0.22
+Nodes (9): API calls on this page, Decisions, Monitoring (machine list), On page load, Open productivity / health, Rules & edge cases, Shared components used, State & storage (+1 more)
 
-### Community 59 - "Add / edit branch"
-Cohesion: 0.29
-Nodes (7): Add / edit branch, API calls on this page, Decisions, On page load, Shared components used, State & storage, UI states
+### Community 59 - "AddBranch.jsx"
+Cohesion: 0.08
+Nodes (39): Add / edit branch, API calls on this page, Decisions, On page load, Save branch (add / edit form), Shared components used, State & storage, UI states (+31 more)
 
 ### Community 60 - "0011. Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page"
-Cohesion: 0.40
-Nodes (5): 0011. Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page, Alternatives considered, Consequences, Context, Decision
+Cohesion: 0.11
+Nodes (15): 0011. Business Setup: Customer, Licence Key, Clientele and Machine Catalog on one tabbed page, Alternatives considered, Consequences, Context, Decision, 0014. Business Setup renamed Account Center; old Account Center item removed, Alternatives considered, Consequences (+7 more)
 
-### Community 61 - "apiClient"
-Cohesion: 0.25
-Nodes (7): apiClient, createUserCountry(), unwrap(), unwrapList(), createUserState(), unwrap(), unwrapList()
+### Community 61 - "withQuery"
+Cohesion: 0.20
+Nodes (16): API calls on this page, Cities, Decisions, Delete user city, On page load, Save user city (add / edit form), Shared components used, State & storage (+8 more)
 
 ### Community 62 - "States"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Decisions, Delete user state, Save user state (add / edit form), Shared components used, State & storage, States, UI states
-
-### Community 63 - "App shell (session, logout, theme)"
-Cohesion: 0.08
-Nodes (24): API calls on this page, App shell (session, logout, theme), Change theme, Decisions, On page load, Shared components used, State & storage, UI states (+16 more)
+Cohesion: 0.18
+Nodes (14): API calls on this page, Decisions, Delete user state, On page load, Save user state (add / edit form), Shared components used, State & storage, States (+6 more)
 
 ### Community 64 - "LicenceKeyGenerator.jsx"
-Cohesion: 0.07
-Nodes (46): API calls on this page, Decisions, Delete licence key, Generate licence keys, Licence keys, On page load, Save licence key (add / edit form), Save licence keys (add / edit form) (+38 more)
+Cohesion: 0.10
+Nodes (30): Dashboard, Masters, Masters › Downtime, Masters › Organization, Masters › Shift, Masters › Users, Operations, Operations › Monitoring (+22 more)
 
 ### Community 65 - "useLoad"
-Cohesion: 0.24
+Cohesion: 0.27
 Nodes (10): API calls on this page, Change the Machine Modes period, Decisions, Live updates, On page load, Productivity, Shared components used, State & storage (+2 more)
 
 ### Community 66 - "0008. Folder structure by page and by concern"
@@ -427,161 +416,129 @@ Nodes (5): 0008. Folder structure by page and by concern, Alternatives considere
 Cohesion: 0.25
 Nodes (8): Decisions, On page load, Rules & edge cases, Sections, Shared components used, State & storage, UI states, User guide
 
-### Community 68 - "clienteleService.js"
-Cohesion: 0.36
-Nodes (9): On page load, Save clientele (add / edit form), On page load, createClientele(), getClienteleById(), getClienteles(), unwrap(), unwrapList() (+1 more)
-
 ### Community 69 - "0006. React-Bootstrap with SCSS design tokens"
 Cohesion: 0.33
 Nodes (5): 0006. React-Bootstrap with SCSS design tokens, Alternatives considered, Consequences, Context, Decision
 
 ### Community 70 - "toast.js"
-Cohesion: 0.36
-Nodes (8): TOAST_DEFAULTS, dismiss(), emit(), listeners, remove(), setToasts(), show(), toasts
-
-### Community 71 - "Client documentation"
 Cohesion: 0.50
-Nodes (4): Client documentation, How to use Postman, How to view the API docs in Chrome (Swagger UI), How to view the page flow docs
+Nodes (5): dismiss(), emit(), remove(), setToasts(), show()
+
+### Community 71 - "SummaryCards.jsx"
+Cohesion: 0.17
+Nodes (21): DEFAULT_MODE_RANGE, formatCount(), formatCycle(), KPI_REFRESH_MS, MODE_RANGES, SUMMARY_MODE_IDS, modeSeconds(), sinceLabel (+13 more)
 
 ### Community 72 - "sharedGet"
-Cohesion: 0.35
-Nodes (11): On page load, sharedGet(), getMachineTimeByDay(), unwrap(), getCycleCounts(), getFinishCycles(), getModeTimeline(), getModeTotals() (+3 more)
+Cohesion: 0.18
+Nodes (12): Decision, On page load, apiClient, pendingGets, sharedGet(), unauthorizedListeners, getMachineTimeByDay(), unwrap() (+4 more)
 
 ### Community 73 - "Breaks"
 Cohesion: 0.25
-Nodes (8): API calls on this page, Breaks, Decisions, Delete break, On page load, Shared components used, State & storage, UI states
+Nodes (8): API calls on this page, Breaks, Decisions, Delete break, Shared components used, State & storage, UI states, deleteBreak()
 
-### Community 74 - "App.jsx"
-Cohesion: 0.36
-Nodes (7): App(), Toaster(), ICONS, ToastItem(), OrgUserProvider(), getToasts(), subscribeToasts()
-
-### Community 75 - "Brands"
-Cohesion: 0.22
-Nodes (9): API calls on this page, Brands, Decisions, Delete brand, On page load, Save brand (add / edit form), Shared components used, State & storage (+1 more)
+### Community 75 - "Tool List, Tool Life and Virtual Screen (machine tabs)"
+Cohesion: 0.25
+Nodes (8): API calls on this page, Decisions, On page load, Rules & edge cases, Shared components used, State & storage, Tool List, Tool Life and Virtual Screen (machine tabs), UI states
 
 ### Community 76 - "CountryFormModal.jsx"
-Cohesion: 0.28
-Nodes (10): MultiSelectPicker(), summary(), toGroups(), countrySchema, INITIAL_VALUES, toCountryPayloads(), CountryFormModal(), NOUN (+2 more)
+Cohesion: 0.39
+Nodes (7): countrySchema, INITIAL_VALUES, toCountryPayloads(), CountryFormModal(), NOUN, sameName(), ownedBy()
 
-### Community 77 - "Machine health"
-Cohesion: 0.13
-Nodes (16): 0012. Monitoring: Productivity and Machine Health on one tabbed page, Alternatives considered, Consequences, Context, Decision, 0019. Monitoring: machine list, then the machine's tabs with a back arrow, Alternatives considered, Consequences (+8 more)
+### Community 77 - "0003. Server state via service modules and useLoad, Context only for the session"
+Cohesion: 0.40
+Nodes (4): 0003. Server state via service modules and useLoad, Context only for the session, Alternatives considered, Consequences, Context
 
 ### Community 78 - "shiftService.js"
 Cohesion: 0.18
-Nodes (15): API calls on this page, Decisions, Delete shift, On page load, Save shift (add / edit form), Shared components used, Shifts, State & storage (+7 more)
+Nodes (16): API calls on this page, Decisions, Delete shift, On page load, Save shift (add / edit form), Shared components used, Shifts, State & storage (+8 more)
 
-### Community 79 - "HolidayFormModal.jsx"
-Cohesion: 0.19
-Nodes (16): Save holiday (add / edit form), StatusToggle(), HOLIDAY_TYPES, holidaySchema, INITIAL_VALUES, MAX_LENGTH, toFormValues(), toHolidayPayload() (+8 more)
-
-### Community 80 - "0017. Log in as customer in a new tab, on the tab's own API path"
-Cohesion: 0.18
-Nodes (9): 0017. Log in as customer in a new tab, on the tab's own API path, Alternatives considered, Consequences, Context, Decision, 0018. Log in as customer opens the dashboard directly (no /login-as page), Alternatives considered, Consequences (+1 more)
-
-### Community 81 - "0014. Business Setup renamed Account Center; old Account Center item removed"
-Cohesion: 0.40
-Nodes (5): 0014. Business Setup renamed Account Center; old Account Center item removed, Alternatives considered, Consequences, Context, Decision
-
-### Community 82 - "Customers / Users list"
-Cohesion: 0.22
-Nodes (9): API calls on this page, Customers / Users list, Decisions, Delete user, Save user (add / edit form), Shared components used, State & storage, UI states (+1 more)
+### Community 80 - "SidebarProvider.jsx"
+Cohesion: 0.33
+Nodes (7): BREAKPOINTS, SidebarContext, SidebarProvider(), useMediaQuery(), useMachineView(), readStorage(), writeStorage()
 
 ### Community 83 - "userLineService.js"
 Cohesion: 0.18
 Nodes (15): API calls on this page, Decisions, Delete user line, Lines, On page load, Save user line (add / edit form), Shared components used, State & storage (+7 more)
 
-### Community 84 - "Shops"
+### Community 84 - "userShopService.js"
+Cohesion: 0.18
+Nodes (15): API calls on this page, Decisions, Delete user shop, On page load, Save user shop (add / edit form), Shared components used, Shops, State & storage (+7 more)
+
+### Community 85 - "ModelFormModal.jsx"
+Cohesion: 0.26
+Nodes (12): Save model (add / edit form), ControllerOptions(), groupByBrand(), INITIAL_VALUES, modelSchema, NAME_MAX_LENGTH, toFormValues(), toModelPayload() (+4 more)
+
+### Community 87 - "CellFormModal.jsx"
+Cohesion: 0.32
+Nodes (9): zod, cellSchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCellPayload(), toFormValues(), CellFormModal(), recordShape (+1 more)
+
+### Community 88 - "vite.config.js"
 Cohesion: 0.29
-Nodes (7): API calls on this page, Decisions, Delete user shop, Shared components used, Shops, State & storage, UI states
-
-### Community 85 - "useTableSort"
-Cohesion: 0.22
-Nodes (14): ARIA_SORT, compareValues(), isBlank(), SORT_DIR, useTableSort(), ClienteleList(), matchesSearch(), byBrandThenName() (+6 more)
-
-### Community 86 - "customerName"
-Cohesion: 0.44
-Nodes (6): customerLabel(), OrgCustomerField(), customerMobile(), customerName(), matchesSearch(), CustomerRow()
-
-### Community 87 - "LineFormModal.jsx"
-Cohesion: 0.42
-Nodes (7): INITIAL_VALUES, lineSchema, NAME_MAX_LENGTH, toFormValues(), toLinePayload(), LineFormModal(), recordShape
-
-### Community 88 - "Cities"
-Cohesion: 0.25
-Nodes (8): API calls on this page, Cities, Decisions, Delete user city, On page load, Shared components used, State & storage, UI states
+Nodes (4): vite, @vitejs/plugin-react, __dirname, SASS_SILENCED
 
 ### Community 89 - "0005. Forms with react-hook-form and zod"
 Cohesion: 0.33
 Nodes (5): 0005. Forms with react-hook-form and zod, Alternatives considered, Consequences, Context, Decision
 
-### Community 90 - "Login"
-Cohesion: 0.29
-Nodes (7): API calls on this page, Decisions, Login, Shared components used, State & storage, Submit login form, UI states
+### Community 90 - "AuthProvider.jsx"
+Cohesion: 0.08
+Nodes (28): 0004. Axios client with the HttpOnly session cookie, Alternatives considered, Consequences, Context, Decision, Click Log out, API calls on this page, Decisions (+20 more)
 
 ### Community 91 - "0009. Page-wise flow documentation in docs/pages"
 Cohesion: 0.33
 Nodes (5): 0009. Page-wise flow documentation in docs/pages, Alternatives considered, Consequences, Context, Decision
 
-### Community 92 - "userCityService.js"
-Cohesion: 0.52
-Nodes (6): Save user city (add / edit form), createUserCity(), getUserCities(), unwrap(), unwrapList(), updateUserCity()
-
-### Community 93 - "0004. Axios client with the HttpOnly session cookie"
-Cohesion: 0.33
-Nodes (5): 0004. Axios client with the HttpOnly session cookie, Alternatives considered, Consequences, Context, Decision
-
-### Community 94 - "userCellService.js"
-Cohesion: 0.60
-Nodes (5): Save user cell (add / edit form), createUserCell(), unwrap(), unwrapList(), updateUserCell()
-
-### Community 95 - "userLocationService.js"
-Cohesion: 0.60
-Nodes (5): Save user location (add / edit form), createUserLocation(), unwrap(), unwrapList(), updateUserLocation()
-
-### Community 96 - "0015. Clientele is a Masters page, not an Account Center tab"
+### Community 92 - "0002. React Router with one route table and role guards"
 Cohesion: 0.40
-Nodes (5): 0015. Clientele is a Masters page, not an Account Center tab, Alternatives considered, Consequences, Context, Decision
+Nodes (4): 0002. React Router with one route table and role guards, Alternatives considered, Consequences, Context
+
+### Community 94 - "theme.js"
+Cohesion: 0.18
+Nodes (15): bootstrap-icons, @fontsource-variable/roboto, react-dom, @/assets/scss/theme-light.scss?inline, DEFAULT_THEME, useTheme(), applyTheme(), chooseTheme() (+7 more)
+
+### Community 95 - "Locations"
+Cohesion: 0.29
+Nodes (7): API calls on this page, Decisions, Delete user location, Locations, Shared components used, State & storage, UI states
 
 ### Community 97 - "LocationFormModal.jsx"
-Cohesion: 0.42
-Nodes (7): INITIAL_VALUES, locationSchema, NAME_MAX_LENGTH, toFormValues(), toLocationPayload(), LocationFormModal(), recordShape
+Cohesion: 0.32
+Nodes (9): customerLabel(), OrgCustomerField(), INITIAL_VALUES, locationSchema, NAME_MAX_LENGTH, toFormValues(), toLocationPayload(), LocationFormModal() (+1 more)
 
-### Community 98 - "userShopService.js"
-Cohesion: 0.60
-Nodes (5): Save user shop (add / edit form), createUserShop(), unwrap(), unwrapList(), updateUserShop()
+### Community 100 - "Brands"
+Cohesion: 0.20
+Nodes (10): API calls on this page, Brands, Decisions, Delete brand, On page load, Save brand (add / edit form), Shared components used, State & storage (+2 more)
 
-### Community 99 - "ModelList.jsx"
-Cohesion: 0.48
-Nodes (6): byBrandControllerName(), compareText(), matchesSearch(), ModelList(), ModelList, deleteModel()
-
-### Community 100 - "SortableHead"
-Cohesion: 0.18
-Nodes (18): On page load, SortableHead(), byName(), LineList(), matchesSearch(), byName(), LocationList(), matchesSearch() (+10 more)
-
-### Community 101 - "0003. Server state via service modules and useLoad, Context only for the session"
-Cohesion: 0.40
-Nodes (4): 0003. Server state via service modules and useLoad, Context only for the session, Alternatives considered, Consequences, Context
+### Community 101 - "ModeGanttChart.jsx"
+Cohesion: 0.14
+Nodes (13): 0007. Recharts for charts, plain SVG for the Gantt, Alternatives considered, Consequences, Context, Decision, clockMinutes, clockWithSeconds, ModeGanttChart() (+5 more)
 
 ### Community 102 - "Add / edit production schedule"
 Cohesion: 0.33
 Nodes (6): Add / edit production schedule, API calls on this page, Decisions, Shared components used, State & storage, UI states
 
-### Community 103 - "validators.js"
-Cohesion: 0.53
-Nodes (5): isBlank(), matches(), minLength(), PASSWORD_MIN_LENGTH, required()
+### Community 104 - "apiBaseUrl"
+Cohesion: 0.14
+Nodes (14): 0017. Log in as customer in a new tab, on the tab's own API path, Alternatives considered, Consequences, Context, Decision, 0018. Log in as customer opens the dashboard directly (no /login-as page), Alternatives considered, Consequences (+6 more)
 
-### Community 104 - "DrawingUpload.jsx"
+### Community 105 - "react-bootstrap"
+Cohesion: 0.05
+Nodes (151): ADR-0018, Save user (add / edit form), On page load, On page load, react-bootstrap, react-router-dom, ConfirmModal(), Loader() (+143 more)
+
+### Community 107 - "constants/navigation.js"
+Cohesion: 0.16
+Nodes (11): 0010. Organization levels on one tabbed page, a route per tab, Alternatives considered, Consequences, Context, Decision, ACCOUNT_CENTER_PATHS, NAV_SECTIONS, ORGANIZATION_PATHS (+3 more)
+
+### Community 112 - "scripts"
+Cohesion: 0.33
+Nodes (6): scripts, build, build:theme, dev, lint, preview
+
+### Community 114 - "Client documentation"
 Cohesion: 0.50
-Nodes (4): checkDrawing, DrawingUpload(), DRAWING_RULES, fileRule()
-
-### Community 113 - "CellFormModal.jsx"
-Cohesion: 0.42
-Nodes (7): cellSchema, INITIAL_VALUES, NAME_MAX_LENGTH, toCellPayload(), toFormValues(), CellFormModal(), recordShape
+Nodes (4): Client documentation, How to use Postman, How to view the API docs in Chrome (Swagger UI), How to view the page flow docs
 
 ### Community 115 - "ShopFormModal.jsx"
-Cohesion: 0.31
-Nodes (10): zod, INITIAL_VALUES, NAME_MAX_LENGTH, shopSchema, toFormValues(), toShopPayload(), recordShape, ShopFormModal() (+2 more)
+Cohesion: 0.42
+Nodes (7): INITIAL_VALUES, NAME_MAX_LENGTH, shopSchema, toFormValues(), toShopPayload(), recordShape, ShopFormModal()
 
 ### Community 116 - "0016. Account Center is superadmin only; Users lists company members only"
 Cohesion: 0.40
@@ -593,24 +550,24 @@ Nodes (5): 0016. Account Center is superadmin only; Users lists company members 
 
 ## Knowledge Gaps
 - **11 isolated node(s):** `bootstrap`, `@types/react`, `@types/react-dom`, `eslint`, `sass` (+6 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 392 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 398 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `Login.jsx`, `BarLineChart.jsx`, `ProductionScheduleList.jsx`, `Productivity.jsx`, `toast`, `ShiftFormModal.jsx`, `AddBranch.jsx`, `dateTime.js`, `TimePicker.jsx`, `StateFormModal.jsx`, `AddProductionSchedule.jsx`, `chartTheme.js`, `AddCustomer.jsx`, `ClienteleFormModal.jsx`, `helpers.js`, `SupervisorFormModal.jsx`, `AddPart.jsx`, `BreakFormModal.jsx`, `package.json`, `apiClient.js`, `pages.jsx`, `app.js`, `catalogService.js`, `ProtectedRoute`, `healthSensors.js`, `Loader`, `DatePicker.jsx`, `ShiftCard.jsx`, `FieldLabel`, `AddMachine.jsx`, `react-bootstrap`, `ModelFormModal.jsx`, `Loader`, `CityFormModal.jsx`, `UserGuide.jsx`, `apiClient`, `LicenceKeyGenerator.jsx`, `useLoad`, `App.jsx`, `CountryFormModal.jsx`, `HolidayFormModal.jsx`, `useTableSort`, `customerName`, `LineFormModal.jsx`, `LocationFormModal.jsx`, `ModelList.jsx`, `SortableHead`, `DrawingUpload.jsx`, `CellFormModal.jsx`, `ShopFormModal.jsx`?**
-  _High betweenness centrality (0.165) - this node is a cross-community bridge._
+- **Why does `ProtectedRoute()` connect `ProtectedRoute` to `ClienteleFormModal.jsx`, `licenceKeyService.js`, `getUsers`, `SupervisorFormModal.jsx`, `userCountryService.js`, `Add / edit part`, `Machine health`, `userCellService.js`, `Parts`, `Controllers`, `Add / edit machine`, `Downtime / idle reasons`, `Machine models`, `AddMachine.jsx`, `Holidays / week off`, `Production schedules`, `Theme showcase`, `Monitoring › Machines`, `AddBranch.jsx`, `withQuery`, `States`, `useLoad`, `User guide`, `Breaks`, `Tool List, Tool Life and Virtual Screen (machine tabs)`, `shiftService.js`, `userLineService.js`, `userShopService.js`, `Locations`, `Brands`, `Add / edit production schedule`, `apiBaseUrl`, `react-bootstrap`?**
+  _High betweenness centrality (0.158) - this node is a cross-community bridge._
 - **Are the 22 inferred relationships involving `useAuth()` (e.g. with `State & storage` and `State & storage`) actually correct?**
   _`useAuth()` has 22 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
   _11 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Login.jsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.05163511187607573 - nodes in this community are weakly interconnected._
-- **Why does `ProtectedRoute()` connect `ProtectedRoute` to `Machine models`, `AddPart`, `userCountryService.js`, `Cells`, `Parts`, `Loader`, `All machines`, `Clientele`, `Downtime / idle reasons`, `AddMachine.jsx`, `Locations`, `Holidays / week off`, `react-bootstrap`, `Production schedules`, `userSupervisorService.js`, `Monitoring › Machines`, `Add / edit branch`, `States`, `App shell (session, logout, theme)`, `LicenceKeyGenerator.jsx`, `useLoad`, `User guide`, `Breaks`, `Brands`, `Machine health`, `shiftService.js`, `0017. Log in as customer in a new tab, on the tab's own API path`, `Customers / Users list`, `userLineService.js`, `Shops`, `Cities`, `Add / edit production schedule`?**
-  _High betweenness centrality (0.153) - this node is a cross-community bridge._
+- **Should `ClienteleFormModal.jsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.061088485746019994 - nodes in this community are weakly interconnected._
+- **Why does `react` connect `react` to `Login.jsx`, `ClienteleFormModal.jsx`, `BarLineChart.jsx`, `Productivity.jsx`, `BrandFormModal.jsx`, `HolidayFormModal.jsx`, `ControllerFormModal.jsx`, `dateTime.js`, `dateTime.js`, `StateFormModal.jsx`, `Speedometer.jsx`, `AddProductionSchedule.jsx`, `MainLayout.jsx`, `AddPart.jsx`, `MonitorMachineCard.jsx`, `SupervisorFormModal.jsx`, `MonitoringMachine.jsx`, `package.json`, `SidebarItem.jsx`, `ProtectedRoute`, `healthSensors.js`, `ShiftCard.jsx`, `AddMachine.jsx`, `LineFormModal.jsx`, `BreakFormModal.jsx`, `ShiftFormModal.jsx`, `CityFormModal.jsx`, `UserGuide.jsx`, `AddBranch.jsx`, `LicenceKeyGenerator.jsx`, `SummaryCards.jsx`, `sharedGet`, `CountryFormModal.jsx`, `SidebarProvider.jsx`, `ModelFormModal.jsx`, `CellFormModal.jsx`, `AuthProvider.jsx`, `theme.js`, `LocationFormModal.jsx`, `ModeGanttChart.jsx`, `react-bootstrap`, `constants/navigation.js`, `ShopFormModal.jsx`?**
+  _High betweenness centrality (0.158) - this node is a cross-community bridge._
 - **Should `Productivity.jsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.07982583454281568 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10588235294117647 - nodes in this community are weakly interconnected._
 
 ### Low-confidence Hints
 _AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._

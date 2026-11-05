@@ -226,24 +226,56 @@ $ts-containers: ".container, .container-fluid, .ts-page, .ts-topbar, .ts-footer"
   box-shadow: 0 0 0 2px $ts-appbar;
 }
 
+// Top-bar user menu: a bordered button (name, avatar, chevron) that turns accent while open,
+// and a menu exactly as wide as the button (a fixed minimum on phones, where only the avatar shows)
+.ts-user-menu {
+  .dropdown-menu {
+    min-width: $ts-user-menu-min-width;
+    margin-top: $ts-space-1;
+
+    @include media-breakpoint-up(md) { min-width: 100%; }
+  }
+}
+
 .ts-user-toggle {
+  --bs-btn-border-color: #{$ts-line};
+  --bs-btn-hover-border-color: #{$ts-orange};
+  --bs-btn-active-border-color: #{$ts-orange};
+  --bs-btn-hover-bg: #{$ts-panel-2};
+  --bs-btn-active-bg: #{$ts-panel-2};
+
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: $ts-space-2;
-  padding-block: ts-rem(3);
+  min-height: $ts-btn-height;
+  padding: ts-rem(3) $ts-space-3;
+  border-radius: $ts-radius-md;
   font-size: ts-rem(12);
+
+  &.show {
+    border-color: $ts-orange;
+    box-shadow: 0 0 0 $ts-user-toggle-ring rgba($ts-orange, $ts-user-toggle-ring-alpha);
+  }
+
+  &::after { margin-left: $ts-space-1; }
+}
+
+.ts-user-name {
+  color: $ts-ink;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .ts-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: ts-rem(30);
-  height: ts-rem(30);
-  border-radius: $ts-radius;
-  background: $ts-panel-2;
+  width: ts-rem(24);
+  height: ts-rem(24);
+  border-radius: $ts-radius-sm;
   color: $ts-ink-2;
-  font-size: ts-rem(16);
+  font-size: ts-rem(15);
 }
 
 // Sidebar (closed = slid out + hidden from tab order; open = visible)
@@ -1541,6 +1573,53 @@ fieldset:disabled .btn {
   margin-bottom: $ts-space-2;
   font-size: ts-rem(32);
   color: $ts-ink-3;
+}
+
+// Search / filter with no hits, inside the table panel under its header (TableNoResults.jsx)
+.ts-no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $ts-space-6 $ts-space-4;
+  text-align: center;
+  white-space: normal;
+}
+
+.ts-no-results-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $ts-no-results-icon-size;
+  height: $ts-no-results-icon-size;
+  margin-bottom: $ts-space-3;
+  font-size: $ts-fs-xl;
+  color: $ts-ink-3;
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-pill;
+}
+
+.ts-no-results-title {
+  margin: 0 0 $ts-space-1;
+  font-size: $ts-fs-lg;
+  font-weight: 600;
+  color: $ts-ink;
+}
+
+.ts-no-results-text {
+  max-width: $ts-no-results-text-width;
+  margin: 0 0 $ts-space-3;
+  font-size: $ts-fs-md;
+  color: $ts-ink-3;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+// The row is a message, not data: no hover tint, no bottom rule
+.table > tbody > .ts-no-results-row > td {
+  --bs-table-bg-state: transparent;
+  padding: 0;
+  border-bottom-width: 0;
 }
 
 // Legend for charts
@@ -3659,6 +3738,117 @@ $ts-toast-colors: (
 .ts-monitor-card-meta {
   font-size: $ts-fs-base;
   color: $ts-ink-3;
+}
+
+// Today's OEE / cycles in the card: two label-over-value columns
+.ts-monitor-card-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $ts-space-3;
+  margin: $ts-space-3 0 0;
+
+  dt {
+    font-size: $ts-fs-xs;
+    font-weight: 600;
+    color: $ts-ink-3;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  dd { margin: 0; }
+}
+
+// A value with a bar beside it and its parts underneath (Monitoring OEE / cycles, MachineMetrics):
+// "72.4% ▬▬▬──" over "A 90%  P 85%  Q 95%", "15 ▬▬▬▬─" over "● 12 completed  ● 3 unfinished"
+.ts-metric {
+  display: inline-flex;
+  flex-direction: column;
+  gap: $ts-space-1;
+  line-height: 1.25;
+}
+
+.ts-metric-head {
+  display: flex;
+  gap: $ts-space-2;
+  align-items: center;
+}
+
+.ts-metric-value {
+  min-width: $ts-metric-value-width;
+  font-size: $ts-fs-lg;
+  font-weight: 600;
+  color: $ts-ink;
+}
+
+.ts-metric-bar {
+  --bs-progress-height: #{$ts-metric-bar-height};
+  flex: 1 0 $ts-metric-bar-width;
+  gap: ts-rem(1);
+}
+
+// A / P / Q: letter over its percent, three even columns
+.ts-metric-parts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: $ts-space-3;
+  justify-content: start;
+  margin: 0;
+  font-size: $ts-fs-sm;
+
+  > div {
+    display: flex;
+    gap: $ts-space-1;
+    align-items: baseline;
+  }
+
+  dt {
+    font-size: $ts-fs-2xs;
+    font-weight: 600;
+    color: $ts-ink-3;
+    letter-spacing: $ts-ls-wide;
+  }
+
+  dd {
+    margin: 0;
+    color: $ts-ink-2;
+  }
+}
+
+// Completed / unfinished: coloured dot, count, word (muted when the count is 0)
+.ts-metric-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 $ts-space-3;
+  padding: 0;
+  margin: 0;
+  font-size: $ts-fs-sm;
+  color: $ts-ink-3;
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    gap: $ts-space-1;
+    align-items: center;
+
+    &::before {
+      width: $ts-metric-dot-size;
+      height: $ts-metric-dot-size;
+      content: "";
+      background: currentcolor;
+      border-radius: $ts-radius-pill;
+    }
+
+    &.is-good::before { background: $ts-good; }
+    &.is-bad::before { background: $ts-red; }
+    &.is-zero::before { opacity: .35; }
+  }
+
+  strong {
+    font-weight: 600;
+    color: $ts-ink-2;
+  }
+
+  .is-zero strong { color: $ts-ink-3; }
 }
 
 .ts-monitor-card-links {

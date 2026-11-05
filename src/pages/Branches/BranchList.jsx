@@ -4,6 +4,7 @@ import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { BRANCH_STATUS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
@@ -77,6 +78,12 @@ function BranchList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setPage(1)
+  }
 
   const setBranchStatus = (id, status) =>
     setBranches((list) => list.map((branch) => (branch.id === id ? { ...branch, status } : branch)))
@@ -177,24 +184,27 @@ function BranchList() {
           </InputGroup>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((branch) => (
-                  <BranchRow
-                    key={branch.id}
-                    branch={branch}
-                    canManage={canManage}
-                    statusBusy={statusBusyIds.has(branch.id)}
-                    onToggleStatus={handleToggleStatus}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((branch) => (
+                <BranchRow
+                  key={branch.id}
+                  branch={branch}
+                  canManage={canManage}
+                  statusBusy={statusBusyIds.has(branch.id)}
+                  onToggleStatus={handleToggleStatus}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message={`No branches match “${search.trim()}”.`} onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -205,10 +215,8 @@ function BranchList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No branches match “{search.trim()}”.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

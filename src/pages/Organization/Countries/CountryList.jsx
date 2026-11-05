@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { PAGE_SIZES } from '@/constants/app'
 import { deleteUserCountry, getUserCountries } from '@/services/userCountryService'
 import useOrgUser from '@/hooks/useOrgUser'
@@ -69,6 +70,12 @@ function CountryList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setPage(1)
+  }
 
   const handleSaved = (added) => {
     setPage(1) // the new rows are on top of page 1
@@ -141,16 +148,19 @@ function CountryList() {
           </InputGroup>
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((country) => (
-                  <CountryRow key={country.id} country={country} onDelete={setPendingDelete} />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((country) => (
+                <CountryRow key={country.id} country={country} onDelete={setPendingDelete} />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message={`No countries match “${search.trim()}”.`} onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -161,10 +171,8 @@ function CountryList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No countries match “{search.trim()}”.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Loader from '@/components/common/Loader'
 import SortableHead from '@/components/common/SortableHead'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults, { NoResults } from '@/components/common/TableNoResults'
 import { PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import useAuth from '@/hooks/useAuth'
 import useTableSort from '@/hooks/useTableSort'
@@ -30,9 +31,25 @@ const matchesSearch = (machine, term, withMode) =>
 // (Productivity / Health): search, customer filter (superadmin), sortable table or cards, paging.
 // The page passes what each machine offers: `rowActions` (table; none = no Actions column),
 // `cardActions` (card header) and `cardFooter`, or its own card (`renderCard(machine, showCustomer)`).
-// `showMode` adds the Mode column (the mode the machine is in now). The card view's frame is flattened
-// by the theme (.ts-table-panel:has(> .row)), so the cards are the only framed surface.
-function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowActions, cardActions, cardFooter, renderCard, showMode = false }) {
+// `showMode` adds the Mode column (the mode the machine is in now). A page can also bring its own
+// table: `tableColumns(showCustomer)` (useTableSort columns) with `renderRow(machine, showCustomer,
+// actions)`. The card view's frame is flattened by the theme (.ts-table-panel:has(> .row)), so the
+// cards are the only framed surface.
+function MachineBrowser({
+  machines,
+  loading,
+  error,
+  onRetry,
+  view,
+  empty,
+  rowActions,
+  cardActions,
+  cardFooter,
+  renderCard,
+  tableColumns,
+  renderRow,
+  showMode = false,
+}) {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
 
@@ -63,7 +80,7 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
   // Stay on a valid page when the list shrinks (search, filter, delete)
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pageCount)
-  const columns = [
+  const columns = tableColumns?.(isSuperadmin) ?? [
     { label: 'ID', sort: (row) => row.id },
     { label: 'Machine', sort: (row) => row.name },
     ...(isSuperadmin ? [{ label: 'Customer', sort: (row) => row.customerName }] : []),
@@ -78,6 +95,14 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const noResults = 'No machines match these filters.'
+  const clearFilters = () => {
+    setSearch('')
+    setCustomerFilter('')
+    setPage(1)
+  }
 
   if (loading) return <Loader text="Loading machines…" />
 
@@ -135,30 +160,34 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
         )}
       </div>
 
-      {filtered.length ? (
-        <div className="ts-table-panel">
-          {view === 'cards' ? (
-            <Row xs={1} md={2} xxl={3} className="g-3">
-              {pageRows.map((machine) => (
-                <Col key={machine.id}>
-                  {renderCard ? (
-                    renderCard(machine, isSuperadmin)
-                  ) : (
-                    <MachineCard
-                      machine={machine}
-                      showCustomer={isSuperadmin}
-                      actions={cardActions?.(machine)}
-                      footer={cardFooter?.(machine)}
-                    />
-                  )}
-                </Col>
-              ))}
-            </Row>
-          ) : (
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((machine) => (
+      <div className="ts-table-panel">
+        {view === 'cards' && !pageRows.length && <NoResults message={noResults} onClear={clearFilters} />}
+        {view === 'cards' && pageRows.length > 0 && (
+          <Row xs={1} md={2} xxl={3} className="g-3">
+            {pageRows.map((machine) => (
+              <Col key={machine.id}>
+                {renderCard ? (
+                  renderCard(machine, isSuperadmin)
+                ) : (
+                  <MachineCard
+                    machine={machine}
+                    showCustomer={isSuperadmin}
+                    actions={cardActions?.(machine)}
+                    footer={cardFooter?.(machine)}
+                  />
+                )}
+              </Col>
+            ))}
+          </Row>
+        )}
+        {view !== 'cards' && (
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((machine) =>
+                renderRow ? (
+                  renderRow(machine, isSuperadmin, rowActions?.(machine))
+                ) : (
                   <MachineRow
                     key={machine.id}
                     machine={machine}
@@ -166,10 +195,15 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
                     showMode={showMode}
                     actions={rowActions?.(machine)}
                   />
-                ))}
-              </tbody>
-            </Table>
-          )}
+                ),
+              )}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message={noResults} onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+        )}
+        {filtered.length > 0 && (
           <TablePagination
             page={currentPage}
             pageSize={pageSize}
@@ -180,10 +214,8 @@ function MachineBrowser({ machines, loading, error, onRetry, view, empty, rowAct
               setPage(1)
             }}
           />
-        </div>
-      ) : (
-        <div className="ts-empty">No machines match these filters.</div>
-      )}
+        )}
+      </div>
     </>
   )
 }
@@ -199,6 +231,8 @@ MachineBrowser.propTypes = {
   cardActions: PropTypes.func,
   cardFooter: PropTypes.func,
   renderCard: PropTypes.func,
+  tableColumns: PropTypes.func,
+  renderRow: PropTypes.func,
   showMode: PropTypes.bool,
 }
 

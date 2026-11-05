@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, InputGroup, Table } from 'react-bootstrap'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { CUSTOMER_ROLE_ID, MANAGERS, PAGE_SIZES, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { HOLIDAY_TYPES, WEEKDAYS } from '@/constants/shifts'
 import useAuth from '@/hooks/useAuth'
@@ -120,6 +121,14 @@ function HolidaySetup() {
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice(firstIndex, firstIndex + pageSize)
 
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setTypeFilter('')
+    setCustomerFilter('')
+    setPage(1)
+  }
+
   const handleSaved = useCallback((saved, wasEdit) => {
     if (!wasEdit) setPage(1) // a new row is on top of page 1
     setHolidays((list) => (wasEdit ? list.map((holiday) => (holiday.id === saved.id ? saved : holiday)) : [...list, saved]))
@@ -217,25 +226,28 @@ function HolidaySetup() {
           )}
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((holiday, index) => (
-                  <HolidayRow
-                    key={holiday.id}
-                    holiday={holiday}
-                    number={firstIndex + index + 1}
-                    showCustomer={isSuperadmin}
-                    canManage={canManage}
-                    isEditing={showForm && editing?.id === holiday.id}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((holiday, index) => (
+                <HolidayRow
+                  key={holiday.id}
+                  holiday={holiday}
+                  number={firstIndex + index + 1}
+                  showCustomer={isSuperadmin}
+                  canManage={canManage}
+                  isEditing={showForm && editing?.id === holiday.id}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="Nothing matches these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -246,10 +258,8 @@ function HolidaySetup() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">Nothing matches these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

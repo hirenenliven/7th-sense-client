@@ -35,13 +35,14 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 
 ## Operations › Monitoring
 
-One page, [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): the machine list, then a picked machine ([MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx)) with a back arrow and its Productivity / Machine Health tabs (`constants/monitoring.js`), each tab its own route with the machine id. Sidebar: one top-level Monitoring item in Operations. See [ADR 0019](../adr/0019-monitoring-machine-view.md).
+One page, [MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx): the machine list, then a picked machine ([MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx)) with a back arrow and its Productivity / Machine Health / Tool List / Tool Life / Virtual Screen tabs (`constants/monitoring.js`), each tab its own route with the machine id. Sidebar: one top-level Monitoring item in Operations. See [ADR 0019](../adr/0019-monitoring-machine-view.md).
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | Machine list | `/monitoring` | Yes | every logged-in role | [monitoring-machines.md](monitoring-machines.md) |
 | Productivity (machine tab) | `/monitoring/:machineId/productivity` | Yes | every logged-in role | [productivity.md](productivity.md) |
 | Machine health (machine tab) | `/monitoring/:machineId/health` | Yes | every logged-in role | [machine-health.md](machine-health.md) |
+| Tool List / Tool Life / Virtual Screen (machine tabs, not built yet) | `/monitoring/:machineId/tools` · `/tool-life` · `/virtual-screen` | Placeholder | every logged-in role | [machine-tools-virtual-screen.md](machine-tools-virtual-screen.md) |
 
 ## Masters
 

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Card } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import IconAction from '@/components/common/IconAction'
@@ -7,16 +7,21 @@ import { ACTION_ICONS } from '@/constants/icons'
 import { MONITOR_REFRESH_MS, machineMonitorPath } from '@/constants/monitoring'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
+import useLoad from '@/hooks/useLoad'
 import MachineBrowser from '@/pages/Machines/MachineBrowser'
 import MachineViewToggle from '@/pages/Machines/MachineViewToggle'
 import useMachines from '@/pages/Machines/useMachines'
 import useMachineView from '@/pages/Machines/useMachineView'
+import { getMachineSummaries } from '@/services/productivityService'
 import MonitorMachineCard from './MonitorMachineCard'
+import MonitorMachineRow from './MonitorMachineRow'
+import { monitorColumns } from './monitorTable'
 
 // Operations › Monitoring (main screen): every machine the user may see with the mode it is in now
-// (reloaded every MONITOR_REFRESH_MS), and only Productivity and Health (each opens that machine's
-// tab, MonitoringMachine). Adding, editing and deleting machines stays on All Machines.
-const renderCard = (machine, showCustomer) => <MonitorMachineCard machine={machine} showCustomer={showCustomer} />
+// and today's OEE and cycles (GET /machines + GET /productivity/machine-summaries, both reloaded
+// every MONITOR_REFRESH_MS), and only Productivity and Health (each opens that machine's tab,
+// MonitoringMachine). The table is compact (stacked cells) so it fits without sideways scroll.
+// Adding, editing and deleting machines stays on All Machines.
 
 function MonitoringMachines() {
   const navigate = useNavigate()
@@ -25,6 +30,32 @@ function MonitoringMachines() {
 
   const { machines, loading, error, reload } = useMachines({ refreshMs: MONITOR_REFRESH_MS })
   const [view, changeView] = useMachineView(STORAGE_KEYS.MONITORING_VIEW)
+  // A failed load only leaves OEE / cycles as "—"; the machine list still shows
+  const summariesState = useLoad(getMachineSummaries, 'machine-summaries', { refreshMs: MONITOR_REFRESH_MS })
+  const summaries = useMemo(
+    () => new Map((summariesState.data ?? []).map((summary) => [summary.machineId, summary])),
+    [summariesState.data],
+  )
+
+  const tableColumns = useCallback((showCustomer) => monitorColumns(showCustomer, summaries), [summaries])
+  const renderRow = useCallback(
+    (machine, showCustomer, actions) => (
+      <MonitorMachineRow
+        key={machine.id}
+        machine={machine}
+        showCustomer={showCustomer}
+        summary={summaries.get(machine.id)}
+        actions={actions}
+      />
+    ),
+    [summaries],
+  )
+  const renderCard = useCallback(
+    (machine, showCustomer) => (
+      <MonitorMachineCard machine={machine} showCustomer={showCustomer} summary={summaries.get(machine.id)} />
+    ),
+    [summaries],
+  )
 
   const rowActions = useCallback(
     (machine) => (
@@ -69,6 +100,8 @@ function MonitoringMachines() {
             view={view}
             rowActions={rowActions}
             renderCard={renderCard}
+            tableColumns={tableColumns}
+            renderRow={renderRow}
             showMode
             empty={
               <div className="ts-empty">

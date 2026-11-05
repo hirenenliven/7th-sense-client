@@ -5,6 +5,7 @@ import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import SortableHead from '@/components/common/SortableHead'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { MANAGERS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import useAuth from '@/hooks/useAuth'
 import useTableSort from '@/hooks/useTableSort'
@@ -88,6 +89,13 @@ function ReasonList({ kind }) {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setCustomerFilter('')
+    setPage(1)
+  }
 
   const handleAdd = () => {
     setEditing(null)
@@ -189,23 +197,26 @@ function ReasonList({ kind }) {
           )}
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((reason) => (
-                  <ReasonRow
-                    key={reason.id}
-                    reason={reason}
-                    showCustomer={isSuperadmin}
-                    canManage={canManage}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((reason) => (
+                <ReasonRow
+                  key={reason.id}
+                  reason={reason}
+                  showCustomer={isSuperadmin}
+                  canManage={canManage}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message={`No ${page.plural} match these filters.`} onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -216,10 +227,8 @@ function ReasonList({ kind }) {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No {page.plural} match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

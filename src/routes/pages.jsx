@@ -74,6 +74,9 @@ export const PAGES = [
   { path: ROUTES.MONITORING, element: <MonitoringPage /> },
   { path: ROUTES.MACHINE_PRODUCTIVITY, element: <MonitoringPage /> },
   { path: ROUTES.MACHINE_HEALTH, element: <MonitoringPage /> },
+  { path: ROUTES.MACHINE_TOOLS, element: <MonitoringPage /> },
+  { path: ROUTES.MACHINE_TOOL_LIFE, element: <MonitoringPage /> },
+  { path: ROUTES.MACHINE_VIRTUAL_SCREEN, element: <MonitoringPage /> },
   // Clientele and parts: everyone reads their company's; managers add, edit and delete
   { path: ROUTES.CLIENTELES, element: <ClienteleList /> },
   { path: ROUTES.PARTS, element: <PartList /> },

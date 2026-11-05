@@ -4,6 +4,7 @@ import { Link, generatePath, useNavigate } from 'react-router-dom'
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loader from '@/components/common/Loader'
 import TablePagination from '@/components/common/TablePagination'
+import TableNoResults from '@/components/common/TableNoResults'
 import { MANAGERS, PAGE_SIZES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
@@ -84,6 +85,13 @@ function PartList() {
   ]
   const { sortedRows, sort, onSort } = useTableSort(filtered, columns, () => setPage(1))
   const pageRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+  // No results: Clear filters goes back to the whole list
+  const clearFilters = () => {
+    setSearch('')
+    setCustomerFilter('')
+    setPage(1)
+  }
 
   const handleEdit = useCallback((part) => navigate(generatePath(ROUTES.PART_EDIT, { id: String(part.id) })), [navigate])
 
@@ -170,23 +178,26 @@ function PartList() {
           )}
         </div>
 
-        {filtered.length ? (
-          <div className="ts-table-panel">
-            <Table hover responsive className="mb-0">
-              <SortableHead columns={columns} sort={sort} onSort={onSort} />
-              <tbody>
-                {pageRows.map((part) => (
-                  <PartRow
-                    key={part.id}
-                    part={part}
-                    showCustomer={isSuperadmin}
-                    canManage={canManage}
-                    onEdit={handleEdit}
-                    onDelete={setPendingDelete}
-                  />
-                ))}
-              </tbody>
-            </Table>
+        <div className="ts-table-panel">
+          <Table hover responsive className="mb-0">
+            <SortableHead columns={columns} sort={sort} onSort={onSort} />
+            <tbody>
+              {pageRows.map((part) => (
+                <PartRow
+                  key={part.id}
+                  part={part}
+                  showCustomer={isSuperadmin}
+                  canManage={canManage}
+                  onEdit={handleEdit}
+                  onDelete={setPendingDelete}
+                />
+              ))}
+              {!pageRows.length && (
+                <TableNoResults colSpan={columns.length} message="No parts match these filters." onClear={clearFilters} />
+              )}
+            </tbody>
+          </Table>
+          {filtered.length > 0 && (
             <TablePagination
               page={currentPage}
               pageSize={pageSize}
@@ -197,10 +208,8 @@ function PartList() {
                 setPage(1)
               }}
             />
-          </div>
-        ) : (
-          <div className="ts-empty">No parts match these filters.</div>
-        )}
+          )}
+        </div>
       </>
     )
   }

@@ -6,12 +6,14 @@ import { MACHINE_STATUS, modeTypeOf } from '@/constants/machines'
 import { machineMonitorPath } from '@/constants/monitoring'
 import { ROUTES } from '@/constants/routes'
 import MachineMode from '@/pages/Machines/MachineMode'
+import { MachineCycles, MachineOee } from './MachineMetrics'
+import { summaryShape } from './monitorTable'
 import MachineSilhouette from './MachineSilhouette'
 
 // Monitoring › Machines card: Active / Inactive strip, machine picture with its number (red dot
-// when offline), then name, model, brand / controller, the mode it is in now and the Health /
-// Productivity links. No set-up actions here (those are on All Machines).
-function MonitorMachineCard({ machine, showCustomer }) {
+// when offline), then name, model, brand / controller, today's OEE and cycles (`summary`), the mode
+// it is in now and the Health / Productivity links. No set-up actions here (those are on All Machines).
+function MonitorMachineCard({ machine, showCustomer, summary }) {
   const isActive = machine.status !== MACHINE_STATUS.INACTIVE
 
   return (
@@ -42,6 +44,21 @@ function MonitorMachineCard({ machine, showCustomer }) {
         {showCustomer && machine.customerName && (
           <div className="ts-monitor-card-meta small text-truncate">{machine.customerName}</div>
         )}
+
+        <dl className="ts-monitor-card-metrics">
+          <div>
+            <dt>OEE today</dt>
+            <dd>
+              <MachineOee summary={summary} />
+            </dd>
+          </div>
+          <div>
+            <dt>Cycles today</dt>
+            <dd>
+              <MachineCycles summary={summary} />
+            </dd>
+          </div>
+        </dl>
 
         <ul className="ts-monitor-card-links">
           {modeTypeOf(machine.modeId) && (
@@ -80,6 +97,7 @@ MonitorMachineCard.propTypes = {
     modeId: PropTypes.number,
   }).isRequired,
   showCustomer: PropTypes.bool.isRequired,
+  summary: summaryShape,
 }
 
 export default MonitorMachineCard

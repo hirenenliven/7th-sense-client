@@ -2,7 +2,7 @@ import { CUSTOMER_ROLE_ID, DEFAULT_THEME, THEMES, USER_STATUS } from '@/constant
 import { DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, INDIA, getCountryCode, getCountryName, getDialCode, getStateCode, getStateName } from '@/constants/locations'
 import { normalizeTheme } from '@/utils/theme'
 import { ACCOUNT_KIND } from './accountPages'
-import { PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
 
 // Filters the customer can use on their screens and reports (users API `filters`, user_filters table).
@@ -74,7 +74,7 @@ export const REQUIRED_FIELDS = new Set([
 ])
 
 // Check if a field is required (including conditional country-specific fields).
-// The password is only asked for when adding (PUT /users/{id} does not take one).
+// The password is required only when adding; when editing a blank password keeps the current one.
 export const isFieldRequired = (fieldName, country, isEdit = false) => {
   if (fieldName === 'password') return !isEdit
   if (REQUIRED_FIELDS.has(fieldName)) return true
@@ -82,7 +82,7 @@ export const isFieldRequired = (fieldName, country, isEdit = false) => {
   return false
 }
 
-// Zod schema for customer form validation (isEdit → no password field).
+// Zod schema for customer form validation (isEdit → the password is optional: blank keeps it).
 // kind USER also needs a role, and the company when needsCompany (the superadmin adds the user).
 export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER, needsCompany = false } = {}) => z
   .object({
@@ -104,7 +104,7 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       .optional(),
     email: z.string().min(1, 'Email is required').regex(PATTERNS.email, 'Enter a valid email address'),
     username: z.string().min(1, 'User name is required').regex(PATTERNS.username, 'Use 3–50 letters, numbers, dot or underscore'),
-    password: z.string(),
+    password: z.string().max(PASSWORD_MAX_LENGTH, `Password must be at most ${PASSWORD_MAX_LENGTH} characters`),
     address1: z.string().min(1, 'Address line 1 is required'),
     address2: z.string().optional(),
     country: z.string().min(1, 'Country is required'),
@@ -127,7 +127,8 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Customer is required', path: ['companyId'] })
     }
 
-    if (!isEdit && data.password.length < PASSWORD_MIN_LENGTH) {
+    // Adding needs a password; editing checks it only when a new one is typed
+    if ((!isEdit || data.password) && data.password.length < PASSWORD_MIN_LENGTH) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
@@ -254,9 +255,10 @@ export const toUserPayload = (values, existing = null, kind = ACCOUNT_KIND.CUSTO
     filters: toFilterNames(values.filters),
   }
 
-  // PUT takes no password (it cannot be changed here), so it is only sent when adding
+  // Adding always sends the password; editing sends it only when a new one is typed
+  // (PUT keeps the current password when it is left out or blank)
   if (existing) payload.status = existing.status ?? USER_STATUS.ACTIVE
-  else payload.password = values.password
+  if (!existing || values.password) payload.password = values.password
   return payload
 }
 

@@ -7,17 +7,19 @@ export const ROUTES = {
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
   // Operations › Monitoring (constants/monitoring.js): the machine list, then one machine's
-  // Productivity / Health tabs. Kept apart from the machine set-up under /machines.
+  // Productivity / Health / Tool List / Tool Life / Virtual Screen tabs. Kept apart from the
+  // machine set-up under /machines.
   MONITORING: '/monitoring',
   MACHINE_PRODUCTIVITY: '/monitoring/:machineId/productivity',
   MACHINE_HEALTH: '/monitoring/:machineId/health',
+  MACHINE_TOOLS: '/monitoring/:machineId/tools',
+  MACHINE_TOOL_LIFE: '/monitoring/:machineId/tool-life',
+  MACHINE_VIRTUAL_SCREEN: '/monitoring/:machineId/virtual-screen',
   MACHINE_GROUPS: '/machines/groups',
   PRODUCTION_SCHEDULE: '/production/schedule',
   PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',
   PRODUCTION_SCHEDULE_EDIT: '/production/schedule/:id/edit',
   PRODUCTION_MONITOR: '/production/monitor',
-  TOOLS: '/tools',
-  TOOL_LIFE: '/tools/life',
   REPORT_OEE: '/reports/oee',
   REPORT_DOWNTIME: '/reports/downtime',
   REPORT_PRODUCTION: '/reports/production',

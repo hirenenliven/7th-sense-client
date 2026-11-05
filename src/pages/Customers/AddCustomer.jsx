@@ -14,6 +14,7 @@ import { getAssignableRoles } from '@/services/roleService'
 import useAuth from '@/hooks/useAuth'
 import { formatFileSize } from '@/utils/helpers'
 import { refreshUserTheme } from '@/utils/theme'
+import { PASSWORD_MAX_LENGTH } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import TimePicker from '@/components/common/TimePicker'
@@ -464,29 +465,30 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                 <Form.Control.Feedback type="invalid">{errors.username?.message}</Form.Control.Feedback>
               </Form.Group>
 
-              {/* Only when adding: an existing customer's password is not changed here */}
-              {!isEdit && (
-                <Form.Group as={Col} md={6} xxl={4} controlId="password">
-                  <Form.Label className={labelClass('password')}>Password</Form.Label>
-                  <InputGroup hasValidation>
-                    <Form.Control
-                      {...register('password')}
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      isInvalid={Boolean(errors.password)}
-                    />
-                    <Button
-                      variant="ghost"
-                      onClick={() => setShowPassword((show) => !show)}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      aria-pressed={showPassword}
-                    >
-                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
-                    </Button>
-                    <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
-                  </InputGroup>
-                </Form.Group>
-              )}
+              {/* Required when adding; when editing it starts empty and a typed value sets a new password */}
+              <Form.Group as={Col} md={6} xxl={4} controlId="password">
+                <Form.Label className={labelClass('password')}>{isEdit ? 'New Password' : 'Password'}</Form.Label>
+                <InputGroup hasValidation>
+                  <Form.Control
+                    {...register('password')}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    maxLength={PASSWORD_MAX_LENGTH}
+                    placeholder={isEdit ? '••••••••' : undefined}
+                    isInvalid={Boolean(errors.password)}
+                  />
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowPassword((show) => !show)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
+                  >
+                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true" />
+                  </Button>
+                  <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
+                </InputGroup>
+                {isEdit && <Form.Text>To change the password type a new one here, otherwise leave it blank.</Form.Text>}
+              </Form.Group>
             </Row>
           </Card.Body>
         </Card>
