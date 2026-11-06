@@ -1,5 +1,5 @@
 import { STATUS_COLORS } from '@/components/charts/chartTheme'
-import { MACHINE_MODES, modeTypeOf } from '@/constants/machines'
+import { modeTypeOf } from '@/constants/machines'
 import { FAIR_OEE, SUMMARY_MODE_IDS, SUMMARY_MODE_PARTS, WORLD_CLASS_OEE, percent } from '@/pages/Productivity/productivitySettings'
 import { formatModeDuration, pad2 } from '@/utils/dateTime'
 
@@ -18,14 +18,36 @@ export const LOWEST_OEE_LIMIT = 5
 export const FLEET_MODES = SUMMARY_MODE_IDS.map((id) => ({ ...modeTypeOf(id), parts: SUMMARY_MODE_PARTS[id] ?? [id] }))
 export const OTHER_MODE = { id: 'other', label: 'Other modes', color: 'var(--ts-neutral)' }
 
-// Where the time went: mode groups (server dto.ModeGroup*) in MACHINE_MODES colours, then the
-// time with no record
-const GROUP_ORDER = ['production', 'hold', 'idle', 'downtime', 'offline']
-export const TIME_GROUPS = GROUP_ORDER.map((key) => {
-  const mode = MACHINE_MODES.find((item) => item.key === key)
-  return { key, label: mode.label, color: STATUS_COLORS[mode.color], muted: mode.muted }
-})
-export const UNRECORDED_GROUP = { key: 'unrecorded', label: 'Not recorded', color: STATUS_COLORS.neutral, muted: true }
+// Where the time went: a row per fleet mode (In Production includes Rapid Mode) in its mode colour,
+// Other modes (Setup, planned downtime, …) and the time with no record. `tone` colours the list
+// row (`.ts-tone-<tone>`), `color` the donut slice.
+export const PRODUCTION_TIME_KEY = `mode-${FLEET_MODES[0].id}`
+export const UNRECORDED_TIME = { key: 'unrecorded', label: 'Not recorded', tone: 'neutral', color: STATUS_COLORS.neutral, muted: true }
+// Smallest slice (degrees), so a few minutes of Hold beside a day of Offline still shows
+export const TIME_MIN_SLICE_DEG = 4
+
+// The server rounds each mode's time down to whole seconds, so a fully recorded day can come out
+// a few seconds short of its span: less than this is not shown as Not recorded
+const MIN_UNRECORDED_SEC = 60
+
+// Rows of the chart from the server's { modeId, durationSec } list: every fleet mode (also at 0),
+// then Other modes and Not recorded when they have time
+export const timeByMode = ({ modes, spanSec }) => {
+  const seconds = Object.fromEntries(modes.map((mode) => [mode.modeId, mode.durationSec]))
+  const known = new Set(FLEET_MODES.flatMap((mode) => mode.parts))
+  const sum = (list) => list.reduce((total, value) => total + value, 0)
+  const rows = FLEET_MODES.map((mode) => ({
+    key: `mode-${mode.id}`, label: mode.label, color: mode.color, tone: `mode-${mode.id}`,
+    value: sum(mode.parts.map((id) => seconds[id] ?? 0)),
+  }))
+  const other = sum(modes.filter((mode) => !known.has(mode.modeId)).map((mode) => mode.durationSec))
+  const unrecorded = Math.max(0, spanSec - sum(modes.map((mode) => mode.durationSec)))
+  return [
+    ...rows,
+    ...(other ? [{ key: OTHER_MODE.id, label: OTHER_MODE.label, color: OTHER_MODE.color, tone: 'neutral', value: other }] : []),
+    ...(unrecorded >= MIN_UNRECORDED_SEC ? [{ ...UNRECORDED_TIME, value: unrecorded }] : []),
+  ]
+}
 
 // Parts per hour chart: the day as bars, the day before as a dashed line
 export const HOURLY_BARS = [{ key: 'partsMade', label: 'Parts' }]

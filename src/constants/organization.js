@@ -14,5 +14,15 @@ export const ORGANIZATION_TABS = [
   { key: 'supervisors', label: 'Supervisor', icon: 'bi-person-badge', path: ROUTES.ORG_SUPERVISORS },
 ]
 
+// Levels that are a name under one parent: one list for all of them (pages/Organization/orgLevels.js)
+export const ORG_LEVEL = {
+  CITY: 'city',
+  LOCATION: 'location',
+  SHOP: 'shop',
+  LINE: 'line',
+  CELL: 'cell',
+  SUPERVISOR: 'supervisor',
+}
+
 // Paths that light up the sidebar's Organization item (every tab, plus Add / Edit Branch)
 export const ORGANIZATION_PATHS = [...ORGANIZATION_TABS.map((tab) => tab.path), ROUTES.BRANCH_ADD, ROUTES.BRANCH_EDIT]

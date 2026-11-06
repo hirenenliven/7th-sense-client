@@ -1,12 +1,12 @@
+// A plain "YYYY-MM-DD" would be read as midnight UTC, the day before in the Americas
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
+
 export const formatDate = (date, locale = 'en-US') =>
-  new Date(date).toLocaleDateString(locale, {
+  new Date(DATE_ONLY.test(date) ? `${date}T00:00` : date).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
-
-export const capitalize = (str = '') =>
-  str.charAt(0).toUpperCase() + str.slice(1)
 
 export const formatClockTime = (date, locale = 'en-US') =>
   date.toLocaleString(locale, {
@@ -22,12 +22,6 @@ export const formatLongDate = (date, locale = 'en-GB') =>
     month: 'long',
     year: 'numeric',
   })
-
-export const formatFileSize = (bytes) => {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 // 13 → "13th", 1 → "1st", 22 → "22nd", 11 → "11th"
 export const ordinal = (day) => {

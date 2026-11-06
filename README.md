@@ -44,7 +44,7 @@ src/
 ├── config/env.js             # env variables
 ├── constants/              # routes, navigation (sidebar menu), app settings
 ├── context/                # AuthProvider (logged-in user), SidebarProvider (open/close state)
-├── hooks/                  # useAuth, useSidebar, useMediaQuery, useFetch
+├── hooks/                  # useAuth, useSidebar, useMediaQuery
 ├── pages/                    # one folder per page
 ├── routes/                   # AppRoutes (lazy loaded), pages.jsx, ProtectedRoute
 ├── services/                 # apiClient (axios + 401 handling), authService, one file per API

@@ -36,8 +36,9 @@ DonutCentre.propTypes = {
 
 // Parts of a whole, clockwise from the top: items [{ key, label, value, color?, muted? }].
 // Optional `centre` { value, caption } in the hole; the legend lists each part with its value
-// (`valueFormatter`) unless legendValues is false.
-function DonutChart({ data, centre, valueFormatter = String, legendValues = true, emptyText }) {
+// (`valueFormatter`) unless legendValues is false; `legend={false}` drops it (the page lists the
+// parts itself). `minAngle` (degrees) keeps a tiny part visible.
+function DonutChart({ data, centre, valueFormatter = String, legend = true, legendValues = true, minAngle = 0, emptyText }) {
   const total = data.reduce((sum, item) => sum + item.value, 0)
   const legendFormatter = (name, entry) => (
     <span className="ts-chart-legend-text">
@@ -52,7 +53,7 @@ function DonutChart({ data, centre, valueFormatter = String, legendValues = true
     <ChartFrame empty={!total} emptyText={emptyText}>
       <PieChart margin={CHART_MARGIN}>
         {renderTooltip({ valueFormatter })}
-        {renderLegend({ ...LEGEND_BOTTOM_PROPS, formatter: legendFormatter })}
+        {legend && renderLegend({ ...LEGEND_BOTTOM_PROPS, formatter: legendFormatter })}
         <Pie
           data={data}
           dataKey="value"
@@ -63,6 +64,7 @@ function DonutChart({ data, centre, valueFormatter = String, legendValues = true
           outerRadius={RADIUS.outer}
           cornerRadius={CORNER}
           paddingAngle={PADDING_ANGLE}
+          minAngle={minAngle}
           {...SEGMENT_GAP}
           animationDuration={ANIMATION_MS}
         >
@@ -93,7 +95,9 @@ DonutChart.propTypes = {
   ).isRequired,
   centre: PropTypes.shape({ value: PropTypes.node.isRequired, caption: PropTypes.string }),
   valueFormatter: PropTypes.func,
+  legend: PropTypes.bool,
   legendValues: PropTypes.bool,
+  minAngle: PropTypes.number,
   emptyText: PropTypes.string,
 }
 

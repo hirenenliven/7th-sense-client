@@ -1,14 +1,10 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
 // The superadmin sees every customer's clienteles (userId narrows to one customer); everyone else
 // their company's. Managers (superadmin, customer, admin) create, update and delete.
 const PATH = '/clienteles'
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 export const getClienteles = async (userId) => unwrapList(await sharedGet(withQuery(PATH, { userId })))
 

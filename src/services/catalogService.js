@@ -1,12 +1,8 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 
 // Machine catalog: Brand → Controller → Model. Every logged-in user reads these lists
 // (machine form options); only the superadmin may add, edit or delete brands, controllers and models.
 // Paths are relative to VITE_API_BASE_URL (…/api/v1); these functions return `data`.
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 // Brands — brand = { id, name, code, description, … }
 export const getBrands = async () => unwrapList(await sharedGet('/brands'))

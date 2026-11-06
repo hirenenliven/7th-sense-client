@@ -24,6 +24,9 @@ const toGroups = (list) =>
 // of one group get a heading; a `hint` (e.g. a machine's mode) is shown after the label and searched. value = picked option values, kept in option order. The open list has
 // a search, an "All" row and a footer with the count and Clear; the picked options are listed below
 // the field as neutral chips (under the same group headings), each removable.
+// onAllChange makes "All" the caller's own choice rather than a pick of every option (e.g. "all
+// machines, including ones added later"): the row shows allChecked, its label allLabel, and
+// toggling it calls onAllChange(checked) instead of changing value.
 function MultiSelectPicker({
   id,
   options,
@@ -36,6 +39,9 @@ function MultiSelectPicker({
   disabled = false,
   isInvalid = false,
   showPicked = true,
+  allChecked = false,
+  onAllChange,
+  allLabel,
 }) {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(false)
@@ -115,12 +121,12 @@ function MultiSelectPicker({
         <Dropdown.Toggle
           id={id}
           variant=""
-          disabled={disabled || !options.length}
+          disabled={disabled || (!options.length && !onAllChange)}
           className={`form-select ts-select-toggle text-start${isInvalid ? ' is-invalid' : ''}`}
         >
           <span className="ts-multi-toggle">
             <span className={`text-truncate${value.length ? '' : ' text-body-tertiary'}`}>
-              {options.length ? summary(pickedOptions, options, placeholder, noun) : emptyText}
+              {allChecked ? allLabel ?? `All ${noun.many}` : options.length ? summary(pickedOptions, options, placeholder, noun) : emptyText}
             </span>
             {value.length > 1 && (
               <span className="ts-multi-count" aria-label={`${countLabel(value.length)} selected`}>
@@ -146,25 +152,40 @@ function MultiSelectPicker({
           </div>
 
           <div className="ts-multi-menu-list">
-            {shown.length > 1 && (
+            {onAllChange ? (
               <Form.Check
                 id={`${id}-all`}
                 className="ts-multi-menu-all"
                 label={
                   <>
-                    <span>{term ? `All ${shown.length} shown` : `All ${noun.many}`}</span>
-                    <span className="ts-multi-menu-meta">
-                      {shownPickedCount}/{shown.length}
-                    </span>
+                    <span>{allLabel ?? `All ${noun.many}`}</span>
+                    <span className="ts-multi-menu-meta">{options.length}</span>
                   </>
                 }
-                checked={allShownPicked}
-                // Some but not all picked: a dash instead of a tick
-                ref={(input) => {
-                  if (input) input.indeterminate = shownPickedCount > 0 && !allShownPicked
-                }}
-                onChange={toggleShown}
+                checked={allChecked}
+                onChange={(event) => onAllChange(event.target.checked)}
               />
+            ) : (
+              shown.length > 1 && (
+                <Form.Check
+                  id={`${id}-all`}
+                  className="ts-multi-menu-all"
+                  label={
+                    <>
+                      <span>{term ? `All ${shown.length} shown` : `All ${noun.many}`}</span>
+                      <span className="ts-multi-menu-meta">
+                        {shownPickedCount}/{shown.length}
+                      </span>
+                    </>
+                  }
+                  checked={allShownPicked}
+                  // Some but not all picked: a dash instead of a tick
+                  ref={(input) => {
+                    if (input) input.indeterminate = shownPickedCount > 0 && !allShownPicked
+                  }}
+                  onChange={toggleShown}
+                />
+              )
             )}
 
             {shown.length ? (
@@ -196,14 +217,20 @@ function MultiSelectPicker({
             ) : (
               <div className="ts-multi-menu-empty">
                 <i className="bi bi-search" aria-hidden="true" />
-                No {noun.many} match “{search.trim()}”.
+                {term ? `No ${noun.many} match “${search.trim()}”.` : emptyText}
               </div>
             )}
           </div>
 
           <div className="ts-multi-menu-foot">
             <span aria-live="polite">{value.length ? `${countLabel(value.length)} selected` : 'None selected'}</span>
-            <Button variant="link" size="sm" className="ts-multi-clear" onClick={() => onChange([])} disabled={disabled || !value.length}>
+            <Button
+              variant="link"
+              size="sm"
+              className="ts-multi-clear"
+              onClick={() => (allChecked ? onAllChange(false) : onChange([]))}
+              disabled={disabled || (!value.length && !allChecked)}
+            >
               Clear
             </Button>
           </div>
@@ -218,7 +245,13 @@ function MultiSelectPicker({
               <span className="ts-multi-count">{pickedOptions.length}</span>
             </span>
             {pickedOptions.length > 1 && (
-              <Button variant="link" size="sm" className="ts-multi-clear" onClick={() => onChange([])} disabled={disabled}>
+              <Button
+                variant="link"
+                size="sm"
+                className="ts-multi-clear"
+                onClick={() => (allChecked ? onAllChange(false) : onChange([]))}
+                disabled={disabled}
+              >
                 <i className="bi bi-x-circle me-1" aria-hidden="true" />
                 Clear all
               </Button>
@@ -280,6 +313,10 @@ MultiSelectPicker.propTypes = {
   isInvalid: PropTypes.bool,
   // false: no chip list under the field (a compact filter, e.g. in a chart toolbar)
   showPicked: PropTypes.bool,
+  // With onAllChange the "All" row is the caller's flag (see the component comment)
+  allChecked: PropTypes.bool,
+  onAllChange: PropTypes.func,
+  allLabel: PropTypes.string,
 }
 
 export default MultiSelectPicker

@@ -3,20 +3,21 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { createUserCity, updateUserCity } from '@/services/userCityService'
 import OrgCustomerField from '@/components/common/OrgCustomerField'
 import useOrgUser from '@/hooks/useOrgUser'
 import { ownedBy, ownerOf, withCustomer } from '@/utils/orgCustomer'
 import { toast } from '@/utils/toast'
-import { INITIAL_VALUES, NAME_MAX_LENGTH, citySchema, toCityPayload, toFormValues } from './cityForm'
+import { NAME_MAX_LENGTH, toLevelFormValues, toLevelPayload } from './orgLevels'
 
-// Add / edit a city: its state and name. `city` = the city being edited, null when adding.
-function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) {
-  const isEdit = Boolean(city)
+// Add / edit a row of an organization level (orgLevels.js): its parent and name. `row` = the row
+// being edited, null when adding.
+function OrgLevelFormModal({ level, show, row, parents, defaultParentId, onSaved, onHide }) {
+  const isEdit = Boolean(row)
+  const { parent, one, title } = level
 
   // The superadmin picks the customer on the form; others always save to their own company
-  const { canPickUser, userId } = useOrgUser()
-  const schema = useMemo(() => withCustomer(citySchema, canPickUser), [canPickUser])
+  const { canPickUser } = useOrgUser()
+  const schema = useMemo(() => withCustomer(level.schema, canPickUser), [level, canPickUser])
 
   const {
     register,
@@ -27,65 +28,65 @@ function CityFormModal({ show, city, states, defaultStateId, onSaved, onHide }) 
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: INITIAL_VALUES,
+    defaultValues: level.emptyValues,
   })
 
   // Fresh values every time the modal opens
   useEffect(() => {
     if (!show) return
     reset(
-      city
-        ? { ...toFormValues(city), customerId: String(city.userId) }
-        : { ...INITIAL_VALUES, customerId: ownerOf(states, defaultStateId, 'userId'), userStateId: defaultStateId },
+      row
+        ? { ...toLevelFormValues(level, row), customerId: String(row.userId) }
+        : { ...level.emptyValues, customerId: ownerOf(parents, defaultParentId, parent.ownerKey), [parent.key]: defaultParentId },
     )
-  }, [show, city, defaultStateId, states, reset])
+  }, [show, row, defaultParentId, parents, parent, level, reset])
 
   // Parents of the picked customer only; a new customer clears the picked parent
   const customerId = watch('customerId')
-  const parentOptions = useMemo(() => ownedBy(states, canPickUser, customerId, 'userId'), [states, canPickUser, customerId])
+  const parentOptions = useMemo(() => ownedBy(parents, canPickUser, customerId, parent.ownerKey), [parents, canPickUser, customerId, parent])
 
   const onSubmit = async (values) => {
     try {
-      const ownerId = canPickUser ? values.customerId : userId
-      const payload = toCityPayload(values)
-      const saved = isEdit ? await updateUserCity(city.id, payload, ownerId) : await createUserCity(payload, ownerId)
-      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: isEdit ? 'City updated' : 'City added' })
+      const ownerId = canPickUser ? values.customerId : undefined
+      const payload = toLevelPayload(level, values)
+      const saved = isEdit ? await level.update(row.id, payload, ownerId) : await level.create(payload, ownerId)
+      toast.success(`${saved.name} has been ${isEdit ? 'updated' : 'added'}.`, { title: `${title} ${isEdit ? 'updated' : 'added'}` })
       onSaved(saved)
     } catch (error) {
-      toast.error(error.message, { title: 'Could not save city' })
+      toast.error(error.message, { title: `Could not save ${one}` })
     }
   }
 
   return (
     <Modal show={show} onHide={isSubmitting ? undefined : onHide} centered backdrop={isSubmitting ? 'static' : true}>
-      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={isEdit ? 'Edit city' : 'Add city'}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)} aria-label={`${isEdit ? 'Edit' : 'Add'} ${one}`}>
         <Modal.Header closeButton={!isSubmitting}>
-          <Modal.Title>{isEdit ? 'Edit City' : 'Add City'}</Modal.Title>
+          <Modal.Title>{`${isEdit ? 'Edit' : 'Add'} ${title}`}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <OrgCustomerField
-            id="city-customer"
-            registration={register('customerId', { onChange: () => setValue('userStateId', '') })}
+            id={`${one}-customer`}
+            registration={register('customerId', { onChange: () => setValue(parent.key, '') })}
             locked={isEdit}
             disabled={isSubmitting}
             error={errors.customerId?.message}
           />
-          <Form.Group controlId="city-state" className="mb-3">
-            <Form.Label className="required">State</Form.Label>
-            <Form.Select {...register('userStateId')} isInvalid={Boolean(errors.userStateId)}>
-              <option value="">Select state</option>
+          <Form.Group controlId={`${one}-${parent.one}`} className="mb-3">
+            <Form.Label className="required">{parent.title}</Form.Label>
+            <Form.Select {...register(parent.key)} isInvalid={Boolean(errors[parent.key])}>
+              <option value="">Select {parent.one}</option>
               {parentOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.countryName ? `${option.name} · ${option.countryName}` : option.name}
+                  {option[parent.hintField] ? `${option.name} · ${option[parent.hintField]}` : option.name}
                 </option>
               ))}
             </Form.Select>
-            <Form.Control.Feedback type="invalid">{errors.userStateId?.message}</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{errors[parent.key]?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group controlId="city-name">
-            <Form.Label className="required">City Name</Form.Label>
+          <Form.Group controlId={`${one}-name`}>
+            <Form.Label className="required">{title} Name</Form.Label>
             <Form.Control {...register('name')} maxLength={NAME_MAX_LENGTH} autoComplete="off" autoFocus isInvalid={Boolean(errors.name)} />
             <Form.Control.Feedback type="invalid">{errors.name?.message}</Form.Control.Feedback>
           </Form.Group>
@@ -119,17 +120,14 @@ const recordShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
 })
 
-CityFormModal.propTypes = {
+OrgLevelFormModal.propTypes = {
+  level: PropTypes.object.isRequired,
   show: PropTypes.bool.isRequired,
-  city: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    userStateId: PropTypes.number,
-  }),
-  states: PropTypes.arrayOf(recordShape).isRequired,
-  defaultStateId: PropTypes.string,
+  row: recordShape,
+  parents: PropTypes.arrayOf(recordShape).isRequired,
+  defaultParentId: PropTypes.string,
   onSaved: PropTypes.func.isRequired,
   onHide: PropTypes.func.isRequired,
 }
 
-export default CityFormModal
+export default OrgLevelFormModal

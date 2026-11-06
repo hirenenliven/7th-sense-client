@@ -27,7 +27,7 @@ function CountryList() {
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
   // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
-  const { userId, canAssign, customerLabel } = useOrgUser()
+  const { canAssign, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0])
@@ -42,14 +42,14 @@ function CountryList() {
     let active = true
     setLoading(true)
     setError('')
-    getUserCountries(userId)
+    getUserCountries()
       .then((list) => active && setCountries(list))
       .catch((err) => active && setError(err.message))
       .finally(() => active && setLoading(false))
     return () => {
       active = false
     }
-  }, [reloadKey, userId])
+  }, [reloadKey])
 
   const matched = useMemo(() => {
     const term = search.trim().toLowerCase()

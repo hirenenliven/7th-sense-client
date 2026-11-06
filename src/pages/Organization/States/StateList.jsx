@@ -29,7 +29,7 @@ function StateList() {
   const [error, setError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
   // The superadmin lists every customer's rows (Customer column) and picks the customer on the form
-  const { userId, canAssign, customerLabel } = useOrgUser()
+  const { canAssign, customerLabel } = useOrgUser()
 
   const [search, setSearch] = useState('')
   const [countryFilter, setCountryFilter] = useState('')
@@ -46,7 +46,7 @@ function StateList() {
     let active = true
     setLoading(true)
     setError('')
-    Promise.all([getUserStates(null, userId), getUserCountries(userId)])
+    Promise.all([getUserStates(), getUserCountries()])
       .then(([list, countryList]) => {
         if (!active) return
         setStates(list)
@@ -57,7 +57,7 @@ function StateList() {
     return () => {
       active = false
     }
-  }, [reloadKey, userId])
+  }, [reloadKey])
 
   const matched = useMemo(() => {
     const term = search.trim().toLowerCase()

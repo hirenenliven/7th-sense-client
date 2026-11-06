@@ -1,4 +1,4 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
@@ -7,13 +7,7 @@ import apiClient, { sharedGet, withQuery } from './apiClient'
 // its breaks and its durationMinutes / breakMinutes; breaks are saved with the shift.
 const PATH = '/shifts'
 
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
-
 export const getShifts = async (userId) => unwrapList(await sharedGet(withQuery(PATH, { userId })))
-
-export const getShiftById = async (id) => unwrap(await sharedGet(`${PATH}/${id}`))
 
 export const createShift = async (shift) => unwrap(await apiClient.post(PATH, shift))
 

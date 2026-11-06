@@ -16,6 +16,11 @@ const apiClient = axios.create({
 // (utils/loginAs.js), so it never uses or ends the superadmin's session.
 apiClient.interceptors.request.use((config) => ({ ...config, baseURL: apiBaseUrl() }))
 
+// Every response is { statusCode, success, message, data }; services return `data`. The server
+// omits `data` for an empty list, so lists fall back to [].
+export const unwrap = (response) => response.data.data
+export const unwrapList = (response) => unwrap(response) ?? []
+
 const GENERIC_ERROR = 'Something went wrong'
 
 // 401 = no valid session (expired, logged out elsewhere, user deactivated).
@@ -27,6 +32,9 @@ export const onUnauthorized = (listener) => {
   return () => unauthorizedListeners.delete(listener)
 }
 
+// Also called by the live socket when the server ends its session (services/liveSocket.js)
+export const notifyUnauthorized = () => unauthorizedListeners.forEach((listener) => listener())
+
 // Normalize error responses: { message, statusCode }. 400 / 404 messages are written for
 // end users and shown as is; server errors (5xx) get a generic message.
 apiClient.interceptors.response.use(
@@ -35,7 +43,7 @@ apiClient.interceptors.response.use(
     const statusCode = error.response?.data?.statusCode ?? error.response?.status
     const message =
       statusCode >= 500 ? GENERIC_ERROR : error.response?.data?.message || error.message || GENERIC_ERROR
-    if (statusCode === 401) unauthorizedListeners.forEach((listener) => listener())
+    if (statusCode === 401) notifyUnauthorized()
     return Promise.reject({ ...error, message, statusCode })
   },
 )

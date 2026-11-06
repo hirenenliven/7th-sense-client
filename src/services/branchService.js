@@ -1,12 +1,8 @@
-import apiClient, { sharedGet } from './apiClient'
+import apiClient, { sharedGet, unwrap, unwrapList } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
 const BRANCHES_PATH = '/branches'
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 export const getBranches = async () => unwrapList(await sharedGet(BRANCHES_PATH))
 

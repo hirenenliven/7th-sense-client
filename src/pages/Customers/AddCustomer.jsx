@@ -1,49 +1,62 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { ALL_MACHINE_ROLES, ROLE_LABELS, ROLES, SUPERADMIN_ONLY, THEMES } from '@/constants/app'
-import { ACTION_ICONS } from '@/constants/icons'
 import { COUNTRIES, TIME_ZONES, getDialCode, getStates } from '@/constants/locations'
 import { getBranches } from '@/services/branchService'
 import { createUser, getUserById, getUsers, updateUser } from '@/services/customerService'
 import { getMachines } from '@/services/machineService'
 import { getAssignableRoles } from '@/services/roleService'
 import useAuth from '@/hooks/useAuth'
-import { formatFileSize } from '@/utils/helpers'
+import useOrgUser from '@/hooks/useOrgUser'
 import { refreshUserTheme } from '@/utils/theme'
 import { PASSWORD_MAX_LENGTH } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import TimePicker from '@/components/common/TimePicker'
-import IconAction from '@/components/common/IconAction'
 import Loader from '@/components/common/Loader'
+import MultiSelectPicker from '@/components/common/MultiSelectPicker'
 import {
   FILTER_NAMES,
   FILTER_OPTIONS,
   INITIAL_VALUES,
   getCustomerSchema,
   isFieldRequired,
-  savedLogoPath,
   toFormValues,
   toUserPayload,
 } from './customerForm'
 import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
+import {
+  EMPTY_MACHINE_FILTER,
+  MACHINE_FILTER_LEVELS,
+  buildOrganizationPaths,
+  hasFilterLevels,
+  levelOptions,
+  loadOrganization,
+  machineMatches,
+  pickFilterLevel,
+} from './machineFilter'
 import { customerName } from './customerFormat'
 import { FIELD_HELP } from './customerHelp'
 
+// Group of the machines without a line in the machine dropdown
+const NO_LINE = 'No line'
+
 // Customers and users share this form (add and edit): /masters/customers/add, /masters/customers/:id/edit,
 // /masters/users/add and /masters/users/:id/edit. Users also get the Access card: role, company
-// (the superadmin picks it) and the machines they may access.
+// (the superadmin picks it) and the machines they may access, narrowed by the company's organization
+// (Country → … → Line); "all machines" there also gives the machines added later. The Filters card
+// is for customers only.
 function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const page = ACCOUNT_PAGES[kind]
   const isUser = kind === ACCOUNT_KIND.USER
   const navigate = useNavigate()
   const { id } = useParams()
   const isEdit = Boolean(id)
-  const logoInputRef = useRef(null)
+  const { reloadUsers } = useOrgUser()
 
   // Only the superadmin works across companies, so only it picks the user's company
   const { hasRole } = useAuth()
@@ -80,17 +93,26 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const [companies, setCompanies] = useState([])
   const [machines, setMachines] = useState([])
   const [machinesLoading, setMachinesLoading] = useState(false)
+  const [organization, setOrganization] = useState({})
   const [accessError, setAccessError] = useState('')
 
   // Watch specific fields for conditional logic
   const roleId = watch('roleId')
   const companyId = watch('companyId')
   const machineIds = watch('machineIds') ?? []
+  const machineFilter = watch('machineFilter') ?? EMPTY_MACHINE_FILTER
   const roleName = roles.find((role) => String(role.id) === roleId)?.name
   // Admins see every machine of their company, so only other roles get machines assigned
-  const assignsMachines = isUser && Boolean(roleName) && !ALL_MACHINE_ROLES.includes(roleName)
+  // (shown before a role is picked too, so the machine filter is visible from the start)
+  const assignsMachines = isUser && !ALL_MACHINE_ROLES.includes(roleName)
+  const organizationPaths = useMemo(() => buildOrganizationPaths(organization), [organization])
+  const filteredMachines = machines.filter((machine) => machineMatches(machine, machineFilter, organizationPaths))
+  const allMachines = machineFilter.allMachines
+  // Machine dropdown options, grouped by line (machines without a line last)
+  const machineOptions = filteredMachines
+    .map((machine) => ({ value: String(machine.id), label: machine.name, group: machine.lineName || NO_LINE, hint: machine.modelName || undefined }))
+    .sort((a, b) => (a.group === NO_LINE) - (b.group === NO_LINE) || a.group.localeCompare(b.group) || a.label.localeCompare(b.label))
   const country = watch('country')
-  const logo = watch('logo')
   const filters = watch('filters') ?? []
   const allFiltersChosen = filters.length === FILTER_NAMES.length
 
@@ -134,26 +156,59 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     }
   }, [isUser, needsCompany])
 
-  // Users: the company's machines to assign. The server returns a customer's or admin's own
-  // company machines; the superadmin asks for the picked customer's.
+  // Users: the company's machines to assign and its organization to narrow them. The server
+  // returns a customer's or admin's own company; the superadmin asks for the picked customer's.
   useEffect(() => {
     if (!isUser || (needsCompany && !companyId)) {
       setMachines([])
+      setOrganization({})
       return undefined
     }
     let active = true
+    const userId = needsCompany ? companyId : undefined
     setMachinesLoading(true)
-    getMachines(needsCompany ? companyId : undefined)
+    // Loaded apart, so an organization list that fails still leaves the machines to pick
+    const machinesLoad = getMachines(userId)
       .then((list) => active && setMachines(list))
       .catch((error) => active && toast.error(error.message, { title: 'Could not load machines' }))
-      .finally(() => active && setMachinesLoading(false))
+    const organizationLoad = loadOrganization(userId)
+      .then((levels) => active && setOrganization(levels))
+      .catch((error) => active && toast.error(error.message, { title: 'Could not load the organization' }))
+    Promise.all([machinesLoad, organizationLoad]).finally(() => active && setMachinesLoading(false))
     return () => {
       active = false
     }
   }, [isUser, needsCompany, companyId])
 
-  // Another company has other machines, so a new pick clears the chosen ones
-  const handleCompanyChange = () => setValue('machineIds', [])
+  // Another company has other machines and organization, so a new pick clears the chosen ones
+  const handleCompanyChange = () => {
+    setValue('machineIds', [])
+    setValue('machineFilter', EMPTY_MACHINE_FILTER)
+  }
+
+  // A new level keeps only the picked machines that are still under the selection, so the
+  // dropdown always shows every machine that will be saved
+  const handleFilterLevelChange = (key) => (event) => {
+    const next = pickFilterLevel(machineFilter, organizationPaths, key, event.target.value)
+    const stillShown = new Set(
+      machines.filter((machine) => machineMatches(machine, next, organizationPaths)).map((machine) => String(machine.id)),
+    )
+    setValue('machineFilter', next, { shouldDirty: true })
+    setValue('machineIds', machineIds.filter((machineId) => stillShown.has(machineId)), { shouldDirty: true })
+  }
+
+  // Picking machines one by one ends "All machines" (removing one from All keeps the rest picked)
+  const handleMachinesChange = (next) => {
+    setValue('machineFilter', { ...machineFilter, allMachines: false }, { shouldDirty: true })
+    setValue('machineIds', next, { shouldDirty: true })
+  }
+
+  // "All machines" is saved as the filter's allMachines, not as ids: the server then also gives
+  // the machines added to the selection later
+  const handleAllMachinesChange = (checked) => {
+    setValue('machineFilter', { ...machineFilter, allMachines: checked }, { shouldDirty: true })
+    setValue('machineIds', [], { shouldDirty: true })
+  }
 
   // Edit: load the customer and fill the form (reset() also makes these the Reset values)
   useEffect(() => {
@@ -173,13 +228,6 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     }
   }, [id, isEdit, reset])
 
-  // Logo preview URL (revoked when replaced/unmounted)
-  const logoPreview = useMemo(
-    () => (logo && ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(logo.type) ? URL.createObjectURL(logo) : ''),
-    [logo],
-  )
-  useEffect(() => () => logoPreview && URL.revokeObjectURL(logoPreview), [logoPreview])
-
   // Handle country change to reset state
   const handleCountryChange = (event) => {
     setValue('country', event.target.value)
@@ -194,19 +242,20 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     }
   }
 
-  const removeLogo = () => {
-    if (logoInputRef.current) logoInputRef.current.value = ''
-    setValue('logo', null)
-  }
-
   // Required marker (*) — GST / PAN depend on the country, password only when adding
   const isRequired = (name) => isFieldRequired(name, country, isEdit)
   const labelClass = (name) => (isRequired(name) ? 'required' : undefined)
 
   const onSubmit = async (values) => {
     try {
-      // Admins get no assigned machines (they see them all)
-      const payload = toUserPayload(assignsMachines ? values : { ...values, machineIds: [] }, existing, kind)
+      // Admins get no assigned machines or filter (they see them all); with all machines the
+      // filter gives them, so none are sent one by one
+      const access = !assignsMachines
+        ? { machineIds: [], machineFilter: EMPTY_MACHINE_FILTER }
+        : values.machineFilter.allMachines
+          ? { machineIds: [] }
+          : {}
+      const payload = toUserPayload({ ...values, ...access }, existing, kind)
       if (isEdit) {
         await updateUser(id, payload)
         toast.success(`${values.companyName} has been updated.`, { title: `${page.title} updated` })
@@ -214,7 +263,9 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
         await createUser(payload)
         toast.success(`${values.companyName} has been added.`, { title: `${page.title} created` })
       }
-      // Re-apply the logged-in user's theme in case this was their own account
+      // Customer pickers and labels show the change; re-apply the logged-in user's theme in case
+      // this was their own account
+      reloadUsers()
       refreshUserTheme()
       navigate(page.routes.list)
     } catch (error) {
@@ -271,21 +322,6 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
             <Card.Header>
               <i className="bi bi-shield-check text-primary" aria-hidden="true" />
               Access
-              {assignsMachines && (
-                <span className="ms-auto d-flex gap-1">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => setValue('machineIds', machines.map((machine) => String(machine.id)), { shouldDirty: true })}
-                    disabled={!machines.length || machineIds.length === machines.length}
-                  >
-                    Select all
-                  </Button>
-                  <Button variant="link" size="sm" onClick={() => setValue('machineIds', [], { shouldDirty: true })} disabled={!machineIds.length}>
-                    Clear
-                  </Button>
-                </span>
-              )}
             </Card.Header>
             <Card.Body>
               <Row className="g-3">
@@ -329,30 +365,65 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
               {assignsMachines && (
                 <fieldset className="mt-3" aria-describedby="machines-hint">
                   <legend className="visually-hidden">Machines</legend>
-                  <FieldLabel help={FIELD_HELP.machineIds}>Machines this user can access</FieldLabel>
-                  {machinesLoading ? (
-                    <Loader text="Loading machines…" />
-                  ) : machines.length ? (
-                    <div className="d-flex flex-wrap gap-3 mt-1">
-                      {machines.map((machine) => (
-                        <Form.Check
-                          key={machine.id}
-                          id={`machine-${machine.id}`}
-                          type="checkbox"
-                          label={machine.lineName ? `${machine.name} (${machine.lineName})` : machine.name}
-                          value={String(machine.id)}
-                          {...register('machineIds')}
+                  <FieldLabel help={FIELD_HELP.machineFilter}>Machine access by organization</FieldLabel>
+                  <Row className="g-3 mt-0">
+                    {MACHINE_FILTER_LEVELS.map((level) => {
+                      const options = levelOptions(organization, organizationPaths, machineFilter, level.key)
+                      return (
+                        <Form.Group key={level.key} as={Col} md={6} xl={3} controlId={`machineFilter-${level.key}`}>
+                          <Form.Label>{level.label}</Form.Label>
+                          <Form.Select value={machineFilter[level.key]} onChange={handleFilterLevelChange(level.key)} disabled={machinesLoading || !options.length}>
+                            <option value="">
+                              {needsCompany && !companyId
+                                ? 'Select a customer first'
+                                : machinesLoading
+                                  ? 'Loading…'
+                                  : options.length
+                                    ? `All ${level.plural}`
+                                    : `No ${level.plural}`}
+                            </option>
+                            {options.map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.name}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
+                      )
+                    })}
+
+                    <Form.Group as={Col} xs={12}>
+                      <FieldLabel help={FIELD_HELP.machineIds}>Machines</FieldLabel>
+                      {machinesLoading ? (
+                        <Loader text="Loading machines…" />
+                      ) : (
+                        <MultiSelectPicker
+                          id="machineIds"
+                          options={machineOptions}
+                          value={allMachines ? machineOptions.map((option) => option.value) : machineIds}
+                          onChange={handleMachinesChange}
+                          noun={{ one: 'machine', many: 'machines' }}
+                          placeholder="Select machines"
+                          emptyText={
+                            needsCompany && !companyId
+                              ? 'Select a customer to see its machines'
+                              : machines.length
+                                ? 'No machines in this selection yet'
+                                : 'This company has no machines yet'
+                          }
+                          disabled={needsCompany && !companyId}
+                          allChecked={allMachines}
+                          onAllChange={handleAllMachinesChange}
+                          allLabel={hasFilterLevels(machineFilter) ? 'All machines of this selection' : 'All machines of the company'}
                         />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-body-secondary mt-1">
-                      {needsCompany && !companyId ? 'Select a customer to see its machines.' : 'This company has no machines yet.'}
-                    </div>
-                  )}
-                  <Form.Text id="machines-hint">
-                    {`${machineIds.length} of ${machines.length} selected · the user sees only these machines`}
-                  </Form.Text>
+                      )}
+                      <Form.Text id="machines-hint">
+                        {allMachines
+                          ? `${filteredMachines.length} machine${filteredMachines.length === 1 ? '' : 's'} now · machines added to this selection later are given automatically`
+                          : `${machineIds.length} of ${filteredMachines.length} selected · the user sees only the selected machines`}
+                      </Form.Text>
+                    </Form.Group>
+                  </Row>
                 </fieldset>
               )}
             </Card.Body>
@@ -409,37 +480,6 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                 <Form.Label>Website</Form.Label>
                 <Form.Control {...register('website')} type="url" autoComplete="url" placeholder="www.example.com" isInvalid={Boolean(errors.website)} />
                 <Form.Control.Feedback type="invalid">{errors.website?.message}</Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group as={Col} md={6} xxl={4} controlId="logo">
-                <Form.Label>Company Logo</Form.Label>
-                <Form.Control
-                  ref={logoInputRef}
-                  type="file"
-                  accept=".png,.jpg,.jpeg,.svg,.webp"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null
-                    setValue('logo', file)
-                  }}
-                  isInvalid={Boolean(errors.logo)}
-                />
-                <Form.Control.Feedback type="invalid">{errors.logo?.message}</Form.Control.Feedback>
-                {!errors.logo && savedLogoPath(existing) && !logo && (
-                  <Form.Text className="d-block text-truncate">Current: {savedLogoPath(existing)}</Form.Text>
-                )}
-                {!errors.logo && (
-                  <Form.Text>PNG, JPG, SVG or WEBP · max {formatFileSize(2 * 1024 * 1024)}</Form.Text>
-                )}
-                {logo && (
-                  <div className="ts-file-preview mt-2">
-                    {logoPreview && <img src={logoPreview} alt="Logo preview" className="ts-file-preview-img" />}
-                    <div className="ts-file-preview-meta">
-                      <div className="text-truncate">{logo.name}</div>
-                      <div className="fs-xs text-body-tertiary">{formatFileSize(logo.size)}</div>
-                    </div>
-                    <IconAction danger icon={ACTION_ICONS.remove} label="Remove logo" onClick={removeLogo} />
-                  </div>
-                )}
               </Form.Group>
             </Row>
           </Card.Body>
@@ -627,46 +667,48 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
           </Card.Body>
         </Card>
 
-        {/* Filters */}
-        <Card className="mb-3">
-          <Card.Header>
-            <i className="bi bi-funnel text-primary" aria-hidden="true" />
-            Filters
-            <span className="ts-filter-count" aria-hidden="true">
-              {filters.length}/{FILTER_NAMES.length}
-            </span>
-            <span className="ms-auto d-flex gap-1">
-              <Button variant="link" size="sm" onClick={() => setValue('filters', FILTER_NAMES, { shouldDirty: true })} disabled={allFiltersChosen}>
-                Select all
-              </Button>
-              <Button variant="link" size="sm" onClick={() => setValue('filters', [], { shouldDirty: true })} disabled={!filters.length}>
-                Clear
-              </Button>
-            </span>
-          </Card.Header>
-          <Card.Body>
-            <fieldset aria-describedby="filters-hint">
-              <legend className="visually-hidden">Filters</legend>
-              <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-                <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
-                <span id="filters-hint" className={`fs-sm ${errors.filters ? 'text-danger' : 'text-body-tertiary'}`}>
-                  {errors.filters?.message || `${filters.length} of ${FILTER_NAMES.length} selected · shown on dashboards and reports`}
-                </span>
-              </div>
+        {/* Filters (customers only; a user's machines are narrowed in the Access card) */}
+        {!isUser && (
+          <Card className="mb-3">
+            <Card.Header>
+              <i className="bi bi-funnel text-primary" aria-hidden="true" />
+              Filters
+              <span className="ts-filter-count" aria-hidden="true">
+                {filters.length}/{FILTER_NAMES.length}
+              </span>
+              <span className="ms-auto d-flex gap-1">
+                <Button variant="link" size="sm" onClick={() => setValue('filters', FILTER_NAMES, { shouldDirty: true })} disabled={allFiltersChosen}>
+                  Select all
+                </Button>
+                <Button variant="link" size="sm" onClick={() => setValue('filters', [], { shouldDirty: true })} disabled={!filters.length}>
+                  Clear
+                </Button>
+              </span>
+            </Card.Header>
+            <Card.Body>
+              <fieldset aria-describedby="filters-hint">
+                <legend className="visually-hidden">Filters</legend>
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                  <FieldLabel help={FIELD_HELP.filters}>Filters available to this {page.noun}</FieldLabel>
+                  <span id="filters-hint" className={`fs-sm ${errors.filters ? 'text-danger' : 'text-body-tertiary'}`}>
+                    {errors.filters?.message || `${filters.length} of ${FILTER_NAMES.length} selected · shown on dashboards and reports`}
+                  </span>
+                </div>
 
-              <div className="ts-filter-chips">
-                {FILTER_OPTIONS.map((option) => (
-                  <label key={option.value} className={`ts-filter-chip${errors.filters ? ' is-invalid' : ''}`} htmlFor={`filter-${option.value}`}>
-                    <input id={`filter-${option.value}`} type="checkbox" className="ts-filter-input" value={option.value} {...register('filters')} />
-                    <i className={`bi ${option.icon} ts-filter-icon`} aria-hidden="true" />
-                    {option.label}
-                    <i className="bi bi-check-lg ts-filter-check" aria-hidden="true" />
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </Card.Body>
-        </Card>
+                <div className="ts-filter-chips">
+                  {FILTER_OPTIONS.map((option) => (
+                    <label key={option.value} className={`ts-filter-chip${errors.filters ? ' is-invalid' : ''}`} htmlFor={`filter-${option.value}`}>
+                      <input id={`filter-${option.value}`} type="checkbox" className="ts-filter-input" value={option.value} {...register('filters')} />
+                      <i className={`bi ${option.icon} ts-filter-icon`} aria-hidden="true" />
+                      {option.label}
+                      <i className="bi bi-check-lg ts-filter-check" aria-hidden="true" />
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </Card.Body>
+          </Card>
+        )}
 
         {/* Actions */}
         <div className="ts-form-actions">

@@ -23,6 +23,9 @@ Client (frontend) decisions, one file each (Michael Nygard template). Never edit
 | 0017 | [Log in as customer in a new tab, on the tab's own API path](0017-login-as-customer-tab.md) | Superseded by 0018 | 2026-11-04 |
 | 0018 | [Log in as customer opens the dashboard directly (no /login-as page)](0018-login-as-without-route.md) | Accepted | 2026-11-04 |
 | 0019 | [Monitoring: machine list, then the machine's tabs with a back arrow](0019-monitoring-machine-view.md) | Accepted | 2026-11-04 |
-| 0020 | [Virtual Screen: one REST snapshot polled every 5 s](0020-virtual-screen-polling.md) | Accepted | 2026-11-05 |
+| 0020 | [Virtual Screen: one REST snapshot polled every 5 s](0020-virtual-screen-polling.md) | Superseded by 0021 | 2026-11-05 |
+| 0021 | [Virtual Screen: live values over Socket.IO, REST for derived data](0021-virtual-screen-socket.md) | Accepted | 2026-11-05 |
+| 0022 | [Ponytail plugin for Claude Code, under this repo's rules](0022-ponytail-plugin.md) | Accepted | 2026-11-06 |
+| 0023 | [One list, row and form for the name-under-a-parent organization levels](0023-organization-levels-one-list.md) | Accepted | 2026-11-06 |
 
 New ADR: copy the newest file, take the next number, status "Proposed" until agreed, then "Accepted"; add a row here.

@@ -1,4 +1,4 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
@@ -6,10 +6,6 @@ import apiClient, { sharedGet, withQuery } from './apiClient'
 // its admins see all of the company's machines; other users only the machines assigned to them.
 // Only the superadmin may create, update and delete.
 const PATH = '/machines'
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 export const getMachines = async (userId) => unwrapList(await sharedGet(withQuery(PATH, { userId })))
 

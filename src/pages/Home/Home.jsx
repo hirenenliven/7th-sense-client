@@ -11,7 +11,7 @@ import { customerName } from '@/pages/Customers/customerFormat'
 import { PRODUCTIVITY_DATE_MIN } from '@/pages/Productivity/productivitySettings'
 import { getHomeDashboard } from '@/services/dashboardService'
 import { PICKER_LOCALE, parseIsoDate, todayIso } from '@/utils/dateTime'
-import { DayCard, FleetCard, HourlyCard, TimeCard } from './HomeCards'
+import { DayCard, FleetCard, TimeCard } from './HomeCards'
 import { AlarmsCard, AttentionCard, LowestOeeCard } from './HomeLists'
 
 const dayTitle = new Intl.DateTimeFormat(PICKER_LOCALE, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
@@ -21,14 +21,16 @@ const customerOptionLabel = (user) => (customerName(user) === '—' ? user.usern
 // Main › Dashboard (/): every active machine the user may read, together, from GET
 // /dashboard/home (one request; reloaded every MONITOR_REFRESH_MS while it shows today). Fleet
 // now (connection and mode counts), the day's OEE / utilization / parts vs plan / cycles, where
-// the time went, parts per hour, machines needing attention, the lowest OEE and the top alarms.
+// the time went, machines needing attention, the lowest OEE and the top alarms.
 // The superadmin can narrow it to one customer.
 function Home() {
   const { hasRole } = useAuth()
   const isSuperadmin = hasRole(SUPERADMIN_ONLY)
   const { users } = useOrgUser()
   const today = todayIso()
-  const [date, setDate] = useState(today)
+  // Empty = today: the screen moves to the new day by itself, and the server decides which day that is
+  const [pickedDate, setPickedDate] = useState('')
+  const date = pickedDate || today
   const [customerId, setCustomerId] = useState('')
 
   const customers = useMemo(
@@ -46,15 +48,13 @@ function Home() {
       ? `${customerOptionLabel(pickedCustomer)}’s machines`
       : 'every customer’s machines'
 
-  const isToday = date === today
-  const query = { date, userId: isSuperadmin ? customerId : '' }
+  const isToday = !pickedDate
+  const query = { date: pickedDate, userId: isSuperadmin ? customerId : '' }
   const homeState = useLoad(() => getHomeDashboard(query), JSON.stringify(query), {
     refreshMs: isToday ? MONITOR_REFRESH_MS : undefined,
   })
   const home = homeState.data
 
-  // Today's charts stop at the current hour; a past day shows all 24
-  const lastHour = isToday && home ? new Date(home.serverTime).getHours() : 23
   const dayNoun = isToday ? 'the day so far' : 'the day'
 
   const renderBody = () => {
@@ -75,15 +75,10 @@ function Home() {
         <Col>
           <DayCard home={home} dayNoun={dayNoun} />
         </Col>
+        {/* Parts per hour (HourlyCard) is hidden while the controllers send no part count; the
+            response still carries `hourly` */}
         <Col>
-          <Row xs={1} lg={2} className="g-3">
-            <Col lg={5}>
-              <TimeCard time={home.time} />
-            </Col>
-            <Col lg={7}>
-              <HourlyCard hourly={home.hourly} lastHour={lastHour} />
-            </Col>
-          </Row>
+          <TimeCard time={home.time} />
         </Col>
         <Col>
           <Row xs={1} lg={2} className="g-3">
@@ -129,7 +124,13 @@ function Home() {
               ))}
             </Form.Select>
           )}
-          <ChartDateFilter value={date} onChange={setDate} min={PRODUCTIVITY_DATE_MIN} max={today} label="Dashboard date" />
+          <ChartDateFilter
+            value={date}
+            onChange={(value) => setPickedDate(value === today ? '' : value)}
+            min={PRODUCTIVITY_DATE_MIN}
+            max={today}
+            label="Dashboard date"
+          />
         </div>
       </header>
 

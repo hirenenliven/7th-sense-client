@@ -1,4 +1,4 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 import { apiBaseUrl } from '@/utils/loginAs'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
@@ -9,10 +9,6 @@ const PATH = '/parts'
 
 // A 10 MB drawing needs longer than the default 15 s on a slow connection
 const UPLOAD_TIMEOUT_MS = 120000
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 // List rows carry no processes (only processCount); GET /parts/{id} has them
 export const getParts = async (userId) => unwrapList(await sharedGet(withQuery(PATH, { userId })))

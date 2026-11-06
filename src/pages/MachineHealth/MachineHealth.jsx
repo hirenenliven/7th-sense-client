@@ -61,8 +61,7 @@ const DATE_FILTERS = {
   runHoursDaily: 'range',
 }
 
-const initialDates = () => {
-  const today = todayIso()
+const defaultDates = (today) => {
   const lastDays = { from: shiftIsoDate(today, 1 - DEFAULT_RANGE_DAYS), to: today }
   return Object.fromEntries(
     Object.entries(DATE_FILTERS).map(([key, mode]) => [key, mode === 'range' ? lastDays : today]),
@@ -82,8 +81,10 @@ const outOf100 = (value) => `${value} / 100`
 // sensor API.
 function MachineHealth({ machine }) {
   const selectedId = machine.id
-  const [dates, setDates] = useState(initialDates)
   const today = todayIso()
+  // Only picked dates are kept: the others follow today, so the screen moves on after midnight
+  const [pickedDates, setPickedDates] = useState({})
+  const dates = useMemo(() => ({ ...defaultDates(today), ...pickedDates }), [today, pickedDates])
 
   // Each chart's data for its own date / range
   const load = useMemo(() => (selectedId == null ? 0 : spindleLoad(selectedId, dates.load)), [selectedId, dates.load])
@@ -166,7 +167,7 @@ function MachineHealth({ machine }) {
     <ChartDateFilter
       mode={DATE_FILTERS[key]}
       value={dates[key]}
-      onChange={(value) => setDates((current) => ({ ...current, [key]: value }))}
+      onChange={(value) => setPickedDates((current) => ({ ...current, [key]: value }))}
       min={HEALTH_DATE_MIN}
       max={today}
       maxDays={MAX_RANGE_DAYS}

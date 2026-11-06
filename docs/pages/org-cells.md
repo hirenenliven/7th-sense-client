@@ -1,6 +1,6 @@
 # Cells
 
-- **Route:** `/organization/cells` · **Component:** [CellList.jsx](../../src/pages/Organization/Cells/CellList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/cells` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="cell"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 7: cells of a line.
 - **Navigation:** Sidebar › Masters › Organization → **Cell** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CellList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCellService
   participant userLineService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [CellList.jsx](../../src/pages/Organization/Cells/CellList.jsx) → useEffect(): runs on load `getUserCells()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserCells()`
 2. [userCellService.js](../../src/services/userCellService.js) → getUserCells(): calls `GET /api/v1/user-cell`
 3. [user_cell_routes.go](../../../7th-sense-server/internal/routes/user_cell_routes.go) → `GET /v1/user-cell` → UserCellHandler.GetAll
 4. [user_cell_handler.go](../../../7th-sense-server/internal/handler/user_cell_handler.go) → GetAll(): query userLineId, userId; calls the service
 5. [user_cell_service.go](../../../7th-sense-server/internal/service/user_cell_service.go) → GetAll(): Returns the user's cells. A non-nil userLineID keeps only that line's cells.
 6. [user_cell_repository.go](../../../7th-sense-server/internal/repository/user_cell_repository.go) → FindAll(): reads / writes `user_cell`, `user_line`
-7. [CellList.jsx](../../src/pages/Organization/Cells/CellList.jsx) → useEffect(): runs on load `getUserLines()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserLines()`
 8. [userLineService.js](../../src/services/userLineService.js) → getUserLines(): calls `GET /api/v1/user-line`
 9. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `GET /v1/user-line` → UserLineHandler.GetAll
 10. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → GetAll(): query userShopId, userId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CellList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCellService
   participant API as Go router (/api/v1)
   participant UserCellHandler
@@ -91,7 +91,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [CellList.jsx](../../src/pages/Organization/Cells/CellList.jsx) → confirmDelete(): runs `deleteUserCell()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserCell()`
 2. [userCellService.js](../../src/services/userCellService.js) → deleteUserCell(): calls `DELETE /api/v1/user-cell/{id}`
 3. [user_cell_routes.go](../../../7th-sense-server/internal/routes/user_cell_routes.go) → `DELETE /v1/user-cell/{id}` (managersOnly: superadmin, customer, admin) → UserCellHandler.Delete
 4. [user_cell_handler.go](../../../7th-sense-server/internal/handler/user_cell_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -111,7 +111,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CellList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCellService
   participant API as Go router (/api/v1)
   participant UserCellHandler
@@ -142,13 +142,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [CellFormModal.jsx](../../src/pages/Organization/Cells/CellFormModal.jsx) → onSubmit(): runs `createUserCell()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserCell()`
 2. [userCellService.js](../../src/services/userCellService.js) → createUserCell(): calls `POST /api/v1/user-cell`
 3. [user_cell_routes.go](../../../7th-sense-server/internal/routes/user_cell_routes.go) → `POST /v1/user-cell` (managersOnly: superadmin, customer, admin) → UserCellHandler.Create
 4. [user_cell_handler.go](../../../7th-sense-server/internal/handler/user_cell_handler.go) → Create(): query userId; decodes `dto.CreateUserCellRequest` and runs its Validate(); calls the service
 5. [user_cell_service.go](../../../7th-sense-server/internal/service/user_cell_service.go) → Create(): Adds a cell for userID under one of the user's lines.
 6. [user_cell_repository.go](../../../7th-sense-server/internal/repository/user_cell_repository.go) → Create(): reads / writes `user_cell`, `user_line`
-7. [CellFormModal.jsx](../../src/pages/Organization/Cells/CellFormModal.jsx) → onSubmit(): runs `updateUserCell()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserCell()`
 8. [userCellService.js](../../src/services/userCellService.js) → updateUserCell(): calls `PUT /api/v1/user-cell/{id}`
 9. [user_cell_routes.go](../../../7th-sense-server/internal/routes/user_cell_routes.go) → `PUT /v1/user-cell/{id}` (managersOnly: superadmin, customer, admin) → UserCellHandler.Update
 10. [user_cell_handler.go](../../../7th-sense-server/internal/handler/user_cell_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserCellRequest` and runs its Validate(); calls the service
@@ -179,7 +179,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

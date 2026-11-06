@@ -1,11 +1,10 @@
-import { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Operations › Monitoring › Productivity charts, from what the CNC collector recorded (mode periods, cycles) for
 // the machines the user may read. Dates are YYYY-MM-DD; id lists are sent comma-separated.
 const PATH = '/productivity'
 
-const unwrap = (response) => response.data.data
 const ids = (list) => (list?.length ? list.join(',') : undefined)
 
 // Mode periods of one day (`date`) or of the last `minutes` up to now, clipped to the window:
@@ -29,10 +28,6 @@ export const getOee = async ({ machineIds, from, to, shiftIds, program, schedule
     ),
   )
 
-// [{ date, produced, finished, unfinished }]
-export const getCycleCounts = async ({ machineIds, from, to, shiftIds }) =>
-  unwrap(await sharedGet(withQuery(`${PATH}/cycle-counts`, { machineIds: ids(machineIds), from, to, shiftIds: ids(shiftIds) }))) ?? []
-
 // { cycles: [{ endedAt, programName, durationSec, productionSec, holdSec, downtimeSec, offlineSec }]
 // (completed), summary: { cycleCount, completedCount, unfinishedCount, averageCycleSec,
 // averageProductionSec }, lastFinishedAt, programs }
@@ -53,4 +48,4 @@ export const getMachineSummaries = async ({ date } = {}) =>
 // startTime, endTime, quantity, completedCycles, partName, processName, clienteleName,
 // standardCycleSec } | null }
 export const getVirtualScreen = async (machineId) =>
-  unwrap(await sharedGet(withQuery(`${PATH}/virtual-screen`, { machineId })))
+  unwrap(await apiClient.get(withQuery(`${PATH}/virtual-screen`, { machineId })))

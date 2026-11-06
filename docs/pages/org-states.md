@@ -163,7 +163,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

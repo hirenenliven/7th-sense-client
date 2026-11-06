@@ -1,6 +1,6 @@
 # Locations
 
-- **Route:** `/organization/locations` · **Component:** [LocationList.jsx](../../src/pages/Organization/Locations/LocationList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/locations` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="location"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 4: locations of a branch.
 - **Navigation:** Sidebar › Masters › Organization → **Location** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LocationList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLocationService
   participant branchService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [LocationList.jsx](../../src/pages/Organization/Locations/LocationList.jsx) → useEffect(): runs on load `getUserLocations()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserLocations()`
 2. [userLocationService.js](../../src/services/userLocationService.js) → getUserLocations(): calls `GET /api/v1/user-location`
 3. [user_location_routes.go](../../../7th-sense-server/internal/routes/user_location_routes.go) → `GET /v1/user-location` → UserLocationHandler.GetAll
 4. [user_location_handler.go](../../../7th-sense-server/internal/handler/user_location_handler.go) → GetAll(): query branchId, userId; calls the service
 5. [user_location_service.go](../../../7th-sense-server/internal/service/user_location_service.go) → GetAll(): Returns the user's locations. A non-nil branchID keeps only that branch's locations.
 6. [user_location_repository.go](../../../7th-sense-server/internal/repository/user_location_repository.go) → FindAll(): reads / writes `user_location`, `branches`
-7. [LocationList.jsx](../../src/pages/Organization/Locations/LocationList.jsx) → useEffect(): runs on load `getBranches()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getBranches()`
 8. [branchService.js](../../src/services/branchService.js) → getBranches(): calls `GET /api/v1/branches`
 9. [branch_routes.go](../../../7th-sense-server/internal/routes/branch_routes.go) → `GET /v1/branches` → BranchHandler.GetAll
 10. [branch_handler.go](../../../7th-sense-server/internal/handler/branch_handler.go) → GetAll(): query userCityId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LocationList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLocationService
   participant API as Go router (/api/v1)
   participant UserLocationHandler
@@ -91,7 +91,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [LocationList.jsx](../../src/pages/Organization/Locations/LocationList.jsx) → confirmDelete(): runs `deleteUserLocation()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserLocation()`
 2. [userLocationService.js](../../src/services/userLocationService.js) → deleteUserLocation(): calls `DELETE /api/v1/user-location/{id}`
 3. [user_location_routes.go](../../../7th-sense-server/internal/routes/user_location_routes.go) → `DELETE /v1/user-location/{id}` (managersOnly: superadmin, customer, admin) → UserLocationHandler.Delete
 4. [user_location_handler.go](../../../7th-sense-server/internal/handler/user_location_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -111,7 +111,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LocationList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLocationService
   participant API as Go router (/api/v1)
   participant UserLocationHandler
@@ -142,13 +142,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [LocationFormModal.jsx](../../src/pages/Organization/Locations/LocationFormModal.jsx) → onSubmit(): runs `createUserLocation()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserLocation()`
 2. [userLocationService.js](../../src/services/userLocationService.js) → createUserLocation(): calls `POST /api/v1/user-location`
 3. [user_location_routes.go](../../../7th-sense-server/internal/routes/user_location_routes.go) → `POST /v1/user-location` (managersOnly: superadmin, customer, admin) → UserLocationHandler.Create
 4. [user_location_handler.go](../../../7th-sense-server/internal/handler/user_location_handler.go) → Create(): query userId; decodes `dto.CreateUserLocationRequest` and runs its Validate(); calls the service
 5. [user_location_service.go](../../../7th-sense-server/internal/service/user_location_service.go) → Create(): Adds a location for userID under a branch.
 6. [user_location_repository.go](../../../7th-sense-server/internal/repository/user_location_repository.go) → Create(): reads / writes `user_location`, `branches`
-7. [LocationFormModal.jsx](../../src/pages/Organization/Locations/LocationFormModal.jsx) → onSubmit(): runs `updateUserLocation()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserLocation()`
 8. [userLocationService.js](../../src/services/userLocationService.js) → updateUserLocation(): calls `PUT /api/v1/user-location/{id}`
 9. [user_location_routes.go](../../../7th-sense-server/internal/routes/user_location_routes.go) → `PUT /v1/user-location/{id}` (managersOnly: superadmin, customer, admin) → UserLocationHandler.Update
 10. [user_location_handler.go](../../../7th-sense-server/internal/handler/user_location_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserLocationRequest` and runs its Validate(); calls the service
@@ -179,7 +179,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

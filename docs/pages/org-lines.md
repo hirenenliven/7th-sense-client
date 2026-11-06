@@ -1,6 +1,6 @@
 # Lines
 
-- **Route:** `/organization/lines` · **Component:** [LineList.jsx](../../src/pages/Organization/Lines/LineList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/lines` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="line"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 6: lines of a shop.
 - **Navigation:** Sidebar › Masters › Organization → **Line** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LineList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLineService
   participant userShopService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [LineList.jsx](../../src/pages/Organization/Lines/LineList.jsx) → useEffect(): runs on load `getUserLines()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserLines()`
 2. [userLineService.js](../../src/services/userLineService.js) → getUserLines(): calls `GET /api/v1/user-line`
 3. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `GET /v1/user-line` → UserLineHandler.GetAll
 4. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → GetAll(): query userShopId, userId; calls the service
 5. [user_line_service.go](../../../7th-sense-server/internal/service/user_line_service.go) → GetAll(): Returns the user's lines. A non-nil userShopID keeps only that shop's lines.
 6. [user_line_repository.go](../../../7th-sense-server/internal/repository/user_line_repository.go) → FindAll(): reads / writes `user_line`, `user_shop`
-7. [LineList.jsx](../../src/pages/Organization/Lines/LineList.jsx) → useEffect(): runs on load `getUserShops()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserShops()`
 8. [userShopService.js](../../src/services/userShopService.js) → getUserShops(): calls `GET /api/v1/user-shop`
 9. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `GET /v1/user-shop` → UserShopHandler.GetAll
 10. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → GetAll(): query userLocationId, userId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LineList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLineService
   participant API as Go router (/api/v1)
   participant UserLineHandler
@@ -91,7 +91,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [LineList.jsx](../../src/pages/Organization/Lines/LineList.jsx) → confirmDelete(): runs `deleteUserLine()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserLine()`
 2. [userLineService.js](../../src/services/userLineService.js) → deleteUserLine(): calls `DELETE /api/v1/user-line/{id}`
 3. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `DELETE /v1/user-line/{id}` (managersOnly: superadmin, customer, admin) → UserLineHandler.Delete
 4. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -111,7 +111,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as LineList.jsx
+  participant Page as OrgLevelList.jsx
   participant userLineService
   participant API as Go router (/api/v1)
   participant UserLineHandler
@@ -142,13 +142,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [LineFormModal.jsx](../../src/pages/Organization/Lines/LineFormModal.jsx) → onSubmit(): runs `createUserLine()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserLine()`
 2. [userLineService.js](../../src/services/userLineService.js) → createUserLine(): calls `POST /api/v1/user-line`
 3. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `POST /v1/user-line` (managersOnly: superadmin, customer, admin) → UserLineHandler.Create
 4. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → Create(): query userId; decodes `dto.CreateUserLineRequest` and runs its Validate(); calls the service
 5. [user_line_service.go](../../../7th-sense-server/internal/service/user_line_service.go) → Create(): Adds a line for userID under one of the user's shops.
 6. [user_line_repository.go](../../../7th-sense-server/internal/repository/user_line_repository.go) → Create(): reads / writes `user_line`, `user_shop`
-7. [LineFormModal.jsx](../../src/pages/Organization/Lines/LineFormModal.jsx) → onSubmit(): runs `updateUserLine()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserLine()`
 8. [userLineService.js](../../src/services/userLineService.js) → updateUserLine(): calls `PUT /api/v1/user-line/{id}`
 9. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `PUT /v1/user-line/{id}` (managersOnly: superadmin, customer, admin) → UserLineHandler.Update
 10. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserLineRequest` and runs its Validate(); calls the service
@@ -179,7 +179,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

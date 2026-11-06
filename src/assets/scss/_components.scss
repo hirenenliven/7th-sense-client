@@ -1085,32 +1085,6 @@ fieldset:disabled .btn {
   }
 }
 
-// Selected-file preview (logo upload)
-.ts-file-preview {
-  display: flex;
-  align-items: center;
-  gap: ts-rem(10);
-  padding: $ts-space-2;
-  background: $ts-panel-2;
-  border: 1px solid $ts-line;
-  border-radius: $ts-radius;
-}
-
-.ts-file-preview-img {
-  flex: none;
-  width: ts-rem(40);
-  height: ts-rem(40);
-  object-fit: contain;
-  background: $ts-panel;
-  border-radius: $ts-radius-sm;
-}
-
-.ts-file-preview-meta {
-  flex: 1;
-  min-width: 0;
-  font-size: $ts-fs-md;
-}
-
 // Colour dot (fill set on the SVG, e.g. branch colour)
 .ts-swatch {
   flex: none;
@@ -4269,137 +4243,480 @@ $ts-toast-colors: (
 
 // -----------------------------------------------------------------------------
 // Monitoring › Virtual Screen (pages/Productivity/VirtualScreen.jsx, VirtualScreenParts.jsx): the
-// machine's controller screen. Spindle load uses .ts-gauge; overrides are ring dials, axis loads
-// vertical bars, batch / cycle a thick progress bar with tenth ticks.
+// old PHP controller screen. A dark panel with a black inset frame and a diagonal sheen, Roboto
+// light / italic type, the dial / strip / panel images of the original; gauges and bars are SVGs
+// (VirtualScreenParts). It stays dark in the light theme too: the dial images are drawn for it.
 // -----------------------------------------------------------------------------
 
-.ts-vs-label {
-  display: block;
-  font-size: ts-rem(11);
-  font-weight: 600;
-  letter-spacing: $ts-ls-wide;
-  text-transform: uppercase;
-  color: $ts-ink-2;
+$ts-vs-images: "../images/virtual-screen";
+
+.ts-vs-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: $ts-vs-pad;
+  border-radius: $ts-vs-radius;
+  background: $ts-vs-bg;
+  box-shadow: inset 0 0 0 $ts-vs-frame-width $ts-vs-frame;
+  color: $ts-vs-ink;
+  font-weight: 300;
+  color-scheme: dark;
+
+  // The glass sheen across the screen
+  &::before {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 50%, $ts-vs-sheen 50%, $ts-vs-sheen-end 66%, transparent 100%);
+  }
+
+  h2, h3, h4 { color: inherit; }
 }
 
-.ts-vs-reading {
-  display: flex;
-  flex-direction: column;
-  gap: ts-rem(4);
+.ts-vs-title {
+  margin: 0 0 $ts-space-4;
+  font-size: $ts-vs-fs-title;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.ts-vs-unit { fill: $ts-vs-muted; color: $ts-vs-muted; }
+
+// Top: machine + spindle load on the left, alarms + small gauges + axis load on the right
+.ts-vs-top {
+  display: grid;
+  gap: $ts-space-4;
+
+  @include media-breakpoint-up(xl) {
+    grid-template-columns: $ts-vs-left-width minmax(0, 1fr);
+  }
+}
+
+.ts-vs-top-left {
+  width: 100%;
+  max-width: $ts-vs-left-width;
   min-width: 0;
-
-  .ts-number small { margin-left: ts-rem(3); }
 }
 
-.ts-vs-reading-value { color: $ts-ink; }
+.ts-vs-machine {
+  margin: 0;
+  font-size: $ts-vs-fs-machine;
+  font-weight: 300;
+  line-height: 1.1;
+}
 
-.ts-vs-dial {
+.ts-vs-controller {
+  display: block;
+  margin-top: $ts-space-1;
+  font-size: $ts-vs-fs-label;
+  font-style: italic;
+  color: $ts-vs-muted;
+}
+
+.ts-vs-load-gauge {
+  display: block;
+  width: 100%;
+  margin-top: $ts-space-4;
+}
+
+.ts-vs-load-value {
+  font-size: $ts-vs-fs-load;
+  font-style: italic;
+  fill: $ts-vs-ink;
+
+  &.ts-vs-status-warning { fill: $ts-vs-accent; }
+  &.ts-vs-status-critical { fill: $ts-vs-alarm; }
+  &.ts-vs-status-idle { fill: $ts-vs-muted; }
+}
+
+.ts-vs-top-right {
+  position: relative;
+  min-width: 0;
+  padding-top: $ts-space-4;
+
+  > * { position: relative; z-index: 1; }
+
+  @include media-breakpoint-up(xl) {
+    padding-left: $ts-vs-box-inset;
+
+    // Slanted panel behind the alarms and its orange marker, as on the bottom boxes
+    &::before,
+    &::after {
+      position: absolute;
+      content: "";
+    }
+
+    &::before {
+      top: 0;
+      left: 0;
+      width: $ts-vs-corner-width;
+      height: $ts-vs-corner-height;
+      background: url("#{$ts-vs-images}/panel-corner.png") left top no-repeat;
+    }
+
+    &::after {
+      top: $ts-vs-marker-top;
+      left: $ts-vs-marker-left;
+      width: $ts-vs-marker-width;
+      height: $ts-vs-marker-height;
+      background: url("#{$ts-vs-images}/marker-orange.png") left top no-repeat;
+    }
+  }
+}
+
+.ts-vs-alarms .ts-vs-title { font-style: italic; }
+
+.ts-vs-alarm {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $ts-space-2;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: $ts-space-1 $ts-space-2;
+  margin-bottom: $ts-space-2;
+  font-size: $ts-vs-fs-label;
+  color: $ts-vs-muted;
+
+  span { color: $ts-vs-ink; }
+  .bi { color: $ts-vs-accent; }
+
+  .ts-vs-alarm-state {
+    font-size: $ts-vs-fs-small;
+    font-style: italic;
+    color: $ts-vs-muted;
+  }
+
+  &.is-active {
+    .bi,
+    .ts-vs-alarm-message { color: $ts-vs-alarm; }
+  }
+}
+
+.ts-vs-meters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $ts-space-4 $ts-space-5;
+  margin-top: $ts-space-4;
+}
+
+// Spindle / feed override: title over the dial, the % and the reading panel beside it
+.ts-vs-meter { width: $ts-vs-meter-width; }
+
+.ts-vs-meter-title {
+  width: $ts-vs-meter-dial;
+  margin: 0 0 $ts-space-1;
+  font-size: $ts-vs-fs-title;
+  font-style: italic;
+  font-weight: 400;
   text-align: center;
 }
 
-.ts-vs-dial-face {
-  position: relative;
-  width: 100%;
-  max-width: $ts-vs-dial-size;
-  aspect-ratio: 1;
-
-  svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.ts-vs-dial-track,
-.ts-vs-dial-value {
-  fill: none;
-  stroke-width: $ts-vs-dial-stroke;
-  stroke-linecap: round;
-}
-
-.ts-vs-dial-track { stroke: $ts-panel-2; }
-
-.ts-vs-dial-value { transition: stroke-dasharray $ts-transition; }
-
-.ts-vs-dial-tick {
-  stroke: $ts-ink-2;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.ts-vs-dial-readout {
-  position: absolute;
-  inset: 0;
+.ts-vs-meter-body {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.ts-vs-dial-scale {
-  font-size: $ts-chart-tick-size;
-  color: $ts-ink-3;
-}
-
-.ts-vs-dial-extra { font-size: $ts-fs-lg; }
-
-.ts-vs-axes {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   gap: $ts-space-2;
 }
 
-.ts-vs-axes-bars {
-  display: flex;
-  justify-content: center;
-  gap: ts-rem(18);
+.ts-vs-meter-dial {
+  flex: none;
+  width: $ts-vs-meter-dial;
 }
 
-.ts-vs-axis {
+.ts-vs-meter-side {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: ts-rem(6);
+  gap: $ts-space-2;
+  min-width: 0;
+}
 
-  svg {
-    width: $ts-vs-axis-width;
-    height: $ts-vs-axis-height;
+.ts-vs-meter-value {
+  font-size: $ts-vs-fs-figure;
+  font-style: italic;
+  line-height: 1;
 
-    rect { transition: y $ts-transition, height $ts-transition; }
+  .ts-vs-unit { font-size: $ts-vs-fs-label; }
+}
+
+.ts-vs-cap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: $ts-vs-cap-height;
+  padding-left: $ts-space-3;
+  background: url("#{$ts-vs-images}/reading-panel.png") left top no-repeat;
+}
+
+.ts-vs-cap-label {
+  font-size: $ts-vs-fs-small;
+  text-transform: uppercase;
+  color: $ts-vs-muted;
+}
+
+.ts-vs-cap-value {
+  font-size: $ts-vs-fs-value;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+// Needle colours of the override dials (VirtualScreenParts OverrideGauge `tone`)
+@each $tone, $tip, $base in (spindle, $ts-vs-needle-spindle, $ts-vs-needle-spindle-base), (feed, $ts-vs-needle-feed, $ts-vs-needle-feed-base) {
+  .ts-vs-needle-#{$tone} {
+    .ts-vs-needle-tip { stop-color: $tip; }
+    .ts-vs-needle-base { stop-color: $base; }
+
+    .ts-vs-needle-ring {
+      fill: $ts-vs-bg;
+      stroke: $base;
+      stroke-width: 3;
+    }
   }
 }
 
-.ts-vs-axis-track { fill: $ts-panel-2; }
+// Axis load: slanted panel with the strips, readings beside it
+.ts-vs-axis-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: $ts-space-3;
+  min-width: 0;
+}
+
+.ts-vs-axis-strips {
+  flex: none;
+  width: $ts-vs-axis-panel-width;
+}
 
 .ts-vs-axis-name {
-  font-weight: 700;
-  color: $ts-ink;
+  font-size: $ts-vs-fs-axis;
+  font-weight: 500;
+  fill: $ts-vs-ink;
 }
 
-.ts-vs-ticks {
-  display: flex;
-  justify-content: space-between;
-  margin-top: ts-rem(6);
+.ts-vs-axis-readings {
+  padding-top: $ts-space-4;
+  font-size: $ts-vs-fs-label;
+  line-height: 1.6;
+  color: $ts-vs-muted;
 
-  span {
-    width: $ts-vs-tick-width;
-    height: $ts-vs-tick-height;
-    border-radius: $ts-radius-pill;
-    background: $ts-line;
+  b {
+    font-weight: 500;
+    color: $ts-vs-ink;
   }
 }
 
-.ts-vs-status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: $ts-space-2 ts-rem(40);
+.ts-vs-axis-title {
+  display: block;
+  padding-bottom: $ts-space-1;
+  font-size: $ts-vs-fs-value;
+  color: $ts-vs-ink;
 }
+
+.ts-vs-axis-value {
+  font-size: $ts-vs-fs-value;
+  font-style: italic;
+  color: $ts-vs-ink;
+}
+
+// Batch / cycle / job boxes: slanted panel top-left, a coloured marker beside the title
+.ts-vs-boxes {
+  display: grid;
+  gap: $ts-space-4;
+  margin-top: $ts-space-5;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ts-vs-box {
+  --ts-vs-tone: #{$ts-vs-ink};
+  position: relative;
+  min-width: 0;
+  min-height: $ts-vs-corner-height;
+  padding: $ts-space-4 $ts-space-4 0 $ts-vs-box-inset;
+
+  > * { position: relative; z-index: 1; }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $ts-vs-corner-width;
+    height: $ts-vs-corner-height;
+    content: "";
+    background: url("#{$ts-vs-images}/panel-corner.png") left top no-repeat;
+  }
+
+  &::after {
+    position: absolute;
+    top: $ts-vs-marker-top;
+    left: $ts-vs-marker-left;
+    width: $ts-vs-marker-width;
+    height: $ts-vs-marker-height;
+    content: "";
+    background: left top no-repeat;
+  }
+}
+
+.ts-vs-box-batch {
+  --ts-vs-tone: #{$ts-vs-batch};
+  &::after { background-image: url("#{$ts-vs-images}/marker-green.png"); }
+}
+
+.ts-vs-box-cycle {
+  --ts-vs-tone: #{$ts-vs-cycle};
+  &::after { background-image: url("#{$ts-vs-images}/marker-blue.png"); }
+  &.is-overrun { --ts-vs-tone: #{$ts-vs-accent}; }
+}
+
+.ts-vs-box-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $ts-space-3;
+  font-size: $ts-vs-fs-label;
+  line-height: 1;
+}
+
+.ts-vs-figure {
+  display: block;
+  padding-top: $ts-space-3;
+  font-size: $ts-vs-fs-value;
+  color: $ts-vs-muted;
+}
+
+.ts-vs-figure-main {
+  font-size: $ts-vs-fs-figure;
+  font-weight: 400;
+  color: var(--ts-vs-tone);
+}
+
+.ts-vs-sep { color: $ts-vs-sep; }
+
+.ts-vs-progress {
+  display: block;
+  width: 100%;
+  margin-top: $ts-space-4;
+}
+
+.ts-vs-progress-track,
+.ts-vs-progress-tick { fill: $ts-vs-track; }
+
+.ts-vs-progress-label {
+  font-size: $ts-vs-fs-title;
+  font-style: italic;
+}
+
+@each $tone, $color, $end in (batch, $ts-vs-batch, $ts-vs-batch-end), (cycle, $ts-vs-cycle, $ts-vs-cycle-end), (overrun, $ts-vs-accent, $ts-vs-accent) {
+  .ts-vs-progress-#{$tone} {
+    .ts-vs-progress-start { stop-color: rgba($color, .33); }
+    .ts-vs-progress-mid { stop-color: $color; }
+    .ts-vs-progress-end { stop-color: $end; }
+    .ts-vs-progress-marker { fill: $end; }
+    .ts-vs-progress-label { fill: $color; }
+  }
+}
+
+.ts-vs-box-foot {
+  padding-top: $ts-space-3;
+  font-size: $ts-vs-fs-label;
+  color: $ts-vs-muted;
+
+  span { color: $ts-vs-ink; }
+}
+
+.ts-vs-job-row {
+  display: grid;
+  padding-bottom: $ts-space-2;
+  font-size: $ts-vs-fs-label;
+  line-height: 1.5;
+
+  > span:first-child { color: $ts-vs-muted; }
+}
+
+// Footer: current mode, logo, server date and clock
+.ts-vs-footer {
+  display: grid;
+  gap: $ts-space-4;
+  align-items: center;
+  justify-items: center;
+  margin-top: $ts-space-5;
+  text-align: center;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    > :first-child { justify-self: start; }
+    > :last-child { justify-self: end; }
+  }
+}
+
+.ts-vs-mode {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-3;
+  min-height: $ts-vs-corner-small-height;
+  padding-left: $ts-vs-mode-inset;
+  font-size: $ts-vs-fs-label;
+  text-align: start;
+
+  > * { position: relative; z-index: 1; }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $ts-vs-corner-small-width;
+    height: $ts-vs-corner-small-height;
+    content: "";
+    background: url("#{$ts-vs-images}/panel-corner-small.png") left top no-repeat;
+  }
+
+  b { font-weight: 400; }
+}
+
+.ts-vs-mode-dot {
+  flex: none;
+  width: $ts-vs-mode-dot;
+  height: $ts-vs-mode-dot;
+  border-radius: 50%;
+  background: var(--ts-tone, #{$ts-vs-muted});
+}
+
+.ts-vs-mode-text { min-width: 0; }
+
+.ts-vs-mode-meta {
+  font-size: $ts-vs-fs-small;
+  color: $ts-vs-muted;
+}
+
+.ts-vs-logo { height: $ts-vs-logo-height; }
+
+.ts-vs-date {
+  position: relative;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $ts-space-1 $ts-space-3;
+  padding-right: $ts-vs-pin-width + $ts-space-3;
+  font-size: $ts-vs-fs-label;
+  color: $ts-vs-muted;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: $ts-vs-pin-width;
+    height: $ts-vs-pin-height;
+    content: "";
+    transform: translateY(-50%);
+    background: url("#{$ts-vs-images}/date-pin.png") left top no-repeat;
+  }
+}
+
+.ts-vs-clock { color: $ts-vs-ink; }
 
 // -----------------------------------------------------------------------------
 // Home dashboard tiles (pages/Home/HomeCards.jsx KpiTile): a quiet panel-coloured icon badge; the
@@ -4464,4 +4781,23 @@ $ts-tile-tones: (
     width: $ts-home-tile-dot;
     height: $ts-home-tile-dot;
   }
+}
+
+// Where the time went: a row per mode beside the donut (colour mark, name, time, share)
+.ts-home-time-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto $ts-home-time-share-width;
+  align-items: center;
+  column-gap: $ts-space-2;
+  padding: $ts-space-2 0;
+  font-size: $font-size-sm;
+
+  & + & { border-top: 1px solid $ts-line; }
+
+  .ts-dot { color: var(--ts-tone); }
+}
+
+.ts-home-time-share {
+  text-align: end;
+  font-weight: $font-weight-semibold;
 }

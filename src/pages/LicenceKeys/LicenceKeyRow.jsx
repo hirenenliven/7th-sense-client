@@ -23,7 +23,7 @@ function LicenceKeyRow({ licenceKey, number, showCustomer, canManage, onCopy, on
       <td className="text-nowrap">{durationLabel(licenceKey.duration)}</td>
       <td className="text-nowrap">{formatDate(licenceKey.createdAt)}</td>
       <td className="text-nowrap">
-        {licenceKey.expiresOn ? formatDate(`${licenceKey.expiresOn}T00:00`) : 'Never'}
+        {licenceKey.expiresOn ? formatDate(licenceKey.expiresOn) : 'Never'}
         {licenceKey.isExpired && (
           <Badge bg="" className="badge-soft-danger ms-2">
             Expired

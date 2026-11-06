@@ -1,14 +1,10 @@
-import apiClient, { sharedGet, withQuery } from './apiClient'
+import apiClient, { sharedGet, withQuery, unwrap, unwrapList } from './apiClient'
 
 // The logged-in user's cells (user_cell table). The server picks the user;
 // an admin passes userId to work on another user's rows.
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Every response is { statusCode, success, message, data }; these functions return `data`.
 const PATH = '/user-cell'
-
-// The server omits `data` for an empty list, so lists fall back to [].
-const unwrap = (response) => response.data.data
-const unwrapList = (response) => unwrap(response) ?? []
 
 // userLineId (optional) keeps only the cells of that line
 export const getUserCells = async (userLineId, userId) =>

@@ -1,6 +1,6 @@
 # Shops
 
-- **Route:** `/organization/shops` · **Component:** [ShopList.jsx](../../src/pages/Organization/Shops/ShopList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/shops` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="shop"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 5: shops of a location.
 - **Navigation:** Sidebar › Masters › Organization → **Shop** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as ShopList.jsx
+  participant Page as OrgLevelList.jsx
   participant userShopService
   participant userLocationService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [ShopList.jsx](../../src/pages/Organization/Shops/ShopList.jsx) → useEffect(): runs on load `getUserShops()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserShops()`
 2. [userShopService.js](../../src/services/userShopService.js) → getUserShops(): calls `GET /api/v1/user-shop`
 3. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `GET /v1/user-shop` → UserShopHandler.GetAll
 4. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → GetAll(): query userLocationId, userId; calls the service
 5. [user_shop_service.go](../../../7th-sense-server/internal/service/user_shop_service.go) → GetAll(): Returns the user's shops. A non-nil userLocationID keeps only that location's shops.
 6. [user_shop_repository.go](../../../7th-sense-server/internal/repository/user_shop_repository.go) → FindAll(): reads / writes `user_shop`, `user_location`
-7. [ShopList.jsx](../../src/pages/Organization/Shops/ShopList.jsx) → useEffect(): runs on load `getUserLocations()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserLocations()`
 8. [userLocationService.js](../../src/services/userLocationService.js) → getUserLocations(): calls `GET /api/v1/user-location`
 9. [user_location_routes.go](../../../7th-sense-server/internal/routes/user_location_routes.go) → `GET /v1/user-location` → UserLocationHandler.GetAll
 10. [user_location_handler.go](../../../7th-sense-server/internal/handler/user_location_handler.go) → GetAll(): query branchId, userId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as ShopList.jsx
+  participant Page as OrgLevelList.jsx
   participant userShopService
   participant API as Go router (/api/v1)
   participant UserShopHandler
@@ -91,7 +91,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [ShopList.jsx](../../src/pages/Organization/Shops/ShopList.jsx) → confirmDelete(): runs `deleteUserShop()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserShop()`
 2. [userShopService.js](../../src/services/userShopService.js) → deleteUserShop(): calls `DELETE /api/v1/user-shop/{id}`
 3. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `DELETE /v1/user-shop/{id}` (managersOnly: superadmin, customer, admin) → UserShopHandler.Delete
 4. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -111,7 +111,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as ShopList.jsx
+  participant Page as OrgLevelList.jsx
   participant userShopService
   participant API as Go router (/api/v1)
   participant UserShopHandler
@@ -142,13 +142,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [ShopFormModal.jsx](../../src/pages/Organization/Shops/ShopFormModal.jsx) → onSubmit(): runs `createUserShop()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserShop()`
 2. [userShopService.js](../../src/services/userShopService.js) → createUserShop(): calls `POST /api/v1/user-shop`
 3. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `POST /v1/user-shop` (managersOnly: superadmin, customer, admin) → UserShopHandler.Create
 4. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → Create(): query userId; decodes `dto.CreateUserShopRequest` and runs its Validate(); calls the service
 5. [user_shop_service.go](../../../7th-sense-server/internal/service/user_shop_service.go) → Create(): Adds a shop for userID under one of the user's locations.
 6. [user_shop_repository.go](../../../7th-sense-server/internal/repository/user_shop_repository.go) → Create(): reads / writes `user_shop`, `user_location`
-7. [ShopFormModal.jsx](../../src/pages/Organization/Shops/ShopFormModal.jsx) → onSubmit(): runs `updateUserShop()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserShop()`
 8. [userShopService.js](../../src/services/userShopService.js) → updateUserShop(): calls `PUT /api/v1/user-shop/{id}`
 9. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `PUT /v1/user-shop/{id}` (managersOnly: superadmin, customer, admin) → UserShopHandler.Update
 10. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserShopRequest` and runs its Validate(); calls the service
@@ -179,7 +179,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

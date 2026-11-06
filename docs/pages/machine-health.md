@@ -56,7 +56,7 @@ sequenceDiagram
 
 ## Live updates
 
-- **Machine Time by Day** loads `GET /machine-health/machine-time-by-day` for the selected machine and range, and reloads every 60 s while the range includes today. Time without a recorded mode counts as offline.
+- **Machine Time by Day** loads `GET /machine-health/machine-time-by-day` for the selected machine and range, and reloads every 60 s while the range includes today. A range nobody picked follows today, so it moves on after midnight. Time without a recorded mode counts as offline.
 - The other sensor charts on this page still use sample data ([healthSampleData.js](../../src/pages/MachineHealth/healthSampleData.js)) and call no API yet.
 
 ## UI states

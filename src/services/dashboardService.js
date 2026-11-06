@@ -1,9 +1,7 @@
-import { sharedGet, withQuery } from './apiClient'
+import { sharedGet, withQuery, unwrap } from './apiClient'
 
 // Paths are relative to VITE_API_BASE_URL (…/api/v1).
 // Home dashboard: every active machine the user may read, together (server DashboardService).
-
-const unwrap = (response) => response.data.data
 
 // One day (`date` YYYY-MM-DD, default today); `userId` = one customer's machines (superadmin only).
 // { date, serverTime,

@@ -8,7 +8,7 @@ import Loader from '@/components/common/Loader'
 import { UNKNOWN_MODE_COLOR, modeTypeOf } from '@/constants/machines'
 import useLoad from '@/hooks/useLoad'
 import { getModeTimeline } from '@/services/productivityService'
-import { formatModeDuration } from '@/utils/dateTime'
+import { formatModeDuration, todayIso } from '@/utils/dateTime'
 import {
   DEFAULT_TIMELINE_RANGE,
   TIMELINE_HISTORY,
@@ -26,14 +26,17 @@ const readoutClock = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute:
 // the clock) or, with History, over a whole day. Live windows reload every TIMELINE_POLL_MS (new
 // mode changes) and the open period grows every second on the server's clock (offset kept from the
 // response's serverTime). The readout shows the hovered period, else the current one.
-function ModeTimelineCard({ machineId, min, today }) {
+function ModeTimelineCard({ machineId, min }) {
+  const today = todayIso()
   const [range, setRange] = useState(DEFAULT_TIMELINE_RANGE)
-  const [date, setDate] = useState(today)
+  // Empty = today, so History on today moves to the new day by itself
+  const [pickedDate, setPickedDate] = useState('')
+  const date = pickedDate || today
   const [zoom, setZoom] = useState(TIMELINE_ZOOMS[0])
   const [hovered, setHovered] = useState(null)
   const [clientNow, setClientNow] = useState(() => Date.now())
   const history = range === TIMELINE_HISTORY
-  const live = !history || date === today
+  const live = !history || !pickedDate
   const query = history ? { date } : { minutes: range }
 
   const { data, loading, error } = useLoad(
@@ -105,7 +108,15 @@ function ModeTimelineCard({ machineId, min, today }) {
           ))}
           <option value={TIMELINE_HISTORY}>Whole day (history)</option>
         </Form.Select>
-        {history && <ChartDateFilter value={date} onChange={setDate} min={min} max={today} label="Mode timeline date" />}
+        {history && (
+          <ChartDateFilter
+            value={date}
+            onChange={(value) => setPickedDate(value === today ? '' : value)}
+            min={min}
+            max={today}
+            label="Mode timeline date"
+          />
+        )}
         <ButtonGroup aria-label="Zoom">
           <Button variant="ghost" disabled={zoomIndex <= 0} onClick={() => setZoom(TIMELINE_ZOOMS[zoomIndex - 1])} aria-label="Zoom out">
             <i className="bi bi-zoom-out" aria-hidden="true" />
@@ -162,7 +173,6 @@ function ModeTimelineCard({ machineId, min, today }) {
 ModeTimelineCard.propTypes = {
   machineId: PropTypes.number.isRequired,
   min: PropTypes.string.isRequired,
-  today: PropTypes.string.isRequired,
 }
 
 export default ModeTimelineCard

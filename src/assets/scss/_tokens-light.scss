@@ -84,3 +84,23 @@ $color-contrast-light: #fff; // text on dark fills (danger, info, …)
 
 $box-shadow-sm:    0 1px 2px rgba(0, 0, 0, .06);
 $box-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, .06);
+
+// Virtual Screen: stays dark in the light theme (its dial images are drawn for a dark panel)
+$ts-vs-bg:                  #15181b;
+$ts-vs-frame:               #000000;
+$ts-vs-ink:                 #ffffff;
+$ts-vs-muted:               #88939f;
+$ts-vs-sep:                 #51585e;
+$ts-vs-accent:              #f7941d;
+$ts-vs-alarm:               #ff4d4d;
+$ts-vs-track:               #232b33;
+$ts-vs-batch:               #2acc48;
+$ts-vs-batch-end:           #00ff2f;
+$ts-vs-cycle:               #18c8f4;
+$ts-vs-cycle-end:           #00ccff;
+$ts-vs-sheen:               rgba(130, 192, 255, .05);
+$ts-vs-sheen-end:           rgba(130, 192, 255, .03);
+$ts-vs-needle-spindle:      #ff2f6e;
+$ts-vs-needle-spindle-base: #ff8a1e;
+$ts-vs-needle-feed:         #8a00ff;
+$ts-vs-needle-feed-base:    #b77bff;

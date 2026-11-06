@@ -12,6 +12,7 @@ import StatusBadge from '@/components/common/StatusBadge'
 import { ACCOUNT_KIND, ACCOUNT_PAGES } from './accountPages'
 import { FILTER_OPTIONS } from './customerForm'
 import { customerName } from './customerFormat'
+import { buildOrganizationPaths, filterLabel, hasFilterLevels, loadOrganization, machineMatches, toMachineFilterValues } from './machineFilter'
 
 const EMPTY = '—'
 
@@ -51,7 +52,8 @@ DetailCard.propTypes = {
 }
 
 // Account Center › Customer › View and Masters › Users › View (kind): everything GET /users/{id} returns.
-// profile, companyProfile and address may each be null. Users also show their role and machines.
+// profile, companyProfile and address may each be null. Users also show their role, machines and
+// machine filter; only customers have the Filters card.
 function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const account = ACCOUNT_PAGES[kind]
   const isUser = kind === ACCOUNT_KIND.USER
@@ -61,8 +63,9 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
 
   const [customer, setCustomer] = useState(null)
   const [branchName, setBranchName] = useState('')
-  // Names of the user's assigned machines (the company's machines, looked up by id)
-  const [machineNames, setMachineNames] = useState([])
+  // The company's machines (to name the user's; null until loaded) and organization (to name the machine filter)
+  const [companyMachines, setCompanyMachines] = useState(null)
+  const [organization, setOrganization] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -80,11 +83,15 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
             .then((branch) => active && setBranchName(branch?.name ?? ''))
             .catch(() => {})
         }
-        // Machine names are a nice-to-have too; the count is shown if they cannot be loaded
-        if (isUser && data.machineIds?.length) {
-          const assigned = new Set(data.machineIds)
-          getMachines(isSuperadmin ? data.companyId : undefined)
-            .then((machines) => active && setMachineNames(machines.filter((machine) => assigned.has(machine.id)).map((machine) => machine.name)))
+        // Machine and organization names are a nice-to-have too; counts are shown if they cannot be loaded
+        if (isUser && (data.machineIds?.length || data.machineFilter)) {
+          const userId = isSuperadmin ? data.companyId : undefined
+          Promise.all([getMachines(userId), hasFilterLevels(data.machineFilter) ? loadOrganization(userId) : {}])
+            .then(([machines, levels]) => {
+              if (!active) return
+              setCompanyMachines(machines)
+              setOrganization(levels)
+            })
             .catch(() => {})
         }
       })
@@ -146,11 +153,21 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const filterLabels = FILTER_OPTIONS.filter((option) => chosenFilters.has(option.value))
   const seesAllMachines = ALL_MACHINE_ROLES.includes(customer.role)
   const assignedCount = customer.machineIds?.length ?? 0
+  const assigned = new Set(customer.machineIds ?? [])
+  const machineNames = (companyMachines ?? []).filter((machine) => assigned.has(machine.id)).map((machine) => machine.name)
+  const machineFilter = customer.machineFilter
+  const filterPath = hasFilterLevels(machineFilter) ? filterLabel(machineFilter, organization) : ''
+  // With all machines the filter gives them: count the company machines under it now (once loaded)
+  const filterValues = toMachineFilterValues(machineFilter)
+  const organizationPaths = buildOrganizationPaths(organization)
+  const filterMachineCount = companyMachines?.filter((machine) => machineMatches(machine, filterValues, organizationPaths)).length
   const machinesValue = seesAllMachines
     ? 'All company machines'
-    : machineNames.length
-      ? machineNames.join(', ')
-      : `${assignedCount} assigned`
+    : machineFilter?.allMachines
+      ? `All machines of ${filterPath || 'the company'} (${filterMachineCount == null ? '' : `${filterMachineCount} now, `}new ones included)`
+      : machineNames.length
+        ? machineNames.join(', ')
+        : `${assignedCount} assigned`
 
   return (
     <>
@@ -165,6 +182,7 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
               items={[
                 ['Role', ROLE_LABELS[customer.role] ?? customer.role],
                 ['Machines', machinesValue],
+                ...(!seesAllMachines && filterPath && !machineFilter.allMachines ? [['Organization', filterPath]] : []),
               ]}
             />
           </Col>
@@ -228,25 +246,27 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
         </Col>
       </Row>
 
-      <Card>
-        <Card.Header>
-          <i className="bi bi-funnel text-primary" aria-hidden="true" />
-          Filters
-        </Card.Header>
-        <Card.Body>
-          {filterLabels.length ? (
-            <div className="d-flex flex-wrap gap-2">
-              {filterLabels.map((option) => (
-                <Badge key={option.value} bg="primary">
-                  {option.label}
-                </Badge>
-              ))}
-            </div>
-          ) : (
-            <span className="text-body-secondary">No filters selected.</span>
-          )}
-        </Card.Body>
-      </Card>
+      {!isUser && (
+        <Card>
+          <Card.Header>
+            <i className="bi bi-funnel text-primary" aria-hidden="true" />
+            Filters
+          </Card.Header>
+          <Card.Body>
+            {filterLabels.length ? (
+              <div className="d-flex flex-wrap gap-2">
+                {filterLabels.map((option) => (
+                  <Badge key={option.value} bg="primary">
+                    {option.label}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <span className="text-body-secondary">No filters selected.</span>
+            )}
+          </Card.Body>
+        </Card>
+      )}
     </>
   )
 }

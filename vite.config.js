@@ -41,6 +41,8 @@ export default defineConfig(({ mode }) => {
           // Keep the browser's Host header: the API's CSRF check (Go CrossOriginProtection)
           // compares Origin with Host, so rewriting Host makes every POST/PUT/DELETE fail with 403.
           changeOrigin: false,
+          // Forward the live data WebSocket (/api/v1/socket.io/, services/liveSocket.js) too
+          ws: true,
         },
       },
     },

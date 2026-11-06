@@ -30,7 +30,7 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const account = ACCOUNT_PAGES[kind]
   const navigate = useNavigate()
   const { hasRole } = useAuth()
-  const { customerLabel } = useOrgUser()
+  const { customerLabel, reloadUsers } = useOrgUser()
   // The superadmin's Users list has every company's members: show whose each one is
   const showCustomer = kind === ACCOUNT_KIND.USER && hasRole(SUPERADMIN_ONLY)
 
@@ -166,6 +166,7 @@ function CustomerList({ kind = ACCOUNT_KIND.CUSTOMER }) {
     try {
       await deleteUser(pendingDelete.id)
       setCustomers((list) => list.filter((customer) => customer.id !== pendingDelete.id))
+      reloadUsers()
       toast.success(`${customerName(pendingDelete)} has been deleted.`, { title: `${account.title} deleted` })
       setPendingDelete(null)
     } catch (err) {

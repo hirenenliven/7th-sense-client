@@ -114,6 +114,7 @@ sequenceDiagram
   AuthRepository->>DB: auth_tokens
   DB-->>AuthRepository: rows
   AuthService-->>AuthHandler: result
+  AuthHandler->>AuthHandler: live.DisconnectSession(token): session:expired to the session's sockets, then close
   AuthHandler-->>Page: 200 JSON envelope
   Page-->>User: updates the screen
 ```
@@ -126,16 +127,19 @@ sequenceDiagram
 4. [auth_handler.go](../../../7th-sense-server/internal/handler/auth_handler.go) → Logout(): reads the logged-in user; calls the service
 5. [auth_service.go](../../../7th-sense-server/internal/service/auth_service.go) → Logout(): Ends the session of token. An unknown or empty token is not an error.
 6. [auth_repository.go](../../../7th-sense-server/internal/repository/auth_repository.go) → DeleteSession(): reads / writes `auth_tokens`
+7. [live_handler.go](../../../7th-sense-server/internal/handler/live_handler.go) → DisconnectSession(): every live socket of this session (all its tabs) gets `session:expired` and is closed; the user's other sessions keep theirs
+8. [AuthProvider.jsx](../../src/context/AuthProvider.jsx) → `disconnectLive()` ([liveSocket.js](../../src/services/liveSocket.js)) when the user is dropped or changes, so a new login opens a new socket for the new session
 
 **Rules & edge cases**
 
-- Any 401 from the API (expired or missing session) fires `onUnauthorized` in [apiClient.js](../../src/services/apiClient.js); [AuthProvider.jsx](../../src/context/AuthProvider.jsx) drops the user and the routes redirect to `/login`.
+- Any 401 from the API (expired or missing session) fires `onUnauthorized` in [apiClient.js](../../src/services/apiClient.js); [AuthProvider.jsx](../../src/context/AuthProvider.jsx) drops the user and the routes redirect to `/login`. The live socket's `session:expired` does the same (`notifyUnauthorized`), and after a refused or server-closed socket the client checks `GET /auth/me` (live data: [ADR 0021](../adr/0021-virtual-screen-socket.md)).
 - In a "log in as customer" tab ([customer-user-list.md](customer-user-list.md#view-customer-log-in-as)) every call goes to `/api/as/<key>/v1` ([loginAs.js](../../src/utils/loginAs.js)); logout ends only that tab's session, drops its key and shows the login screen. The superadmin's session is untouched.
 - [ProtectedRoute.jsx](../../src/routes/ProtectedRoute.jsx) renders `Forbidden` when the user's role is not in the route's `roles`.
 - The theme is read from the user (`GET /me`) after login and saved with `PUT /me/theme` when changed ([theme.js](../../src/utils/theme.js)); saves are queued so the last choice wins.
 
 ## UI states
 
+- **A screen crashes, or its code cannot be downloaded** (e.g. a tab left open across a deploy): [ErrorBoundary.jsx](../../src/components/common/ErrorBoundary.jsx) around the routes shows "This page could not be shown" with a Reload button instead of a blank app.
 - **Success / failure of an action:** toast message (`utils/toast.js`).
 
 ## API calls on this page

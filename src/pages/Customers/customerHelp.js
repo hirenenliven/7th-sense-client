@@ -39,7 +39,7 @@ export const FIELD_HELP = {
   },
   filters: {
     title: 'Filters',
-    content: 'Filters offered to this customer on their dashboards and reports. Only the ticked filters are shown.',
+    content: 'Filters offered to this customer on their dashboards and reports. Only the ticked filters are shown. Customers only — a user’s machines are narrowed in the Access card.',
     rules: ['Optional — tick none to hide all filters', 'Can be changed later by editing the customer'],
   },
   // Users only (Access card)
@@ -48,9 +48,27 @@ export const FIELD_HELP = {
     content: 'What the user can do. Administrators see every machine of the company and can add users; other roles see only the machines ticked below.',
     rules: ['Customers can give every role but Customer', 'Administrators cannot give the Administrator role'],
   },
+  machineFilter: {
+    title: 'Machine access by organization',
+    content:
+      'Pick the company’s Country, State, City, Branch, Location, Shop or Line: the Machines dropdown then lists only the machines under it.',
+    example: 'India › Gujarat — the Machines dropdown lists the machines in Gujarat',
+    rules: [
+      'Optional — leave every level on All to list all company machines',
+      'Picking a lower level (e.g. a line) fills the levels above it',
+      'Changing a level drops the picked machines that are no longer under it',
+      'Machines without a line only show when no level is picked',
+    ],
+  },
   machineIds: {
     title: 'Machines',
-    content: 'The company machines this user can see. Machines that are not ticked are hidden from the user everywhere.',
-    rules: ['Optional — tick none and the user sees no machines', 'Not needed for Administrators: they see every machine'],
+    content:
+      'The machines this user can see; the others are hidden from the user everywhere. Pick several in the dropdown, or pick “All machines” to give every machine of the selection — machines added to it later are given automatically.',
+    rules: [
+      'Optional — pick none and the user sees no machines',
+      '“All machines” is saved as a rule, not a list: new machines under the selection are included',
+      'Removing one machine from “All machines” keeps the others picked one by one',
+      'Not needed for Administrators: they see every machine',
+    ],
   },
 }

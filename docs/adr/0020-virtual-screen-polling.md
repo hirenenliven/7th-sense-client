@@ -1,7 +1,7 @@
 # 0020. Virtual Screen: one REST snapshot polled every 5 s
 
 - **Date:** 2026-11-05
-- **Status:** Accepted
+- **Status:** Superseded by [0021](0021-virtual-screen-socket.md)
 
 ## Context
 

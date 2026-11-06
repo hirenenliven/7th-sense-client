@@ -7,15 +7,17 @@ import DonutChart from '@/components/charts/DonutChart'
 import { monitoringSearchPath } from '@/constants/monitoring'
 import { ROUTES } from '@/constants/routes'
 import { formatCount, percent } from '@/pages/Productivity/productivitySettings'
+import { formatModeDuration } from '@/utils/dateTime'
 import {
   HOURLY_BARS,
   HOURLY_LINES,
   OTHER_MODE,
-  TIME_GROUPS,
-  UNRECORDED_GROUP,
+  PRODUCTION_TIME_KEY,
+  TIME_MIN_SLICE_DEG,
   fleetModeCounts,
   hourLabel,
   scoreTone,
+  timeByMode,
   timeShare,
   UNFINISHED_WARNING,
   unfinishedRate,
@@ -77,7 +79,7 @@ function TileRow({ tiles, cols }) {
 
 TileRow.propTypes = { tiles: PropTypes.arrayOf(tileShape).isRequired, cols: PropTypes.object.isRequired }
 
-// Fleet now: connection counts, then a tile per mode with its share of the fleet (each opens
+// Live Machine Status: connection counts, then a tile per mode with its share of the fleet (each opens
 // Monitoring searched by that mode's name; Other modes opens the whole list)
 export function FleetCard({ fleet }) {
   const share = (count) => (fleet.total ? (count / fleet.total) * 100 : 0)
@@ -101,7 +103,7 @@ export function FleetCard({ fleet }) {
   }))
 
   return (
-    <ChartCard title="Fleet now" subtitle="Live · machines by connection and current mode" icon="bi-broadcast">
+    <ChartCard title="Live Machine Status" subtitle="Right now · every active machine by connection and current mode" icon="bi-broadcast">
       <TileRow tiles={statusTiles} cols={{ lg: 4 }} />
       <div className="mt-3">
         <TileRow tiles={modeTiles} cols={{ md: 3, xxl: modeTiles.length }} />
@@ -136,7 +138,7 @@ export function DayCard({ home, dayNoun }) {
   ]
 
   return (
-    <ChartCard title="Performance" subtitle="Machines together, weighted by their time · same rules as Productivity" icon="bi-graph-up">
+    <ChartCard title="Production Performance" subtitle={`OEE, utilization, parts and cycles for ${dayNoun} · all machines, weighted by their time`} icon="bi-graph-up">
       <TileRow tiles={tiles} cols={{ lg: 4 }} />
     </ChartCard>
   )
@@ -144,24 +146,41 @@ export function DayCard({ home, dayNoun }) {
 
 DayCard.propTypes = { home: PropTypes.object.isRequired, dayNoun: PropTypes.string.isRequired }
 
-// Where the machines' time went: mode groups and the time with no record, as shares of the day
+// Where the machines' time went: a slice per mode in its mode colour (small ones held at a visible
+// size) beside a list of every mode: its colour mark, time and share of the day
 export function TimeCard({ time }) {
-  const seconds = Object.fromEntries(time.groups.map((group) => [group.group, group.durationSec]))
-  const recorded = time.groups.reduce((sum, group) => sum + group.durationSec, 0)
-  const data = [
-    ...TIME_GROUPS.map((group) => ({ ...group, value: seconds[group.key] ?? 0 })),
-    { ...UNRECORDED_GROUP, value: Math.max(0, time.spanSec - recorded) },
-  ].filter((item) => item.value > 0)
-  const production = seconds.production ?? 0
+  const rows = timeByMode(time)
+  const share = (seconds) => (time.spanSec ? (seconds / time.spanSec) * 100 : 0)
+  const production = rows.find((row) => row.key === PRODUCTION_TIME_KEY)?.value ?? 0
 
   return (
-    <ChartCard title="Where the time went" subtitle="Donut · time of every machine by mode group" icon="bi-pie-chart">
-      <DonutChart
-        data={data}
-        centre={{ value: time.spanSec ? percent((production / time.spanSec) * 100) : '—', caption: 'In production' }}
-        valueFormatter={(value) => timeShare(value, time.spanSec)}
-        emptyText="No machine time for this day."
-      />
+    <ChartCard title="Where the time went" subtitle="Time of every machine by mode · share of the day" icon="bi-pie-chart">
+      <Row className="g-3 align-items-center flex-grow-1">
+        <Col sm={5}>
+          <DonutChart
+            data={rows.filter((row) => row.value > 0)}
+            centre={{ value: time.spanSec ? percent(share(production)) : '—', caption: 'In production' }}
+            valueFormatter={(value) => timeShare(value, time.spanSec)}
+            legend={false}
+            minAngle={TIME_MIN_SLICE_DEG}
+            emptyText="No machine time for this day."
+          />
+        </Col>
+        {time.spanSec > 0 && (
+          <Col sm={7}>
+            <ul className="list-unstyled mb-0">
+              {rows.map((row) => (
+                <li key={row.key} className={`ts-home-time-row ts-tone-${row.tone}`}>
+                  <i className="ts-dot" aria-hidden="true" />
+                  <span className="text-truncate">{row.label}</span>
+                  <span className="font-tabular text-body-secondary">{formatModeDuration(row.value)}</span>
+                  <span className="ts-home-time-share font-tabular">{percent(share(row.value))}</span>
+                </li>
+              ))}
+            </ul>
+          </Col>
+        )}
+      </Row>
     </ChartCard>
   )
 }

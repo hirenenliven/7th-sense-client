@@ -129,10 +129,10 @@ function Productivity({ machine, machines }) {
       <>
         <Row xs={1} className="g-3">
           <Col>
-            <SummaryCards key={selectedId} machineId={selectedId} today={today} />
+            <SummaryCards key={selectedId} machineId={selectedId} />
           </Col>
           <Col>
-            <ModeTimelineCard key={selectedId} machineId={selectedId} min={PRODUCTIVITY_DATE_MIN} today={today} />
+            <ModeTimelineCard key={selectedId} machineId={selectedId} min={PRODUCTIVITY_DATE_MIN} />
           </Col>
           <Col>
             <ChartCard title="OEE" subtitle="Line · daily %, the machines and shifts picked together, weighted by their time" icon="bi-graph-up">

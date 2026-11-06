@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { SUPERADMIN_ONLY, MANAGERS } from '@/constants/app'
+import { ORG_LEVEL } from '@/constants/organization'
 import { ROUTES } from '@/constants/routes'
 import { ACCOUNT_KIND } from '@/pages/Customers/accountPages'
 import { REASON_KIND } from '@/pages/Reasons/reasonPages'
@@ -37,12 +38,8 @@ const AccountCenterPage = lazy(() => import('@/pages/AccountCenter/AccountCenter
 const OrganizationPage = lazy(() => import('@/pages/Organization/OrganizationPage'))
 const OrgCountryList = lazy(() => import('@/pages/Organization/Countries/CountryList'))
 const OrgStateList = lazy(() => import('@/pages/Organization/States/StateList'))
-const OrgCityList = lazy(() => import('@/pages/Organization/Cities/CityList'))
-const OrgLocationList = lazy(() => import('@/pages/Organization/Locations/LocationList'))
-const OrgShopList = lazy(() => import('@/pages/Organization/Shops/ShopList'))
-const OrgLineList = lazy(() => import('@/pages/Organization/Lines/LineList'))
-const OrgCellList = lazy(() => import('@/pages/Organization/Cells/CellList'))
-const OrgSupervisorList = lazy(() => import('@/pages/Organization/Supervisors/SupervisorList'))
+// City, Location, Shop, Line, Cell and Supervisor are one list (orgLevels.js); `key` gives each its own state
+const OrgLevelList = lazy(() => import('@/pages/Organization/OrgLevelList'))
 
 // Screens that exist. Every other sidebar link renders <ComingSoon /> until it is built.
 // Also read by the User Guide to show which screens are available.
@@ -103,12 +100,12 @@ export const PAGES = [
   { path: ROUTES.USER_GUIDE, element: <UserGuide /> },
   { path: ROUTES.ORG_COUNTRIES, element: <OrganizationPage><OrgCountryList /></OrganizationPage> },
   { path: ROUTES.ORG_STATES, element: <OrganizationPage><OrgStateList /></OrganizationPage> },
-  { path: ROUTES.ORG_CITIES, element: <OrganizationPage><OrgCityList /></OrganizationPage> },
-  { path: ROUTES.ORG_LOCATIONS, element: <OrganizationPage><OrgLocationList /></OrganizationPage> },
-  { path: ROUTES.ORG_SHOPS, element: <OrganizationPage><OrgShopList /></OrganizationPage> },
-  { path: ROUTES.ORG_LINES, element: <OrganizationPage><OrgLineList /></OrganizationPage> },
-  { path: ROUTES.ORG_CELLS, element: <OrganizationPage><OrgCellList /></OrganizationPage> },
-  { path: ROUTES.ORG_SUPERVISORS, element: <OrganizationPage><OrgSupervisorList /></OrganizationPage> },
+  { path: ROUTES.ORG_CITIES, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.CITY} level={ORG_LEVEL.CITY} /></OrganizationPage> },
+  { path: ROUTES.ORG_LOCATIONS, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.LOCATION} level={ORG_LEVEL.LOCATION} /></OrganizationPage> },
+  { path: ROUTES.ORG_SHOPS, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.SHOP} level={ORG_LEVEL.SHOP} /></OrganizationPage> },
+  { path: ROUTES.ORG_LINES, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.LINE} level={ORG_LEVEL.LINE} /></OrganizationPage> },
+  { path: ROUTES.ORG_CELLS, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.CELL} level={ORG_LEVEL.CELL} /></OrganizationPage> },
+  { path: ROUTES.ORG_SUPERVISORS, element: <OrganizationPage><OrgLevelList key={ORG_LEVEL.SUPERVISOR} level={ORG_LEVEL.SUPERVISOR} /></OrganizationPage> },
 ]
 
 export const BUILT_PATHS = new Set(PAGES.map((page) => page.path))

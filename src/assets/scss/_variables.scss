@@ -255,14 +255,58 @@ $ts-gauge-scale-inset:   ts-rem(10);  // 0 / 100 labels under the ends of the ar
 $ts-home-tile-icon-size: ts-rem(32); // tinted icon badge
 $ts-home-tile-icon-font: ts-rem(15);
 $ts-home-tile-dot:       ts-rem(9);  // mode dot inside the badge
+$ts-home-time-share-width: ts-rem(48); // share column, so the rows line up
 
-// Monitoring › Virtual Screen (pages/Productivity/VirtualScreen*.jsx)
-$ts-vs-dial-size:        ts-rem(150); // override dial (spindle / feed)
-$ts-vs-dial-stroke:      10;          // ring width, SVG units of the 120-unit dial
-$ts-vs-axis-width:       ts-rem(28);  // one axis load bar
-$ts-vs-axis-height:      ts-rem(120);
-$ts-vs-tick-width:       ts-rem(3);   // tenth ticks under a progress bar
-$ts-vs-tick-height:      ts-rem(6);
+// Monitoring › Virtual Screen (pages/Productivity/VirtualScreen*.jsx): the old controller screen,
+// dark in both themes (its dial images are drawn for it; _tokens-light.scss keeps these values)
+$ts-vs-bg:                  #15181b !default;
+$ts-vs-frame:               #000000 !default; // inset frame round the screen
+$ts-vs-ink:                 #ffffff !default;
+$ts-vs-muted:               #88939f !default; // labels
+$ts-vs-sep:                 #51585e !default; // the "/" of cycles
+$ts-vs-accent:              #f7941d !default; // alarm icon, warnings, cycle overrun
+$ts-vs-alarm:               #ff4d4d !default; // active alarm, E-stop
+$ts-vs-track:               #232b33 !default; // progress track and ticks
+$ts-vs-batch:               #2acc48 !default;
+$ts-vs-batch-end:           #00ff2f !default;
+$ts-vs-cycle:               #18c8f4 !default;
+$ts-vs-cycle-end:           #00ccff !default;
+$ts-vs-sheen:               rgba(130, 192, 255, .05) !default;
+$ts-vs-sheen-end:           rgba(130, 192, 255, .03) !default;
+$ts-vs-needle-spindle:      #ff2f6e !default; // spindle override needle, tip → pivot
+$ts-vs-needle-spindle-base: #ff8a1e !default;
+$ts-vs-needle-feed:         #8a00ff !default; // feed override needle
+$ts-vs-needle-feed-base:    #b77bff !default;
+$ts-vs-frame-width:         ts-rem(18);
+$ts-vs-radius:              ts-rem(8);
+$ts-vs-pad:                 ts-rem(44);  // frame + inner space
+$ts-vs-left-width:          ts-rem(440); // machine name + spindle load column
+$ts-vs-meter-width:         ts-rem(220); // one override gauge with its readings
+$ts-vs-meter-dial:          ts-rem(112);
+$ts-vs-cap-height:          ts-rem(63);  // reading panel image
+$ts-vs-axis-panel-width:    ts-rem(230);
+$ts-vs-corner-width:        ts-rem(219); // slanted panel image behind a box
+$ts-vs-corner-height:       ts-rem(200);
+$ts-vs-corner-small-width:  ts-rem(210); // behind the mode
+$ts-vs-corner-small-height: ts-rem(100);
+$ts-vs-marker-width:        ts-rem(6);   // coloured marker beside a box title
+$ts-vs-marker-height:       ts-rem(35);
+$ts-vs-marker-top:          ts-rem(20);
+$ts-vs-marker-left:         ts-rem(17);
+$ts-vs-box-inset:           ts-rem(45);  // box text clear of the marker
+$ts-vs-mode-inset:          ts-rem(38);
+$ts-vs-mode-dot:            ts-rem(32);
+$ts-vs-logo-height:         ts-rem(36);
+$ts-vs-pin-width:           ts-rem(22);
+$ts-vs-pin-height:          ts-rem(32);
+$ts-vs-fs-machine:          ts-rem(44);
+$ts-vs-fs-load:             ts-rem(40);  // SVG units of the 440-unit gauge
+$ts-vs-fs-figure:           ts-rem(30);
+$ts-vs-fs-value:            ts-rem(24);
+$ts-vs-fs-title:            ts-rem(21);
+$ts-vs-fs-label:            ts-rem(17);
+$ts-vs-fs-axis:             ts-rem(14);
+$ts-vs-fs-small:            ts-rem(14);
 
 // Login screen (pages/Login) — slate backdrop with line rings, light Login button
 $ts-login-bg:        #15181d !default; // page behind the rings

@@ -6,25 +6,23 @@ import { getUsers } from '@/services/customerService'
 import { MANAGERS, SUPERADMIN_ONLY } from '@/constants/app'
 import { customerName } from '@/pages/Customers/customerFormat'
 
-// Whose organization (Masters › Countries … Supervisors) the screens show and change.
-// Every user works on their own; an admin can pick another user, and that choice stays
-// while moving between the Masters screens. userId '' = the logged-in user.
-// Only the superadmin may act for another user (server: targetUserID).
+// What the Masters (organization) screens need to know about the logged-in user: whether they may
+// edit, and for the superadmin, who works across companies, every user (customer pickers and the
+// Customer column).
 function OrgUserProvider({ children }) {
   const { user, hasRole } = useAuth()
   const isAdmin = Boolean(user) && hasRole(SUPERADMIN_ONLY)
   // Members read their company's organization; only managers change it (server: managersOnly)
   const canEdit = Boolean(user) && hasRole(MANAGERS)
 
-  const [selection, setSelection] = useState({ ownerId: null, userId: '' })
   const [users, setUsers] = useState([])
   const [usersError, setUsersError] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
 
-  // A pick belongs to the admin who made it: a new login starts on their own organization
-  const userId = selection.ownerId === user?.id ? selection.userId : ''
-  const setUserId = useCallback((nextUserId) => setSelection({ ownerId: user?.id ?? null, userId: nextUserId }), [user])
+  // Called after a customer or user is saved or deleted, so pickers and labels show the change
+  const reloadUsers = useCallback(() => setReloadKey((key) => key + 1), [])
 
-  // Only the superadmin picks another user, from every user (GET /users)
+  // Only the superadmin picks a customer, from every user (GET /users)
   useEffect(() => {
     if (!isAdmin) return undefined
     let active = true
@@ -38,7 +36,7 @@ function OrgUserProvider({ children }) {
     return () => {
       active = false
     }
-  }, [isAdmin])
+  }, [isAdmin, reloadKey])
 
   // Customer column of the Masters tables: a row's owner (userId / customerId) → company name.
   // The superadmin has every user; other users only see their own company's rows.
@@ -61,14 +59,11 @@ function OrgUserProvider({ children }) {
       canEdit,
       // Countries and states are assigned customer-wise by the superadmin only (server: superAdminOnly)
       canAssign: isAdmin,
-      userId,
-      setUserId,
       users: isAdmin ? users : [],
       usersError: isAdmin ? usersError : '',
-      // The picked user's record; null while working on the logged-in user's own organization
-      selectedUser: (userId && users.find((option) => String(option.id) === userId)) || null,
+      reloadUsers,
     }),
-    [customerLabel, isAdmin, canEdit, userId, setUserId, users, usersError],
+    [customerLabel, isAdmin, canEdit, users, usersError, reloadUsers],
   )
 
   return <OrgUserContext.Provider value={value}>{children}</OrgUserContext.Provider>

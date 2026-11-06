@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import AuthContext from './AuthContext'
 import { onUnauthorized } from '@/services/apiClient'
 import * as authService from '@/services/authService'
+import { disconnectLive } from '@/services/liveSocket'
 import { clearLoginAs } from '@/utils/loginAs'
 import { refreshUserTheme } from '@/utils/theme'
 import { toast } from '@/utils/toast'
@@ -32,6 +33,11 @@ function AuthProvider({ children }) {
       active = false
     }
   }, [])
+
+  // The live socket belongs to the logged-in user: a logout or another user closes it, and the
+  // next screen that watches a machine opens a new one for the new session
+  const userId = user?.id
+  useEffect(() => () => disconnectLive(), [userId])
 
   // Any 401 from the API means the session is gone: drop the user (routes redirect to login)
   useEffect(

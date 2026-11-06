@@ -2,10 +2,12 @@ import { CUSTOMER_ROLE_ID, DEFAULT_THEME, THEMES, USER_STATUS } from '@/constant
 import { DEFAULT_COUNTRY, DEFAULT_TIME_ZONE, INDIA, getCountryCode, getCountryName, getDialCode, getStateCode, getStateName } from '@/constants/locations'
 import { normalizeTheme } from '@/utils/theme'
 import { ACCOUNT_KIND } from './accountPages'
+import { EMPTY_MACHINE_FILTER, MACHINE_FILTER_LEVELS, toMachineFilterPayload, toMachineFilterValues } from './machineFilter'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
 
 // Filters the customer can use on their screens and reports (users API `filters`, user_filters table).
+// Customers only: a user's machines are narrowed by the Access card's machine filter instead.
 // `value` is the filter name the API stores; this order is also the order they are sent in.
 // `icon` is the chip icon on the form.
 export const FILTER_OPTIONS = [
@@ -23,17 +25,18 @@ export const FILTER_OPTIONS = [
 export const FILTER_NAMES = FILTER_OPTIONS.map((option) => option.value)
 
 export const INITIAL_VALUES = {
-  // Access (users only): role, company (superadmin picks it) and assigned machines
+  // Access (users only): role, company (superadmin picks it), assigned machines and the
+  // organization levels that narrow them (machineFilter.js)
   roleId: '',
   companyId: '',
   machineIds: [],
+  machineFilter: EMPTY_MACHINE_FILTER,
   branchId: '',
   companyName: '',
   finixId: '',
   gstNo: '',
   panNo: '',
   website: '',
-  logo: null,
   email: '',
   username: '',
   password: '',
@@ -89,19 +92,16 @@ export const getCustomerSchema = (isEdit = false, { kind = ACCOUNT_KIND.CUSTOMER
     roleId: z.string(),
     companyId: z.string(),
     machineIds: z.array(z.string()),
+    machineFilter: z.object({
+      ...Object.fromEntries(MACHINE_FILTER_LEVELS.map((level) => [level.key, z.string()])),
+      allMachines: z.boolean(),
+    }),
     branchId: z.string().min(1, 'Branch is required'),
     companyName: z.string().min(1, 'Company name is required').max(150, 'Company name is too long'),
     finixId: z.string().regex(/^\d*$/, 'Finix ID must be a number').optional().or(z.literal('')),
     gstNo: z.string().optional(),
     panNo: z.string().optional(),
     website: z.string().regex(PATTERNS.url, 'Enter a valid website, e.g. www.example.com').optional().or(z.literal('')),
-    logo: z
-      .any()
-      .refine((file) => !file || file === '' || file instanceof File, 'Invalid file')
-      .refine((file) => !file || file === '' || ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'].includes(file.type), 'Unsupported file type')
-      .refine((file) => !file || file === '' || file.size <= 2 * 1024 * 1024, 'File must be smaller than 2 MB')
-      .nullable()
-      .optional(),
     email: z.string().min(1, 'Email is required').regex(PATTERNS.email, 'Enter a valid email address'),
     username: z.string().min(1, 'User name is required').regex(PATTERNS.username, 'Use 3–50 letters, numbers, dot or underscore'),
     password: z.string().max(PASSWORD_MAX_LENGTH, `Password must be at most ${PASSWORD_MAX_LENGTH} characters`),
@@ -219,10 +219,10 @@ const splitName = (fullName) => {
   return { firstName, lastName: rest.join(' ') }
 }
 
-// `existing` = the loaded customer (GET /users/{id}) when editing: keeps status, company and logo.
-// A newly picked logo file cannot travel in JSON, so the current logo path is kept.
-// kind USER sends the chosen role, company and machines; the server checks the logged-in user may
-// give them (a customer's or admin's own company is used whatever companyId says).
+// `existing` = the loaded customer (GET /users/{id}) when editing: keeps status, company and logo
+// (the form has no logo field: the server has no logo upload yet).
+// kind USER sends the chosen role, company, machines and machine filter; the server checks the
+// logged-in user may give them (a customer's or admin's own company is used whatever companyId says).
 export const toUserPayload = (values, existing = null, kind = ACCOUNT_KIND.CUSTOMER) => {
   const isUser = kind === ACCOUNT_KIND.USER
   const payload = {
@@ -232,6 +232,7 @@ export const toUserPayload = (values, existing = null, kind = ACCOUNT_KIND.CUSTO
     roleId: isUser ? toId(values.roleId) : CUSTOMER_ROLE_ID,
     companyId: (isUser && toId(values.companyId)) || existing?.companyId || null,
     machineIds: isUser ? values.machineIds.map(Number) : [],
+    machineFilter: isUser ? toMachineFilterPayload(values.machineFilter) : null,
     branchId: toId(values.branchId),
     companyName: values.companyName.trim(),
     finixId: toId(values.finixId),
@@ -251,8 +252,9 @@ export const toUserPayload = (values, existing = null, kind = ACCOUNT_KIND.CUSTO
     timeZone: values.timeZone,
     dayStartFrom: values.dayStartFrom,
     theme: values.theme,
-    // Always sent (an empty list clears them) — the server replaces the customer's filters with this list
-    filters: toFilterNames(values.filters),
+    // Always sent (an empty list clears them) — the server replaces the customer's filters with this
+    // list. Filters are for customers only, so a user saves none.
+    filters: isUser ? [] : toFilterNames(values.filters),
   }
 
   // Adding always sends the password; editing sends it only when a new one is typed
@@ -279,6 +281,7 @@ export const toFormValues = (customer) => {
     roleId: customer.roleId ? String(customer.roleId) : '',
     companyId: customer.companyId ? String(customer.companyId) : '',
     machineIds: (customer.machineIds ?? []).map(String),
+    machineFilter: toMachineFilterValues(customer.machineFilter),
     branchId: customer.branchId ? String(customer.branchId) : '',
     companyName: company.companyName ?? '',
     finixId: company.finixId != null ? String(company.finixId) : '',

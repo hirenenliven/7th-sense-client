@@ -26,8 +26,8 @@ function HolidayRow({ holiday, number, showCustomer, canManage, isEditing, onEdi
       </td>
       {showCustomer && <td>{holiday.customerName || '—'}</td>}
       <td className="fw-semibold">{holiday.name || '—'}</td>
-      <td className="text-nowrap">{holiday.startDate ? formatDate(`${holiday.startDate}T00:00`) : '—'}</td>
-      <td className="text-nowrap">{holiday.endDate ? formatDate(`${holiday.endDate}T00:00`) : '—'}</td>
+      <td className="text-nowrap">{holiday.startDate ? formatDate(holiday.startDate) : '—'}</td>
+      <td className="text-nowrap">{holiday.endDate ? formatDate(holiday.endDate) : '—'}</td>
       <td>{isWeekOff ? dayLabel(holiday.weekDay) : '—'}</td>
       <td>
         <StatusBadge active={isActive} />

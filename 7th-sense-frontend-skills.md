@@ -122,7 +122,7 @@ const filtered = useMemo(() => newestFirst(matched), [matched])
 8. **TablePagination**: Integrate as footer inside the panel for consistent pagination
 
 ##### Reference Implementation
-See `src/pages/Branches/BranchList.jsx`, `src/pages/Parts/PartList.jsx`, or `src/pages/Organization/Supervisors/SupervisorList.jsx` for complete working examples.
+See `src/pages/Branches/BranchList.jsx`, `src/pages/Parts/PartList.jsx`, or `src/pages/Organization/OrgLevelList.jsx` for complete working examples.
 
 #### 4. State Management
 - **Local State**: useState for component-level state

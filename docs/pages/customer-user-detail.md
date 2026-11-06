@@ -1,7 +1,7 @@
 # Customer / user detail
 
 - **Route:** `/masters/customers/:id` · `/masters/users/:id` (kind `user`) · **Component:** [CustomerView.jsx](../../src/pages/Customers/CustomerView.jsx) · **Auth:** protected (customers: superadmin; users: superadmin, customer, admin — [ADR 0016](../adr/0016-account-center-superadmin-only.md)) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
-- **Purpose:** Read-only view of one customer or user and what belongs to it.
+- **Purpose:** Read-only view of one customer or user and what belongs to it. A user shows Role and Machines (ticked machines, or "All machines of India › Gujarat (N now, new ones included)" for a machine filter with all machines; the count is left out until the company's machines have loaded) and Organization (the levels of a filter without all machines); the Filters card is shown for customers only.
 - **Navigation:** Customer / user list → detail → Edit
 
 ## On page load
@@ -82,6 +82,7 @@ sequenceDiagram
 20. [user_routes.go](../../../7th-sense-server/internal/routes/user_routes.go) → `GET /v1/me` → UserHandler.Me
 21. [user_handler.go](../../../7th-sense-server/internal/handler/user_handler.go) → Me(): reads the logged-in user; calls the service
 22. [user_service.go](../../../7th-sense-server/internal/service/user_service.go) → GetCurrent(): Returns the logged-in user (userID) with its details.
+23. [CustomerView.jsx](../../src/pages/Customers/CustomerView.jsx) → useEffect(): a user with `machineFilter` levels also runs [machineFilter.js](../../src/pages/Customers/machineFilter.js) → loadOrganization() (the company's `GET /user-country` … `/user-line`, `/branches`) to name the levels; `filterLabel()` / `machineMatches()` give the path and the machine count. Names are a nice-to-have: counts or `#id` show when they cannot be loaded.
 
 ## Change theme
 
@@ -129,6 +130,7 @@ sequenceDiagram
 |---|---|---|---|
 | GET | `/api/v1/branches/{id}` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Branches/getBranchById) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/users/{id}` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Users/getUserById) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| GET | `/api/v1/user-country`, `/user-state`, `/user-city`, `/user-location`, `/user-shop`, `/user-line` | On page load (user with a machine filter) | [Swagger](http://localhost:8080/api-docs/index.html#/Organization/getUserCountries) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/machines` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machines/getMachines) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/me` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Users/getCurrentUser) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | PUT | `/api/v1/me/theme` | Change theme | [Swagger](http://localhost:8080/api-docs/index.html#/Users/saveMyTheme) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |

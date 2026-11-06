@@ -6,7 +6,7 @@ import Loader from '@/components/common/Loader'
 import { modeTypeOf } from '@/constants/machines'
 import useLoad from '@/hooks/useLoad'
 import { getFinishCycles, getModeTotals, getOee } from '@/services/productivityService'
-import { PICKER_LOCALE, formatModeDuration } from '@/utils/dateTime'
+import { PICKER_LOCALE, formatModeDuration, todayIso } from '@/utils/dateTime'
 import {
   DEFAULT_MODE_RANGE,
   DEFAULT_SCHEDULE_MODE,
@@ -103,8 +103,9 @@ SummaryCard.propTypes = {
 // The machine's summary as three cards, each with its own request: today's Cycles (GET
 // /productivity/finish-cycles) and OEE (GET /productivity/oee, without schedule), and Machine Modes
 // (GET /productivity/mode-totals) over the period picked on the card: Today (default), Yesterday,
-// Last 7 / 30 days or All time.
-function SummaryCards({ machineId, today }) {
+// Last 7 / 30 days or All time. Today is read on every render, so a refresh after midnight moves on.
+function SummaryCards({ machineId }) {
+  const today = todayIso()
   const [modeRangeValue, setModeRangeValue] = useState(DEFAULT_MODE_RANGE)
   const modeRange = MODE_RANGES.find((range) => range.value === modeRangeValue)
   const modeQuery = modeRange.query(today)
@@ -223,7 +224,6 @@ function SummaryCards({ machineId, today }) {
 
 SummaryCards.propTypes = {
   machineId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  today: PropTypes.string.isRequired,
 }
 
 export default SummaryCards

@@ -21,7 +21,7 @@ const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 // onSaved(addedCountries) gets the rows that were saved.
 function CountryFormModal({ show, countries, onSaved, onHide }) {
   // The superadmin picks the customer on the form; others always save to their own company
-  const { canPickUser, userId } = useOrgUser()
+  const { canPickUser } = useOrgUser()
   const schema = useMemo(() => withCustomer(countrySchema, canPickUser), [canPickUser])
 
   const {
@@ -53,7 +53,7 @@ function CountryFormModal({ show, countries, onSaved, onHide }) {
   }, [countries, canPickUser, customerId])
 
   const onSubmit = async (values) => {
-    const ownerId = canPickUser ? values.customerId : userId
+    const ownerId = canPickUser ? values.customerId : undefined
     // One request per country, in order, so a failure names the country it is about
     const added = []
     for (const payload of toCountryPayloads(values)) {

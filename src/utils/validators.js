@@ -32,9 +32,6 @@ export const required = (value, label) => (isBlank(value) ? `${label} is require
 export const matches = (pattern, message) => (value) =>
   isBlank(value) || pattern.test(String(value).trim()) ? '' : message
 
-export const minLength = (min, label) => (value) =>
-  isBlank(value) || String(value).length >= min ? '' : `${label} must be at least ${min} characters`
-
 // File check: allowed MIME types + max size in bytes
 export const fileRule = ({ types, maxBytes }) => (file) => {
   if (!file) return ''

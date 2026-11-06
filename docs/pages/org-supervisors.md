@@ -1,6 +1,6 @@
 # Supervisors
 
-- **Route:** `/organization/supervisors` · **Component:** [SupervisorList.jsx](../../src/pages/Organization/Supervisors/SupervisorList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/supervisors` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="supervisor"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 8: supervisors of a cell.
 - **Navigation:** Sidebar › Masters › Organization → **Supervisor** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as SupervisorList.jsx
+  participant Page as OrgLevelList.jsx
   participant userSupervisorService
   participant userCellService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [SupervisorList.jsx](../../src/pages/Organization/Supervisors/SupervisorList.jsx) → useEffect(): runs on load `getUserSupervisors()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserSupervisors()`
 2. [userSupervisorService.js](../../src/services/userSupervisorService.js) → getUserSupervisors(): calls `GET /api/v1/user-supervisor`
 3. [user_supervisor_routes.go](../../../7th-sense-server/internal/routes/user_supervisor_routes.go) → `GET /v1/user-supervisor` → UserSupervisorHandler.GetAll
 4. [user_supervisor_handler.go](../../../7th-sense-server/internal/handler/user_supervisor_handler.go) → GetAll(): query userCellId, userId; calls the service
 5. [user_supervisor_service.go](../../../7th-sense-server/internal/service/user_supervisor_service.go) → GetAll(): Returns the user's supervisors. A non-nil userCellID keeps only that cell's supervisors.
 6. [user_supervisor_repository.go](../../../7th-sense-server/internal/repository/user_supervisor_repository.go) → FindAll(): reads / writes `user_supervisor`, `user_cell`
-7. [SupervisorList.jsx](../../src/pages/Organization/Supervisors/SupervisorList.jsx) → useEffect(): runs on load `getUserCells()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserCells()`
 8. [userCellService.js](../../src/services/userCellService.js) → getUserCells(): calls `GET /api/v1/user-cell`
 9. [user_cell_routes.go](../../../7th-sense-server/internal/routes/user_cell_routes.go) → `GET /v1/user-cell` → UserCellHandler.GetAll
 10. [user_cell_handler.go](../../../7th-sense-server/internal/handler/user_cell_handler.go) → GetAll(): query userLineId, userId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as SupervisorList.jsx
+  participant Page as OrgLevelList.jsx
   participant userSupervisorService
   participant API as Go router (/api/v1)
   participant UserSupervisorHandler
@@ -88,7 +88,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [SupervisorList.jsx](../../src/pages/Organization/Supervisors/SupervisorList.jsx) → confirmDelete(): runs `deleteUserSupervisor()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserSupervisor()`
 2. [userSupervisorService.js](../../src/services/userSupervisorService.js) → deleteUserSupervisor(): calls `DELETE /api/v1/user-supervisor/{id}`
 3. [user_supervisor_routes.go](../../../7th-sense-server/internal/routes/user_supervisor_routes.go) → `DELETE /v1/user-supervisor/{id}` (managersOnly: superadmin, customer, admin) → UserSupervisorHandler.Delete
 4. [user_supervisor_handler.go](../../../7th-sense-server/internal/handler/user_supervisor_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -107,7 +107,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as SupervisorList.jsx
+  participant Page as OrgLevelList.jsx
   participant userSupervisorService
   participant API as Go router (/api/v1)
   participant UserSupervisorHandler
@@ -138,13 +138,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [SupervisorFormModal.jsx](../../src/pages/Organization/Supervisors/SupervisorFormModal.jsx) → onSubmit(): runs `createUserSupervisor()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserSupervisor()`
 2. [userSupervisorService.js](../../src/services/userSupervisorService.js) → createUserSupervisor(): calls `POST /api/v1/user-supervisor`
 3. [user_supervisor_routes.go](../../../7th-sense-server/internal/routes/user_supervisor_routes.go) → `POST /v1/user-supervisor` (managersOnly: superadmin, customer, admin) → UserSupervisorHandler.Create
 4. [user_supervisor_handler.go](../../../7th-sense-server/internal/handler/user_supervisor_handler.go) → Create(): query userId; decodes `dto.CreateUserSupervisorRequest` and runs its Validate(); calls the service
 5. [user_supervisor_service.go](../../../7th-sense-server/internal/service/user_supervisor_service.go) → Create(): Adds a supervisor for userID under one of the user's cells.
 6. [user_supervisor_repository.go](../../../7th-sense-server/internal/repository/user_supervisor_repository.go) → Create(): reads / writes `user_supervisor`, `user_cell`
-7. [SupervisorFormModal.jsx](../../src/pages/Organization/Supervisors/SupervisorFormModal.jsx) → onSubmit(): runs `updateUserSupervisor()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserSupervisor()`
 8. [userSupervisorService.js](../../src/services/userSupervisorService.js) → updateUserSupervisor(): calls `PUT /api/v1/user-supervisor/{id}`
 9. [user_supervisor_routes.go](../../../7th-sense-server/internal/routes/user_supervisor_routes.go) → `PUT /v1/user-supervisor/{id}` (managersOnly: superadmin, customer, admin) → UserSupervisorHandler.Update
 10. [user_supervisor_handler.go](../../../7th-sense-server/internal/handler/user_supervisor_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserSupervisorRequest` and runs its Validate(); calls the service
@@ -175,7 +175,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used

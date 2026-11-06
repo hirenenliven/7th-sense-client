@@ -1,6 +1,6 @@
 # Cities
 
-- **Route:** `/organization/cities` · **Component:** [CityList.jsx](../../src/pages/Organization/Cities/CityList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
+- **Route:** `/organization/cities` · **Component:** [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) (`level="city"`, config in [orgLevels.js](../../src/pages/Organization/orgLevels.js)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Organization level 3: cities of a state.
 - **Navigation:** Sidebar › Masters › Organization → **City** tab ([OrganizationPage.jsx](../../src/pages/Organization/OrganizationPage.jsx): page header + tabs, this list is the tab body; the tab is the route)
 
@@ -10,7 +10,7 @@
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CityList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCityService
   participant userStateService
   participant API as Go router (/api/v1)
@@ -45,13 +45,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [CityList.jsx](../../src/pages/Organization/Cities/CityList.jsx) → useEffect(): runs on load `getUserCities()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserCities()`
 2. [userCityService.js](../../src/services/userCityService.js) → getUserCities(): calls `GET /api/v1/user-city`
 3. [user_city_routes.go](../../../7th-sense-server/internal/routes/user_city_routes.go) → `GET /v1/user-city` → UserCityHandler.GetAll
 4. [user_city_handler.go](../../../7th-sense-server/internal/handler/user_city_handler.go) → GetAll(): query userStateId, userId; calls the service
 5. [user_city_service.go](../../../7th-sense-server/internal/service/user_city_service.go) → GetAll(): Returns the user's cities. A non-nil userStateID keeps only that state's cities.
 6. [user_city_repository.go](../../../7th-sense-server/internal/repository/user_city_repository.go) → FindAll(): reads / writes `user_city`, `user_state`
-7. [CityList.jsx](../../src/pages/Organization/Cities/CityList.jsx) → useEffect(): runs on load `getUserStates()`
+7. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → useEffect(): runs on load `getUserStates()`
 8. [userStateService.js](../../src/services/userStateService.js) → getUserStates(): calls `GET /api/v1/user-state`
 9. [user_state_routes.go](../../../7th-sense-server/internal/routes/user_state_routes.go) → `GET /v1/user-state` → UserStateHandler.GetAll
 10. [user_state_handler.go](../../../7th-sense-server/internal/handler/user_state_handler.go) → GetAll(): query userCountryId, userId; calls the service
@@ -66,7 +66,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CityList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCityService
   participant API as Go router (/api/v1)
   participant UserCityHandler
@@ -91,7 +91,7 @@ sequenceDiagram
 
 **Steps**
 
-1. [CityList.jsx](../../src/pages/Organization/Cities/CityList.jsx) → confirmDelete(): runs `deleteUserCity()`
+1. [OrgLevelList.jsx](../../src/pages/Organization/OrgLevelList.jsx) → confirmDelete(): runs `deleteUserCity()`
 2. [userCityService.js](../../src/services/userCityService.js) → deleteUserCity(): calls `DELETE /api/v1/user-city/{id}`
 3. [user_city_routes.go](../../../7th-sense-server/internal/routes/user_city_routes.go) → `DELETE /v1/user-city/{id}` (managersOnly: superadmin, customer, admin) → UserCityHandler.Delete
 4. [user_city_handler.go](../../../7th-sense-server/internal/handler/user_city_handler.go) → Delete(): reads {id}; query userId; calls the service
@@ -111,7 +111,7 @@ sequenceDiagram
 sequenceDiagram
   autonumber
   actor User
-  participant Page as CityList.jsx
+  participant Page as OrgLevelList.jsx
   participant userCityService
   participant API as Go router (/api/v1)
   participant UserCityHandler
@@ -142,13 +142,13 @@ sequenceDiagram
 
 **Steps**
 
-1. [CityFormModal.jsx](../../src/pages/Organization/Cities/CityFormModal.jsx) → onSubmit(): runs `createUserCity()`
+1. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `createUserCity()`
 2. [userCityService.js](../../src/services/userCityService.js) → createUserCity(): calls `POST /api/v1/user-city`
 3. [user_city_routes.go](../../../7th-sense-server/internal/routes/user_city_routes.go) → `POST /v1/user-city` (managersOnly: superadmin, customer, admin) → UserCityHandler.Create
 4. [user_city_handler.go](../../../7th-sense-server/internal/handler/user_city_handler.go) → Create(): query userId; decodes `dto.CreateUserCityRequest` and runs its Validate(); calls the service
 5. [user_city_service.go](../../../7th-sense-server/internal/service/user_city_service.go) → Create(): Adds a city for userID under one of the user's states.
 6. [user_city_repository.go](../../../7th-sense-server/internal/repository/user_city_repository.go) → Create(): reads / writes `user_city`, `user_state`
-7. [CityFormModal.jsx](../../src/pages/Organization/Cities/CityFormModal.jsx) → onSubmit(): runs `updateUserCity()`
+7. [OrgLevelFormModal.jsx](../../src/pages/Organization/OrgLevelFormModal.jsx) → onSubmit(): runs `updateUserCity()`
 8. [userCityService.js](../../src/services/userCityService.js) → updateUserCity(): calls `PUT /api/v1/user-city/{id}`
 9. [user_city_routes.go](../../../7th-sense-server/internal/routes/user_city_routes.go) → `PUT /v1/user-city/{id}` (managersOnly: superadmin, customer, admin) → UserCityHandler.Update
 10. [user_city_handler.go](../../../7th-sense-server/internal/handler/user_city_handler.go) → Update(): reads {id}; query userId; decodes `dto.UpdateUserCityRequest` and runs its Validate(); calls the service
@@ -179,7 +179,7 @@ sequenceDiagram
 
 ## State & storage
 
-- `useOrgUser()` (organization user picked)
+- `useOrgUser()` (may edit, customer label)
 - Local component state (`useState`) for filters, form and modal
 
 ## Shared components used
