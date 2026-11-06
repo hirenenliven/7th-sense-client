@@ -6,6 +6,9 @@ import { ACCOUNT_KIND } from '@/pages/Customers/accountPages'
 import { REASON_KIND } from '@/pages/Reasons/reasonPages'
 
 const Home = lazy(() => import('@/pages/Home/Home'))
+const OperationsCenter = lazy(() => import('@/pages/OperationsCenter/OperationsCenter'))
+const PlantIntelligence = lazy(() => import('@/pages/PlantIntelligence/PlantIntelligence'))
+const MachineDiagnostics = lazy(() => import('@/pages/MachineDiagnostics/MachineDiagnostics'))
 const About = lazy(() => import('@/pages/About/About'))
 const ThemeShowcase = lazy(() => import('@/pages/ThemeShowcase/ThemeShowcase'))
 const CustomerList = lazy(() => import('@/pages/Customers/CustomerList'))
@@ -47,6 +50,8 @@ const OrgLevelList = lazy(() => import('@/pages/Organization/OrgLevelList'))
 // eslint-disable-next-line react-refresh/only-export-components -- route table, not a component module
 export const PAGES = [
   { path: ROUTES.HOME, element: <Home /> },
+  { path: ROUTES.OPERATIONS_CENTER, element: <OperationsCenter /> },
+  { path: ROUTES.PLANT_INTELLIGENCE, element: <PlantIntelligence /> },
   { path: ROUTES.ABOUT, element: <About /> },
   { path: ROUTES.THEME, element: <ThemeShowcase />, roles: SUPERADMIN_ONLY },
   // System › Account Center: `/account-center` opens the first tab the role may see (managers and up)
@@ -66,6 +71,7 @@ export const PAGES = [
   { path: ROUTES.MACHINES, element: <MachineList /> },
   { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
+  { path: ROUTES.MACHINE_DIAGNOSTICS, element: <MachineDiagnostics />, roles: SUPERADMIN_ONLY },
   // Operations › Monitoring: one page (machine list, then a machine's Productivity / Health tabs);
   // every user, for the machines the server returns them
   { path: ROUTES.MONITORING, element: <MonitoringPage /> },

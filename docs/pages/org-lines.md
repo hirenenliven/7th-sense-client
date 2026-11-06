@@ -95,7 +95,7 @@ sequenceDiagram
 2. [userLineService.js](../../src/services/userLineService.js) → deleteUserLine(): calls `DELETE /api/v1/user-line/{id}`
 3. [user_line_routes.go](../../../7th-sense-server/internal/routes/user_line_routes.go) → `DELETE /v1/user-line/{id}` (managersOnly: superadmin, customer, admin) → UserLineHandler.Delete
 4. [user_line_handler.go](../../../7th-sense-server/internal/handler/user_line_handler.go) → Delete(): reads {id}; query userId; calls the service
-5. [user_line_service.go](../../../7th-sense-server/internal/service/user_line_service.go) → Delete(): Soft-deletes the line. A line that still has cells is kept: its cells must be deleted first.
+5. [user_line_service.go](../../../7th-sense-server/internal/service/user_line_service.go) → Delete(): Soft-deletes the line. A line that still has cells is kept: its cells must be deleted first. A line with machines (`HasMachines`), or that a user's machine filter names (`IsInMachineFilter`), is refused with 400 too: without it the machines drop out of the filters and the user cannot be saved.
 6. [user_line_repository.go](../../../7th-sense-server/internal/repository/user_line_repository.go) → HasCells(): reads / writes `user_cell`
 7. [user_line_repository.go](../../../7th-sense-server/internal/repository/user_line_repository.go) → Delete(): reads / writes `user_line`
 

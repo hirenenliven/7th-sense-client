@@ -67,6 +67,7 @@ export const FIELD_HELP = {
     rules: [
       'Optional — pick none and the user sees no machines',
       '“All machines” is saved as a rule, not a list: new machines under the selection are included',
+      'Without “All machines” the user keeps only the machines picked, even when the levels above say All',
       'Removing one machine from “All machines” keeps the others picked one by one',
       'Not needed for Administrators: they see every machine',
     ],

@@ -76,7 +76,7 @@ sequenceDiagram
 2. [branchService.js](../../src/services/branchService.js) → deleteBranch(): calls `DELETE /api/v1/branches/{id}`
 3. [branch_routes.go](../../../7th-sense-server/internal/routes/branch_routes.go) → `DELETE /v1/branches/{id}` (superAdminOnly) → BranchHandler.Delete
 4. [branch_handler.go](../../../7th-sense-server/internal/handler/branch_handler.go) → Delete(): reads {id}; calls the service
-5. [branch_service.go](../../../7th-sense-server/internal/service/branch_service.go) → Delete(): Soft-deletes the branch. A branch that still has locations is kept: its locations must be deleted first.
+5. [branch_service.go](../../../7th-sense-server/internal/service/branch_service.go) → Delete(): Soft-deletes the branch. A branch that still has locations is kept: its locations must be deleted first. A branch that a user's machine filter names (`IsInMachineFilter`) is refused with 400 too: the user would lose the machines and could not be saved.
 6. [branch_repository.go](../../../7th-sense-server/internal/repository/branch_repository.go) → HasLocations(): reads / writes `user_location`
 7. [branch_repository.go](../../../7th-sense-server/internal/repository/branch_repository.go) → Delete(): reads / writes `branches`
 

@@ -95,7 +95,7 @@ sequenceDiagram
 2. [userCityService.js](../../src/services/userCityService.js) → deleteUserCity(): calls `DELETE /api/v1/user-city/{id}`
 3. [user_city_routes.go](../../../7th-sense-server/internal/routes/user_city_routes.go) → `DELETE /v1/user-city/{id}` (managersOnly: superadmin, customer, admin) → UserCityHandler.Delete
 4. [user_city_handler.go](../../../7th-sense-server/internal/handler/user_city_handler.go) → Delete(): reads {id}; query userId; calls the service
-5. [user_city_service.go](../../../7th-sense-server/internal/service/user_city_service.go) → Delete(): Soft-deletes the city. A city that still has branches is kept: its branches must be deleted first.
+5. [user_city_service.go](../../../7th-sense-server/internal/service/user_city_service.go) → Delete(): Soft-deletes the city. A city that still has branches is kept: its branches must be deleted first. A city that a user's machine filter names (`IsInMachineFilter`) is refused with 400 too: the user would lose the machines and could not be saved.
 6. [user_city_repository.go](../../../7th-sense-server/internal/repository/user_city_repository.go) → HasBranches(): reads / writes `branches`
 7. [user_city_repository.go](../../../7th-sense-server/internal/repository/user_city_repository.go) → Delete(): reads / writes `user_city`
 

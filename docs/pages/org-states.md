@@ -95,7 +95,7 @@ sequenceDiagram
 2. [userStateService.js](../../src/services/userStateService.js) → deleteUserState(): calls `DELETE /api/v1/user-state/{id}`
 3. [user_state_routes.go](../../../7th-sense-server/internal/routes/user_state_routes.go) → `DELETE /v1/user-state/{id}` (superAdminOnly) → UserStateHandler.Delete
 4. [user_state_handler.go](../../../7th-sense-server/internal/handler/user_state_handler.go) → Delete(): reads {id}; query userId; calls the service
-5. [user_state_service.go](../../../7th-sense-server/internal/service/user_state_service.go) → Delete(): Soft-deletes the state. A state that still has cities is kept: its cities must be deleted first.
+5. [user_state_service.go](../../../7th-sense-server/internal/service/user_state_service.go) → Delete(): Soft-deletes the state. A state that still has cities is kept: its cities must be deleted first. A state that a user's machine filter names (`IsInMachineFilter`) is refused with 400 too: the user would lose the machines and could not be saved.
 6. [user_state_repository.go](../../../7th-sense-server/internal/repository/user_state_repository.go) → HasCities(): reads / writes `user_city`
 7. [user_state_repository.go](../../../7th-sense-server/internal/repository/user_state_repository.go) → Delete(): reads / writes `user_state`
 

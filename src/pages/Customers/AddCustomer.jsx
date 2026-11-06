@@ -44,6 +44,7 @@ import { FIELD_HELP } from './customerHelp'
 
 // Group of the machines without a line in the machine dropdown
 const NO_LINE = 'No line'
+const OUTSIDE_FILTER = 'Outside this selection'
 
 // Customers and users share this form (add and edit): /masters/customers/add, /masters/customers/:id/edit,
 // /masters/users/add and /masters/users/:id/edit. Users also get the Access card: role, company
@@ -108,9 +109,14 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
   const organizationPaths = useMemo(() => buildOrganizationPaths(organization), [organization])
   const filteredMachines = machines.filter((machine) => machineMatches(machine, machineFilter, organizationPaths))
   const allMachines = machineFilter.allMachines
-  // Machine dropdown options, grouped by line (machines without a line last)
-  const machineOptions = filteredMachines
-    .map((machine) => ({ value: String(machine.id), label: machine.name, group: machine.lineName || NO_LINE, hint: machine.modelName || undefined }))
+  // Machine dropdown options, grouped by line (machines without a line last). A saved pick outside
+  // the filter (the machine moved since) stays listed: it is still saved, so it must be removable.
+  const pickedOutside = machines.filter((machine) => machineIds.includes(String(machine.id)) && !filteredMachines.includes(machine))
+  const machineOptions = [
+    ...filteredMachines.map((machine) => ({ machine, hint: machine.modelName || undefined })),
+    ...pickedOutside.map((machine) => ({ machine, hint: OUTSIDE_FILTER })),
+  ]
+    .map(({ machine, hint }) => ({ value: String(machine.id), label: machine.name, group: machine.lineName || NO_LINE, hint }))
     .sort((a, b) => (a.group === NO_LINE) - (b.group === NO_LINE) || a.group.localeCompare(b.group) || a.label.localeCompare(b.label))
   const country = watch('country')
   const filters = watch('filters') ?? []
@@ -195,6 +201,12 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
     )
     setValue('machineFilter', next, { shouldDirty: true })
     setValue('machineIds', machineIds.filter((machineId) => stillShown.has(machineId)), { shouldDirty: true })
+    const dropped = machines.filter((machine) => machineIds.includes(String(machine.id)) && !stillShown.has(String(machine.id)))
+    if (dropped.length) {
+      toast.warning(`${dropped.map((machine) => machine.name).join(', ')} removed: not under this selection. To give machines from different places, choose a level above them all.`, {
+        title: 'Picked machines removed',
+      })
+    }
   }
 
   // Picking machines one by one ends "All machines" (removing one from All keeps the rest picked)
@@ -420,8 +432,13 @@ function AddCustomer({ kind = ACCOUNT_KIND.CUSTOMER }) {
                       <Form.Text id="machines-hint">
                         {allMachines
                           ? `${filteredMachines.length} machine${filteredMachines.length === 1 ? '' : 's'} now · machines added to this selection later are given automatically`
-                          : `${machineIds.length} of ${filteredMachines.length} selected · the user sees only the selected machines`}
+                          : `${machineIds.length} of ${machineOptions.length} selected · the user sees only the selected machines`}
                       </Form.Text>
+                      {!allMachines && (machineIds.length > 0 || hasFilterLevels(machineFilter)) && (
+                        <Alert variant="info" className="mt-2 mb-0">
+                          New machines are not added automatically. To include them, pick <b>All machines</b> in the Machines dropdown.
+                        </Alert>
+                      )}
                     </Form.Group>
                   </Row>
                 </fieldset>

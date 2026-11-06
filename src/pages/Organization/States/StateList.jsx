@@ -256,7 +256,7 @@ function StateList() {
         onCancel={() => setPendingDelete(null)}
       >
         Delete <strong>{pendingDelete?.name}</strong>?
-        {' '}A state that still has cities cannot be deleted — delete those first.
+        {' '}A state with cities, or used in a user's machine access, cannot be deleted.
       </ConfirmModal>
     </>
   )

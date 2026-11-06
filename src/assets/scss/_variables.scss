@@ -257,6 +257,35 @@ $ts-home-tile-icon-font: ts-rem(15);
 $ts-home-tile-dot:       ts-rem(9);  // mode dot inside the badge
 $ts-home-time-share-width: ts-rem(48); // share column, so the rows line up
 
+// Main › Operations Center (pages/OperationsCenter/)
+$ts-ops-oee-size:      ts-rem(44);  // the OEE figure
+$ts-ops-factor-label:  ts-rem(84);  // A · P · Q label column
+$ts-ops-factor-value:  ts-rem(46);  // A · P · Q value column
+$ts-ops-machine-min:   ts-rem(168); // machine tile on the floor map
+$ts-ops-machine-bar:   ts-rem(3);   // mode colour bar
+$ts-ops-search-width:  ts-rem(220);
+$ts-ops-stat-min:      ts-rem(120); // narrowest readiness count
+$ts-ops-plan-min:      ts-rem(120); // plan progress column
+
+// Main › Plant Intelligence (pages/PlantIntelligence/)
+$ts-int-spark-height:   ts-rem(24);  // line of the days inside a KPI tile
+$ts-int-fleet-height:   ts-rem(18);  // the fleet as one bar
+$ts-int-heat-name:      ts-rem(190); // machine column of the heatmap
+$ts-int-heat-summary:   ts-rem(72);  // period column of the heatmap
+$ts-int-heat-cell:      ts-rem(50);  // narrowest day column
+$ts-int-heat-max:       ts-rem(520); // the heatmap scrolls past this height
+$ts-int-table-max:      ts-rem(360); // the comparison table scrolls past this height
+$ts-int-alarm-text:     ts-rem(180); // alarm message under its code
+$ts-int-outlook-day:    ts-rem(60);  // day column of the next 7 days
+$ts-int-outlook-side:   ts-rem(84);  // shifts / holiday column of the next 7 days
+
+// Machines › Diagnostics (pages/MachineDiagnostics/)
+$ts-diag-fact-label:  ts-rem(130); // label column of the connection facts
+$ts-diag-var-min:     ts-rem(270); // narrowest variable card
+$ts-diag-var-bar:     ts-rem(3);   // colour bar of what its data is doing
+$ts-diag-var-label:   ts-rem(84);  // label column of a variable card
+$ts-diag-events-max:  ts-rem(320); // the events table scrolls past this height
+
 // Monitoring › Virtual Screen (pages/Productivity/VirtualScreen*.jsx): the old controller screen,
 // dark in both themes (its dial images are drawn for it; _tokens-light.scss keeps these values)
 $ts-vs-bg:                  #15181b !default;

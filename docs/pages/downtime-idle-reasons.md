@@ -3,6 +3,7 @@
 - **Route:** `/masters/downtime-reasons` (kind `downtime`) · `/masters/idle-reasons` (kind `idle`) · **Component:** [ReasonList.jsx](../../src/pages/Reasons/ReasonList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** One screen for two lists (kind): reasons a machine was down, reasons it stood idle. Managers add, edit and delete.
 - **Navigation:** Sidebar › Masters › Downtime → Downtime List / Idle List
+- **Used in:** the active reasons are what the [Productivity](productivity.md#add-a-downtime-or-idle-reason) timeline's popup offers.
 
 ## On page load
 

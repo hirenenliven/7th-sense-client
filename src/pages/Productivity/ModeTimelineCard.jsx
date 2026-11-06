@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, ButtonGroup, Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import ChartCard from '@/components/charts/ChartCard'
@@ -7,8 +7,11 @@ import ModeGanttChart from '@/components/charts/ModeGanttChart'
 import Loader from '@/components/common/Loader'
 import { UNKNOWN_MODE_COLOR, modeTypeOf } from '@/constants/machines'
 import useLoad from '@/hooks/useLoad'
+import { getMachineModeReasons } from '@/services/machineModeReasonService'
 import { getModeTimeline } from '@/services/productivityService'
 import { formatModeDuration, todayIso } from '@/utils/dateTime'
+import { toast } from '@/utils/toast'
+import ModeReasonModal from './ModeReasonModal'
 import {
   DEFAULT_TIMELINE_RANGE,
   TIMELINE_HISTORY,
@@ -25,7 +28,8 @@ const readoutClock = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute:
 // Machine Mode Timeline: the machine's modes as a Gantt chart over the last N minutes (sliding with
 // the clock) or, with History, over a whole day. Live windows reload every TIMELINE_POLL_MS (new
 // mode changes) and the open period grows every second on the server's clock (offset kept from the
-// response's serverTime). The readout shows the hovered period, else the current one.
+// response's serverTime). The readout shows the hovered period, else the current one. Clicking a bar
+// opens its reasons popup; the server refuses a bar that takes none (the toast says why).
 function ModeTimelineCard({ machineId, min }) {
   const today = todayIso()
   const [range, setRange] = useState(DEFAULT_TIMELINE_RANGE)
@@ -35,6 +39,7 @@ function ModeTimelineCard({ machineId, min }) {
   const [zoom, setZoom] = useState(TIMELINE_ZOOMS[0])
   const [hovered, setHovered] = useState(null)
   const [clientNow, setClientNow] = useState(() => Date.now())
+  const [reasonsOf, setReasonsOf] = useState(null)
   const history = range === TIMELINE_HISTORY
   const live = !history || !pickedDate
   const query = history ? { date } : { minutes: range }
@@ -69,6 +74,15 @@ function ModeTimelineCard({ machineId, min }) {
     setHovered(null)
   }
 
+  const openReasons = useCallback(async (bar) => {
+    try {
+      setReasonsOf(await getMachineModeReasons(bar.id))
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }, [])
+  const closeReasons = useCallback(() => setReasonsOf(null), [])
+
   const renderBody = () => {
     if (loading) return <Loader text="Loading machine modes…" />
     if (error && !data) return <Alert variant="danger" className="mb-0">{error}</Alert>
@@ -81,6 +95,7 @@ function ModeTimelineCard({ machineId, min }) {
         zoom={zoom}
         live={live}
         onHover={setHovered}
+        onBarClick={openReasons}
       />
     )
   }
@@ -88,7 +103,7 @@ function ModeTimelineCard({ machineId, min }) {
   return (
     <ChartCard
       title="Machine Mode Timeline"
-      subtitle={live ? 'Gantt · live, the current mode grows every second' : 'Gantt · machine modes through the day'}
+      subtitle={`${live ? 'Gantt · live, the current mode grows every second' : 'Gantt · machine modes through the day'} · click a finished Idle or Downtime bar to add its reason`}
       icon="bi-bar-chart-steps"
       actions={
         live && (
@@ -166,6 +181,7 @@ function ModeTimelineCard({ machineId, min }) {
         </div>
       </div>
       {renderBody()}
+      {reasonsOf && <ModeReasonModal key={reasonsOf.period.id} loaded={reasonsOf} onHide={closeReasons} />}
     </ChartCard>
   )
 }

@@ -95,7 +95,7 @@ sequenceDiagram
 2. [userShopService.js](../../src/services/userShopService.js) → deleteUserShop(): calls `DELETE /api/v1/user-shop/{id}`
 3. [user_shop_routes.go](../../../7th-sense-server/internal/routes/user_shop_routes.go) → `DELETE /v1/user-shop/{id}` (managersOnly: superadmin, customer, admin) → UserShopHandler.Delete
 4. [user_shop_handler.go](../../../7th-sense-server/internal/handler/user_shop_handler.go) → Delete(): reads {id}; query userId; calls the service
-5. [user_shop_service.go](../../../7th-sense-server/internal/service/user_shop_service.go) → Delete(): Soft-deletes the shop. A shop that still has lines is kept: its lines must be deleted first.
+5. [user_shop_service.go](../../../7th-sense-server/internal/service/user_shop_service.go) → Delete(): Soft-deletes the shop. A shop that still has lines is kept: its lines must be deleted first. A shop that a user's machine filter names (`IsInMachineFilter`) is refused with 400 too: the user would lose the machines and could not be saved.
 6. [user_shop_repository.go](../../../7th-sense-server/internal/repository/user_shop_repository.go) → HasLines(): reads / writes `user_line`
 7. [user_shop_repository.go](../../../7th-sense-server/internal/repository/user_shop_repository.go) → Delete(): reads / writes `user_shop`
 

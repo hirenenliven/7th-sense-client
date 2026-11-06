@@ -28,7 +28,7 @@ const PARENTS = {
   cell: { key: 'userCellId', one: 'cell', many: 'cells', title: 'Cell', route: ROUTES.ORG_CELLS, nameField: 'cellName', hintField: 'lineName', ownerKey: 'userId', list: getUserCells },
 }
 
-const childNote = (one, children) => `A ${one} that still has ${children} cannot be deleted — delete those first.`
+const childNote = (one, children) => `A ${one} with ${children}, or used in a user's machine access, cannot be deleted.`
 
 const orgLevel = ({ parent, title, ...level }) => ({
   ...level,
@@ -59,7 +59,7 @@ export const ORG_LEVELS = {
   }),
   [ORG_LEVEL.LINE]: orgLevel({
     one: 'line', many: 'lines', title: 'Line', titlePlural: 'Lines', icon: 'bi-distribute-horizontal', parent: PARENTS.shop,
-    deleteNote: childNote('line', 'cells'),
+    deleteNote: childNote('line', 'cells or machines'),
     list: getUserLines, create: createUserLine, update: updateUserLine, remove: deleteUserLine,
   }),
   [ORG_LEVEL.CELL]: orgLevel({

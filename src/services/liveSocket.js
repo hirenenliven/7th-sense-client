@@ -17,10 +17,11 @@ import { apiBaseUrl } from '@/utils/loginAs'
 const SESSION_CHECK_MS = 30_000
 
 // The state of a machine nobody has data for yet
-const EMPTY_STATE = Object.freeze({ values: Object.freeze({}), at: null, status: null, denied: false })
+const EMPTY_STATE = Object.freeze({ values: Object.freeze({}), at: null, status: null, denied: false, unknown: Object.freeze([]), error: '' })
 
 let socket = null
 let connected = false
+let connectError = ''
 let sessionCheckedAt = 0
 const connectionListeners = new Set()
 const pendingSyncs = new Set()
@@ -110,6 +111,7 @@ const getSocket = () => {
     transports: ['websocket'],
   })
   socket.on('connect', () => {
+    connectError = ''
     setConnected(true)
     machines.forEach((_, machineId) => scheduleSync(machineId, true))
   })
@@ -123,8 +125,10 @@ const getSocket = () => {
     }
   })
   // A refused handshake looks like a network error with WebSocket only (401 is not readable)
-  socket.on('connect_error', () => {
-    setConnected(false)
+  socket.on('connect_error', (error) => {
+    connectError = error?.message ?? ''
+    connected = false
+    connectionListeners.forEach((listener) => listener())
     checkSession()
   })
   socket.on('machine:values', onValues)
@@ -153,7 +157,10 @@ const applyAnswer = (machineId, key, answer) => {
   if (!entry || entry.subscribedKey !== key) return
   const early = entry.early ?? []
   entry.early = null
-  if (!answer?.ok) return
+  if (!answer?.ok) {
+    setMachineState(entry, { ...entry.state, error: answer?.message || 'The subscription was refused.' })
+    return
+  }
   const snapshot = answer.snapshots?.find((item) => item.machineId === machineId)
   entry.snapshotSeq = snapshot?.seq ?? 0
   const state = {
@@ -161,6 +168,8 @@ const applyAnswer = (machineId, key, answer) => {
     at: snapshot?.at ?? null,
     status: snapshot && 'online' in snapshot ? statusOf(snapshot) : entry.state.status,
     denied: answer.denied?.includes(machineId) ?? false,
+    unknown: answer.unknown ?? [],
+    error: '',
   }
   const newer = early.filter(({ message }) => message.seq > entry.snapshotSeq)
   setMachineState(entry, newer.reduce((current, { message, apply }) => apply(current, message), state))
@@ -216,7 +225,8 @@ export const watchMachine = (machineId, { codes = [], channels = [], intervalMs 
 }
 
 // { values: { code: value }, at, status: { online, modeId, modeSince, programName } | null,
-// denied (the user may not read the machine) }
+// denied (the user may not read the machine), unknown (codes the collector does not read),
+// error (why the subscription was refused) }
 export const getMachineState = (machineId) => machines.get(machineId)?.state ?? EMPTY_STATE
 
 export const subscribeMachineState = (machineId, listener) => {
@@ -240,6 +250,9 @@ export const onMachineEvent = (machineId, listener) => {
 
 export const isLiveConnected = () => connected
 
+// Why the socket could not connect, '' when it did
+export const getLiveConnectError = () => connectError
+
 export const subscribeConnection = (listener) => {
   connectionListeners.add(listener)
   return () => connectionListeners.delete(listener)
@@ -252,6 +265,7 @@ export const disconnectLive = () => {
   socket.removeAllListeners()
   socket.disconnect()
   socket = null
+  connectError = ''
   machines.forEach((entry) => {
     entry.subscribedKey = ''
     entry.snapshotSeq = 0

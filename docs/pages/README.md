@@ -23,12 +23,15 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | Home | `/` | Yes | every logged-in role | [home.md](home.md) |
+| Operations Center | `/operations-center` | Yes | every logged-in role | [operations-center.md](operations-center.md) |
+| Plant Intelligence | `/plant-intelligence` | Yes | every logged-in role | [plant-intelligence.md](plant-intelligence.md) |
 
 ## Operations
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | All machines | `/machines` | Yes | every logged-in role | [machine-list.md](machine-list.md) |
+| Machine diagnostics | `/machines/:id/diagnostics` | Yes | superadmin | [machine-diagnostics.md](machine-diagnostics.md) |
 | Add / edit machine | `/machines/add` · `/machines/:id/edit` | Yes | managers | [machine-form.md](machine-form.md) |
 | Production schedules | `/production/schedule` | Yes | every logged-in role | [production-schedule-list.md](production-schedule-list.md) |
 | Add / edit production schedule | `/production/schedule/add` · `/production/schedule/:id/edit` | Yes | managers | [production-schedule-form.md](production-schedule-form.md) |

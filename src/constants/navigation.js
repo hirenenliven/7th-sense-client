@@ -12,7 +12,11 @@ export const NAV_SECTIONS = [
   {
     key: 'main',
     title: 'Main',
-    items: [{ key: 'dashboard', label: 'Dashboard', icon: 'bi-speedometer2', path: ROUTES.HOME }],
+    items: [
+      { key: 'dashboard', label: 'Dashboard', icon: 'bi-speedometer2', path: ROUTES.HOME },
+      { key: 'operations-center', label: 'Operations Center', icon: 'bi-grid-1x2', path: ROUTES.OPERATIONS_CENTER },
+      { key: 'plant-intelligence', label: 'Plant Intelligence', icon: 'bi-lightbulb', path: ROUTES.PLANT_INTELLIGENCE },
+    ],
   },
   {
     key: 'operations',
@@ -50,7 +54,7 @@ export const NAV_SECTIONS = [
         label: 'Machines',
         icon: 'bi-cpu',
         children: [
-          { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES },
+          { key: 'machine-list', label: 'All Machines', path: ROUTES.MACHINES, activePaths: [ROUTES.MACHINE_DIAGNOSTICS] },
           // { key: 'machine-groups', label: 'Machine Groups', path: ROUTES.MACHINE_GROUPS },
         ],
       },

@@ -1,7 +1,7 @@
 # Productivity
 
 - **Route:** `/monitoring/:machineId/productivity` · **Component:** [Productivity.jsx](../../src/pages/Productivity/Productivity.jsx) inside [MonitoringMachine.jsx](../../src/pages/Monitoring/MonitoringMachine.jsx) ([MonitoringPage.jsx](../../src/pages/Monitoring/MonitoringPage.jsx)) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
-- **Purpose:** Live productivity of one machine: today's Cycles and OEE cards, the Machine Modes card (Today by default, or Yesterday / Last 7 days / Last 30 days / All time), mode Gantt timeline and the OEE trend.
+- **Purpose:** Live productivity of one machine: today's Cycles and OEE cards, the Machine Modes card (Today by default, or Yesterday / Last 7 days / Last 30 days / All time), mode Gantt timeline (click a finished Downtime or Idle bar to add its reason) and the OEE trend.
 - **Navigation:** Sidebar › Operations › **Monitoring** → [machine list](monitoring-machines.md) → a machine's Productivity action → **Productivity** tab. The machine view has a page header (machine name, "Machine # id · model · customer"), a **Machine list** back-arrow button and the Productivity / Machine Health tabs (the tab is the route; both carry the machine id). There is no machine select: go back to the list to pick another machine.
 
 ## On page load
@@ -131,6 +131,69 @@ sequenceDiagram
 5. [dashboard_service.go](../../../7th-sense-server/internal/service/dashboard_service.go) → GetModeTotals(): checks the user may read the machine, cuts the range at now (all time: from the first period); `from` in the response is the range start or, for all time, the first recorded period
 6. [machine_telemetry_repository.go](../../../7th-sense-server/internal/repository/machine_telemetry_repository.go) → SumModeDurations(): one `SUM` per mode in SQL over `machine_mode_log` (+ `machine_modes` names), every period clipped to the range and the open one running up to now, so All time does not load every period
 
+## Add a downtime or idle reason
+
+Click a bar of the Machine Mode Timeline. Only a finished Downtime or Idle bar opens the popup (Update Downtime Reason / Update Idle Reason).
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User
+  participant Card as ModeTimelineCard.jsx
+  participant Modal as ModeReasonModal.jsx
+  participant Service as machineModeReasonService
+  participant API as Go router (/api/v1)
+  participant Handler as MachineModeReasonHandler
+  participant ReasonService as MachineModeReasonService
+  participant Repository as MachineModeReasonRepository
+  participant DB as PostgreSQL
+  User->>Card: clicks a Gantt bar
+  Card->>Service: getMachineModeReasons(bar.id)
+  Service->>API: GET /api/v1/machine-mode-reasons?periodId=
+  API->>Handler: GetByPeriod()
+  Handler->>ReasonService: GetByPeriod()
+  ReasonService->>Repository: FindPeriodByID(), FindAllByPeriod()
+  Repository->>DB: machine_mode_log, machine_mode_reasons
+  alt another mode, or still running
+    ReasonService-->>Card: 400 with the message
+    Card-->>User: error toast, no popup
+  else finished Downtime or Idle
+    ReasonService-->>Card: { period, reasonType, customerId, reasons }
+    Card->>Modal: opens on the whole period
+    Modal->>API: GET /api/v1/downtime-reasons or /idle-reasons?userId=
+    User->>Modal: picks reason and time, Submit
+    Modal->>Service: createMachineModeReason()
+    Service->>API: POST /api/v1/machine-mode-reasons
+    API->>Handler: Create()
+    Handler->>ReasonService: Create()
+    ReasonService->>Repository: LockPeriod(), HasOverlap(), Create() in one transaction
+    Repository->>DB: machine_mode_reasons
+    ReasonService-->>Modal: 201, then reloads the rows
+    Modal-->>User: toast, row in the table, form on the free time
+  end
+```
+
+**Steps**
+
+1. [ModeGanttChart.jsx](../../src/components/charts/ModeGanttChart.jsx) → `onBarClick(bar)`; [ModeTimelineCard.jsx](../../src/pages/Productivity/ModeTimelineCard.jsx) → `openReasons()`: loads the period, or shows the server's message in a toast
+2. [machineModeReasonService.js](../../src/services/machineModeReasonService.js) → `getMachineModeReasons()`: calls `GET /api/v1/machine-mode-reasons?periodId=`
+3. [machine_mode_reason_routes.go](../../../7th-sense-server/internal/routes/machine_mode_reason_routes.go) → [machine_mode_reason_handler.go](../../../7th-sense-server/internal/handler/machine_mode_reason_handler.go) → GetByPeriod(): query periodId
+4. [machine_mode_reason_service.go](../../../7th-sense-server/internal/service/machine_mode_reason_service.go) → GetByPeriod(): `readablePeriod()` checks the user may read the machine, `reasonTypeOfPeriod()` refuses other modes and a running period
+5. [ModeReasonModal.jsx](../../src/pages/Productivity/ModeReasonModal.jsx): header with the whole period; loads the kind's active reasons ([reasonPages.js](../../src/pages/Reasons/reasonPages.js)); [modeReasonForm.js](../../src/pages/Productivity/modeReasonForm.js) → `newFormValues()` starts on the first free time, `modeReasonSchema()` shows mistakes on their field, `toReasonPayload()` builds the body
+6. [machine_mode_reason_dto.go](../../../7th-sense-server/internal/dto/machine_mode_reason_dto.go) → Validate(): reason, times, end after start
+7. [machine_mode_reason_service.go](../../../7th-sense-server/internal/service/machine_mode_reason_service.go) → Create() / Update(): `checkInsidePeriod()`, `checkReason()`, then `inPeriodLock()` + `checkNoOverlap()`
+8. [machine_mode_reason_repository.go](../../../7th-sense-server/internal/repository/machine_mode_reason_repository.go): reads / writes `machine_mode_reasons`, `machine_mode_log`
+9. **Edit** loads a row into the form (`PUT /machine-mode-reasons/{id}`); **Delete** asks first (`DELETE /machine-mode-reasons/{id}`, soft delete, frees the time)
+
+**Rules & edge cases**
+
+- Every user who may read the machine adds, edits and deletes; a machine they may not read → 404 "Machine not found".
+- Refused bars: "You can not add a reason in In Production mode." (also Hold, Offline), and "You can not add downtime reason in running mode." for a Downtime or Idle bar still running.
+- The time must lie inside the period and overlap no other reason of it; reasons may touch. A period may be split into several reasons.
+- The form picks whole minutes. The minute holding the period's start or end means that exact instant, so the default saves the whole period to the second.
+- A period past midnight also shows Start Date and End Date fields.
+- New picks are active reasons of the machine's customer. A row keeps its reason if that is later made inactive or deleted from the master list.
+
 ## Live updates
 
 - **Cycles / OEE / Machine Modes cards:** each reloads its request every `KPI_REFRESH_MS` ([productivitySettings.js](../../src/pages/Productivity/productivitySettings.js)); a failed call shows its error only in its own card.
@@ -162,6 +225,11 @@ sequenceDiagram
 | GET | `/api/v1/shifts` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Shifts/getShifts) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/productivity/mode-timeline` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Productivity/getModeTimeline) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/productivity/mode-totals` | On page load · Change the Machine Modes period | [Swagger](http://localhost:8080/api-docs/index.html#/Productivity/getModeTotals) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| GET | `/api/v1/machine-mode-reasons` | Add a downtime or idle reason | [Swagger](http://localhost:8080/api-docs/index.html#/Reasons/getMachineModeReasons) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| POST | `/api/v1/machine-mode-reasons` | Add a downtime or idle reason | [Swagger](http://localhost:8080/api-docs/index.html#/Reasons/createMachineModeReason) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| PUT | `/api/v1/machine-mode-reasons/{id}` | Add a downtime or idle reason (Edit) | [Swagger](http://localhost:8080/api-docs/index.html#/Reasons/updateMachineModeReason) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| DELETE | `/api/v1/machine-mode-reasons/{id}` | Add a downtime or idle reason (Delete) | [Swagger](http://localhost:8080/api-docs/index.html#/Reasons/deleteMachineModeReason) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| GET | `/api/v1/downtime-reasons`, `/api/v1/idle-reasons` | Add a downtime or idle reason (the popup's list) | [Swagger](http://localhost:8080/api-docs/index.html#/Reasons/getDowntimeReasons) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 
 ## State & storage
 
@@ -172,9 +240,10 @@ sequenceDiagram
 
 ## Shared components used
 
-[ChartCard.jsx](../../src/components/charts/ChartCard.jsx), [ChartDateFilter.jsx](../../src/components/charts/ChartDateFilter.jsx), [LineTrendChart.jsx](../../src/components/charts/LineTrendChart.jsx), [Loader.jsx](../../src/components/common/Loader.jsx), [MultiSelectPicker.jsx](../../src/components/common/MultiSelectPicker.jsx), [ModeGanttChart.jsx](../../src/components/charts/ModeGanttChart.jsx)
+[ChartCard.jsx](../../src/components/charts/ChartCard.jsx), [ChartDateFilter.jsx](../../src/components/charts/ChartDateFilter.jsx), [LineTrendChart.jsx](../../src/components/charts/LineTrendChart.jsx), [Loader.jsx](../../src/components/common/Loader.jsx), [MultiSelectPicker.jsx](../../src/components/common/MultiSelectPicker.jsx), [ModeGanttChart.jsx](../../src/components/charts/ModeGanttChart.jsx), [TimePicker.jsx](../../src/components/common/TimePicker.jsx), [DatePicker.jsx](../../src/components/common/DatePicker.jsx), [SortableHead.jsx](../../src/components/common/SortableHead.jsx), [TablePagination.jsx](../../src/components/common/TablePagination.jsx), [TableNoResults.jsx](../../src/components/common/TableNoResults.jsx), [ConfirmModal.jsx](../../src/components/common/ConfirmModal.jsx)
 
 ## Decisions
 
 - [ADR 0019: Monitoring machine list, then the machine's tabs with a back arrow](../adr/0019-monitoring-machine-view.md) (replaces [ADR 0012](../adr/0012-monitoring-tabbed-page.md) / [0013](../adr/0013-monitoring-machine-list.md))
+- [Server ADR 0012: Downtime and idle reasons on a period, one table](../../../7th-sense-server/docs/adr/0012-machine-mode-reasons-one-table.md)
 - [Client ADR index](../adr/README.md)

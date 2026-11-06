@@ -3,6 +3,7 @@
 export const ACTION_ICONS = {
   view: 'bi-eye',
   health: 'bi-heart-pulse',
+  diagnostics: 'bi-activity',
   productivity: 'bi-graph-up-arrow',
   edit: 'bi-pencil',
   delete: 'bi-trash3',

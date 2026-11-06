@@ -27,5 +27,7 @@ Client (frontend) decisions, one file each (Michael Nygard template). Never edit
 | 0021 | [Virtual Screen: live values over Socket.IO, REST for derived data](0021-virtual-screen-socket.md) | Accepted | 2026-11-05 |
 | 0022 | [Ponytail plugin for Claude Code, under this repo's rules](0022-ponytail-plugin.md) | Accepted | 2026-11-06 |
 | 0023 | [One list, row and form for the name-under-a-parent organization levels](0023-organization-levels-one-list.md) | Accepted | 2026-11-06 |
+| 0024 | [Operations Center: a second dashboard beside Home, on the existing APIs](0024-operations-center-beside-home.md) | Accepted | 2026-11-06 |
+| 0025 | [Plant Intelligence: a period and per-machine dashboard, from one existing API per day](0025-plant-intelligence-period-analysis.md) | Accepted | 2026-11-06 |
 
 New ADR: copy the newest file, take the next number, status "Proposed" until agreed, then "Accepted"; add a row here.

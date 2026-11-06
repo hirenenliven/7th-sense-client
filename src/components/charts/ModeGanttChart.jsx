@@ -27,7 +27,7 @@ const ticksFor = (from, to, step) => {
 // modes" row, then one row per machine_modes id (MACHINE_MODE_TYPES). An open period (endedAt null)
 // runs up to `now`, so re-rendering with a later `now` grows it live. `zoom` widens the plot,
 // which then scrolls sideways; while `live` it keeps following now unless scrolled back.
-function ModeGanttChart({ periods, from, to, now, zoom = 1, live = false, onHover }) {
+function ModeGanttChart({ periods, from, to, now, zoom = 1, live = false, onHover, onBarClick }) {
   const scrollRef = useRef(null)
   const followRef = useRef(true)
   const [width, setWidth] = useState(0)
@@ -63,7 +63,8 @@ function ModeGanttChart({ periods, from, to, now, zoom = 1, live = false, onHove
   const renderBars = (list) =>
     list.map((bar) => (
       <rect
-        key={`${bar.id}-${bar.start}`}
+        // Not by start: the first bar of a live window starts later every second, and a remounted bar loses the click
+        key={bar.id ?? bar.start}
         x={xOf(bar.start)}
         y="30%"
         width={Math.max(xOf(bar.end) - xOf(bar.start), MIN_BAR_WIDTH)}
@@ -72,6 +73,7 @@ function ModeGanttChart({ periods, from, to, now, zoom = 1, live = false, onHove
         fill={bar.color}
         onMouseEnter={() => onHover?.(bar)}
         onMouseLeave={() => onHover?.(null)}
+        onClick={() => onBarClick?.(bar)}
       />
     ))
 
@@ -147,6 +149,7 @@ ModeGanttChart.propTypes = {
   zoom: PropTypes.number,
   live: PropTypes.bool,
   onHover: PropTypes.func,
+  onBarClick: PropTypes.func,
 }
 
 export default memo(ModeGanttChart)

@@ -2,7 +2,7 @@
 
 - **Route:** `/machines` · **Component:** [MachineList.jsx](../../src/pages/Machines/MachineList.jsx) · **Auth:** protected (every logged-in role) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Machine set-up: lists the machines the user may see (table or cards); managers add / edit, the superadmin deletes. No Productivity / Health links: live data lives only under [Monitoring › Machines](monitoring-machines.md).
-- **Navigation:** Sidebar › Operations → All Machines → Add / Edit
+- **Navigation:** Sidebar › Operations → All Machines → Add / Edit; superadmin: a machine's **Check data** opens [Machine diagnostics](machine-diagnostics.md)
 
 ## On page load
 

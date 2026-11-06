@@ -1,11 +1,15 @@
 export const ROUTES = {
   HOME: '/',
+  // Second dashboard beside Home, for comparison (ADR 0024)
+  OPERATIONS_CENTER: '/operations-center',
+  PLANT_INTELLIGENCE: '/plant-intelligence',
   LOGIN: '/login',
 
   // Operations
   MACHINES: '/machines',
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
+  MACHINE_DIAGNOSTICS: '/machines/:id/diagnostics',
   // Operations › Monitoring (constants/monitoring.js): the machine list, then one machine's
   // Productivity / Health / Tool List / Tool Life / Virtual Screen tabs. Kept apart from the
   // machine set-up under /machines.

@@ -208,7 +208,7 @@ function CountryList() {
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       >
-        Delete <strong>{pendingDelete?.name}</strong>? A country that still has states cannot be deleted — delete those first.
+        Delete <strong>{pendingDelete?.name}</strong>? A country with states, or used in a user's machine access, cannot be deleted.
       </ConfirmModal>
     </>
   )

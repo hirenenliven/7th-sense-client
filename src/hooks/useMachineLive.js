@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import {
+  getLiveConnectError,
   getMachineState,
   isLiveConnected,
   onMachineEvent,
@@ -11,7 +12,7 @@ import {
 // Live values of one machine over Socket.IO (services/liveSocket.js): only `codes` (constants/live.js),
 // at most every `intervalMs`, plus `channels` ('status', 'event'). `onEvent` gets the machine's
 // alarm / emergency / cycle events. Re-renders only when this machine's state changes.
-// const { values, status, connected, denied } = useMachineLive(machine.id, { codes, intervalMs, channels })
+// const { values, status, connected, denied, unknown, error, connectError } = useMachineLive(machine.id, { codes, intervalMs, channels })
 export default function useMachineLive(machineId, { codes = [], intervalMs = 0, channels = [], onEvent } = {}) {
   const codesKey = codes.join(',')
   const channelsKey = channels.join(',')
@@ -41,6 +42,7 @@ export default function useMachineLive(machineId, { codes = [], intervalMs = 0, 
   )
   const state = useSyncExternalStore(subscribe, () => getMachineState(machineId))
   const connected = useSyncExternalStore(subscribeConnection, isLiveConnected)
+  const connectError = useSyncExternalStore(subscribeConnection, getLiveConnectError)
 
-  return useMemo(() => ({ ...state, connected }), [state, connected])
+  return useMemo(() => ({ ...state, connected, connectError }), [state, connected, connectError])
 }

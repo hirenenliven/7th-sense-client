@@ -76,7 +76,7 @@ sequenceDiagram
 2. [userCountryService.js](../../src/services/userCountryService.js) → deleteUserCountry(): calls `DELETE /api/v1/user-country/{id}`
 3. [user_country_routes.go](../../../7th-sense-server/internal/routes/user_country_routes.go) → `DELETE /v1/user-country/{id}` (superAdminOnly) → UserCountryHandler.Delete
 4. [user_country_handler.go](../../../7th-sense-server/internal/handler/user_country_handler.go) → Delete(): reads {id}; query userId; calls the service
-5. [user_country_service.go](../../../7th-sense-server/internal/service/user_country_service.go) → Delete(): Soft-deletes the country. A country that still has states is kept: its states must be deleted first.
+5. [user_country_service.go](../../../7th-sense-server/internal/service/user_country_service.go) → Delete(): Soft-deletes the country. A country that still has states is kept: its states must be deleted first. A country that a user's machine filter names (`IsInMachineFilter`) is refused with 400 too: the user would lose the machines and could not be saved.
 6. [user_country_repository.go](../../../7th-sense-server/internal/repository/user_country_repository.go) → HasStates(): reads / writes `user_state`
 7. [user_country_repository.go](../../../7th-sense-server/internal/repository/user_country_repository.go) → Delete(): reads / writes `user_country`
 

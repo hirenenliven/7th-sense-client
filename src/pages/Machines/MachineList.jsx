@@ -15,8 +15,9 @@ import useMachines from './useMachines'
 import useMachineView from './useMachineView'
 
 // Operations › All Machines: machine set-up only (live data is under Monitoring). The superadmin sees
-// every customer's machines (filter by customer) and deletes them; managers (superadmin, customer,
-// admin) add and edit; everyone else only reads the machines the server returns for them.
+// every customer's machines (filter by customer), deletes them and opens a machine's Diagnostics;
+// managers (superadmin, customer, admin) add and edit; everyone else only reads the machines the
+// server returns for them.
 function MachineList() {
   const navigate = useNavigate()
   const { hasRole } = useAuth()
@@ -38,6 +39,13 @@ function MachineList() {
           label={`Edit ${machine.name}`}
           onClick={() => navigate(generatePath(ROUTES.MACHINE_EDIT, { id: String(machine.id) }))}
         />
+        {isSuperadmin && (
+          <IconAction
+            icon={ACTION_ICONS.diagnostics}
+            label={`Check data of ${machine.name}`}
+            onClick={() => navigate(generatePath(ROUTES.MACHINE_DIAGNOSTICS, { id: String(machine.id) }))}
+          />
+        )}
         {isSuperadmin && (
           <IconAction danger icon={ACTION_ICONS.delete} label={`Delete ${machine.name}`} onClick={() => setPendingDelete(machine)} />
         )}

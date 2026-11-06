@@ -4801,3 +4801,420 @@ $ts-tile-tones: (
   text-align: end;
   font-weight: $font-weight-semibold;
 }
+
+// -----------------------------------------------------------------------------
+// Main › Operations Center (pages/OperationsCenter/). Tones come from .ts-tone-<name> (--ts-tone).
+// -----------------------------------------------------------------------------
+
+.ts-ops-oee {
+  margin-top: $ts-space-2;
+  color: var(--ts-tone);
+  font-size: $ts-ops-oee-size;
+  font-weight: $font-weight-semibold;
+  line-height: 1.1;
+}
+
+.ts-ops-factors {
+  display: grid;
+  gap: $ts-space-2;
+  margin: $ts-space-3 0;
+}
+
+.ts-ops-factor {
+  display: grid;
+  grid-template-columns: $ts-ops-factor-label minmax(0, 1fr) $ts-ops-factor-value;
+  align-items: center;
+  gap: $ts-space-2;
+  font-size: $ts-fs-md;
+
+  .progress-bar { background-color: var(--ts-tone); }
+  > :last-child { text-align: end; }
+}
+
+.ts-ops-loss {
+  padding-top: $ts-space-2;
+  border-top: 1px solid $ts-line;
+}
+
+// A row of the action queue or the readiness list
+.ts-ops-action {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: $ts-space-2;
+  padding: $ts-space-2;
+  border-bottom: 1px solid $ts-line;
+}
+
+a.ts-ops-action:hover {
+  background: $ts-panel-2;
+
+  .ts-drill { color: $ts-orange; }
+}
+
+li:last-child > .ts-ops-action { border-bottom: 0; }
+
+.ts-ops-action-icon {
+  color: var(--ts-tone);
+  font-size: $ts-fs-lg;
+}
+
+.ts-ops-action-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ts-ops-action-title {
+  font-size: $ts-fs-base;
+  font-weight: $font-weight-semibold;
+}
+
+// Shop floor
+.ts-ops-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-2;
+}
+
+.ts-ops-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-1;
+  padding: $ts-space-1 $ts-space-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+  background: transparent;
+  color: inherit;
+  font-size: $ts-fs-md;
+
+  .ts-dot { background: var(--ts-tone); }
+  &:hover { background: $ts-panel-2; }
+
+  &[aria-pressed="true"] {
+    border-color: var(--ts-tone);
+    background: $ts-panel-2;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.ts-ops-search { max-width: $ts-ops-search-width; }
+
+// Lines sit side by side while they fit, so a fleet of small lines stays compact
+.ts-ops-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-3 $ts-space-4;
+}
+
+.ts-ops-group {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ts-ops-group-title {
+  margin-bottom: $ts-space-2;
+  color: $ts-ink-2;
+  font-size: $ts-fs-md;
+  font-weight: $font-weight-semibold;
+}
+
+.ts-ops-floor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-2;
+}
+
+.ts-ops-machine {
+  display: flex;
+  flex-direction: column;
+  gap: $ts-space-1;
+  width: $ts-ops-machine-min;
+  max-width: 100%;
+  padding: $ts-space-2;
+  border: 1px solid $ts-line;
+  border-left: $ts-ops-machine-bar solid var(--ts-tone);
+  border-radius: $ts-radius;
+  background: $ts-panel-2;
+
+  &:hover { border-color: var(--ts-tone); }
+}
+
+.ts-ops-machine-name {
+  font-size: $ts-fs-base;
+  font-weight: $font-weight-semibold;
+}
+
+.ts-ops-machine-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: $ts-space-2;
+}
+
+.ts-ops-plan-cell {
+  min-width: $ts-ops-plan-min;
+
+  .progress { margin-top: $ts-space-1; }
+}
+
+// Readiness counts
+.ts-ops-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($ts-ops-stat-min, 1fr));
+  gap: $ts-space-2;
+}
+
+.ts-ops-stat {
+  display: flex;
+  flex-direction: column;
+  padding: $ts-space-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius;
+  background: $ts-panel-2;
+
+  &:hover { border-color: $ts-orange; }
+}
+
+.ts-ops-stat-icon { color: $ts-ink-2; }
+
+.ts-ops-stat-value {
+  font-size: $ts-fs-xl;
+  font-weight: $font-weight-semibold;
+}
+
+// -----------------------------------------------------------------------------
+// Main › Plant Intelligence (pages/PlantIntelligence/). Tones come from .ts-tone-<name> (--ts-tone).
+// -----------------------------------------------------------------------------
+
+.ts-int-spark {
+  display: block;
+  width: 100%;
+  height: $ts-int-spark-height;
+  margin-bottom: $ts-space-1;
+
+  polyline {
+    fill: none;
+    stroke: var(--ts-tone);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.ts-int-fleet-bar {
+  display: block;
+  height: $ts-int-fleet-height;
+  border-radius: $ts-radius-sm;
+}
+
+.ts-int-stuck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: $ts-space-2;
+  align-items: center;
+  padding: $ts-space-1 0;
+  border-bottom: 1px solid rgba($ts-line, .6);
+
+  &:last-child { border-bottom: 0; }
+}
+
+.ts-int-bar .progress-bar { background-color: var(--ts-tone); }
+
+.ts-int-table-scroll {
+  max-height: $ts-int-table-max;
+  overflow-y: auto;
+}
+
+.ts-int-alarm-text { max-width: $ts-int-alarm-text; }
+
+.ts-int-outlook {
+  display: grid;
+  grid-template-columns: $ts-int-outlook-day minmax(0, 1fr) $ts-int-outlook-side;
+  gap: $ts-space-2;
+  align-items: center;
+  padding: $ts-space-2 0;
+  border-bottom: 1px solid rgba($ts-line, .6);
+
+  &:last-child { border-bottom: 0; }
+}
+
+// Machines by day: the machine column and the header stay while the table scrolls both ways
+.ts-int-heat-scroll {
+  max-height: $ts-int-heat-max;
+  overflow: auto;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-sm;
+  scrollbar-width: thin;
+}
+
+.ts-int-heat {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: $ts-fs-sm;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: $ts-space-1 $ts-space-2;
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+    background: var(--ts-panel);
+  }
+}
+
+.ts-int-heat .ts-int-heat-name {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: $ts-int-heat-name;
+  min-width: $ts-int-heat-name;
+  max-width: $ts-int-heat-name;
+  padding: $ts-space-1 $ts-space-2;
+  text-align: start;
+  background: var(--ts-panel);
+}
+
+.ts-int-heat thead .ts-int-heat-name { z-index: 2; }
+
+.ts-int-heat-summary {
+  min-width: $ts-int-heat-summary;
+  padding: $ts-space-1 $ts-space-2;
+  font-weight: $font-weight-semibold;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.ts-int-heat-day { min-width: $ts-int-heat-cell; text-align: center; }
+
+.ts-int-cell {
+  text-align: center;
+  border-radius: $ts-radius-sm;
+}
+
+.ts-int-cell-zero { color: $ts-ink-3; background: rgba($ts-line, .35); }
+.ts-int-cell-score { background: color-mix(in srgb, var(--ts-tone) 32%, transparent); }
+
+@each $level, $strength in (1: 18%, 2: 34%, 3: 52%, 4: 72%) {
+  .ts-int-level-#{$level} { background: color-mix(in srgb, var(--ts-blue) $strength, transparent); }
+}
+
+.ts-int-heat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $ts-space-1 $ts-space-3;
+  margin-top: $ts-space-2;
+
+  .ts-dot { background: var(--ts-tone); }
+}
+
+// -----------------------------------------------------------------------------
+// Machines › Diagnostics (pages/MachineDiagnostics/). Tones come from .ts-tone-<name> (--ts-tone).
+// -----------------------------------------------------------------------------
+
+.ts-diag-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: $ts-space-3;
+  align-items: start;
+  padding: $ts-space-2 0;
+  border-bottom: 1px solid rgba($ts-line, .6);
+
+  &:last-child { border-bottom: 0; }
+}
+
+.ts-diag-step-icon { color: var(--ts-tone); }
+
+.ts-diag-state {
+  display: inline-flex;
+  align-items: center;
+  gap: $ts-space-1;
+  color: var(--ts-tone);
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+
+  .ts-dot { background: var(--ts-tone); }
+}
+
+// Variable cards: wide enough for an address, as many per row as fit
+.ts-diag-vars {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min($ts-diag-var-min, 100%), 1fr));
+  gap: $ts-space-3;
+}
+
+.ts-diag-var {
+  display: flex;
+  flex-direction: column;
+  gap: $ts-space-2;
+  min-width: 0;
+  padding: $ts-space-3;
+  background: var(--ts-panel);
+  border: 1px solid $ts-line;
+  border-left: $ts-diag-var-bar solid var(--ts-tone);
+  border-radius: $ts-radius-sm;
+
+  &.is-unreadable { background: transparent; }
+}
+
+.ts-diag-var-head {
+  display: flex;
+  justify-content: space-between;
+  gap: $ts-space-2;
+
+  .min-w-0 { min-width: 0; }
+}
+
+.ts-diag-var-name { overflow-wrap: anywhere; }
+
+.ts-diag-var-value {
+  font-size: $ts-fs-xl;
+  font-weight: $font-weight-semibold;
+  overflow-wrap: anywhere;
+
+  small { font-size: $ts-fs-sm; font-weight: normal; }
+}
+
+// The value just changed: a short highlight, restarted by each change
+.ts-diag-var-flash {
+  padding: 0 $ts-space-1;
+  margin-left: calc(-1 * #{$ts-space-1});
+  border-radius: $ts-radius-sm;
+  animation: ts-diag-var-flash 1s ease-out;
+}
+
+@keyframes ts-diag-var-flash {
+  from { background: color-mix(in srgb, var(--ts-tone) 45%, transparent); }
+  to { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-diag-var-flash { animation: none; }
+}
+
+.ts-diag-var-facts {
+  display: grid;
+  grid-template-columns: $ts-diag-var-label minmax(0, 1fr);
+  gap: $ts-space-1 $ts-space-2;
+  padding-top: $ts-space-2;
+  margin-top: auto;
+  border-top: 1px solid rgba($ts-line, .6);
+
+  dt { color: $ts-ink-2; font-weight: normal; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+}
+
+.ts-diag-facts {
+  display: grid;
+  grid-template-columns: $ts-diag-fact-label minmax(0, 1fr);
+  gap: $ts-space-1 $ts-space-3;
+
+  dt { color: $ts-ink-2; font-weight: normal; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+}
+
+.ts-diag-events {
+  max-height: $ts-diag-events-max;
+  overflow-y: auto;
+}
