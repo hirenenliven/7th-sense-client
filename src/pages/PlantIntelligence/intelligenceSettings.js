@@ -18,6 +18,7 @@ export const DEFAULT_PERIOD = PERIODS[0].value
 // Same modes as the server's OEE: cutting time, and planned stops left out of the planned time
 const RUN_MODE_IDS = [3, 12]
 const PLANNED_STOP_MODE_IDS = [7, 13]
+const DOWNTIME_MODE_IDS = [6]
 const OFFLINE_TIME_KEY = 'mode-9'
 const UNRECORDED_TIME_KEY = 'unrecorded'
 
@@ -103,6 +104,19 @@ const machineRows = (days) => {
   })
 }
 
+// A day's seconds in some modes
+const daySecondsIn = (day, ids) => sum(day.time.modes.filter((mode) => ids.includes(mode.modeId)).map((mode) => mode.durationSec))
+
+// A day's plan: completed cycles of the machines with a job against their quantity, each machine
+// capped at its quantity so one machine's extra cycles do not hide another's shortfall
+const dayPlan = (day) => {
+  const planned = day.machines.filter((machine) => machine.plannedQuantity > 0)
+  return {
+    planDone: sum(planned.map((machine) => Math.min(machine.completedCount, machine.plannedQuantity))),
+    planQuantity: sum(planned.map((machine) => machine.plannedQuantity)),
+  }
+}
+
 // The alarm codes over the period, most raised first. `/dashboard/home` lists the top codes of each
 // day, so a code raised rarely may be left out of a busy day.
 const alarmRows = (days) => {
@@ -147,6 +161,8 @@ export const analyse = (days) => {
     closedQuality: share(day.cycles.completedCount, day.cycles.completedCount + day.cycles.unfinishedCount),
     alarms: sum(day.alarms.map((alarm) => alarm.count)),
     connected: share(sum(timeByMode(day.time).filter((row) => row.key !== OFFLINE_TIME_KEY && row.key !== UNRECORDED_TIME_KEY).map((row) => row.value)), day.time.spanSec),
+    downtime: share(daySecondsIn(day, DOWNTIME_MODE_IDS), day.time.spanSec),
+    ...dayPlan(day),
   }))
 
   return {
@@ -162,9 +178,35 @@ export const analyse = (days) => {
     availability: share(secondsIn(RUN_MODE_IDS), spanSec - secondsIn(PLANNED_STOP_MODE_IDS)),
     quality: share(completed, completed + unfinished),
     connected: share(spanSec - sum(lost.map((row) => row.value)), spanSec),
+    downtime: share(secondsIn(DOWNTIME_MODE_IDS), spanSec),
     oeeAverage: mean(trend.map((day) => day.oee)),
     alarmCount: sum(trend.map((day) => day.alarms)),
     plannedDays: days.filter((day) => day.plan).length,
+  }
+}
+
+// The executive summary: this period against the same number of days before it (`previous` is the
+// analysis of those days, null when none could be read). Shares compare directly, in points. Cycles
+// and the plan compare per finished day: today is only part of a day, so it is left out of both.
+export const compareFigures = (current, previous) => {
+  const change = (now, before) => (now != null && before != null ? now - before : null)
+  const finished = current.trend.slice(0, -1)
+  const before = previous?.trend ?? []
+  const perDay = (rows) => (rows.length ? sum(rows.map((row) => row.finished)) / rows.length : null)
+  const attainment = (rows) => share(sum(rows.map((row) => row.planDone)), sum(rows.map((row) => row.planQuantity)))
+  const cyclesPerDay = perDay(finished)
+  const cyclesPerDayBefore = perDay(before)
+  const plan = attainment(finished)
+  return {
+    availability: change(current.availability, previous?.availability),
+    oee: change(current.oeeAverage, previous?.oeeAverage),
+    quality: change(current.quality, previous?.quality),
+    downtime: change(current.downtime, previous?.downtime),
+    connected: change(current.connected, previous?.connected),
+    cyclesPerDay,
+    cyclesGrowth: cyclesPerDay != null && cyclesPerDayBefore ? ((cyclesPerDay - cyclesPerDayBefore) / cyclesPerDayBefore) * 100 : null,
+    plan,
+    planChange: change(plan, attainment(before)),
   }
 }
 

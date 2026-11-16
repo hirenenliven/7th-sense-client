@@ -12,7 +12,7 @@ import useTableSort from '@/hooks/useTableSort'
 import { KpiTile } from '@/pages/Home/HomeCards'
 import { ATTENTION_MINUTES, ATTENTION_MODE_IDS, OTHER_MODE, fleetModeCounts, scoreTone, secondsInMode } from '@/pages/Home/homeSettings'
 import { ActionRow } from '@/pages/OperationsCenter/OpsPanels'
-import { OEE_DOMAIN, OEE_TICKS, formatCount, percent } from '@/pages/Productivity/productivitySettings'
+import { FAIR_OEE, OEE_DOMAIN, OEE_TICKS, WORLD_CLASS_OEE, formatCount, percent } from '@/pages/Productivity/productivitySettings'
 import { PICKER_LOCALE, formatModeDuration } from '@/utils/dateTime'
 import { ALARM_LIMIT, INSIGHT_LIMIT, STUCK_LIMIT, dayLabel, timeChart, weekdayLabel } from './intelligenceSettings'
 
@@ -39,47 +39,99 @@ function Sparkline({ values }) {
 
 Sparkline.propTypes = { values: PropTypes.arrayOf(PropTypes.number).isRequired }
 
-// The period in six tiles, each with its line of the days
-export function PeriodTiles({ analysis, today, periodLabel }) {
-  const { trend } = analysis
-  const line = (key) => trend.map((day) => day[key])
-  const days = trend.length
-  const tiles = [
-    { key: 'oee', label: 'OEE today', icon: 'bi-speedometer2', tone: scoreTone(today.oee?.oee), value: percent(today.oee?.oee),
-      spark: line('oee'), meta: `Average of daily OEE: ${percent(analysis.oeeAverage)}` },
-    { key: 'availability', label: 'Availability', icon: 'bi-power', tone: scoreTone(analysis.availability), value: percent(analysis.availability),
-      spark: line('availability'), meta: `Run time of planned time, ${periodLabel}` },
-    { key: 'quality', label: 'Quality', icon: 'bi-patch-check', tone: scoreTone(analysis.quality), value: percent(analysis.quality),
-      spark: line('closedQuality'), meta: `Completed of closed cycles, ${periodLabel}` },
-    { key: 'cycles', label: 'Cycles completed', icon: 'bi-arrow-repeat', tone: 'info', value: formatCount(analysis.completed),
-      spark: line('finished'), meta: `${formatCount(Math.round(analysis.completed / days))} a day · ${formatCount(analysis.unfinished)} unfinished` },
-    { key: 'connected', label: 'Connected time', icon: 'bi-wifi', tone: scoreTone(analysis.connected), value: percent(analysis.connected),
-      spark: line('connected'), meta: `${formatCount(today.fleet.online)} of ${formatCount(today.fleet.total)} machines online now`, to: ROUTES.MONITORING },
-    { key: 'alarms', label: 'Alarm raises', icon: 'bi-bell', tone: analysis.alarmCount ? 'warning' : 'neutral', value: formatCount(analysis.alarmCount),
-      spark: line('alarms'), meta: `${formatCount(analysis.alarms.length)} alarm code${analysis.alarms.length === 1 ? '' : 's'}, ${periodLabel}` },
-  ]
+// A change against the period before: green when better, red when worse (`lowerIsBetter` for
+// downtime); `unit` is "pts" for shares, "%" for growth
+function Change({ value, unit, lowerIsBetter }) {
+  if (value == null) return <span className="d-block">No earlier figure to compare</span>
+  const rounded = Number(value.toFixed(1))
+  if (rounded === 0) return <span className="d-block">Same as before</span>
+  const better = lowerIsBetter ? rounded < 0 : rounded > 0
   return (
-    <Row xs={2} md={3} xxl={6} className="g-3">
-      {tiles.map(({ spark, meta, ...tile }) => (
-        <Col key={tile.key}>
-          <KpiTile
-            tile={{
-              ...tile,
-              meta: (
-                <div className="w-100">
-                  <Sparkline values={spark} />
-                  {meta}
-                </div>
-              ),
-            }}
-          />
-        </Col>
-      ))}
-    </Row>
+    <span className={`d-block ${better ? 'text-success' : 'text-danger'}`}>
+      <i className={`bi ${rounded > 0 ? 'bi-arrow-up-right' : 'bi-arrow-down-right'} me-1`} aria-hidden="true" />
+      {`${rounded > 0 ? '+' : ''}${rounded.toFixed(1)} ${unit} vs before`}
+    </span>
   )
 }
 
-PeriodTiles.propTypes = { analysis: PropTypes.object.isRequired, today: PropTypes.object.isRequired, periodLabel: PropTypes.string.isRequired }
+Change.propTypes = { value: PropTypes.number, unit: PropTypes.string.isRequired, lowerIsBetter: PropTypes.bool }
+
+// The owner's view of the period: the six figures decisions are taken on, each against the same
+// number of days before (compareFigures), its line of the days, and how far the data can be trusted
+export function ExecutiveSummaryCard({ analysis, figures, today, periodLabel, previousDays, insights }) {
+  const { trend } = analysis
+  const line = (key) => trend.map((day) => day[key])
+  const downtimeMode = modeTypeOf(6)
+  const critical = insights.filter((insight) => insight.severity === 'critical').length
+  const warning = insights.filter((insight) => insight.severity === 'warning').length
+  const noSpeed = insights.some((insight) => insight.key === 'performance')
+  const tiles = [
+    { key: 'availability', label: 'Availability', icon: 'bi-power', tone: scoreTone(analysis.availability), value: percent(analysis.availability),
+      spark: line('availability'), change: <Change value={figures.availability} unit="pts" />, meta: 'Run time of planned time' },
+    { key: 'oee', label: 'OEE', icon: 'bi-speedometer2', tone: scoreTone(analysis.oeeAverage), value: percent(analysis.oeeAverage),
+      spark: line('oee'), change: <Change value={figures.oee} unit="pts" />, meta: `Average of daily OEE · today ${percent(today.oee?.oee)}` },
+    { key: 'quality', label: 'Quality', icon: 'bi-patch-check', tone: scoreTone(analysis.quality), value: percent(analysis.quality),
+      spark: line('closedQuality'), change: <Change value={figures.quality} unit="pts" />, meta: 'Completed of closed cycles' },
+    { key: 'cycles', label: 'Cycles completed', icon: 'bi-arrow-repeat', tone: 'info', value: formatCount(analysis.completed),
+      spark: line('finished'), change: <Change value={figures.cyclesGrowth} unit="%" />,
+      meta: `${figures.cyclesPerDay == null ? '' : `${formatCount(Math.round(figures.cyclesPerDay))} a finished day · `}${formatCount(analysis.unfinished)} unfinished` },
+    { key: 'plan', label: 'Plan attainment', icon: 'bi-calendar-check', tone: figures.plan == null ? 'neutral' : 'info', value: percent(figures.plan),
+      spark: trend.map((day) => (day.planQuantity ? (day.planDone / day.planQuantity) * 100 : null)),
+      change: figures.plan == null ? null : <Change value={figures.planChange} unit="pts" />,
+      meta: figures.plan == null ? 'No job scheduled on the finished days' : 'Cycles against scheduled qty., finished days', to: ROUTES.PRODUCTION_SCHEDULE },
+    { key: 'downtime', label: 'Downtime', icon: 'bi-exclamation-octagon', tone: 'mode-6', value: percent(analysis.downtime),
+      spark: line('downtime'), change: <Change value={figures.downtime} unit="pts" lowerIsBetter />, meta: 'Share of all machine time',
+      to: monitoringSearchPath(downtimeMode.label) },
+  ]
+
+  return (
+    <ChartCard
+      title="Executive summary"
+      subtitle={`${periodLabel[0].toUpperCase()}${periodLabel.slice(1)} against the ${formatCount(trend.length)} days before · green from ${WORLD_CLASS_OEE} %, amber from ${FAIR_OEE} %`}
+      icon="bi-briefcase"
+      actions={
+        <>
+          {critical > 0 && <Badge bg="danger">{formatCount(critical)} critical</Badge>}
+          {warning > 0 && <Badge bg="warning" text="dark">{formatCount(warning)} warning</Badge>}
+        </>
+      }
+    >
+      <Row xs={2} md={3} xxl={6} className="g-3">
+        {tiles.map(({ spark, change, meta, ...tile }) => (
+          <Col key={tile.key}>
+            <KpiTile
+              tile={{
+                ...tile,
+                meta: (
+                  <div className="w-100">
+                    <Sparkline values={spark} />
+                    {change}
+                    {meta}
+                  </div>
+                ),
+              }}
+            />
+          </Col>
+        ))}
+      </Row>
+      <p className="small text-body-secondary mt-3 mb-0">
+        <i className="bi bi-shield-check me-1" aria-hidden="true" />
+        Data behind these figures: {formatCount(trend.length)} days read, {formatCount(previousDays)} before them; machines connected{' '}
+        {percent(analysis.connected)} of the time ({formatCount(today.fleet.online)} of {formatCount(today.fleet.total)} online now).
+        {noSpeed && ' Performance shows 100 % (no standard cycle time), so OEE shows no speed loss.'}
+      </p>
+    </ChartCard>
+  )
+}
+
+ExecutiveSummaryCard.propTypes = {
+  analysis: PropTypes.object.isRequired,
+  figures: PropTypes.object.isRequired,
+  today: PropTypes.object.isRequired,
+  periodLabel: PropTypes.string.isRequired,
+  previousDays: PropTypes.number.isRequired,
+  insights: PropTypes.arrayOf(PropTypes.object).isRequired,
+}
 
 // Right now: the fleet as one bar in mode colours, and the machines stuck longest
 export function NowCard({ today, showCustomer }) {

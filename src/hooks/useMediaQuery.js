@@ -12,4 +12,4 @@ export default function useMediaQuery(query) {
   )
 
   return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches)
-}
+} 

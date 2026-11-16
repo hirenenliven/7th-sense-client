@@ -258,10 +258,10 @@
     "semantic_hash": "184a7bddd6c0f0b98f8e548899a392c7"
   },
   "src/hooks/useMediaQuery.js": {
-    "mtime": 1791807100.5630605,
-    "seen": 1792149093.2481754,
-    "ast_hash": "e770ca8be15d550f27c2d36410fe7d5b",
-    "semantic_hash": "e770ca8be15d550f27c2d36410fe7d5b"
+    "mtime": 1794813949.9276633,
+    "seen": 1794823371.446087,
+    "ast_hash": "ef0440ab4246949d8f504a9af7dc0c26",
+    "semantic_hash": ""
   },
   "src/hooks/useOrgUser.js": {
     "mtime": 1793941931.164027,
@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1793949888.0406516,
-    "seen": 1793954605.3012297,
-    "ast_hash": "193b9fc3d8e313608215af15ff8b635c",
+    "mtime": 1794823359.226269,
+    "seen": 1794823371.4465206,
+    "ast_hash": "d78e262f11253f3da9d727a0c389aaf4",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1374,9 +1374,9 @@
     "semantic_hash": ""
   },
   "docs/adr/README.md": {
-    "mtime": 1793948570.451499,
-    "seen": 1793948639.0869038,
-    "ast_hash": "d7f4b3d843d88f7595a2c058210b0ec3",
+    "mtime": 1794823332.9540892,
+    "seen": 1794823371.4465723,
+    "ast_hash": "dc5ff6195f3bd562699eb4ec181e5f96",
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
@@ -2058,9 +2058,9 @@
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/IntelligencePanels.jsx": {
-    "mtime": 1793948485.0105405,
-    "seen": 1793948639.0867093,
-    "ast_hash": "9acb79e03939d7ec77d31da0c6212c55",
+    "mtime": 1794823219.1330926,
+    "seen": 1794823371.446347,
+    "ast_hash": "0fe1215c8c63842bce2d798290634f33",
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/MachineHeatmap.jsx": {
@@ -2070,15 +2070,15 @@
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/PlantIntelligence.jsx": {
-    "mtime": 1793948346.223991,
-    "seen": 1793948639.0867124,
-    "ast_hash": "320035cdb5390dbab3ed6f5a55869d67",
+    "mtime": 1794823277.9997587,
+    "seen": 1794823371.4463503,
+    "ast_hash": "eb15b9f8165405458cf9ec9ecbc67c4e",
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/intelligenceSettings.js": {
-    "mtime": 1793948485.0328054,
-    "seen": 1793948639.0867138,
-    "ast_hash": "dfaf4bc6aa7a05188ab7bcda68caca73",
+    "mtime": 1794823165.3957403,
+    "seen": 1794823371.4463518,
+    "ast_hash": "9aa0942215f88ea6c105f9a808efe194",
     "semantic_hash": ""
   },
   "docs/adr/0025-plant-intelligence-period-analysis.md": {
@@ -2088,9 +2088,9 @@
     "semantic_hash": ""
   },
   "docs/pages/plant-intelligence.md": {
-    "mtime": 1793948645.7394643,
-    "seen": 1793954605.3013742,
-    "ast_hash": "0d26ff283d55b9fdf78e0c44475dcb72",
+    "mtime": 1794823351.2860584,
+    "seen": 1794823371.4466374,
+    "ast_hash": "7d4216836caa6d390948a2f52c62cb89",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/DiagnosticsVariables.jsx": {
@@ -2121,6 +2121,12 @@
     "mtime": 1793954494.6966476,
     "seen": 1793954605.3013349,
     "ast_hash": "e4d85f987bee61c51cc7b39f3a00c709",
+    "semantic_hash": ""
+  },
+  "docs/adr/0026-plant-intelligence-owner-dashboard.md": {
+    "mtime": 1794823332.700266,
+    "seen": 1794823371.4465704,
+    "ast_hash": "c90e3af68117ee71c0b2229dc5194d02",
     "semantic_hash": ""
   }
 }

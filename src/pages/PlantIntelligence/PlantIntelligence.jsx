@@ -9,8 +9,8 @@ import useAuth from '@/hooks/useAuth'
 import useLoad from '@/hooks/useLoad'
 import useOrgUser from '@/hooks/useOrgUser'
 import { customerName } from '@/pages/Customers/customerFormat'
-import { CycleTrendCard, OeeTrendCard, ReadinessCard } from '@/pages/OperationsCenter/OpsPanels'
-import { SLOW_REFRESH_MS, buildReadiness, currentShift, dayOffName } from '@/pages/OperationsCenter/operationsSettings'
+import { ActionQueueCard, CycleTrendCard, OeeTrendCard, PlanCard, ReadinessCard } from '@/pages/OperationsCenter/OpsPanels'
+import { SLOW_REFRESH_MS, buildActions, buildReadiness, currentShift, dayOffName } from '@/pages/OperationsCenter/operationsSettings'
 import { formatCount } from '@/pages/Productivity/productivitySettings'
 import { getClienteles } from '@/services/clienteleService'
 import { getHomeDashboard } from '@/services/dashboardService'
@@ -22,9 +22,9 @@ import { getParts } from '@/services/partService'
 import { getProductionSchedules } from '@/services/productionScheduleService'
 import { getShifts } from '@/services/shiftService'
 import { PICKER_LOCALE, formatClock12, shiftIsoDate } from '@/utils/dateTime'
-import { AlarmParetoCard, GroupsCard, InsightsCard, NowCard, OutlookCard, PeriodTiles, TimeLossCard } from './IntelligencePanels'
+import { AlarmParetoCard, ExecutiveSummaryCard, GroupsCard, InsightsCard, NowCard, OutlookCard, TimeLossCard } from './IntelligencePanels'
 import MachineHeatmap from './MachineHeatmap'
-import { DEFAULT_PERIOD, PERIODS, analyse, buildInsights, groupRows, outlookRows } from './intelligenceSettings'
+import { DEFAULT_PERIOD, PERIODS, analyse, buildInsights, compareFigures, groupRows, outlookRows } from './intelligenceSettings'
 
 const clockLabel = new Intl.DateTimeFormat(PICKER_LOCALE, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 const customerOptionLabel = (user) => (customerName(user) === '—' ? user.username : customerName(user))
@@ -60,21 +60,27 @@ function PlantIntelligence() {
   const todayState = useLoad(() => getHomeDashboard({ userId: scopeUserId }), `today|${scopeUserId}`, { refreshMs: MONITOR_REFRESH_MS })
   const today = todayState.data
 
-  // The days before the one the server answered for; a day that fails is left out and reported
+  // The days before the one the server answered for: the period's, then as many again before them for
+  // the executive summary's comparison (oldest first). A day that fails is left out and reported.
   const historyState = useLoad(
     () =>
       Promise.all(
-        Array.from({ length: period - 1 }, (_, index) =>
-          orNull(getHomeDashboard({ date: shiftIsoDate(today.date, index + 1 - period), userId: scopeUserId })),
+        Array.from({ length: 2 * period - 1 }, (_, index) =>
+          orNull(getHomeDashboard({ date: shiftIsoDate(today.date, index + 1 - 2 * period), userId: scopeUserId })),
         ),
       ),
     today ? `history|${scopeUserId}|${today.date}|${period}` : null,
   )
-  const failedDays = historyState.data?.filter((day) => !day).length ?? 0
+  const periodHistory = useMemo(() => historyState.data?.slice(period) ?? null, [historyState.data, period])
+  const previousDays = useMemo(() => historyState.data?.slice(0, period).filter(Boolean) ?? [], [historyState.data, period])
+  const failedDays = periodHistory?.filter((day) => !day).length ?? 0
 
-  const days = useMemo(() => (today && historyState.data ? [...historyState.data.filter(Boolean), today] : null), [today, historyState.data])
+  const days = useMemo(() => (today && periodHistory ? [...periodHistory.filter(Boolean), today] : null), [today, periodHistory])
   const analysis = useMemo(() => (days ? analyse(days) : null), [days])
+  const previous = useMemo(() => (previousDays.length ? analyse(previousDays) : null), [previousDays])
+  const figures = useMemo(() => (analysis ? compareFigures(analysis, previous) : null), [analysis, previous])
   const insights = useMemo(() => (analysis ? buildInsights(analysis, periodLabel) : []), [analysis, periodLabel])
+  const actions = useMemo(() => (today ? buildActions(today, true) : []), [today])
 
   const setupState = useLoad(
     async () => {
@@ -98,10 +104,39 @@ function PlantIntelligence() {
   const activeShifts = setup?.shifts?.filter((shift) => shift.status !== 'inactive') ?? null
   const activeHolidays = setup?.holidays?.filter((holiday) => holiday.status !== 'inactive') ?? null
   const shiftNow = today && oneCompany && activeShifts ? currentShift(activeShifts, today.serverTime) : null
+  const activeSchedules = today && setup?.schedules
+    ? setup.schedules.filter((row) => row.status === 'active' && row.startDate <= today.date && today.date <= row.endDate)
+    : null
 
-  const renderPeriodPanels = () => {
+  // The executive summary first; the loader or the error of the period stands in its place
+  const renderSummary = () => {
     if (historyState.loading) return <Col><Loader text={`Reading ${periodLabel}…`} /></Col>
     if (!analysis) return <Col><Alert variant="danger" className="mb-0">{historyState.error || 'Could not read this period.'}</Alert></Col>
+    return (
+      <>
+        {failedDays > 0 && (
+          <Col>
+            <Alert variant="warning" className="mb-0">
+              {formatCount(failedDays)} day{failedDays === 1 ? '' : 's'} of this period could not be read and {failedDays === 1 ? 'is' : 'are'} left out of these figures.
+            </Alert>
+          </Col>
+        )}
+        <Col>
+          <ExecutiveSummaryCard
+            analysis={analysis}
+            figures={figures}
+            today={today}
+            periodLabel={periodLabel}
+            previousDays={previousDays.length}
+            insights={insights}
+          />
+        </Col>
+      </>
+    )
+  }
+
+  const renderPeriodPanels = () => {
+    if (!analysis || historyState.loading) return null
 
     const dates = days.map((day) => day.date)
     const byCustomer = showCustomer
@@ -128,16 +163,6 @@ function PlantIntelligence() {
 
     return (
       <>
-        {failedDays > 0 && (
-          <Col>
-            <Alert variant="warning" className="mb-0">
-              {formatCount(failedDays)} day{failedDays === 1 ? '' : 's'} of this period could not be read and {failedDays === 1 ? 'is' : 'are'} left out of these figures.
-            </Alert>
-          </Col>
-        )}
-        <Col>
-          <PeriodTiles analysis={analysis} today={today} periodLabel={periodLabel} />
-        </Col>
         <Col>
           <Row xs={1} className="g-3">
             <Col xl={5}>
@@ -228,8 +253,19 @@ function PlantIntelligence() {
             </Alert>
           </Col>
         )}
+        {renderSummary()}
         <Col>
           <NowCard today={today} showCustomer={showCustomer} />
+        </Col>
+        <Col>
+          <Row xs={1} className="g-3">
+            <Col xl={5}>
+              <ActionQueueCard actions={actions} isToday />
+            </Col>
+            <Col xl={7}>
+              <PlanCard machines={today.machines} schedules={activeSchedules} showCustomer={showCustomer} canAdd={isManager} />
+            </Col>
+          </Row>
         </Col>
         {renderPeriodPanels()}
       </Row>
@@ -246,7 +282,7 @@ function PlantIntelligence() {
           <div className="ts-eyebrow">Main · Plant Intelligence</div>
           <h1>Plant Intelligence</h1>
           <p className="ts-page-subtitle">
-            Why capacity is lost, where, and whether it is improving · {scopeLabel}
+            How the plant performs, what needs a decision, and whether it is improving · {scopeLabel}
           </p>
         </div>
         <div className="ts-page-actions">
