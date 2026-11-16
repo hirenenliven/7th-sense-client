@@ -5025,6 +5025,8 @@ li:last-child > .ts-ops-action { border-bottom: 0; }
   overflow-y: auto;
 }
 
+.ts-int-actions { min-height: $ts-int-actions-min; }
+
 .ts-int-alarm-text { max-width: $ts-int-alarm-text; }
 
 .ts-int-outlook {

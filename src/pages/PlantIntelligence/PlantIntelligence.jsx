@@ -259,7 +259,7 @@ function PlantIntelligence() {
         </Col>
         <Col>
           <Row xs={1} className="g-3">
-            <Col xl={5}>
+            <Col xl={5} className="ts-int-actions">
               <ActionQueueCard actions={actions} isToday />
             </Col>
             <Col xl={7}>

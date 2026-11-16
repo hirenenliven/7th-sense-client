@@ -275,6 +275,7 @@ $ts-int-heat-summary:   ts-rem(72);  // period column of the heatmap
 $ts-int-heat-cell:      ts-rem(50);  // narrowest day column
 $ts-int-heat-max:       ts-rem(520); // the heatmap scrolls past this height
 $ts-int-table-max:      ts-rem(360); // the comparison table scrolls past this height
+$ts-int-actions-min:    ts-rem(560); // Action queue column, so the list is not squeezed beside the plan
 $ts-int-alarm-text:     ts-rem(180); // alarm message under its code
 $ts-int-outlook-day:    ts-rem(60);  // day column of the next 7 days
 $ts-int-outlook-side:   ts-rem(84);  // shifts / holiday column of the next 7 days

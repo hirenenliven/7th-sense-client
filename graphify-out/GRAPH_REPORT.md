@@ -6,12 +6,12 @@
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 2206 nodes · 7597 edges · 114 communities (110 shown, 4 thin omitted)
+- 2206 nodes · 7589 edges · 114 communities (110 shown, 4 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 538 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e4982407`
+- Built from commit: `4bf588c0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -135,24 +135,24 @@
 2. `prop-types` - 113 edges
 3. `unwrap()` - 100 edges
 4. `react-bootstrap` - 99 edges
-5. `useAuth()` - 90 edges
-6. `Loader()` - 79 edges
-7. `withQuery()` - 79 edges
+5. `useAuth()` - 89 edges
+6. `withQuery()` - 79 edges
+7. `Loader()` - 78 edges
 8. `sharedGet()` - 67 edges
 9. `ProtectedRoute()` - 52 edges
 10. `formatCount()` - 49 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `UI states` --references--> `Loader()`  [INFERRED]
-  docs/pages/home.md → src/components/common/Loader.jsx
-- `Shared components used` --references--> `NoResults()`  [INFERRED]
-  docs/pages/machine-diagnostics.md → src/components/common/TableNoResults.jsx
-- `Open productivity / health` --references--> `machineMonitorPath()`  [INFERRED]
-  docs/pages/monitoring-machines.md → src/constants/monitoring.js
+- `On page load` --references--> `getBranches()`  [INFERRED]
+  docs/pages/branch-list.md → src/services/branchService.js
 - `State & storage` --references--> `useAuth()`  [INFERRED]
   docs/pages/branch-form.md → src/hooks/useAuth.js
 - `State & storage` --references--> `useAuth()`  [INFERRED]
   docs/pages/breaks.md → src/hooks/useAuth.js
+- `State & storage` --references--> `useAuth()`  [INFERRED]
+  docs/pages/clientele-list.md → src/hooks/useAuth.js
+- `State & storage` --references--> `useAuth()`  [INFERRED]
+  docs/pages/customer-user-detail.md → src/hooks/useAuth.js
 
 ## Import Cycles
 - None detected.
@@ -374,7 +374,7 @@ Nodes (8): Decisions, On page load, Rules & edge cases, Sections, Shared compone
 
 ### Community 53 - "OpsPanels.jsx"
 Cohesion: 0.11
-Nodes (31): ATTENTION_MINUTES, FLEET_MODES, ACTION_LIMIT, alarmActions(), biggestLoss(), buildActions(), expiryAlert(), fleetActions() (+23 more)
+Nodes (31): FLEET_MODES, ACTION_LIMIT, alarmActions(), biggestLoss(), buildActions(), expiryAlert(), fleetActions(), fleetMode() (+23 more)
 
 ### Community 54 - "useTableSort"
 Cohesion: 0.12
@@ -609,23 +609,23 @@ Nodes (4): Client documentation, How to use Postman, How to view the API docs in
   CLAUDE.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **22 isolated node(s):** `bootstrap`, `@types/react`, `@types/react-dom`, `eslint`, `sass` (+17 more)
+- **22 isolated node(s):** `ADR-0025`, `ADR-0025`, `ADR-0024`, `ADR-0013`, `bootstrap` (+17 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 503 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `OperationsCenter.jsx`, `BarLineChart.jsx`, `Productivity.jsx`, `modeTypeOf`, `dateTime.js`, `MachineDiagnostics.jsx`, `AddPart.jsx`, `IntelligencePanels.jsx`, `chartTheme.js`, `AddProductionSchedule.jsx`, `useMachineLive`, `TimePicker.jsx`, `AddCustomer.jsx`, `package.json`, `toast`, `ControllerFormModal.jsx`, `healthSensors.js`, `App.jsx`, `VirtualScreen.jsx`, `OpsFloorMap.jsx`, `AddMachine.jsx`, `AuthProvider.jsx`, `OpsPanels.jsx`, `useTableSort`, `UserGuide.jsx`, `ModeReasonModal.jsx`, `ModelFormModal.jsx`, `AddBranch.jsx`, `SidebarProvider.jsx`, `pages.jsx`, `LicenceKeyGenerator.jsx`, `BreakFormModal.jsx`, `ModelList.jsx`, `Home.jsx`, `AccountCenterPage.jsx`, `BrandFormModal.jsx`, `Loader`, `ShiftFormModal.jsx`, `theme.js`, `getUsers`, `app.js`, `Topbar.jsx`, `react-bootstrap`?**
-  _High betweenness centrality (0.135) - this node is a cross-community bridge._
+- **Why does `ProtectedRoute()` connect `ProtectedRoute` to `machineFilter.js`, `Add / edit part`, `MachineDiagnostics.jsx`, `intelligenceSettings.js`, `Breaks`, `Tool List and Tool Life (machine tabs)`, `toast`, `ControllerFormModal.jsx`, `Customers / Users list`, `All machines`, `0002. React Router with one route table and role guards`, `VirtualScreen.jsx`, `Branches`, `Downtime / idle reasons`, `apiBaseUrl`, `Shifts`, `User guide`, `Add / edit branch`, `ModeReasonModal.jsx`, `ModelFormModal.jsx`, `States`, `LicenceKeyGenerator.jsx`, `Clientele`, `BrandFormModal.jsx`, `Loader`, `userLocationService.js`, `userLineService.js`, `Home (Dashboard)`, `Operations Center`, `Monitoring (machine list)`, `orgLevels.js`, `Customers / Users list`, `Holidays / week off`, `Production schedules`, `Machine health`, `Supervisors`, `Shops`, `react-bootstrap`?**
+  _High betweenness centrality (0.173) - this node is a cross-community bridge._
 - **Are the 23 inferred relationships involving `useAuth()` (e.g. with `State & storage` and `State & storage`) actually correct?**
   _`useAuth()` has 23 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
+- **What connects `ADR-0025`, `ADR-0025`, `ADR-0024` to the rest of the system?**
   _22 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `OperationsCenter.jsx` be split into smaller, more focused modules?**
   _Cohesion score 0.13847780126849896 - nodes in this community are weakly interconnected._
-- **Why does `ProtectedRoute()` connect `ProtectedRoute` to `machineFilter.js`, `Add / edit part`, `MachineDiagnostics.jsx`, `intelligenceSettings.js`, `Breaks`, `Tool List and Tool Life (machine tabs)`, `toast`, `ControllerFormModal.jsx`, `Customers / Users list`, `All machines`, `0002. React Router with one route table and role guards`, `VirtualScreen.jsx`, `Branches`, `Downtime / idle reasons`, `apiBaseUrl`, `Shifts`, `User guide`, `Add / edit branch`, `ModeReasonModal.jsx`, `ModelFormModal.jsx`, `States`, `LicenceKeyGenerator.jsx`, `Clientele`, `BrandFormModal.jsx`, `Loader`, `userLocationService.js`, `userLineService.js`, `Home (Dashboard)`, `Operations Center`, `Monitoring (machine list)`, `orgLevels.js`, `Customers / Users list`, `Holidays / week off`, `Production schedules`, `Machine health`, `Supervisors`, `Shops`, `react-bootstrap`?**
-  _High betweenness centrality (0.105) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `OperationsCenter.jsx`, `BarLineChart.jsx`, `Productivity.jsx`, `modeTypeOf`, `dateTime.js`, `MachineDiagnostics.jsx`, `AddPart.jsx`, `IntelligencePanels.jsx`, `chartTheme.js`, `AddProductionSchedule.jsx`, `useMachineLive`, `TimePicker.jsx`, `AddCustomer.jsx`, `package.json`, `toast`, `ControllerFormModal.jsx`, `healthSensors.js`, `App.jsx`, `VirtualScreen.jsx`, `OpsFloorMap.jsx`, `AddMachine.jsx`, `AuthProvider.jsx`, `OpsPanels.jsx`, `useTableSort`, `UserGuide.jsx`, `ModeReasonModal.jsx`, `ModelFormModal.jsx`, `AddBranch.jsx`, `SidebarProvider.jsx`, `pages.jsx`, `LicenceKeyGenerator.jsx`, `BreakFormModal.jsx`, `ModelList.jsx`, `Home.jsx`, `AccountCenterPage.jsx`, `BrandFormModal.jsx`, `Loader`, `ShiftFormModal.jsx`, `theme.js`, `getUsers`, `app.js`, `Topbar.jsx`, `react-bootstrap`?**
+  _High betweenness centrality (0.117) - this node is a cross-community bridge._
 - **Should `machineFilter.js` be split into smaller, more focused modules?**
   _Cohesion score 0.12333333333333334 - nodes in this community are weakly interconnected._
 

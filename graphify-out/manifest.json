@@ -258,9 +258,9 @@
     "semantic_hash": "184a7bddd6c0f0b98f8e548899a392c7"
   },
   "src/hooks/useMediaQuery.js": {
-    "mtime": 1794813949.9276633,
-    "seen": 1794823371.446087,
-    "ast_hash": "ef0440ab4246949d8f504a9af7dc0c26",
+    "mtime": 1794823985.099084,
+    "seen": 1794824338.880737,
+    "ast_hash": "d92d7ccbac10f9a420fd26e8905aa1ca",
     "semantic_hash": ""
   },
   "src/hooks/useOrgUser.js": {
