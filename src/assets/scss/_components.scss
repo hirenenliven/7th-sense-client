@@ -1954,6 +1954,15 @@ fieldset:disabled .btn {
 
 .ts-alert-modal-action { min-height: $ts-alert-modal-action-height; }
 
+// A form card beside its list (e.g. Account Center › Operator Task): from lg it stays in view
+// below the top bar while the list scrolls. <Card className="ts-side-form">
+.ts-side-form {
+  @include media-breakpoint-up(lg) {
+    position: sticky;
+    top: $ts-appbar-height + $ts-space-4;
+  }
+}
+
 // A <Form> wrapping header, body and footer of a `scrollable` Modal sits between .modal-content
 // and .modal-body: pass the flex column through so the body scrolls between a fixed header and
 // footer. <Modal scrollable><Form className="ts-modal-form">…

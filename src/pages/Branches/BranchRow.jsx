@@ -19,19 +19,6 @@ function BranchRow({ branch, canManage, statusBusy, onToggleStatus, onEdit, onDe
       <td className="text-body-secondary">{customerLabel(branch.customerId)}</td>
       <td className="text-body-secondary">{branch.email || '—'}</td>
       <td className="text-body-secondary">{branch.cityName || '—'}</td>
-      <td className="text-nowrap text-body-secondary">
-        {branch.colorCode ? (
-          <span className="d-inline-flex align-items-center gap-2">
-            {/* SVG fill keeps the per-branch colour out of inline styles */}
-            <svg className="ts-swatch" viewBox="0 0 10 10" aria-hidden="true">
-              <circle cx="5" cy="5" r="5" fill={branch.colorCode} />
-            </svg>
-            <span className="font-tabular">{branch.colorCode}</span>
-          </span>
-        ) : (
-          '—'
-        )}
-      </td>
       <td>
         <Form.Check
           type="switch"
@@ -62,7 +49,6 @@ BranchRow.propTypes = {
     email: PropTypes.string,
     customerId: PropTypes.number,
     cityName: PropTypes.string,
-    colorCode: PropTypes.string,
     status: PropTypes.string,
   }).isRequired,
   canManage: PropTypes.bool.isRequired,

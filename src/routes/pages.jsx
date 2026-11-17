@@ -26,10 +26,13 @@ const BreakSetup = lazy(() => import('@/pages/Breaks/BreakSetup'))
 const HolidaySetup = lazy(() => import('@/pages/Holidays/HolidaySetup'))
 const ReasonList = lazy(() => import('@/pages/Reasons/ReasonList'))
 const LicenceKeySetup = lazy(() => import('@/pages/LicenceKeys/LicenceKeySetup'))
+const OperatorTaskSetup = lazy(() => import('@/pages/OperatorTasks/OperatorTaskSetup'))
+const TaskList = lazy(() => import('@/pages/OperatorTasks/TaskList'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ProductionScheduleList = lazy(() => import('@/pages/ProductionSchedules/ProductionScheduleList'))
 const AddProductionSchedule = lazy(() => import('@/pages/ProductionSchedules/AddProductionSchedule'))
+const OperatorSchedule = lazy(() => import('@/pages/ProductionSchedules/OperatorSchedule'))
 const BrandList = lazy(() => import('@/pages/Brands/BrandList'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
@@ -94,6 +97,7 @@ export const PAGES = [
   { path: ROUTES.PRODUCTION_SCHEDULE, element: <ProductionScheduleList /> },
   { path: ROUTES.PRODUCTION_SCHEDULE_ADD, element: <AddProductionSchedule />, roles: MANAGERS },
   { path: ROUTES.PRODUCTION_SCHEDULE_EDIT, element: <AddProductionSchedule />, roles: MANAGERS },
+  { path: ROUTES.PRODUCTION_OPERATOR_SCHEDULE, element: <OperatorSchedule /> },
   // Shift › Add / Manage Shift, Breaks, Holiday / Week Off: everyone reads their company's;
   // managers add, edit and delete (the pages hide the form)
   { path: ROUTES.SHIFTS, element: <ShiftSetup /> },
@@ -105,6 +109,8 @@ export const PAGES = [
   { path: ROUTES.IDLE_REASONS, element: <ReasonList key={REASON_KIND.IDLE} kind={REASON_KIND.IDLE} /> },
   // Licence keys: the superadmin generates, edits and deletes; customers and admins read their company's
   { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.OPERATOR_TASKS, element: <AccountCenterPage><OperatorTaskSetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MAINTENANCE_TASKS, element: <AccountCenterPage><TaskList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.BRANDS, element: <AccountCenterPage><BrandList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CONTROLLERS, element: <AccountCenterPage><ControllerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <AccountCenterPage><ModelList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },

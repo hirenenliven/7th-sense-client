@@ -19,3 +19,10 @@ export const updateProductionSchedule = async (id, schedule) => unwrap(await api
 export const deleteProductionSchedule = async (id) => {
   await apiClient.delete(`${PATH}/${id}`)
 }
+
+// Every job of the schedules the user may read, one row per job (Operator Wise Production Schedule):
+// { itemId, scheduleId, userId, customerName, scheduleDate, operatorId, operatorName, shiftId, shiftName,
+// jobId, quantity, machineId, machineName, modelName, startTime, endTime, partId, partNo, partName,
+// processName, programName }. Filters (all optional): userId (customer, superadmin), machineId, partId,
+// operatorId, shiftId, date (YYYY-MM-DD).
+export const getOperatorJobs = async (filters = {}) => unwrapList(await sharedGet(withQuery(`${PATH}/operator-jobs`, filters)))

@@ -72,7 +72,6 @@ function BranchList() {
     { label: 'Customer', sort: (row) => customerLabel(row.customerId) },
     { label: 'Email', sort: (row) => row.email },
     { label: 'City', sort: (row) => row.cityName },
-    'Colour',
     { label: 'Status', sort: (row) => row.status },
     ...(canManage ? ['Actions'] : []),
   ]

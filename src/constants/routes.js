@@ -23,6 +23,8 @@ export const ROUTES = {
   PRODUCTION_SCHEDULE: '/production/schedule',
   PRODUCTION_SCHEDULE_ADD: '/production/schedule/add',
   PRODUCTION_SCHEDULE_EDIT: '/production/schedule/:id/edit',
+  // Every scheduled job as one row per operator / job (read only)
+  PRODUCTION_OPERATOR_SCHEDULE: '/production/operator-schedule',
   PRODUCTION_MONITOR: '/production/monitor',
   REPORT_OEE: '/reports/oee',
   REPORT_DOWNTIME: '/reports/downtime',
@@ -53,6 +55,10 @@ export const ROUTES = {
   IDLE_REASONS: '/masters/idle-reasons',
   // Licence keys: the superadmin generates them for a customer; managers read their company's
   LICENCE_KEYS: '/masters/licence-keys',
+  // Operator tasks: the checks an operator does per customer and machine model (superadmin)
+  OPERATOR_TASKS: '/masters/operator-tasks',
+  // The task list those operator tasks pick from (Account Center › Operator Task › Task List)
+  MAINTENANCE_TASKS: '/masters/maintenance-tasks',
   // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)
   USERS: '/masters/users',
   USER_ADD: '/masters/users/add',

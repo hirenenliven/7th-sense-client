@@ -225,6 +225,7 @@ export const SCREENS = [
       { key: 'all-machines', title: 'All Machines', path: ROUTES.MACHINES, who: 'managers', text: 'Machine set-up as a table or cards: add and edit (customer, admin), delete (account team). Live data is under Monitoring.' },
       { key: 'monitoring', title: 'Monitoring', path: ROUTES.MONITORING, who: 'everyone', text: 'Machine list with the current mode of each machine; open one for its Productivity, Machine Health, Tool List, Tool Life and Virtual Screen tabs, with a back arrow to the list.' },
       { key: 'schedule', title: 'Production › Schedule', path: ROUTES.PRODUCTION_SCHEDULE, who: 'managers', text: 'Production plans per machine and day; open one to edit its jobs.' },
+      { key: 'operator-schedule', title: 'Production › Operator Wise', path: ROUTES.PRODUCTION_OPERATOR_SCHEDULE, who: 'everyone', text: 'Every scheduled job as one row: operator, shift, job, quantity, machine, time, part and program. Filter by machine, part, operator, shift and date.' },
     ],
   },
   {
@@ -241,7 +242,7 @@ export const SCREENS = [
   {
     area: 'System',
     items: [
-      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'team', text: 'Customer list (the main customer accounts), Licence Key and Machine Catalog. A customer’s or user’s View has Sessions: log out one of their devices or all of them.' },
+      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'team', text: 'Customer list (the main customer accounts), Licence Key, Operator Task (the checks an operator does per customer and machine type, and the Task List they pick from) and Machine Catalog. A customer’s or user’s View has Sessions: log out one of their devices or all of them.' },
       { key: 'my-sessions', title: 'My Sessions', path: ROUTES.MY_SESSIONS, who: 'everyone', text: 'The devices where your account is signed in: log out one of them, or all but this one.' },
       { key: 'user-guide', title: 'User Guide', path: ROUTES.USER_GUIDE, who: 'everyone', text: 'This page.' },
     ],

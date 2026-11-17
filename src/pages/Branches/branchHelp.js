@@ -15,10 +15,4 @@ export const FIELD_HELP = {
     title: 'City',
     content: 'City the branch is in, picked from the customer’s cities (Masters › City). Leave blank if it has none.',
   },
-  colorCode: {
-    title: 'Colour',
-    content: 'Colour used to tell this branch apart in lists and charts.',
-    example: '#F58220',
-    rules: ['# followed by 6 hex digits', 'Pick one with the swatch or type it'],
-  },
 }

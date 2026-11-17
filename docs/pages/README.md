@@ -35,6 +35,7 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 | Add / edit machine | `/machines/add` · `/machines/:id/edit` | Yes | managers | [machine-form.md](machine-form.md) |
 | Production schedules | `/production/schedule` | Yes | every logged-in role | [production-schedule-list.md](production-schedule-list.md) |
 | Add / edit production schedule | `/production/schedule/add` · `/production/schedule/:id/edit` | Yes | managers | [production-schedule-form.md](production-schedule-form.md) |
+| Operator wise production schedule | `/production/operator-schedule` | Yes | every logged-in role | [operator-schedule.md](operator-schedule.md) |
 
 ## Operations › Monitoring
 
@@ -106,6 +107,8 @@ One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPag
 | Add / edit customer | `/masters/customers/add` · `/masters/customers/:id/edit` | Yes | superadmin | [customer-user-form.md](customer-user-form.md) |
 | Customer detail | `/masters/customers/:id` | Yes | superadmin | [customer-user-detail.md](customer-user-detail.md) |
 | Licence keys (tab) | `/masters/licence-keys` | Yes | superadmin | [licence-keys.md](licence-keys.md) |
+| Operator tasks (Operator Task tab) | `/masters/operator-tasks` | Yes | superadmin | [operator-tasks.md](operator-tasks.md) |
+| Task list (Operator Task tab) | `/masters/maintenance-tasks` | Yes | superadmin | [task-list.md](task-list.md) |
 | Brands (Machine Catalog tab) | `/masters/brands` | Yes | superadmin | [brands.md](brands.md) |
 | Controllers (Machine Catalog tab) | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
 | Machine models (Machine Catalog tab) | `/masters/models` | Yes | superadmin | [models.md](models.md) |

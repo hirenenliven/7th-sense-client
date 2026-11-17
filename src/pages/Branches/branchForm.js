@@ -2,9 +2,6 @@ import { BRANCH_STATUS } from '@/constants/app'
 import { PATTERNS } from '@/utils/validators'
 import { z } from 'zod'
 
-// Native <input type="color"> cannot be blank; shown in the picker until a colour is chosen
-export const COLOR_PICKER_FALLBACK = '#000000'
-
 export const INITIAL_VALUES = {
   code: '',
   name: '',
@@ -14,7 +11,6 @@ export const INITIAL_VALUES = {
   userCityId: '',
   gstNumber: '',
   panNumber: '',
-  colorCode: '',
   status: BRANCH_STATUS.ACTIVE,
 }
 
@@ -35,7 +31,6 @@ export const branchSchema = z.object({
   userCityId: z.string().optional(),
   gstNumber: optional(PATTERNS.gstin, 'Enter a valid 15-character GSTIN'),
   panNumber: optional(PATTERNS.pan, 'Enter a valid PAN, e.g. ABCDE1234F'),
-  colorCode: optional(PATTERNS.hexColor, 'Enter a colour such as #F58220'),
   status: z.enum([BRANCH_STATUS.ACTIVE, BRANCH_STATUS.INACTIVE], { message: 'Status is required' }),
 })
 
@@ -58,7 +53,6 @@ export const toBranchPayload = (values, existing = null) => ({
   customerId: toId(values.customerId),
   gstNumber: trim(values.gstNumber),
   panNumber: trim(values.panNumber),
-  colorCode: trim(values.colorCode),
   status: values.status,
 })
 
@@ -73,6 +67,5 @@ export const toFormValues = (branch) => ({
   userCityId: branch.userCityId ? String(branch.userCityId) : '',
   gstNumber: branch.gstNumber ?? '',
   panNumber: branch.panNumber ?? '',
-  colorCode: branch.colorCode ?? '',
   status: branch.status || BRANCH_STATUS.ACTIVE,
 })

@@ -146,11 +146,19 @@ Workflow**
 
 - List: superadmin sees every customer's (Customer column + filter), edits customer / duration / status in `LicenceKeyFormModal` (the key never changes) and deletes; customers and admins don't see the tab (the API still lets them read their company's). Keys look like `K7M2Q-XR9TB-4HWZP-N8CDF` (server-generated, `font-monospace`; Duration / Expires On columns, Expired filter).
 
+## Operator tasks
+
+- Account Center › Operator Task (`pages/OperatorTasks/`, `services/operatorTaskService.js`, tab and pages `roles: SUPERADMIN_ONLY`, server ADR 0015 / 0016) has two `subTabs`: **Operator Tasks** and **Task List**. Operator Tasks: `OperatorTaskEditor` (React Hook Form + Zod, `operatorTaskForm.js`; not named `OperatorTaskForm`, which clashes with `operatorTaskForm.js` on Windows) beside the list (`Row`: form `lg={5} xl={4} xxl={3}`, `.ts-side-form` sticky from lg; Edit loads a row into the form). Fields: Customer (required), Machine Type = a catalog model grouped by "Brand · Controller" (optional, blank = All machines), Task (required) from `GET /maintenance-tasks`; **New task** adds one to the shared list (`POST /maintenance-tasks`, an existing description is picked instead, `findTask`). After an add the form keeps customer + machine type. The server refuses the same task twice for a customer and machine type. The Task dropdown offers active tasks only (an edited row keeps its inactive one).
+
+- Task List (`TaskList.jsx` + `TaskListEditor.jsx`, `taskListForm.js`, `/masters/maintenance-tasks`): the shared task list, same form-beside-list layout — add, edit (description, Status on edit), delete. `Used By` = `usageCount`; a task in use cannot be deleted (server 400), so its Delete offers **Make inactive** instead.
+
 ## Production schedule
 
 - Production › Schedule (`pages/ProductionSchedules/`, `services/productionScheduleService.js`): list for everyone (their company's; superadmin all + Customer column), Add / Edit for `MANAGERS` (`PRODUCTION_SCHEDULE_ADD|EDIT`). Same customer pattern as parts: the superadmin picks the customer, others save to their own company; changing the customer clears the machine and every job pick, changing the machine clears the processes.
 
 - Schedule Type: Single Day (one `startDate`; jobs use it) or Multiple Day (`startDate`–`endDate`, each job picks its `scheduleDate`). Jobs are a `useFieldArray` (`items`, `itemId` = saved id): Job ID, Supervisor / Operator (`GET /users?filterRole=supervisor|operator`), Shift, Part, Qty., Part Process (the part's processes whose `machineIds` include the machine, loaded with `getPartById`), Start / End Time (TimePicker, inside the shift). The server refuses jobs outside their shift, overlapping jobs and a machine already scheduled that day.
+
+- Production › Operator Wise (`pages/ProductionSchedules/OperatorSchedule.jsx`, every role, read only): every job as one row from `GET /production-schedules/operator-jobs` (`getOperatorJobs`, filters `userId` (superadmin) / `machineId` / `partId` / `operatorId` / `shiftId` / `date`, applied on Search). The Machine / Part / Operator / Shift options come from the customer's unfiltered jobs (`operatorScheduleSettings.js` `filterOptions`), because `GET /users` is managers only. Rows keep the server's order (latest day, then as the jobs run).
 
 ## Productivity and machine health (live data)
 

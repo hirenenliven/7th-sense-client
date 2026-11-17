@@ -9,6 +9,17 @@ export const ACCOUNT_CENTER_TABS = [
   { key: 'customers', label: 'Customer', icon: 'bi-building', path: ROUTES.CUSTOMERS, roles: SUPERADMIN_ONLY },
   { key: 'licence-keys', label: 'Licence Key', icon: 'bi-key', path: ROUTES.LICENCE_KEYS, roles: SUPERADMIN_ONLY },
   {
+    key: 'operator-tasks',
+    label: 'Operator Task',
+    icon: 'bi-clipboard-check',
+    path: ROUTES.OPERATOR_TASKS,
+    roles: SUPERADMIN_ONLY,
+    subTabs: [
+      { key: 'operator-tasks', label: 'Operator Tasks', path: ROUTES.OPERATOR_TASKS },
+      { key: 'task-list', label: 'Task List', path: ROUTES.MAINTENANCE_TASKS },
+    ],
+  },
+  {
     key: 'catalog',
     label: 'Machine Catalog',
     icon: 'bi-motherboard',

@@ -64,7 +64,8 @@ export const NAV_SECTIONS = [
         icon: 'bi-gear-wide-connected',
         children: [
           { key: 'production-schedule', label: 'Schedule', path: ROUTES.PRODUCTION_SCHEDULE },
-          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS }
+          { key: 'production-schedule-add', label: 'Add Schedule', path: ROUTES.PRODUCTION_SCHEDULE_ADD, roles: MANAGERS },
+          { key: 'production-operator-schedule', label: 'Operator Wise', path: ROUTES.PRODUCTION_OPERATOR_SCHEDULE },
         ],
       },
       // The customer's clients (parts are made for a clientele): its own page, no submenu

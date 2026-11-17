@@ -10,7 +10,6 @@ export const PATTERNS = {
   postalCode: /^[A-Za-z0-9\s-]{3,10}$/,
   url: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/i,
   branchCode: /^[A-Z0-9]{2,20}$/, // same rule as the branches API
-  hexColor: /^#[0-9A-Fa-f]{6}$/,
   catalogCode: /^[A-Z0-9_-]{2,50}$/, // brands, categories, products (dto/catalog_dto.go)
   // Machines API (dto/machine_dto.go)
   ipv4: /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/,

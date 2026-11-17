@@ -198,15 +198,15 @@
     "semantic_hash": ""
   },
   "src/constants/navigation.js": {
-    "mtime": 1794891858.0312576,
-    "seen": 1794892176.432178,
-    "ast_hash": "ee75475f969b8ad5ea26af567b41262e",
+    "mtime": 1794899153.488551,
+    "seen": 1794899272.1285203,
+    "ast_hash": "94b751aa42c93e828f9a8c4645df212b",
     "semantic_hash": ""
   },
   "src/constants/routes.js": {
-    "mtime": 1794891858.0302503,
-    "seen": 1794892176.432182,
-    "ast_hash": "b5a7a6b99e6b5a5b5f9cb0f9084ff99d",
+    "mtime": 1794905888.365187,
+    "seen": 1794906036.4182842,
+    "ast_hash": "c5f6c2f0c56d44cb16a611aae1ca72ae",
     "semantic_hash": ""
   },
   "src/constants/shifts.js": {
@@ -300,33 +300,33 @@
     "semantic_hash": ""
   },
   "src/pages/Branches/AddBranch.jsx": {
-    "mtime": 1792563259.9256024,
-    "seen": 1792563274.2791784,
-    "ast_hash": "0225fac704dfecc3368853489be9274f",
-    "semantic_hash": "0225fac704dfecc3368853489be9274f"
+    "mtime": 1794899153.488551,
+    "seen": 1794899272.1285613,
+    "ast_hash": "aafec0d22d6d169bf478c4188cfbe8b0",
+    "semantic_hash": ""
   },
   "src/pages/Branches/BranchList.jsx": {
-    "mtime": 1793852058.7654622,
-    "seen": 1793852151.0353312,
-    "ast_hash": "dba3f1fd8738b3ed5b5f5529584d18e7",
+    "mtime": 1794899153.4900663,
+    "seen": 1794899272.1285627,
+    "ast_hash": "d0d001fd756031b0942ccafdad5e4ea4",
     "semantic_hash": ""
   },
   "src/pages/Branches/BranchRow.jsx": {
-    "mtime": 1792563259.9277794,
-    "seen": 1792563274.2791817,
-    "ast_hash": "c5463b9bb7c84482ecc989893d1051e6",
-    "semantic_hash": "c5463b9bb7c84482ecc989893d1051e6"
+    "mtime": 1794899153.4905455,
+    "seen": 1794899272.1285646,
+    "ast_hash": "a34ad1d541955d31c1ad1452fc27d11d",
+    "semantic_hash": ""
   },
   "src/pages/Branches/branchForm.js": {
-    "mtime": 1792563259.928289,
-    "seen": 1792563274.2791834,
-    "ast_hash": "d7387b5911414d89284ea588aebbb672",
-    "semantic_hash": "d7387b5911414d89284ea588aebbb672"
+    "mtime": 1794899153.4905455,
+    "seen": 1794899272.128566,
+    "ast_hash": "768dba450b35d0c8b347d88d08ccf954",
+    "semantic_hash": ""
   },
   "src/pages/Branches/branchHelp.js": {
-    "mtime": 1792563259.9298046,
-    "seen": 1792563274.2791848,
-    "ast_hash": "94dd2200c879bdfda8f5b109fc4cb868",
+    "mtime": 1794899153.4915519,
+    "seen": 1794899272.1285675,
+    "ast_hash": "75670bdbd0eac91187437d31d7134512",
     "semantic_hash": ""
   },
   "src/pages/Breaks/BreakFormModal.jsx": {
@@ -444,9 +444,9 @@
     "semantic_hash": ""
   },
   "src/pages/Customers/CustomerView.jsx": {
-    "mtime": 1794891858.0336404,
-    "seen": 1794892176.432278,
-    "ast_hash": "4a2cd6ac1ddb99450eec85fe9c15758a",
+    "mtime": 1794893864.924793,
+    "seen": 1794894406.350992,
+    "ast_hash": "7993acd81249abd90878a3b13aea1248",
     "semantic_hash": ""
   },
   "src/pages/Customers/accountPages.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "src/routes/pages.jsx": {
-    "mtime": 1794891858.0326264,
-    "seen": 1794892176.4325297,
-    "ast_hash": "12d3cfbeab8f7f1dfd8f55e65c29d572",
+    "mtime": 1794905875.5972822,
+    "seen": 1794906036.4186437,
+    "ast_hash": "3bfba50f38d9964ecbdfd7f489158424",
     "semantic_hash": ""
   },
   "src/services/apiClient.js": {
@@ -918,9 +918,9 @@
     "semantic_hash": ""
   },
   "src/services/productionScheduleService.js": {
-    "mtime": 1793941764.5102699,
-    "seen": 1793941947.6287262,
-    "ast_hash": "334a70a0927376282f93242905b50075",
+    "mtime": 1794899036.8358822,
+    "seen": 1794899272.1288822,
+    "ast_hash": "993162b2fe09f7a3026f058d53d0ce4f",
     "semantic_hash": ""
   },
   "src/services/roleService.js": {
@@ -1026,15 +1026,15 @@
     "semantic_hash": ""
   },
   "src/utils/validators.js": {
-    "mtime": 1793941931.1747487,
-    "seen": 1793941947.628761,
-    "ast_hash": "684c51b9b9601a106dfa59d8999e7fed",
+    "mtime": 1794899153.4930663,
+    "seen": 1794899272.1289225,
+    "ast_hash": "491ab1c03f129b62c5a7c5452beb595f",
     "semantic_hash": ""
   },
   "vite.config.js": {
-    "mtime": 1793862140.9242716,
-    "seen": 1793862834.8263,
-    "ast_hash": "754bc7a357b20c651ebea8d5ba1cd85b",
+    "mtime": 1794901166.445044,
+    "seen": 1794906036.41872,
+    "ast_hash": "e9f9cf9a8ac5d004b8608f28009706a4",
     "semantic_hash": ""
   },
   "7th-sense-frontend-skills.md": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1794892139.3670044,
-    "seen": 1794892176.4326198,
-    "ast_hash": "dbcc37f2beffe685881284d0a9098302",
+    "mtime": 1794905980.7891273,
+    "seen": 1794906036.4187257,
+    "ast_hash": "43d6b6b9fb7f54bd49aed910ac214da9",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1380,9 +1380,9 @@
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1794892114.5399885,
-    "seen": 1794892176.4326885,
-    "ast_hash": "ecc8dc7d80852db8d2d8f2532e3eba01",
+    "mtime": 1794905980.7886145,
+    "seen": 1794906036.4187825,
+    "ast_hash": "8444104d0be6449d3dd2f3aea462127b",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1476,9 +1476,9 @@
     "semantic_hash": ""
   },
   "docs/pages/login.md": {
-    "mtime": 1794892010.398857,
-    "seen": 1794892176.432725,
-    "ast_hash": "87162d51b14821b168cd82a199edccc7",
+    "mtime": 1794893537.3956356,
+    "seen": 1794894406.3516243,
+    "ast_hash": "5d0a88055c1d1043a73c68301d4c8de3",
     "semantic_hash": ""
   },
   "docs/pages/machine-form.md": {
@@ -1722,15 +1722,15 @@
     "semantic_hash": ""
   },
   "src/constants/accountCenter.js": {
-    "mtime": 1794891858.0312576,
-    "seen": 1794892176.432161,
-    "ast_hash": "12685d304db9a4e1cc21175e4ea60e63",
+    "mtime": 1794905875.596778,
+    "seen": 1794906036.4182622,
+    "ast_hash": "8c273ad891d7e0857d4a6d4355d42765",
     "semantic_hash": ""
   },
   "src/pages/AccountCenter/AccountCenterPage.jsx": {
-    "mtime": 1793788936.1761875,
-    "seen": 1793788966.0643437,
-    "ast_hash": "f711e257476da879f2788bfe7250447e",
+    "mtime": 1794905875.5987859,
+    "seen": 1794906036.4183328,
+    "ast_hash": "82010194d889bb4d2c127c73c5f44300",
     "semantic_hash": ""
   },
   "docs/adr/0014-account-center.md": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "src/pages/UserGuide/userGuideContent.js": {
-    "mtime": 1794891899.0824645,
-    "seen": 1794892176.432524,
-    "ast_hash": "834bbc1128154a4ca929d586b1971887",
+    "mtime": 1794905875.5987859,
+    "seen": 1794906036.4186387,
+    "ast_hash": "58dd9ad716a900afdb978ccc380a3662",
     "semantic_hash": ""
   },
   "docs/adr/0015-clientele-masters-page.md": {
@@ -2130,15 +2130,15 @@
     "semantic_hash": ""
   },
   "src/constants/session.js": {
-    "mtime": 1794891729.270041,
-    "seen": 1794892176.4321842,
-    "ast_hash": "0c66499731bbf2e99eefea15007cd21f",
+    "mtime": 1794893197.1497686,
+    "seen": 1794894406.350894,
+    "ast_hash": "722020c879ab6d16391f4ea1ae15a41a",
     "semantic_hash": ""
   },
   "src/pages/Login/SessionConflictModal.jsx": {
-    "mtime": 1794891763.442096,
-    "seen": 1794892176.4323273,
-    "ast_hash": "ac4e33616394bef6dfae24f79bd5e01f",
+    "mtime": 1794893509.575519,
+    "seen": 1794894406.351043,
+    "ast_hash": "b84e3a0b4c59ed7f1caed5fe245d6d0f",
     "semantic_hash": ""
   },
   "src/pages/Sessions/MySessions.jsx": {
@@ -2181,6 +2181,102 @@
     "mtime": 1794892083.5718572,
     "seen": 1794892176.4327822,
     "ast_hash": "b223ac8a21da3dfc34a3e54789a5502f",
+    "semantic_hash": ""
+  },
+  "src/pages/ProductionSchedules/OperatorJobRow.jsx": {
+    "mtime": 1794898990.6670487,
+    "seen": 1794899272.1287785,
+    "ast_hash": "4fa9a7bc1f58d27fa5f200860f2f7c71",
+    "semantic_hash": ""
+  },
+  "src/pages/ProductionSchedules/OperatorSchedule.jsx": {
+    "mtime": 1794899153.4940765,
+    "seen": 1794899272.1287804,
+    "ast_hash": "a7a68d6d34142ba575f54a4f748b5347",
+    "semantic_hash": ""
+  },
+  "src/pages/ProductionSchedules/operatorScheduleSettings.js": {
+    "mtime": 1794898990.5956182,
+    "seen": 1794899272.1287875,
+    "ast_hash": "8e34f53b31c8fd162a1e4429e51d4090",
+    "semantic_hash": ""
+  },
+  "docs/pages/operator-schedule.md": {
+    "mtime": 1794899240.046539,
+    "seen": 1794899272.1290338,
+    "ast_hash": "84bd34f349928e400853867936a9fb0e",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/OperatorTaskRow.jsx": {
+    "mtime": 1794900296.0803106,
+    "seen": 1794900496.3764637,
+    "ast_hash": "e69f3033ae5d717cae6e50686f71f720",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/OperatorTaskSetup.jsx": {
+    "mtime": 1794905791.5480917,
+    "seen": 1794906036.4185143,
+    "ast_hash": "037436beea96d47f869240c14c269010",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/operatorTaskForm.js": {
+    "mtime": 1794905798.0537665,
+    "seen": 1794906036.4185202,
+    "ast_hash": "dfa90bf9239b8a7d60dca386b49cb344",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/operatorTaskHelp.js": {
+    "mtime": 1794905860.4352465,
+    "seen": 1794906036.418522,
+    "ast_hash": "c83afd421f86ca3eb69d0a1a289c0dd0",
+    "semantic_hash": ""
+  },
+  "src/services/operatorTaskService.js": {
+    "mtime": 1794905798.1057267,
+    "seen": 1794906036.4186757,
+    "ast_hash": "00673fe7a549642765b02d3a22eb1c0e",
+    "semantic_hash": ""
+  },
+  "docs/pages/operator-tasks.md": {
+    "mtime": 1794905980.7870734,
+    "seen": 1794906036.4188335,
+    "ast_hash": "aba1548260bd80df7044655672d787ba",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/OperatorTaskEditor.jsx": {
+    "mtime": 1794905791.546586,
+    "seen": 1794906036.4185097,
+    "ast_hash": "b2323e3e257ecc275255f37f4a483fbc",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/TaskList.jsx": {
+    "mtime": 1794905860.934857,
+    "seen": 1794906036.4185157,
+    "ast_hash": "671017c8bc93fd637f7be698d4a3a405",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/TaskListEditor.jsx": {
+    "mtime": 1794905825.224915,
+    "seen": 1794906036.4185174,
+    "ast_hash": "a92c6ef90da68c3519f8df99d34536e0",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/TaskListRow.jsx": {
+    "mtime": 1794905825.4747157,
+    "seen": 1794906036.4185188,
+    "ast_hash": "977f5233110166f128b81adfa1b4b2ee",
+    "semantic_hash": ""
+  },
+  "src/pages/OperatorTasks/taskListForm.js": {
+    "mtime": 1794905825.158148,
+    "seen": 1794906036.418523,
+    "ast_hash": "1c21abec66cfbda1b6e7775b81baea50",
+    "semantic_hash": ""
+  },
+  "docs/pages/task-list.md": {
+    "mtime": 1794905965.1698906,
+    "seen": 1794906036.4188614,
+    "ast_hash": "2bcde1be780e9ffc9e687c016b13e4aa",
     "semantic_hash": ""
   }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BRANCH_STATUS, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
@@ -9,14 +9,12 @@ import useAuth from '@/hooks/useAuth'
 import { createBranch, getBranchById, updateBranch } from '@/services/branchService'
 import { getUsers } from '@/services/customerService'
 import { getUserCities } from '@/services/userCityService'
-import { PATTERNS } from '@/utils/validators'
 import { toast } from '@/utils/toast'
 import FieldLabel from '@/components/common/FieldLabel'
 import Loader from '@/components/common/Loader'
 import StatusToggle from '@/components/common/StatusToggle'
 import { customerName } from '@/pages/Customers/customerFormat'
 import {
-  COLOR_PICKER_FALLBACK,
   INITIAL_VALUES,
   REQUIRED_FIELDS,
   UPPERCASE_FIELDS,
@@ -62,7 +60,6 @@ function AddBranch() {
   const [branchLoading, setBranchLoading] = useState(isEdit)
   const [branchError, setBranchError] = useState('')
 
-  const colorCode = watch('colorCode')
   const customerId = watch('customerId')
 
   // Load customer options
@@ -228,21 +225,6 @@ function AddBranch() {
                   <Form.Control.Feedback type="invalid">{errors.customerId?.message}</Form.Control.Feedback>
                 </Form.Group>
               )}
-
-              <Form.Group as={Col} md={6} xxl={4} controlId="colorCode">
-                <FieldLabel help={FIELD_HELP.colorCode}>Colour</FieldLabel>
-                <InputGroup hasValidation>
-                  <Form.Control
-                    type="color"
-                    className="form-control-color"
-                    value={PATTERNS.hexColor.test(colorCode) ? colorCode : COLOR_PICKER_FALLBACK}
-                    onChange={(event) => setValue('colorCode', event.target.value.toUpperCase(), { shouldValidate: true })}
-                    aria-label="Pick colour"
-                  />
-                  <Form.Control {...register('colorCode', { onChange: handleChange })} autoComplete="off" maxLength={7} placeholder="#F58220" isInvalid={Boolean(errors.colorCode)} />
-                  <Form.Control.Feedback type="invalid">{errors.colorCode?.message}</Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
 
               <Form.Group as={Col} md={6} xxl={4}>
                 <Form.Label className={labelClass('status')}>Status</Form.Label>

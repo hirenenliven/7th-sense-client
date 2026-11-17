@@ -20,7 +20,8 @@ function AccountCenterPage({ children }) {
 
   if (!children) return <Navigate to={tabs[0].path} replace />
 
-  const subTabs = tabs.find((tab) => isTabActive(tab, pathname))?.subTabs
+  const activeTab = tabs.find((tab) => isTabActive(tab, pathname))
+  const subTabs = activeTab?.subTabs
 
   return (
     <>
@@ -44,7 +45,7 @@ function AccountCenterPage({ children }) {
       </Nav>
 
       {subTabs && (
-        <Nav variant="tabs" className="mb-4" as="nav" aria-label="Machine catalog">
+        <Nav variant="tabs" className="mb-4" as="nav" aria-label={activeTab.label}>
           {subTabs.map((screen) => (
             <Nav.Item key={screen.key}>
               <Nav.Link as={Link} to={screen.path} active={isPathActive(screen.path, pathname)}>
