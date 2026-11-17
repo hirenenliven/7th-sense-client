@@ -23,7 +23,7 @@ export const unwrapList = (response) => unwrap(response) ?? []
 
 const GENERIC_ERROR = 'Something went wrong'
 
-// 401 = no valid session (expired, logged out elsewhere, user deactivated).
+// 401 = no valid session (expired, revoked, logged out elsewhere, user deactivated).
 // AuthProvider subscribes and sends the user back to the login screen.
 const unauthorizedListeners = new Set()
 
@@ -32,19 +32,24 @@ export const onUnauthorized = (listener) => {
   return () => unauthorizedListeners.delete(listener)
 }
 
-// Also called by the live socket when the server ends its session (services/liveSocket.js)
-export const notifyUnauthorized = () => unauthorizedListeners.forEach((listener) => listener())
+// Why the session ended: `code` is the server message code (session_revoked / session_expired,
+// constants/session.js; anything else = signed out) and `reason` the revoke reason. Also called
+// by the live socket when the server ends its session (services/liveSocket.js).
+export const notifyUnauthorized = ({ code = '', reason = '' } = {}) =>
+  unauthorizedListeners.forEach((listener) => listener({ code, reason }))
 
-// Normalize error responses: { message, statusCode }. 400 / 404 messages are written for
-// end users and shown as is; server errors (5xx) get a generic message.
+// Normalize error responses: { message, statusCode, data }. 400 / 404 messages are written for
+// end users and shown as is; server errors (5xx) get a generic message. `data` is kept for the
+// errors that carry some (409 session_conflict lists the sessions in the way).
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const statusCode = error.response?.data?.statusCode ?? error.response?.status
     const message =
       statusCode >= 500 ? GENERIC_ERROR : error.response?.data?.message || error.message || GENERIC_ERROR
-    if (statusCode === 401) notifyUnauthorized()
-    return Promise.reject({ ...error, message, statusCode })
+    const data = error.response?.data?.data
+    if (statusCode === 401) notifyUnauthorized({ code: message, reason: data?.reason })
+    return Promise.reject({ ...error, message, statusCode, data })
   },
 )
 

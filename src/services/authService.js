@@ -6,8 +6,11 @@ import apiClient, { unwrap } from './apiClient'
 // ({ id, username, email, firstName, lastName, status, role }).
 const AUTH_PATH = '/auth'
 
-export const login = async ({ username, password, remember }) =>
-  unwrap(await apiClient.post(`${AUTH_PATH}/login`, { username, password, remember }))
+// A login over the session limit rejects with statusCode 409, message 'session_conflict' and
+// `data` = { mode, maxSessions, sessions } (constants/session.js). forceLogoutOthers logs the
+// sessions in the way out and logs in.
+export const login = async ({ username, password, remember, forceLogoutOthers = false }) =>
+  unwrap(await apiClient.post(`${AUTH_PATH}/login`, { username, password, remember, forceLogoutOthers }))
 
 // The logged-in user; rejects with statusCode 401 when there is no valid session.
 export const getSession = async () => unwrap(await apiClient.get(`${AUTH_PATH}/me`))

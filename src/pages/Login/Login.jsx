@@ -8,6 +8,7 @@ import Loader from '@/components/common/Loader'
 import env from '@/config/env'
 import { STORAGE_KEYS, THEME } from '@/constants/app'
 import { ROUTES } from '@/constants/routes'
+import { SESSION_CODES } from '@/constants/session'
 import useAuth from '@/hooks/useAuth'
 import { readStorage, writeStorage } from '@/utils/storage'
 import { forceTheme } from '@/utils/theme'
@@ -15,6 +16,7 @@ import { toast } from '@/utils/toast'
 import LoginBackdrop from './LoginBackdrop'
 import LoginClock from './LoginClock'
 import { INITIAL_VALUES, loginSchema } from './loginForm'
+import SessionConflictModal from './SessionConflictModal'
 
 // Where to go after login: the protected page that sent the user here, else the dashboard
 const redirectTarget = (location) => {
@@ -28,6 +30,9 @@ function Login() {
   const location = useLocation()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  // A 409 session_conflict: the sessions in the way and the values to log in again with
+  const [conflict, setConflict] = useState(null)
+  const [forcing, setForcing] = useState(false)
 
   // The login screen is always dark, whatever theme the user chose; leaving it shows their theme
   // again. Layout effect: switches before paint, so a light user never sees a light login flash.
@@ -51,14 +56,37 @@ function Login() {
     defaultValues: { ...INITIAL_VALUES, username: rememberedUsername, remember: Boolean(rememberedUsername) },
   })
 
+  const finishLogin = async (values) => {
+    await login(values)
+    writeStorage(STORAGE_KEYS.REMEMBERED_USERNAME, values.remember ? values.username.trim() : '')
+    navigate(redirectTarget(location), { replace: true })
+  }
+
   const onSubmit = async (values) => {
     clearErrors('root.server')
     try {
-      await login(values)
-      writeStorage(STORAGE_KEYS.REMEMBERED_USERNAME, values.remember ? values.username.trim() : '')
-      navigate(redirectTarget(location), { replace: true })
+      await finishLogin(values)
     } catch (error) {
+      // Valid credentials but no session was created: ask before logging another device out
+      if (error.statusCode === 409 && error.message === SESSION_CODES.CONFLICT) {
+        setConflict({ ...error.data, values })
+        return
+      }
       setError('root.server', { message: error.message })
+    }
+  }
+
+  // "Log out other device and continue": the server checks the password again and revokes the
+  // sessions in the way in the same transaction as the new login
+  const forceLogin = async () => {
+    setForcing(true)
+    try {
+      await finishLogin({ ...conflict.values, forceLogoutOthers: true })
+    } catch (error) {
+      setConflict(null)
+      setError('root.server', { message: error.message })
+    } finally {
+      setForcing(false)
     }
   }
 
@@ -143,6 +171,8 @@ function Login() {
           </Form>
         </div>
       </main>
+
+      <SessionConflictModal conflict={conflict} busy={forcing} onContinue={forceLogin} onCancel={() => setConflict(null)} />
     </div>
   )
 }

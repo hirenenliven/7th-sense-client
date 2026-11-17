@@ -10,5 +10,7 @@ export const ACTION_ICONS = {
   remove: 'bi-x-lg',
   settings: 'bi-gear',
   loginAs: 'bi-box-arrow-in-right',
+  logout: 'bi-box-arrow-right',
+  sessions: 'bi-pc-display',
   status: 'bi-toggle-on',
 }

@@ -109,12 +109,14 @@ One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPag
 | Brands (Machine Catalog tab) | `/masters/brands` | Yes | superadmin | [brands.md](brands.md) |
 | Controllers (Machine Catalog tab) | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
 | Machine models (Machine Catalog tab) | `/masters/models` | Yes | superadmin | [models.md](models.md) |
+| User sessions | `/account-center/users/:id/sessions` | Yes | superadmin | [user-sessions.md](user-sessions.md) |
 
 ## System
 
 | Page | Route | Auth required | Roles | Flow doc |
 |---|---|---|---|---|
 | About | `/about` | Yes | every logged-in role | [about.md](about.md) |
+| My sessions | `/my-sessions` | Yes | every logged-in role | [my-sessions.md](my-sessions.md) |
 | Theme showcase | `/theme` | Yes | superadmin | [theme.md](theme.md) |
 | User guide | `/user-guide` | Yes | every logged-in role | [user-guide.md](user-guide.md) |
 

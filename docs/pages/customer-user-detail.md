@@ -2,7 +2,7 @@
 
 - **Route:** `/masters/customers/:id` · `/masters/users/:id` (kind `user`) · **Component:** [CustomerView.jsx](../../src/pages/Customers/CustomerView.jsx) · **Auth:** protected (customers: superadmin; users: superadmin, customer, admin — [ADR 0016](../adr/0016-account-center-superadmin-only.md)) · **Guard/Layout:** `ProtectedRoute` (session) + role guard · `MainLayout`
 - **Purpose:** Read-only view of one customer or user and what belongs to it. A user shows Role and Machines (ticked machines, or "All machines of India › Gujarat (N now, new ones included)" for a machine filter with all machines; the count is left out until the company's machines have loaded) and Organization (the levels of a filter without all machines); the Filters card is shown for customers only.
-- **Navigation:** Customer / user list → detail → Edit
+- **Navigation:** Customer / user list → detail → Edit; the superadmin also has **Sessions** → [user-sessions.md](user-sessions.md) (the account's login sessions)
 
 ## On page load
 

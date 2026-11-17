@@ -74,6 +74,9 @@ export const ROUTES = {
   // Account Center: opens the first tab the user may see (Customer, Licence Key, Machine Catalog
   // keep their own routes above, see constants/accountCenter.js)
   ACCOUNT_CENTER: '/account-center',
+  // Login sessions (server ADR 0014): the logged-in user's own, and one account's for the superadmin
+  MY_SESSIONS: '/my-sessions',
+  USER_SESSIONS: '/account-center/users/:id/sessions',
   THEME: '/theme',
   ABOUT: '/about',
   USER_GUIDE: '/user-guide',

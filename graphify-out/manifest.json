@@ -180,9 +180,9 @@
     "semantic_hash": "5e7ee8656f0289e5e6869de070b076d4"
   },
   "src/constants/icons.js": {
-    "mtime": 1793949694.1367242,
-    "seen": 1793954605.3006127,
-    "ast_hash": "f6945552673792a5a4bd9e5d7e81f89d",
+    "mtime": 1794891781.84365,
+    "seen": 1794892176.432168,
+    "ast_hash": "18063efedaea91914dad56a52f51dd38",
     "semantic_hash": ""
   },
   "src/constants/locations.js": {
@@ -198,15 +198,15 @@
     "semantic_hash": ""
   },
   "src/constants/navigation.js": {
-    "mtime": 1793949694.121559,
-    "seen": 1793954605.3006237,
-    "ast_hash": "c45a59dbe3b4c1063189e44e60d15c79",
+    "mtime": 1794891858.0312576,
+    "seen": 1794892176.432178,
+    "ast_hash": "ee75475f969b8ad5ea26af567b41262e",
     "semantic_hash": ""
   },
   "src/constants/routes.js": {
-    "mtime": 1793949694.0927656,
-    "seen": 1793954605.300628,
-    "ast_hash": "22f1504d8cb3aaf04c59428698914d82",
+    "mtime": 1794891858.0302503,
+    "seen": 1794892176.432182,
+    "ast_hash": "b5a7a6b99e6b5a5b5f9cb0f9084ff99d",
     "semantic_hash": ""
   },
   "src/constants/shifts.js": {
@@ -222,9 +222,9 @@
     "semantic_hash": "e5c47342384aa23b00ffefe6c4bd9fd5"
   },
   "src/context/AuthProvider.jsx": {
-    "mtime": 1793939934.6278589,
-    "seen": 1793941947.6284215,
-    "ast_hash": "7c658aefa19d0d4eb2b7024400ee1a91",
+    "mtime": 1794891740.4955947,
+    "seen": 1794892176.4321907,
+    "ast_hash": "b07a1e308d7ab4559fbe286c60d23dee",
     "semantic_hash": ""
   },
   "src/context/OrgUserContext.js": {
@@ -444,9 +444,9 @@
     "semantic_hash": ""
   },
   "src/pages/Customers/CustomerView.jsx": {
-    "mtime": 1793939935.3910768,
-    "seen": 1793941947.6285028,
-    "ast_hash": "d61b9b6551dfc5d8f06e1f2a9ed8ebef",
+    "mtime": 1794891858.0336404,
+    "seen": 1794892176.432278,
+    "ast_hash": "4a2cd6ac1ddb99450eec85fe9c15758a",
     "semantic_hash": ""
   },
   "src/pages/Customers/accountPages.js": {
@@ -558,9 +558,9 @@
     "semantic_hash": "89369e49393c767468b6da30f99f42df"
   },
   "src/pages/Login/Login.jsx": {
-    "mtime": 1793789067.3399203,
-    "seen": 1793793331.687444,
-    "ast_hash": "7fdd3cb6089a9d4a7ed90ac485f9718a",
+    "mtime": 1794891764.0786638,
+    "seen": 1794892176.4323215,
+    "ast_hash": "1325b0a803b4cde5c16be802e49a7412",
     "semantic_hash": ""
   },
   "src/pages/Login/LoginBackdrop.jsx": {
@@ -846,21 +846,21 @@
     "semantic_hash": ""
   },
   "src/routes/pages.jsx": {
-    "mtime": 1793949694.1179607,
-    "seen": 1793954605.3011365,
-    "ast_hash": "aabe67f350412836fd640dd92acf870e",
+    "mtime": 1794891858.0326264,
+    "seen": 1794892176.4325297,
+    "ast_hash": "12d3cfbeab8f7f1dfd8f55e65c29d572",
     "semantic_hash": ""
   },
   "src/services/apiClient.js": {
-    "mtime": 1793941851.3290362,
-    "seen": 1793941947.6287026,
-    "ast_hash": "d8160490095fcd4812cdedbc14b93f9d",
+    "mtime": 1794891729.1924539,
+    "seen": 1794892176.432531,
+    "ast_hash": "a6e92fcbf9ee5b770ea0382a74cca2fa",
     "semantic_hash": ""
   },
   "src/services/authService.js": {
-    "mtime": 1793941931.1635168,
-    "seen": 1793941947.628704,
-    "ast_hash": "362e25b591b4d7dd3283354958dc9d50",
+    "mtime": 1794891730.4290786,
+    "seen": 1794892176.432533,
+    "ast_hash": "e9bd0ffb166cc6268b654a61afe8ada7",
     "semantic_hash": ""
   },
   "src/services/branchService.js": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1794823359.226269,
-    "seen": 1794823371.4465206,
-    "ast_hash": "d78e262f11253f3da9d727a0c389aaf4",
+    "mtime": 1794892139.3670044,
+    "seen": 1794892176.4326198,
+    "ast_hash": "dbcc37f2beffe685881284d0a9098302",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1374,15 +1374,15 @@
     "semantic_hash": ""
   },
   "docs/adr/README.md": {
-    "mtime": 1794823332.9540892,
-    "seen": 1794823371.4465723,
-    "ast_hash": "dc5ff6195f3bd562699eb4ec181e5f96",
+    "mtime": 1794892114.5399885,
+    "seen": 1794892176.4326868,
+    "ast_hash": "1d3c0999aaf403555afac6de29a50a36",
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1793949888.0467057,
-    "seen": 1793954605.301297,
-    "ast_hash": "863b1ad4a8c5829f6dfe4522fa4c8b64",
+    "mtime": 1794892114.5399885,
+    "seen": 1794892176.4326885,
+    "ast_hash": "ecc8dc7d80852db8d2d8f2532e3eba01",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1392,9 +1392,9 @@
     "semantic_hash": ""
   },
   "docs/pages/app-shell.md": {
-    "mtime": 1793941995.5120978,
-    "seen": 1793942055.7602265,
-    "ast_hash": "a5a52049085f5789656878f16242ecdf",
+    "mtime": 1794892034.4293914,
+    "seen": 1794892176.4326932,
+    "ast_hash": "d5c2b3c164a79a9d5ebadb43242691cf",
     "semantic_hash": ""
   },
   "docs/pages/branch-form.md": {
@@ -1434,9 +1434,9 @@
     "semantic_hash": ""
   },
   "docs/pages/customer-user-detail.md": {
-    "mtime": 1793939935.7696154,
-    "seen": 1793941947.6288548,
-    "ast_hash": "6047367063963c2bbad12c04f506e1bb",
+    "mtime": 1794892114.5389445,
+    "seen": 1794892176.4327097,
+    "ast_hash": "50838723b3dfc1430015b6242eda5ffc",
     "semantic_hash": ""
   },
   "docs/pages/customer-user-form.md": {
@@ -1476,9 +1476,9 @@
     "semantic_hash": ""
   },
   "docs/pages/login.md": {
-    "mtime": 1793690719.826239,
-    "seen": 1793690936.9788368,
-    "ast_hash": "6f8aae0680946acfb018122f73ea0fd2",
+    "mtime": 1794892010.398857,
+    "seen": 1794892176.432725,
+    "ast_hash": "87162d51b14821b168cd82a199edccc7",
     "semantic_hash": ""
   },
   "docs/pages/machine-form.md": {
@@ -1722,9 +1722,9 @@
     "semantic_hash": ""
   },
   "src/constants/accountCenter.js": {
-    "mtime": 1793788936.1746871,
-    "seen": 1793788966.064294,
-    "ast_hash": "6aad7e45dd1eb390028aa8919f5bcef9",
+    "mtime": 1794891858.0312576,
+    "seen": 1794892176.432161,
+    "ast_hash": "12685d304db9a4e1cc21175e4ea60e63",
     "semantic_hash": ""
   },
   "src/pages/AccountCenter/AccountCenterPage.jsx": {
@@ -1740,9 +1740,9 @@
     "semantic_hash": ""
   },
   "src/pages/UserGuide/userGuideContent.js": {
-    "mtime": 1793795571.4291716,
-    "seen": 1793796001.9847841,
-    "ast_hash": "984c39e4f593dcddf92c837843334440",
+    "mtime": 1794891899.0824645,
+    "seen": 1794892176.432524,
+    "ast_hash": "834bbc1128154a4ca929d586b1971887",
     "semantic_hash": ""
   },
   "docs/adr/0015-clientele-masters-page.md": {
@@ -1938,9 +1938,9 @@
     "semantic_hash": ""
   },
   "src/services/liveSocket.js": {
-    "mtime": 1793949694.366853,
-    "seen": 1793954605.3011637,
-    "ast_hash": "749d82874be375c85a2e984e9ef67ca2",
+    "mtime": 1794891730.4980795,
+    "seen": 1794892176.4325545,
+    "ast_hash": "5689af5e062eb18d2817b56d9ba76ef9",
     "semantic_hash": ""
   },
   "docs/adr/0021-virtual-screen-socket.md": {
@@ -2070,9 +2070,9 @@
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/PlantIntelligence.jsx": {
-    "mtime": 1794823277.9997587,
-    "seen": 1794823371.4463503,
-    "ast_hash": "eb15b9f8165405458cf9ec9ecbc67c4e",
+    "mtime": 1794824961.1514,
+    "seen": 1794825044.6203659,
+    "ast_hash": "d290b2827e33f1757711cdac76907ce9",
     "semantic_hash": ""
   },
   "src/pages/PlantIntelligence/intelligenceSettings.js": {
@@ -2127,6 +2127,60 @@
     "mtime": 1794823332.700266,
     "seen": 1794823371.4465704,
     "ast_hash": "c90e3af68117ee71c0b2229dc5194d02",
+    "semantic_hash": ""
+  },
+  "src/constants/session.js": {
+    "mtime": 1794891729.270041,
+    "seen": 1794892176.4321842,
+    "ast_hash": "0c66499731bbf2e99eefea15007cd21f",
+    "semantic_hash": ""
+  },
+  "src/pages/Login/SessionConflictModal.jsx": {
+    "mtime": 1794891763.442096,
+    "seen": 1794892176.4323273,
+    "ast_hash": "ac4e33616394bef6dfae24f79bd5e01f",
+    "semantic_hash": ""
+  },
+  "src/pages/Sessions/MySessions.jsx": {
+    "mtime": 1794891816.3331163,
+    "seen": 1794892176.4325056,
+    "ast_hash": "97d66aa225a45b1f1ff511e28b4b708f",
+    "semantic_hash": ""
+  },
+  "src/pages/Sessions/SessionTable.jsx": {
+    "mtime": 1794891800.4562309,
+    "seen": 1794892176.4325078,
+    "ast_hash": "9a4cd088df565d04abfd75aac9ca8ba5",
+    "semantic_hash": ""
+  },
+  "src/pages/Sessions/UserSessions.jsx": {
+    "mtime": 1794891841.8981137,
+    "seen": 1794892176.4325092,
+    "ast_hash": "f9dc1fd25cec621a8223185a5707140b",
+    "semantic_hash": ""
+  },
+  "src/services/sessionService.js": {
+    "mtime": 1794891729.5356486,
+    "seen": 1794892176.4325728,
+    "ast_hash": "35f3efc44d25e439da7b493f1fdf2ad9",
+    "semantic_hash": ""
+  },
+  "docs/adr/0027-session-codes-and-conflict-modal.md": {
+    "mtime": 1794892127.9076283,
+    "seen": 1794892176.432685,
+    "ast_hash": "cfe14fae4b23402b622e1f4a3d202a7b",
+    "semantic_hash": ""
+  },
+  "docs/pages/my-sessions.md": {
+    "mtime": 1794892083.533155,
+    "seen": 1794892176.4327419,
+    "ast_hash": "69f2fc7217d62a3e53ad7bb02f7ad7c4",
+    "semantic_hash": ""
+  },
+  "docs/pages/user-sessions.md": {
+    "mtime": 1794892083.5718572,
+    "seen": 1794892176.4327822,
+    "ast_hash": "b223ac8a21da3dfc34a3e54789a5502f",
     "semantic_hash": ""
   }
 }

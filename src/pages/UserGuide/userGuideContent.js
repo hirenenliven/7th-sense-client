@@ -241,7 +241,8 @@ export const SCREENS = [
   {
     area: 'System',
     items: [
-      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'team', text: 'Customer list (the main customer accounts), Licence Key and Machine Catalog.' },
+      { key: 'account-center', title: 'Account Center', path: ROUTES.ACCOUNT_CENTER, who: 'team', text: 'Customer list (the main customer accounts), Licence Key and Machine Catalog. A customer’s or user’s View has Sessions: log out one of their devices or all of them.' },
+      { key: 'my-sessions', title: 'My Sessions', path: ROUTES.MY_SESSIONS, who: 'everyone', text: 'The devices where your account is signed in: log out one of them, or all but this one.' },
       { key: 'user-guide', title: 'User Guide', path: ROUTES.USER_GUIDE, who: 'everyone', text: 'This page.' },
     ],
   },

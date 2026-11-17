@@ -125,6 +125,8 @@ export const NAV_SECTIONS = [
       },
       // Developer reference of the design tokens and components: superadmin only
       { key: 'theme', label: 'Theme Showcase', icon: 'bi-palette', path: ROUTES.THEME, roles: SUPERADMIN_ONLY },
+      // The logged-in user's active sessions (every role)
+      // { key: 'my-sessions', label: 'My Sessions', icon: 'bi-pc-display', path: ROUTES.MY_SESSIONS },
       { key: 'user-guide', label: 'User Guide', icon: 'bi-book', path: ROUTES.USER_GUIDE },
     ],
   },

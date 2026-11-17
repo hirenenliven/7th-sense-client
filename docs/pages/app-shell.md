@@ -126,13 +126,51 @@ sequenceDiagram
 3. [auth_routes.go](../../../7th-sense-server/internal/routes/auth_routes.go) → `POST /v1/auth/logout` → AuthHandler.Logout
 4. [auth_handler.go](../../../7th-sense-server/internal/handler/auth_handler.go) → Logout(): reads the logged-in user; calls the service
 5. [auth_service.go](../../../7th-sense-server/internal/service/auth_service.go) → Logout(): Ends the session of token. An unknown or empty token is not an error.
-6. [auth_repository.go](../../../7th-sense-server/internal/repository/auth_repository.go) → DeleteSession(): reads / writes `auth_tokens`
-7. [live_handler.go](../../../7th-sense-server/internal/handler/live_handler.go) → DisconnectSession(): every live socket of this session (all its tabs) gets `session:expired` and is closed; the user's other sessions keep theirs
+6. [auth_repository.go](../../../7th-sense-server/internal/repository/auth_repository.go) → DeleteSession(): `auth_tokens` status → `logged_out`, soft-deleted
+7. [live_handler.go](../../../7th-sense-server/internal/handler/live_handler.go) → DisconnectSession(): every live socket of this session (all its tabs) gets `session:expired {reason: logged_out}` and is closed; the user's other sessions keep theirs
 8. [AuthProvider.jsx](../../src/context/AuthProvider.jsx) → `disconnectLive()` ([liveSocket.js](../../src/services/liveSocket.js)) when the user is dropped or changes, so a new login opens a new socket for the new session
+
+## Session ended
+
+The session can end without this browser asking: another login with "Log out other device and continue" ([login.md](login.md)), the user on another device ([my-sessions.md](my-sessions.md)), the superadmin ([user-sessions.md](user-sessions.md)), or its lifetime.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User
+  participant Page as any screen
+  participant apiClient
+  participant API as Go router (/api/v1)
+  participant Authenticate as middleware.Authenticate
+  participant AuthService
+  participant DB as PostgreSQL
+  participant AuthProvider
+  participant liveSocket
+  Page->>apiClient: any request
+  apiClient->>API: GET/POST … (ts_session cookie)
+  API->>Authenticate: Authenticate()
+  Authenticate->>AuthService: AuthenticateSession()
+  AuthService->>DB: auth_tokens status active? (no row)
+  AuthService->>DB: FindSessionState()
+  AuthService-->>Authenticate: SessionRevokedError / SessionExpired
+  Authenticate-->>apiClient: 401 session_revoked {reason} / session_expired
+  apiClient->>AuthProvider: notifyUnauthorized({code, reason})
+  Note over liveSocket,AuthProvider: the socket's session:expired {reason, revokeReason} calls the same
+  AuthProvider->>liveSocket: disconnectLive()
+  AuthProvider-->>User: toast (why) · user dropped → /login
+```
+
+**Steps**
+
+1. [middleware/auth.go](../../../7th-sense-server/internal/middleware/auth.go) → Authenticate(): a revoked session answers 401 `session_revoked` with `data.reason`; an expired one 401 `session_expired`; anything else "Please log in to continue"
+2. [auth_service.go](../../../7th-sense-server/internal/service/auth_service.go) → sessionEndedError(): reads the row's status only when the active lookup failed
+3. [apiClient.js](../../src/services/apiClient.js) → response interceptor: every 401 calls `notifyUnauthorized({ code: message, reason: data?.reason })`
+4. [liveSocket.js](../../src/services/liveSocket.js) → `session:expired`: same call with the socket's `reason` / `revokeReason` (the server closes the socket right after)
+5. [AuthProvider.jsx](../../src/context/AuthProvider.jsx) → onUnauthorized(): `disconnectLive()`, warning toast with [constants/session.js](../../src/constants/session.js) `sessionEndedMessage()` (e.g. "You were logged out because your account signed in on another device."), clears a "log in as" key, drops the user; the routes redirect to `/login`
 
 **Rules & edge cases**
 
-- Any 401 from the API (expired or missing session) fires `onUnauthorized` in [apiClient.js](../../src/services/apiClient.js); [AuthProvider.jsx](../../src/context/AuthProvider.jsx) drops the user and the routes redirect to `/login`. The live socket's `session:expired` does the same (`notifyUnauthorized`), and after a refused or server-closed socket the client checks `GET /auth/me` (live data: [ADR 0021](../adr/0021-virtual-screen-socket.md)).
+- Any 401 from the API fires `onUnauthorized`; the toast shows when a user was loaded, or always for `session_revoked` / `session_expired` (e.g. a reload of a tab whose session was revoked meanwhile). After a refused or server-closed socket the client checks `GET /auth/me` (live data: [ADR 0021](../adr/0021-virtual-screen-socket.md)).
 - In a "log in as customer" tab ([customer-user-list.md](customer-user-list.md#view-customer-log-in-as)) every call goes to `/api/as/<key>/v1` ([loginAs.js](../../src/utils/loginAs.js)); logout ends only that tab's session, drops its key and shows the login screen. The superadmin's session is untouched.
 - [ProtectedRoute.jsx](../../src/routes/ProtectedRoute.jsx) renders `Forbidden` when the user's role is not in the route's `roles`.
 - The theme is read from the user (`GET /me`) after login and saved with `PUT /me/theme` when changed ([theme.js](../../src/utils/theme.js)); saves are queued so the last choice wins.
@@ -162,4 +200,4 @@ sequenceDiagram
 
 ## Decisions
 
-- [Client ADR index](../adr/README.md)
+- [Client ADR index](../adr/README.md) · session codes: [ADR 0027](../adr/0027-session-codes-and-conflict-modal.md), server [ADR 0014](../../../7th-sense-server/docs/adr/0014-session-modes-and-login-conflict.md)

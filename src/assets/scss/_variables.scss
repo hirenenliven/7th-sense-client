@@ -355,6 +355,14 @@ $ts-login-ring-stroke:  6; // SVG user units (viewBox 1600 × 900)
 $ts-login-glow-opacity: .9;
 $ts-login-day-size:     ts-rem(30);
 $ts-login-clock-clearance: ts-rem(120); // top space for the clock on phones
+// Alert dialog (.ts-alert-modal, e.g. the login's SessionConflictModal): width, icon badge, its halo,
+// the action buttons' height
+$ts-alert-modal-width:       ts-rem(400);
+$ts-alert-modal-icon-size:   ts-rem(56);
+$ts-alert-modal-icon-halo:   ts-rem(6);
+$ts-alert-modal-icon-font:   ts-rem(24);
+$ts-alert-modal-title-size:  ts-rem(18);
+$ts-alert-modal-action-height: ts-rem(40);
 
 // Exposed as CSS custom properties (--ts-*) in _components.scss
 $ts-tokens: (

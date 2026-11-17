@@ -3,6 +3,8 @@ import { Alert, Badge, Button, Card, Col, Row } from 'react-bootstrap'
 import { Link, generatePath, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { ALL_MACHINE_ROLES, ROLE_LABELS, SUPERADMIN_ONLY, THEMES, USER_STATUS } from '@/constants/app'
+import { ACTION_ICONS } from '@/constants/icons'
+import { ROUTES } from '@/constants/routes'
 import useAuth from '@/hooks/useAuth'
 import { getBranchById } from '@/services/branchService'
 import { getUserById } from '@/services/customerService'
@@ -114,6 +116,13 @@ function CustomerView({ kind = ACCOUNT_KIND.CUSTOMER }) {
           <i className="bi bi-arrow-left me-2" aria-hidden="true" />
           {account.title} list
         </Button>
+        {/* Superadmin: the account's login sessions (pages/Sessions/UserSessions.jsx) */}
+        {/* {customer && isSuperadmin && (
+          <Button as={Link} to={generatePath(ROUTES.USER_SESSIONS, { id: String(customer.id) })} variant="ghost">
+            <i className={`bi ${ACTION_ICONS.sessions} me-2`} aria-hidden="true" />
+            Sessions
+          </Button>
+        )} */}
         {customer && (
           <Button as={Link} to={generatePath(account.routes.edit, { id: String(customer.id) })}>
             <i className="bi bi-pencil me-2" aria-hidden="true" />

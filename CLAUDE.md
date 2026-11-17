@@ -104,6 +104,8 @@ Workflow**
 
 - Role and company come from the session (`useAuth().user`), never from a request parameter; the server enforces every rule, the UI only hides what a role cannot use.
 
+- Sessions (ADR 0027, server ADR 0014): the server answers fixed codes — 409 `session_conflict` at login (`data` = `{mode, maxSessions, sessions}`), 401 `session_revoked` (`data.reason`) / `session_expired` — worded in `constants/session.js`, never shown raw. `apiClient` keeps `data` on errors and calls `notifyUnauthorized({ code, reason })` on every 401 (the socket's `session:expired {reason, revokeReason}` too); `AuthProvider` then `disconnectLive()`s, toasts `sessionEndedMessage()` and drops the user. Login: `SessionConflictModal` lists the sessions in the way; "Log out other device and continue" resubmits with `forceLogoutOthers: true`. System › My Sessions (`pages/Sessions/MySessions.jsx`, every role) and the superadmin's account Sessions (`UserSessions.jsx`, the **Sessions** button on Customer / User View) share `SessionTable.jsx`; `services/sessionService.js`. No location (no IP lookup).
+
 - Machines: managers (`MANAGERS`: superadmin, customer, admin) add and edit — a customer or admin always on its own company (no Customer field); only the superadmin deletes and sees the Customer column. Everyone else only reads the machines the server returns (customer/admin: the company's; other roles: their assigned ones).
 
 - Branches are shared master data: everyone reads, only the superadmin adds / edits / deletes. A branch needs a customer; its City list is that customer's cities (cleared when the customer changes).

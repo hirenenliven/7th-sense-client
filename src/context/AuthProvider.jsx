@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import AuthContext from './AuthContext'
+import { isSessionEnded, sessionEndedMessage } from '@/constants/session'
 import { onUnauthorized } from '@/services/apiClient'
 import * as authService from '@/services/authService'
 import { disconnectLive } from '@/services/liveSocket'
@@ -39,16 +40,16 @@ function AuthProvider({ children }) {
   const userId = user?.id
   useEffect(() => () => disconnectLive(), [userId])
 
-  // Any 401 from the API means the session is gone: drop the user (routes redirect to login)
+  // Any 401 from the API (or the socket's session:expired) means the session is gone: close the
+  // live socket, drop the user (routes redirect to login) and say why — revoked by another
+  // login, the user or an administrator, or expired (constants/session.js)
   useEffect(
     () =>
-      onUnauthorized(() => {
-        if (user) {
-          toast.warning('Your session has ended. Please log in again.', {
-            id: SESSION_EXPIRED_TOAST,
-            title: 'Signed out',
-          })
+      onUnauthorized((ended) => {
+        if (user || isSessionEnded(ended.code)) {
+          toast.warning(sessionEndedMessage(ended), { id: SESSION_EXPIRED_TOAST, title: 'Signed out' })
         }
+        disconnectLive()
         // A "log in as" tab whose session ended goes back to a normal tab (login screen)
         clearLoginAs()
         setUser(null)

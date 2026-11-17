@@ -1874,6 +1874,86 @@ fieldset:disabled .btn {
 
 .modal-body { padding-bottom: ts-rem(22); }
 
+// Alert dialog: a centred, header-less modal that asks for one decision — an amber icon badge,
+// title, short text, a list of what happens, full-width actions (primary first).
+// <Modal centered dialogClassName="ts-alert-modal"><Modal.Body>…  (pages/Login/SessionConflictModal.jsx)
+.ts-alert-modal {
+  max-width: $ts-alert-modal-width;
+  margin-inline: auto;
+
+  .modal-content {
+    overflow: hidden;
+    // faint amber light from the top, behind the icon
+    background:
+      radial-gradient(ellipse at top, rgba($ts-amber, $ts-tint-row), transparent 60%),
+      $ts-panel;
+  }
+
+  .modal-body {
+    position: relative;
+    padding: $ts-space-6 $ts-space-5 $ts-space-5;
+    text-align: center;
+  }
+}
+
+.ts-alert-modal-close {
+  position: absolute;
+  top: $ts-space-3;
+  right: $ts-space-3;
+}
+
+.ts-alert-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $ts-alert-modal-icon-size;
+  height: $ts-alert-modal-icon-size;
+  margin-bottom: $ts-space-4;
+  font-size: $ts-alert-modal-icon-font;
+  color: $ts-amber;
+  background: rgba($ts-amber, $ts-tint-soft);
+  border: 1px solid rgba($ts-amber, $ts-tint-border);
+  border-radius: $ts-radius-pill;
+  box-shadow: 0 0 0 $ts-alert-modal-icon-halo rgba($ts-amber, $ts-tint-row);
+}
+
+.ts-alert-modal-title {
+  margin-bottom: $ts-space-2;
+  font-size: $ts-alert-modal-title-size;
+  font-weight: $ts-fw-title;
+  color: $ts-ink;
+}
+
+.ts-alert-modal-text {
+  margin-bottom: $ts-space-4;
+  font-size: $ts-fs-base;
+  color: $ts-ink-2;
+}
+
+.ts-alert-modal-facts {
+  padding: $ts-space-3 $ts-space-4;
+  margin-bottom: $ts-space-5;
+  list-style: none;
+  text-align: left;
+  background: $ts-panel-2;
+  border: 1px solid $ts-line;
+  border-radius: $ts-radius-lg;
+
+  li {
+    display: flex;
+    gap: $ts-space-3;
+    align-items: baseline;
+    font-size: $ts-fs-md;
+    color: $ts-ink-2;
+
+    + li { margin-top: $ts-space-2; }
+  }
+
+  i { color: $ts-ink-3; }
+}
+
+.ts-alert-modal-action { min-height: $ts-alert-modal-action-height; }
+
 // A <Form> wrapping header, body and footer of a `scrollable` Modal sits between .modal-content
 // and .modal-body: pass the flex column through so the body scrolls between a fixed header and
 // footer. <Modal scrollable><Form className="ts-modal-form">…

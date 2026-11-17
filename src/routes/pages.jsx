@@ -34,6 +34,9 @@ const BrandList = lazy(() => import('@/pages/Brands/BrandList'))
 const ControllerList = lazy(() => import('@/pages/Controllers/ControllerList'))
 const ModelList = lazy(() => import('@/pages/Models/ModelList'))
 const UserGuide = lazy(() => import('@/pages/UserGuide/UserGuide'))
+// Login sessions: My Sessions (everyone) and one account's sessions (superadmin)
+const MySessions = lazy(() => import('@/pages/Sessions/MySessions'))
+const UserSessions = lazy(() => import('@/pages/Sessions/UserSessions'))
 // System › Account Center: one tabbed page (Customer, Licence Key, Machine Catalog)
 const AccountCenterPage = lazy(() => import('@/pages/AccountCenter/AccountCenterPage'))
 // Masters › Country … Supervisor (Org prefix keeps them apart from Masters › Branches)
@@ -65,6 +68,8 @@ export const PAGES = [
   { path: ROUTES.USER_ADD, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
   { path: ROUTES.USER_EDIT, element: <AddCustomer kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
   { path: ROUTES.USER_VIEW, element: <CustomerView kind={ACCOUNT_KIND.USER} />, roles: MANAGERS },
+  { path: ROUTES.MY_SESSIONS, element: <MySessions /> },
+  { path: ROUTES.USER_SESSIONS, element: <UserSessions />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.BRANCHES, element: <OrganizationPage><BranchList /></OrganizationPage> },
   { path: ROUTES.BRANCH_ADD, element: <AddBranch />, roles: SUPERADMIN_ONLY },
   { path: ROUTES.BRANCH_EDIT, element: <AddBranch />, roles: SUPERADMIN_ONLY },

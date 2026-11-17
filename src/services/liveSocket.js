@@ -135,7 +135,8 @@ const getSocket = () => {
   socket.on('machine:status', onStatus)
   socket.on('machine:event', onEvent)
   socket.on('access:changed', onAccessChanged)
-  socket.on('session:expired', () => notifyUnauthorized())
+  // { reason: logged_out | session_revoked | session_expired, revokeReason }: same handling as a 401
+  socket.on('session:expired', (ended) => notifyUnauthorized({ code: ended?.reason, reason: ended?.revokeReason }))
   return socket
 }
 
