@@ -8,6 +8,7 @@ export const ACTION_ICONS = {
   save: 'bi-check-lg',
   undo: 'bi-x-lg',
   resetDefault: 'bi-arrow-counterclockwise',
+  testNode: 'bi-play-circle',
   productivity: 'bi-graph-up-arrow',
   edit: 'bi-pencil',
   delete: 'bi-trash3',

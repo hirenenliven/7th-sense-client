@@ -180,9 +180,9 @@
     "semantic_hash": "5e7ee8656f0289e5e6869de070b076d4"
   },
   "src/constants/icons.js": {
-    "mtime": 1795063154.9146836,
-    "seen": 1795063409.5248785,
-    "ast_hash": "6409dcb38fc0d9dc5132e9e44da06d81",
+    "mtime": 1795073412.4945452,
+    "seen": 1795073723.703791,
+    "ast_hash": "79b8068c204312c04eb1f5048c2f6eb2",
     "semantic_hash": ""
   },
   "src/constants/locations.js": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1795067344.5095801,
-    "seen": 1795067485.982901,
-    "ast_hash": "77db6185771b98ccf6a278016006e855",
+    "mtime": 1795073656.8263843,
+    "seen": 1795073723.704311,
+    "ast_hash": "68f2646dcf5be2d04f58993f680611e1",
     "semantic_hash": ""
   },
   "README.md": {
@@ -2334,33 +2334,33 @@
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/MachinePlcVariables.jsx": {
-    "mtime": 1795067225.5926912,
-    "seen": 1795067485.9825833,
-    "ast_hash": "cc028e9d69b491f530b08dc7f54751a6",
+    "mtime": 1795073585.3539834,
+    "seen": 1795073723.7039819,
+    "ast_hash": "3c79980ed86c7e81fd2971757d7a9e51",
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/PlcVariableRow.jsx": {
-    "mtime": 1795064461.824302,
-    "seen": 1795064527.1196053,
-    "ast_hash": "f47f78a31d90370701d976b2d92c71f7",
+    "mtime": 1795073504.8019474,
+    "seen": 1795073723.7039835,
+    "ast_hash": "f0624156a796d8eb73189428747bf063",
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/plcVariableSettings.js": {
-    "mtime": 1795064461.8237906,
-    "seen": 1795064527.1196072,
-    "ast_hash": "6fb5c63f685fdb63deac93b50f65a9dd",
+    "mtime": 1795073436.4623697,
+    "seen": 1795073723.7039855,
+    "ast_hash": "78da2ef454749847d7b15af8260bd2db",
     "semantic_hash": ""
   },
   "src/services/machinePlcVariableService.js": {
-    "mtime": 1795063154.4600017,
-    "seen": 1795063409.5253813,
-    "ast_hash": "2a2f78c5ee82067de0f175a28566770b",
+    "mtime": 1795073412.493003,
+    "seen": 1795073723.7042506,
+    "ast_hash": "2b07ce81b810f402cdee2ecedcb4b376",
     "semantic_hash": ""
   },
   "docs/pages/machine-plc-variables.md": {
-    "mtime": 1795067344.508557,
-    "seen": 1795067485.9829974,
-    "ast_hash": "317aa808fa096aad06164cb045be235c",
+    "mtime": 1795073656.8243654,
+    "seen": 1795073723.7044196,
+    "ast_hash": "82de8e243ef286cbea362028abc888a5",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx": {

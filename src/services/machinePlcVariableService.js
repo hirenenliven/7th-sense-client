@@ -3,9 +3,14 @@ import apiClient, { unwrap } from './apiClient'
 // Paths are relative to VITE_API_BASE_URL (…/api/v1). Superadmin only (server ADR 0020).
 const path = (machineId) => `/machines/${machineId}/plc-variables`
 
+// A test connects to the machine (up to PLC_CONNECT_TIMEOUT_SEC, 10 s) and reads (as long again)
+const TEST_TIMEOUT_MS = 30000
+
 // Every PLC variable of the machine's controller with the node id the machine reads it from:
 // { machineId, machineName, controllerVersionType, updatedCount,
-// variables: [{ variableId, code, name, unit, category, dataType, status, defaultNodeId, nodeId, isDefault }] }
+// reader: { enabled, supported, state, lastError },
+// variables: [{ variableId, code, name, unit, category, dataType, status, defaultNodeId, nodeId, isDefault, nodeStatus,
+// readerNodeId, readerStatus }] }
 export const getMachinePlcVariables = async (machineId) => unwrap(await apiClient.get(path(machineId)))
 
 // Sets the machine's own node id of one variable; the default node id resets it. Returns the row.
@@ -17,3 +22,9 @@ export const resetMachinePlcVariable = async (machineId, variableId) => unwrap(a
 
 // Every variable reads its default node id again. Returns the list as getMachinePlcVariables.
 export const resetMachinePlcVariables = async (machineId) => unwrap(await apiClient.delete(path(machineId)))
+
+// Reads node ids (saved or only typed, at most 100) once from the machine over OPC UA, nothing stored:
+// { endpoint, securityMode, securityPolicy, tested, connected, message, hint, testedAt, durationMs,
+// results: [{ nodeId, ok, status, value, valueType, sourceTime }] }
+export const testMachinePlcNodeIds = async (machineId, nodeIds) =>
+  unwrap(await apiClient.post(`${path(machineId)}/test`, { nodeIds }, { timeout: TEST_TIMEOUT_MS }))
