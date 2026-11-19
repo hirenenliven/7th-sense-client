@@ -11,9 +11,13 @@ const path = (machineId) => `/machines/${machineId}/diagnostics`
 // mode: { modeId, modeName, programName, since } | null, opMode,
 // checks: [{ key, status: 'ok' | 'warning' | 'failed' | 'skipped', message, hint }],
 // variables: [{ id, code, name, unit, category, dataType, source, address, readable, reason, value,
-// storedValue, storedAt }], events: [{ id, type, code, message, at }] }
+// storedValue, storedAt }] (the CNC DLL's), plc: { enabled, supported, state, endpoint, securityMode,
+// securityPolicy, connectedSince, lastError, lastErrorAt, lastChangeAt, changeCount, status, message, hint,
+// variables: [{ id, code, name, unit, category, dataType, nodeId, enabled, subscribed, nodeStatus, value,
+// storedValue, storedAt }] } (the OPC UA PLC reader's, server ADR 0021), events: [{ id, type, code, message, at }] }
 export const getMachineDiagnostics = async (machineId) => unwrap(await apiClient.get(path(machineId)))
 
 // Tests the machine's IP and port from the server (takes up to a few seconds):
-// { checkedAt, address, ip: check, port: check, latencyMs }
+// { checkedAt, address, machineState: powered_on | port_closed | ip_unreachable | ip_invalid,
+// ip: check, port: check, latencyMs }
 export const checkMachineNetwork = async (machineId) => unwrap(await apiClient.get(`${path(machineId)}/network`))

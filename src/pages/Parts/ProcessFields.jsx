@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import FieldLabel from '@/components/common/FieldLabel'
 import IconAction from '@/components/common/IconAction'
 import { ACTION_ICONS } from '@/constants/icons'
-import { MACHINE_ACCURACIES } from '@/constants/machines'
 import { DURATION_PLACEHOLDER, secondsToDuration } from '@/utils/dateTime'
 import DrawingUpload from './DrawingUpload'
 import MachinePicker from './MachinePicker'
@@ -69,7 +68,7 @@ SubPrograms.propTypes = {
 }
 
 // One process of the part: program, machines, drawing, accuracy and times
-function ProcessFields({ index, control, register, setValue, errors, machines, machinesPlaceholder, drawingUrl, canRemove, onRemove }) {
+function ProcessFields({ index, control, register, setValue, errors, machines, machinesPlaceholder, accuracies, accuraciesPlaceholder, drawingUrl, canRemove, onRemove }) {
   const prefix = `processes.${index}`
   const process = useWatch({ control, name: prefix })
   const hasSubProgram = Boolean(process?.hasSubProgram)
@@ -168,14 +167,21 @@ function ProcessFields({ index, control, register, setValue, errors, machines, m
 
         <Form.Group as={Col} controlId={`${prefix}.accuracyId`}>
           <Form.Label className="required">Machine Accuracy Level</Form.Label>
-          <Form.Select {...register(`${prefix}.accuracyId`)} isInvalid={Boolean(errors?.accuracyId)}>
-            <option value="">Machine Accuracy</option>
-            {MACHINE_ACCURACIES.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </Form.Select>
+          {/* Controlled: the list loads after an edited part may have filled the form */}
+          <Controller
+            name={`${prefix}.accuracyId`}
+            control={control}
+            render={({ field }) => (
+              <Form.Select {...field} isInvalid={Boolean(errors?.accuracyId)}>
+                <option value="">{accuraciesPlaceholder}</option>
+                {accuracies.map((option) => (
+                  <option key={option.id} value={String(option.id)}>
+                    {option.name}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+          />
           <Form.Control.Feedback type="invalid">{errors?.accuracyId?.message}</Form.Control.Feedback>
         </Form.Group>
 
@@ -213,6 +219,9 @@ ProcessFields.propTypes = {
   errors: PropTypes.object,
   machines: PropTypes.array.isRequired,
   machinesPlaceholder: PropTypes.string.isRequired,
+  // Account Center › Machine Accuracy list [{ id, name }]
+  accuracies: PropTypes.array.isRequired,
+  accuraciesPlaceholder: PropTypes.string.isRequired,
   drawingUrl: PropTypes.func.isRequired,
   canRemove: PropTypes.bool.isRequired,
   onRemove: PropTypes.func.isRequired,

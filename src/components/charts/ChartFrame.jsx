@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 // Sized box for one Recharts chart (`.ts-chart`, height from the theme). With `empty` it shows a
 // placeholder instead, so a chart without data keeps its place in the layout.
-function ChartFrame({ size, empty = false, emptyText = 'No data to show yet.', children }) {
+function ChartFrame({ size, className, empty = false, emptyText = 'No data to show yet.', children }) {
   return (
-    <div className={`ts-chart${size ? ` ts-chart-${size}` : ''}`}>
+    <div className={`ts-chart${size ? ` ts-chart-${size}` : ''}${className ? ` ${className}` : ''}`}>
       {empty ? (
         <div className="ts-chart-empty">
           <i className="bi bi-bar-chart-line" aria-hidden="true" />
@@ -22,6 +22,7 @@ function ChartFrame({ size, empty = false, emptyText = 'No data to show yet.', c
 
 ChartFrame.propTypes = {
   size: PropTypes.oneOf(['lg']),
+  className: PropTypes.string,
   empty: PropTypes.bool,
   emptyText: PropTypes.string,
   children: PropTypes.element.isRequired,

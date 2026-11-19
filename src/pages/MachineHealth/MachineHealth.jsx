@@ -15,6 +15,7 @@ import { MACHINE_MODES } from '@/constants/machines'
 import useLoad from '@/hooks/useLoad'
 import { getMachineTimeByDay } from '@/services/machineHealthService'
 import { PICKER_LOCALE, parseIsoDate, shiftIsoDate, todayIso } from '@/utils/dateTime'
+import AxisValuesCard from './AxisValuesCard'
 import HealthStatusBadge from './HealthStatusBadge'
 import {
   dailyRows,
@@ -76,9 +77,9 @@ const celsius = (value) => `${formatValue(value, 1)} °C`
 const outOf100 = (value) => `${value} / 100`
 
 // Operations › Monitoring › a machine › Machine Health tab (MonitoringMachine passes the machine).
-// Today's KPI tiles, then charts that each have a date filter (one day or a range). Machine Time by
-// Day is live data; the other readings are SAMPLE data (healthSampleData.js) until the server has a
-// sensor API.
+// Axis Values (X / Y / Z, live machine_telementry) first, then today's KPI tiles and charts that each
+// have a date filter (one day or a range). Machine Time by Day is live data too; the other readings
+// are SAMPLE data (healthSampleData.js) until the server has a sensor API.
 function MachineHealth({ machine }) {
   const selectedId = machine.id
   const today = todayIso()
@@ -178,10 +179,14 @@ function MachineHealth({ machine }) {
   const renderBody = () => {
     return (
       <>
+        <div className="mb-3">
+          <AxisValuesCard machineId={selectedId} />
+        </div>
+
         <Alert variant="info" className="d-flex align-items-center gap-2">
           <i className="bi bi-info-circle" aria-hidden="true" />
           <span>
-            <b>Sample data.</b> These charts show example readings until live sensor data is connected.
+            <b>Sample data.</b> The charts below show example readings until live sensor data is connected (Axis Values above and Machine Time by Day are live).
           </span>
         </Alert>
 

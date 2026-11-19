@@ -1,7 +1,7 @@
 import { SUPERADMIN_ONLY } from './app'
 import { ROUTES } from './routes'
 
-// System › Account Center: Customer, Licence Key and Machine Catalog on one page, a tab each
+// System › Account Center: Customer, Licence Key, Operator Task, Machine Catalog and Machine Accuracy on one page, a tab each
 // (superadmin only; customers manage their own users under Masters › Users). Each tab keeps its own route, so links, Back and reloads open that tab.
 // `roles` (optional): only these roles see the tab (same rule as the tab's route in PAGES).
 // `subTabs` (optional): screens of one tab, shown as a second row of tabs under the tabs.
@@ -31,6 +31,7 @@ export const ACCOUNT_CENTER_TABS = [
       { key: 'models', label: 'Models', path: ROUTES.MODELS },
     ],
   },
+  { key: 'machine-accuracy', label: 'Machine Accuracy', icon: 'bi-bullseye', path: ROUTES.MACHINE_ACCURACY, roles: SUPERADMIN_ONLY },
 ]
 
 // Paths that light up the sidebar's Account Center item (every tab and sub-tab, plus the

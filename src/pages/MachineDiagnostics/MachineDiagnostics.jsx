@@ -10,7 +10,9 @@ import useLoad from '@/hooks/useLoad'
 import useMachineLive from '@/hooks/useMachineLive'
 import { checkMachineNetwork, getMachineDiagnostics } from '@/services/machineDiagnosticsService'
 import { PICKER_LOCALE, formatModeDuration } from '@/utils/dateTime'
+import DiagnosticsPlcVariables from './DiagnosticsPlcVariables'
 import DiagnosticsVariables from './DiagnosticsVariables'
+import MachinePowerCheck from './MachinePowerCheck'
 import { CHECK_STATUS, DEFAULT_LIVE_INTERVAL, DIAGNOSTICS_REFRESH_MS, STATUS_LOOK, buildChecks, buildVerdict, trackChanges } from './diagnosticsSettings'
 
 const dateTime = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -29,8 +31,10 @@ function Fact({ label, children }) {
 
 // Machines › a machine › Diagnostics, for the superadmin: when a customer reports a problem, checks
 // in order whether this machine's data reaches the server and the screen, and says what is wrong:
-// set-up, collector, IP, port, controller, mode, variables and socket. GET /machines/{id}/diagnostics
-// reloads every few seconds; the network test runs on opening and on Run checks again. See server ADR 0013.
+// set-up, collector, IP, port, controller, mode, variables and socket, then the OPC UA PLC reader's
+// section (DiagnosticsPlcVariables, server ADR 0021). GET /machines/{id}/diagnostics
+// reloads every few seconds; the network test runs on opening, on Run checks again and on Check machine
+// (MachinePowerCheck: is the machine on, or is its IP or port closed). See server ADR 0013.
 function MachineDiagnostics() {
   const { id } = useParams()
   const machineId = Number(id)
@@ -194,6 +198,9 @@ function MachineDiagnostics() {
             <Col xl={5}>
               <Row xs={1} className="g-3">
                 <Col>
+                  <MachinePowerCheck machine={machine} network={network} collectorConnected={controllerConnected} onCheck={runNetwork} />
+                </Col>
+                <Col>
                   <ChartCard title="Machine mode" subtitle={liveStatus ? 'Live from the socket' : 'Last recorded by the collector'} icon="bi-activity">
                     <div className="d-flex align-items-center gap-2 mb-2">
                       <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
@@ -249,6 +256,18 @@ function MachineDiagnostics() {
             controllerConnected={controllerConnected}
           />
         </Col>
+
+        {diagnostics.plc && (
+          <Col>
+            <DiagnosticsPlcVariables
+              machineId={machineId}
+              plc={diagnostics.plc}
+              liveOn={liveOn}
+              liveEnabled={diagnostics.liveEnabled}
+              intervalMs={intervalMs}
+            />
+          </Col>
+        )}
 
         <Col>
           <ChartCard title="Recent machine events" subtitle="What the collector recorded for this machine, newest first" icon="bi-clock-history">

@@ -9,6 +9,7 @@ const Home = lazy(() => import('@/pages/Home/Home'))
 const OperationsCenter = lazy(() => import('@/pages/OperationsCenter/OperationsCenter'))
 const PlantIntelligence = lazy(() => import('@/pages/PlantIntelligence/PlantIntelligence'))
 const MachineDiagnostics = lazy(() => import('@/pages/MachineDiagnostics/MachineDiagnostics'))
+const MachinePlcVariables = lazy(() => import('@/pages/MachinePlcVariables/MachinePlcVariables'))
 const About = lazy(() => import('@/pages/About/About'))
 const ThemeShowcase = lazy(() => import('@/pages/ThemeShowcase/ThemeShowcase'))
 const CustomerList = lazy(() => import('@/pages/Customers/CustomerList'))
@@ -28,6 +29,7 @@ const ReasonList = lazy(() => import('@/pages/Reasons/ReasonList'))
 const LicenceKeySetup = lazy(() => import('@/pages/LicenceKeys/LicenceKeySetup'))
 const OperatorTaskSetup = lazy(() => import('@/pages/OperatorTasks/OperatorTaskSetup'))
 const TaskList = lazy(() => import('@/pages/OperatorTasks/TaskList'))
+const MachineAccuracyList = lazy(() => import('@/pages/MachineAccuracy/MachineAccuracyList'))
 const PartList = lazy(() => import('@/pages/Parts/PartList'))
 const AddPart = lazy(() => import('@/pages/Parts/AddPart'))
 const ProductionScheduleList = lazy(() => import('@/pages/ProductionSchedules/ProductionScheduleList'))
@@ -80,6 +82,7 @@ export const PAGES = [
   { path: ROUTES.MACHINE_ADD, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_EDIT, element: <AddMachine />, roles: MANAGERS },
   { path: ROUTES.MACHINE_DIAGNOSTICS, element: <MachineDiagnostics />, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MACHINE_PLC_VARIABLES, element: <MachinePlcVariables />, roles: SUPERADMIN_ONLY },
   // Operations › Monitoring: one page (machine list, then a machine's Productivity / Health tabs);
   // every user, for the machines the server returns them
   { path: ROUTES.MONITORING, element: <MonitoringPage /> },
@@ -111,6 +114,7 @@ export const PAGES = [
   { path: ROUTES.LICENCE_KEYS, element: <AccountCenterPage><LicenceKeySetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.OPERATOR_TASKS, element: <AccountCenterPage><OperatorTaskSetup /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MAINTENANCE_TASKS, element: <AccountCenterPage><TaskList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
+  { path: ROUTES.MACHINE_ACCURACY, element: <AccountCenterPage><MachineAccuracyList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.BRANDS, element: <AccountCenterPage><BrandList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.CONTROLLERS, element: <AccountCenterPage><ControllerList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },
   { path: ROUTES.MODELS, element: <AccountCenterPage><ModelList /></AccountCenterPage>, roles: SUPERADMIN_ONLY },

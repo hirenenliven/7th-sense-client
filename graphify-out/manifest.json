@@ -180,9 +180,9 @@
     "semantic_hash": "5e7ee8656f0289e5e6869de070b076d4"
   },
   "src/constants/icons.js": {
-    "mtime": 1794891781.84365,
-    "seen": 1794892176.432168,
-    "ast_hash": "18063efedaea91914dad56a52f51dd38",
+    "mtime": 1795063154.9146836,
+    "seen": 1795063409.5248785,
+    "ast_hash": "6409dcb38fc0d9dc5132e9e44da06d81",
     "semantic_hash": ""
   },
   "src/constants/locations.js": {
@@ -192,9 +192,9 @@
     "semantic_hash": "af528193a8972e7e8511a97e02cfdc3a"
   },
   "src/constants/machines.js": {
-    "mtime": 1793681972.1754785,
-    "seen": 1793682010.8593714,
-    "ast_hash": "d57813e9e51633203e1f100b35ccee75",
+    "mtime": 1794985076.9948854,
+    "seen": 1794986643.9127526,
+    "ast_hash": "03606b2dd01b7f0a62ccc50dbe7967d1",
     "semantic_hash": ""
   },
   "src/constants/navigation.js": {
@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "src/constants/routes.js": {
-    "mtime": 1794905888.365187,
-    "seen": 1794906036.4182842,
-    "ast_hash": "c5f6c2f0c56d44cb16a611aae1ca72ae",
+    "mtime": 1795063234.4295993,
+    "seen": 1795063409.5248938,
+    "ast_hash": "17318cb77292e00f2baa824816784777",
     "semantic_hash": ""
   },
   "src/constants/shifts.js": {
@@ -582,9 +582,9 @@
     "semantic_hash": ""
   },
   "src/pages/Machines/AddMachine.jsx": {
-    "mtime": 1793768474.266467,
-    "seen": 1793768539.0140758,
-    "ast_hash": "a42a3573311b7d55636a85d13543da01",
+    "mtime": 1794985076.9964004,
+    "seen": 1794986643.91322,
+    "ast_hash": "bc59509876fefa2293d8d356eda79274",
     "semantic_hash": ""
   },
   "src/pages/Machines/HealthSensorPicker.jsx": {
@@ -594,9 +594,9 @@
     "semantic_hash": ""
   },
   "src/pages/Machines/MachineList.jsx": {
-    "mtime": 1793949694.1644268,
-    "seen": 1793954605.3008783,
-    "ast_hash": "4fe49ee10dc4cb7a894cd90364808e8b",
+    "mtime": 1795063235.3291938,
+    "seen": 1795063409.5251188,
+    "ast_hash": "56c71628aaf1829f292dbc96d721c09b",
     "semantic_hash": ""
   },
   "src/pages/Machines/MachineRow.jsx": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "src/pages/Parts/AddPart.jsx": {
-    "mtime": 1793782193.9689863,
-    "seen": 1793782274.798587,
-    "ast_hash": "f4371b7348474e8d2e366cad47f4c3c3",
+    "mtime": 1794984900.842895,
+    "seen": 1794985049.5974221,
+    "ast_hash": "07fef6080aba180f86ae05ffc726d7b8",
     "semantic_hash": ""
   },
   "src/pages/Parts/DrawingUpload.jsx": {
@@ -738,9 +738,9 @@
     "semantic_hash": ""
   },
   "src/pages/Parts/ProcessFields.jsx": {
-    "mtime": 1792563260.039699,
-    "seen": 1792563274.2793448,
-    "ast_hash": "8ddaa57d8e56e64e3c29195d37d26f03",
+    "mtime": 1794985076.9974277,
+    "seen": 1794986643.9134922,
+    "ast_hash": "6d8d49332df6238739e289a8065b3261",
     "semantic_hash": ""
   },
   "src/pages/Parts/partForm.js": {
@@ -846,9 +846,9 @@
     "semantic_hash": ""
   },
   "src/routes/pages.jsx": {
-    "mtime": 1794905875.5972822,
-    "seen": 1794906036.4186437,
-    "ast_hash": "3bfba50f38d9964ecbdfd7f489158424",
+    "mtime": 1795063234.788396,
+    "seen": 1795063409.5253487,
+    "ast_hash": "880b7f718bc31571285fd215639ebcad",
     "semantic_hash": ""
   },
   "src/services/apiClient.js": {
@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1794905980.7891273,
-    "seen": 1794906036.4187257,
-    "ast_hash": "43d6b6b9fb7f54bd49aed910ac214da9",
+    "mtime": 1795067344.5095801,
+    "seen": 1795067485.982901,
+    "ast_hash": "77db6185771b98ccf6a278016006e855",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1128,9 +1128,9 @@
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/MachineHealth.jsx": {
-    "mtime": 1793941854.3533635,
-    "seen": 1793941947.628551,
-    "ast_hash": "1d35f2502fe65cddc6616995c9cf56b0",
+    "mtime": 1794986510.50857,
+    "seen": 1794986643.9131978,
+    "ast_hash": "ab19735b495a84e77192091e10eb7bbf",
     "semantic_hash": ""
   },
   "src/pages/MachineHealth/SensorTrendCard.jsx": {
@@ -1152,9 +1152,9 @@
     "semantic_hash": ""
   },
   "src/components/charts/ChartFrame.jsx": {
-    "mtime": 1792562285.2303717,
-    "seen": 1792563274.2790718,
-    "ast_hash": "2d7a852a10e73f26ea0faa1885e49055",
+    "mtime": 1794987467.502877,
+    "seen": 1794987681.9368725,
+    "ast_hash": "3346acfcd3c3c6e54bb2c85ecef29e25",
     "semantic_hash": ""
   },
   "src/components/charts/chartScale.js": {
@@ -1188,9 +1188,9 @@
     "semantic_hash": ""
   },
   "src/components/charts/LineTrendChart.jsx": {
-    "mtime": 1793183999.114925,
-    "seen": 1793184148.416517,
-    "ast_hash": "036fc060d2f0a1831d1864ef8c05f196",
+    "mtime": 1794987467.5917344,
+    "seen": 1794987681.936881,
+    "ast_hash": "b5089d04d67b839f877b2d485d8642f7",
     "semantic_hash": ""
   },
   "src/components/charts/RadarScoreChart.jsx": {
@@ -1308,9 +1308,9 @@
     "semantic_hash": ""
   },
   "src/services/machineHealthService.js": {
-    "mtime": 1793941764.5092645,
-    "seen": 1793941947.628722,
-    "ast_hash": "f687b6841b9ce9f31bc182df08c00d0c",
+    "mtime": 1794987467.5942948,
+    "seen": 1794987681.93737,
+    "ast_hash": "59a3f8beb7b4d19b00f096972d138196",
     "semantic_hash": ""
   },
   "src/services/productivityService.js": {
@@ -1380,9 +1380,9 @@
     "semantic_hash": ""
   },
   "docs/pages/README.md": {
-    "mtime": 1794905980.7886145,
-    "seen": 1794906036.4187825,
-    "ast_hash": "8444104d0be6449d3dd2f3aea462127b",
+    "mtime": 1795063338.9479349,
+    "seen": 1795063409.5255022,
+    "ast_hash": "ec3857f90f59de9d168d06d78064d95f",
     "semantic_hash": ""
   },
   "docs/pages/about.md": {
@@ -1482,21 +1482,21 @@
     "semantic_hash": ""
   },
   "docs/pages/machine-form.md": {
-    "mtime": 1793690695.0672028,
-    "seen": 1793690936.978838,
-    "ast_hash": "447b0156fba079d7831442f80957096b",
+    "mtime": 1794985004.1496844,
+    "seen": 1794985049.597683,
+    "ast_hash": "a04ad4d4a142b52badbc06abc42f96ea",
     "semantic_hash": ""
   },
   "docs/pages/machine-health.md": {
-    "mtime": 1793941995.5110815,
-    "seen": 1793942055.7602546,
-    "ast_hash": "2455f4e2c238ea4cf350f0cf8f9f1a7d",
+    "mtime": 1794987603.1424034,
+    "seen": 1794987681.9375226,
+    "ast_hash": "5a5ad19cc330e0bdc290a5446efee3f4",
     "semantic_hash": ""
   },
   "docs/pages/machine-list.md": {
-    "mtime": 1793949888.0436726,
-    "seen": 1793954605.3013413,
-    "ast_hash": "df11ffe597151032317d3d529cc5fd66",
+    "mtime": 1795063338.712216,
+    "seen": 1795063409.5255425,
+    "ast_hash": "569745d796f95905e6935db7034e5913",
     "semantic_hash": ""
   },
   "docs/pages/models.md": {
@@ -1560,9 +1560,9 @@
     "semantic_hash": ""
   },
   "docs/pages/part-form.md": {
-    "mtime": 1793690695.0891879,
-    "seen": 1793690936.9788578,
-    "ast_hash": "584acb7c91c9be70686c322eed0b0067",
+    "mtime": 1794985004.1496844,
+    "seen": 1794985049.5977151,
+    "ast_hash": "9863fbafa7c5152270900ca09a495211",
     "semantic_hash": ""
   },
   "docs/pages/part-list.md": {
@@ -1722,9 +1722,9 @@
     "semantic_hash": ""
   },
   "src/constants/accountCenter.js": {
-    "mtime": 1794905875.596778,
-    "seen": 1794906036.4182622,
-    "ast_hash": "8c273ad891d7e0857d4a6d4355d42765",
+    "mtime": 1794984869.6115289,
+    "seen": 1794985049.5970805,
+    "ast_hash": "9bc2c5154856933aa8006816f386f7d5",
     "semantic_hash": ""
   },
   "src/pages/AccountCenter/AccountCenterPage.jsx": {
@@ -2100,27 +2100,27 @@
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/MachineDiagnostics.jsx": {
-    "mtime": 1793949888.0260804,
-    "seen": 1793954605.3008518,
-    "ast_hash": "323383203f9f5c9ee2fbb6562f7bc390",
+    "mtime": 1795067176.1888087,
+    "seen": 1795067485.9825652,
+    "ast_hash": "10de9c998ce16c1779aae067d10bbb69",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/diagnosticsSettings.js": {
-    "mtime": 1793950317.0537715,
-    "seen": 1793954605.3008535,
-    "ast_hash": "cbb6cbfaef11f24f00597f87b7faba18",
+    "mtime": 1795067128.7488556,
+    "seen": 1795067485.9825687,
+    "ast_hash": "8635acde819dd0bee89a6c044e6287ae",
     "semantic_hash": ""
   },
   "src/services/machineDiagnosticsService.js": {
-    "mtime": 1793954494.6547284,
-    "seen": 1793954605.3011658,
-    "ast_hash": "7db15e7d61d74b28cf778bd9986a7fb2",
+    "mtime": 1795067176.1958225,
+    "seen": 1795067485.9828432,
+    "ast_hash": "04f54f1c971d0f1686ac30d76f5d39f3",
     "semantic_hash": ""
   },
   "docs/pages/machine-diagnostics.md": {
-    "mtime": 1793954494.6966476,
-    "seen": 1793954605.3013349,
-    "ast_hash": "e4d85f987bee61c51cc7b39f3a00c709",
+    "mtime": 1795067344.5072677,
+    "seen": 1795067485.9829907,
+    "ast_hash": "60db873e3e1a88eb5ac5ab136d564c47",
     "semantic_hash": ""
   },
   "docs/adr/0026-plant-intelligence-owner-dashboard.md": {
@@ -2277,6 +2277,96 @@
     "mtime": 1794905965.1698906,
     "seen": 1794906036.4188614,
     "ast_hash": "2bcde1be780e9ffc9e687c016b13e4aa",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineDiagnostics/MachinePowerCheck.jsx": {
+    "mtime": 1794911220.439422,
+    "seen": 1794911332.4244597,
+    "ast_hash": "d17eff9e623977f7e83a9b72889c394f",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineAccuracy/MachineAccuracyEditor.jsx": {
+    "mtime": 1794984853.774311,
+    "seen": 1794985049.5973053,
+    "ast_hash": "3281574b07c5d719b8a0b8efe3eeae11",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineAccuracy/MachineAccuracyList.jsx": {
+    "mtime": 1794984853.8266091,
+    "seen": 1794985049.597307,
+    "ast_hash": "891e1636e47e9fec87a25cbe8609a644",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineAccuracy/MachineAccuracyRow.jsx": {
+    "mtime": 1794984853.5809538,
+    "seen": 1794985049.5973084,
+    "ast_hash": "313aa21b3db4fb46bf4ded147884637d",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineAccuracy/machineAccuracyForm.js": {
+    "mtime": 1794984853.537393,
+    "seen": 1794985049.5973096,
+    "ast_hash": "81b56bd9a0b38a477a001679940127b9",
+    "semantic_hash": ""
+  },
+  "src/services/machineAccuracyService.js": {
+    "mtime": 1794984853.2733123,
+    "seen": 1794985049.5975366,
+    "ast_hash": "1f2a25c9c358e3b1a5d205c530e9d3e1",
+    "semantic_hash": ""
+  },
+  "docs/pages/machine-accuracy.md": {
+    "mtime": 1794984972.3597019,
+    "seen": 1794985049.5976796,
+    "ast_hash": "3f916dffb7eea9a82e0f77e29c0afbfa",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/AxisValuesCard.jsx": {
+    "mtime": 1794987501.1093247,
+    "seen": 1794987681.9371307,
+    "ast_hash": "3d3bb459954dcddae2d363c9d6c89d57",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineHealth/axisValues.js": {
+    "mtime": 1794987467.6235323,
+    "seen": 1794987681.937138,
+    "ast_hash": "854ff0267eb8a40cbd261993c31770c2",
+    "semantic_hash": ""
+  },
+  "src/pages/MachinePlcVariables/MachinePlcVariables.jsx": {
+    "mtime": 1795067225.5926912,
+    "seen": 1795067485.9825833,
+    "ast_hash": "cc028e9d69b491f530b08dc7f54751a6",
+    "semantic_hash": ""
+  },
+  "src/pages/MachinePlcVariables/PlcVariableRow.jsx": {
+    "mtime": 1795064461.824302,
+    "seen": 1795064527.1196053,
+    "ast_hash": "f47f78a31d90370701d976b2d92c71f7",
+    "semantic_hash": ""
+  },
+  "src/pages/MachinePlcVariables/plcVariableSettings.js": {
+    "mtime": 1795064461.8237906,
+    "seen": 1795064527.1196072,
+    "ast_hash": "6fb5c63f685fdb63deac93b50f65a9dd",
+    "semantic_hash": ""
+  },
+  "src/services/machinePlcVariableService.js": {
+    "mtime": 1795063154.4600017,
+    "seen": 1795063409.5253813,
+    "ast_hash": "2a2f78c5ee82067de0f175a28566770b",
+    "semantic_hash": ""
+  },
+  "docs/pages/machine-plc-variables.md": {
+    "mtime": 1795067344.508557,
+    "seen": 1795067485.9829974,
+    "ast_hash": "317aa808fa096aad06164cb045be235c",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx": {
+    "mtime": 1795067156.7681482,
+    "seen": 1795067485.9825602,
+    "ast_hash": "26f00e7a2c4fa6106b2f6aa5d60e5602",
     "semantic_hash": ""
   }
 }

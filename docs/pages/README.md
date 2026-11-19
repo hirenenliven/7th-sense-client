@@ -32,6 +32,7 @@ API request / response schemas live in the server API docs: [openapi.yaml](../..
 |---|---|---|---|---|
 | All machines | `/machines` | Yes | every logged-in role | [machine-list.md](machine-list.md) |
 | Machine diagnostics | `/machines/:id/diagnostics` | Yes | superadmin | [machine-diagnostics.md](machine-diagnostics.md) |
+| Machine PLC node IDs | `/machines/:id/plc-variables` | Yes | superadmin | [machine-plc-variables.md](machine-plc-variables.md) |
 | Add / edit machine | `/machines/add` · `/machines/:id/edit` | Yes | managers | [machine-form.md](machine-form.md) |
 | Production schedules | `/production/schedule` | Yes | every logged-in role | [production-schedule-list.md](production-schedule-list.md) |
 | Add / edit production schedule | `/production/schedule/add` · `/production/schedule/:id/edit` | Yes | managers | [production-schedule-form.md](production-schedule-form.md) |
@@ -109,6 +110,7 @@ One page, [AccountCenterPage.jsx](../../src/pages/AccountCenter/AccountCenterPag
 | Licence keys (tab) | `/masters/licence-keys` | Yes | superadmin | [licence-keys.md](licence-keys.md) |
 | Operator tasks (Operator Task tab) | `/masters/operator-tasks` | Yes | superadmin | [operator-tasks.md](operator-tasks.md) |
 | Task list (Operator Task tab) | `/masters/maintenance-tasks` | Yes | superadmin | [task-list.md](task-list.md) |
+| Machine accuracy (tab) | `/masters/machine-accuracy` | Yes | superadmin | [machine-accuracy.md](machine-accuracy.md) |
 | Brands (Machine Catalog tab) | `/masters/brands` | Yes | superadmin | [brands.md](brands.md) |
 | Controllers (Machine Catalog tab) | `/masters/controllers` | Yes | superadmin | [controllers.md](controllers.md) |
 | Machine models (Machine Catalog tab) | `/masters/models` | Yes | superadmin | [models.md](models.md) |

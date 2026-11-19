@@ -86,6 +86,9 @@ sequenceDiagram
 21. [part_handler.go](../../../7th-sense-server/internal/handler/part_handler.go) → GetByID(): reads {id}; query userId; calls the service
 22. [part_service.go](../../../7th-sense-server/internal/service/part_service.go) → GetByID(): Returns the part with its processes when the user may read it, else "Part not found".
 
+
+**Machine accuracy options** (server ADR 0017): [AddPart.jsx](../../src/pages/Parts/AddPart.jsx) → useEffect() calls [machineAccuracyService.js](../../src/services/machineAccuracyService.js) → getMachineAccuracies() → `GET /api/v1/machine-accuracies` ([machine_accuracy_service.go](../../../7th-sense-server/internal/service/machine_accuracy_service.go)): the one list every customer shares, managed on [Machine accuracy](machine-accuracy.md). The select is a controlled `Controller`, so an edited record shows its accuracy even when the list arrives later. On save, [part_service.go](../../../7th-sense-server/internal/service/part_service.go) → PartService.checkReferences refuses an id not in the list ("Please select valid machine accuracy level").
+
 ## Save part (add / edit form)
 
 **Sequence diagram**
@@ -215,6 +218,7 @@ sequenceDiagram
 
 | Method | Endpoint | Triggered by (section) | API docs |
 |---|---|---|---|
+| GET | `/api/v1/machine-accuracies` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machine%20accuracies/getMachineAccuracies) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/clienteles` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Clienteles/getClienteles) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/users` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Users/getUsers) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/machines` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machines/getMachines) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |

@@ -122,6 +122,9 @@ sequenceDiagram
 33. [user_line_service.go](../../../7th-sense-server/internal/service/user_line_service.go) → GetAll(): Returns the user's lines. A non-nil userShopID keeps only that shop's lines.
 34. [user_line_repository.go](../../../7th-sense-server/internal/repository/user_line_repository.go) → FindAll(): reads / writes `user_line`, `user_shop`
 
+
+**Machine accuracy options** (server ADR 0017): [AddMachine.jsx](../../src/pages/Machines/AddMachine.jsx) → loadAccuracies() calls [machineAccuracyService.js](../../src/services/machineAccuracyService.js) → getMachineAccuracies() → `GET /api/v1/machine-accuracies` ([machine_accuracy_service.go](../../../7th-sense-server/internal/service/machine_accuracy_service.go)): the one list every customer shares, managed on [Machine accuracy](machine-accuracy.md). The select is a controlled `Controller`, so an edited record shows its accuracy even when the list arrives later. On save, [machine_service.go](../../../7th-sense-server/internal/service/machine_service.go) → MachineService.checkReferences refuses an id not in the list ("Please select valid machine accuracy").
+
 ## Save machine (add / edit form)
 
 **Sequence diagram**
@@ -190,6 +193,7 @@ sequenceDiagram
 
 | Method | Endpoint | Triggered by (section) | API docs |
 |---|---|---|---|
+| GET | `/api/v1/machine-accuracies` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machine%20accuracies/getMachineAccuracies) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/brands` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machine%20catalog/getBrands) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/controllers` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machine%20catalog/getControllers) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
 | GET | `/api/v1/models` | On page load | [Swagger](http://localhost:8080/api-docs/index.html#/Machine%20catalog/getModels) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |

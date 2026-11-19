@@ -8,6 +8,7 @@ import { ROUTES } from '@/constants/routes'
 import { getClienteles } from '@/services/clienteleService'
 import { getUsers } from '@/services/customerService'
 import { getMachines } from '@/services/machineService'
+import { getMachineAccuracies } from '@/services/machineAccuracyService'
 import { createPart, getPartById, partDrawingUrl, updatePart, uploadPartDrawing } from '@/services/partService'
 import useAuth from '@/hooks/useAuth'
 import { toast } from '@/utils/toast'
@@ -67,6 +68,22 @@ function AddPart() {
   const [customers, setCustomers] = useState({ items: [], loading: canPickCustomer })
   const [machines, setMachines] = useState({ items: [], loading: false })
   const [clienteles, setClienteles] = useState({ items: [], loading: false })
+  const [accuracies, setAccuracies] = useState({ items: [], loading: true })
+
+  // Machine accuracy levels: one list for every customer (Account Center › Machine Accuracy)
+  useEffect(() => {
+    let active = true
+    getMachineAccuracies()
+      .then((items) => active && setAccuracies({ items, loading: false }))
+      .catch((error) => {
+        if (!active) return
+        setAccuracies({ items: [], loading: false })
+        toast.error(error.message, { title: 'Could not load machine accuracies' })
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   // Superadmin: the customers to pick from
   useEffect(() => {
@@ -348,6 +365,8 @@ function AddPart() {
                     errors={errors.processes?.[index]}
                     machines={machines.items}
                     machinesPlaceholder={machinesPlaceholder}
+                    accuracies={accuracies.items}
+                    accuraciesPlaceholder={accuracies.loading ? 'Loading machine accuracies…' : 'Machine Accuracy'}
                     drawingUrl={drawingUrl}
                     canRemove={fields.length > 1}
                     onRemove={() => remove(index)}

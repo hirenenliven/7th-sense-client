@@ -56,6 +56,41 @@ sequenceDiagram
 | 7 | Snapshot variables | Readable variables have values | None readable, no reading yet, every value 0 or empty |
 | 8 | Live socket | Connected and subscribed | Live data off on the server, not connected (with the error), refused, codes the collector does not read |
 
+## Check machine (is the machine on?)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User
+  participant Card as MachinePowerCheck.jsx
+  participant Service as machineDiagnosticsService
+  participant API as Go router (/api/v1)
+  participant Handler as MachineDiagnosticsHandler
+  participant Diagnostics as MachineDiagnosticsService
+  participant Machine as Machine's IP : port
+  User->>Card: Check machine
+  Card->>Service: checkMachineNetwork(id)
+  Service->>API: GET /machines/{id}/diagnostics/network
+  API->>Handler: CheckNetwork() (superAdminOnly)
+  Handler->>Diagnostics: CheckNetwork()
+  Diagnostics->>Machine: one ping + one TCP connect (no data sent)
+  Diagnostics-->>Card: machineState, ip check, port check, latency
+  Card-->>User: Machine is on / Port is closed / IP is not reachable
+```
+
+1. [MachinePowerCheck.jsx](../../src/pages/MachineDiagnostics/MachinePowerCheck.jsx): the **Is the machine on?** card (right column, above Machine mode); **Check machine** in its header runs the same test as on opening, and the IP address and Port checks update with it.
+2. [machine_network_probe.go](../../../7th-sense-server/internal/service/machine_network_probe.go) → machineStateOf(): sums the test up as `machineState`.
+3. [diagnosticsSettings.js](../../src/pages/MachineDiagnostics/diagnosticsSettings.js) → `machineStateLook()` words it; `NETWORK_ROWS` / `networkRowLabel()` label the IP and port rows.
+
+| `machineState` | Card says | When |
+|---|---|---|
+| `powered_on` | Machine is on (green) | The port accepted a TCP connection |
+| `port_closed` | Port is closed (amber) | The IP answers (ping, or a refused connect) but the port does not accept |
+| `ip_unreachable` | IP is not reachable (red) | No answer to ping or TCP, or no route: the machine is off or the network is down |
+| `ip_invalid` | IP is not valid (red) | The Live IP is not an address and does not resolve |
+
+Below the answer: the IP and port with Reachable / Not reachable, Open / Closed and the server's reason and hint, then when it was checked and the TCP connect time.
+
 ## Watch variables live
 
 Each variable is a card: its value large, what its data is doing, its address, last change and last stored number. A value the socket changes updates in place with a short highlight; cards keep their place and all show at once (no paging). Tick the variables to receive (all readable ones to start, **Pick all** / **Pick none**), choose how often and turn **Live socket** off or on. Each change sends a new `subscribe` of exactly those codes ([live-socket-events.md](../../../7th-sense-server/docs/live-socket-events.md)).
@@ -73,13 +108,49 @@ Each variable is a card: its value large, what its data is doing, its address, l
 
 - A machine connected with no recent reading is OK: the DLL calls back only when something changes, and the connection is reopened after `CNC_QUIET_SEC`.
 - A status row not updated for 30 s does not count as connected: a stopped server leaves its last value.
-- A failed IP or port test while the collector is connected only warns: the test may be blocked.
-- The network test runs on opening and on **Run checks again**, never on a timer. The rest reloads every 5 s and on any alarm, emergency or cycle event.
+- A failed IP or port test while the collector is connected only warns: the test may be blocked. `machineState` still says what the test found, and the card adds that the collector is connected.
+- "On" means the port answered, not that the controller answers on it: the Controller connection check says that.
+- The network test runs on opening, on **Run checks again** and on **Check machine**, never on a timer. The rest reloads every 5 s and on any alarm, emergency or cycle event.
 - With no readable variable the list opens on all variables, so each reason shows.
+
+## PLC variables (OPC UA)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User
+  participant Page as DiagnosticsPlcVariables.jsx
+  participant Socket as useMachineLive
+  participant API as Go router (/api/v1)
+  participant Diagnostics as MachineDiagnosticsService
+  participant Board as opcua.StatusBoard
+  participant Worker as PLC worker (OPC UA)
+  participant Machine as Siemens NCU (OPC UA)
+  Worker->>Machine: connect, subscribe to every PLC node ID
+  Machine-->>Worker: changed values (each publish)
+  Worker->>Board: state, node statuses, last change
+  User->>Page: opens the machine's diagnostics
+  Page->>API: GET /machines/{id}/diagnostics (every 5 s)
+  API->>Diagnostics: GetDiagnostics() → plcSection()
+  Diagnostics->>Board: Get(machineId)
+  Diagnostics-->>Page: plc: state, verdict, endpoint, variables (node ID, status, value)
+  Page->>Socket: subscribe (the subscribed PLC codes)
+  Worker-->>Socket: machine:values (hub), then stored
+  Socket-->>Page: live PLC values
+```
+
+1. [DiagnosticsPlcVariables.jsx](../../src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx) → the "PLC variables (OPC UA)" card below the snapshot variables: connection chip, the server's verdict (`plc.status` / `message` / `hint`), facts (endpoint, security mode · policy, connected since, last value change, changes received, last error) and a table per PLC variable: code / name, node ID, Data state, live value (flashes on change), last change (time · count), last stored.
+2. It calls `useMachineLive` itself with the subscribed PLC codes (merged with the snapshot subscription of the page into one socket subscribe), following the page's **Live socket** switch and interval; only while the PLC reader is connected.
+3. [diagnosticsSettings.js](../../src/pages/MachineDiagnostics/diagnosticsSettings.js) → `PLC_STATE_LOOK` (Connected / Connecting / Not connected / Nothing to read / Not read / Not reported), `plcVariableState()` (Turned off, the controller's node status such as `BadNodeIdUnknown`, Last known, No data, Updating, Steady, No value yet).
+4. Server: [machine_diagnostics_plc.go](../../../7th-sense-server/internal/service/machine_diagnostics_plc.go) → `plcSection()`, `plcVerdict()`, `plcErrorHint()` (login, certificate, endpoint, network); the PLC reader: [plc_worker.go](../../../7th-sense-server/internal/monitor/plc_worker.go), [connection.go](../../../7th-sense-server/internal/opcua/connection.go) (server ADR 0021).
+
+- Only Siemens machines are read over OPC UA (`plc.supported`); on others the card says so and lists no live values. PLC variables appear only here, not in the snapshot variables.
+- Filters: search (code, name, node ID), All / Subscribed / Refused or off.
 
 ## UI states
 
-- **Loading:** `<Loader>`; the IP and port show "Testing from the server…" until the test answers.
+- **Loading:** `<Loader>`; the IP and port show "Testing from the server…" and the card "Checking…" until the test answers; **Check machine** shows a spinner and is disabled while a test runs (the last result stays).
+- **No Live IP or port:** the card says so and **Check machine** is disabled. **Test failed to run:** a red alert in the card.
 - **Error:** a red `<Alert>` with Retry (404 "Machine not found"); a failed refresh keeps the last data with a warning.
 - **Not the superadmin:** no action in the list, the route shows Forbidden, the APIs answer 403.
 
@@ -88,12 +159,12 @@ Each variable is a card: its value large, what its data is doing, its address, l
 | Method | Endpoint | Triggered by (section) | API docs |
 |---|---|---|---|
 | GET | `/api/v1/machines/{id}/diagnostics` | On page load, every 5 s | [Swagger](http://localhost:8080/api-docs/index.html#/Machines/getMachineDiagnostics) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
-| GET | `/api/v1/machines/{id}/diagnostics/network` | On page load · Run checks again | [Swagger](http://localhost:8080/api-docs/index.html#/Machines/checkMachineNetwork) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
-| WS | `/api/v1/socket.io/` | Watch variables live | [live-socket-events.md](../../../7th-sense-server/docs/live-socket-events.md) |
+| GET | `/api/v1/machines/{id}/diagnostics/network` | On page load · Run checks again · Check machine | [Swagger](http://localhost:8080/api-docs/index.html#/Machines/checkMachineNetwork) · [openapi.yaml](../../../7th-sense-server/docs/api/openapi.yaml) |
+| WS | `/api/v1/socket.io/` | Watch variables live · PLC variables (OPC UA) | [live-socket-events.md](../../../7th-sense-server/docs/live-socket-events.md) |
 
 ## State & storage
 
-- Route param `:id`; `useLoad()` (reload), `useMachineLive()` (socket), local state: live on / off, interval, picked variables, filters. Change counts live only while the page is open.
+- Route param `:id`; `useLoad()` (reload), `useMachineLive()` (socket), local state: network test `{data, error, running}` (shared by the checks and the card), live on / off, interval, picked variables, filters. Change counts live only while the page is open.
 
 ## Shared components used
 
@@ -102,4 +173,5 @@ Each variable is a card: its value large, what its data is doing, its address, l
 ## Decisions
 
 - [Server ADR 0013: Machine diagnostics from what the collector recorded](../../../7th-sense-server/docs/adr/0013-machine-diagnostics-from-collector-evidence.md)
+- [Server ADR 0021: Read PLC variables over OPC UA with gopcua](../../../7th-sense-server/docs/adr/0021-opcua-plc-reader-gopcua.md)
 - [Client ADR index](../adr/README.md)

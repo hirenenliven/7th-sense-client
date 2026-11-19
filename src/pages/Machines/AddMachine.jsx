@@ -7,13 +7,13 @@ import PropTypes from 'prop-types'
 import { CUSTOMER_ROLE_ID, ROLES, SUPERADMIN_ONLY } from '@/constants/app'
 import {
   CONTROLLER_VERSION_TYPES,
-  MACHINE_ACCURACIES,
   MACHINE_SYSTEM_TYPES,
   SECURITY_MODES,
 } from '@/constants/machines'
 import { ROUTES } from '@/constants/routes'
 import { getBrands, getControllers, getModels } from '@/services/catalogService'
 import { getUsers } from '@/services/customerService'
+import { getMachineAccuracies } from '@/services/machineAccuracyService'
 import { createMachine, getMachineById, updateMachine } from '@/services/machineService'
 import { getUserLines } from '@/services/userLineService'
 import useAuth from '@/hooks/useAuth'
@@ -96,6 +96,7 @@ const loadCustomers = () => getUsers().then((users) => users.filter((user) => us
 const loadBrands = () => getBrands().then((list) => [...list].sort(byName))
 const loadControllers = () => getControllers().then((list) => [...list].sort(byName))
 const loadModels = () => getModels().then((list) => [...list].sort(byName))
+const loadAccuracies = () => getMachineAccuracies()
 
 // Add and edit share this form: /machines/add and /machines/:id/edit (managers only). The superadmin
 // picks the customer; a customer or admin always adds to their own company (the server enforces it).
@@ -132,6 +133,7 @@ function AddMachine() {
   const brands = useOptions(loadBrands, 'brands')
   const controllers = useOptions(loadControllers, 'controllers')
   const models = useOptions(loadModels, 'models')
+  const accuracies = useOptions(loadAccuracies, 'machine accuracies')
 
   const userId = watch('userId')
   const brandId = watch('brandId')
@@ -342,14 +344,21 @@ function AddMachine() {
               </Field>
 
               <Field name="accuracyId" label="Machine Accuracy" {...fieldProps}>
-                <Form.Select {...register('accuracyId')} isInvalid={Boolean(errors.accuracyId)}>
-                  <option value="">Select machine accuracy</option>
-                  {MACHINE_ACCURACIES.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
+                {/* Controlled: the list loads after an edited machine may have filled the form */}
+                <Controller
+                  name="accuracyId"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Select {...field} disabled={accuracies.loading} isInvalid={Boolean(errors.accuracyId)}>
+                      <option value="">{placeholder(accuracies, 'Machine accuracy')}</option>
+                      {accuracies.items.map((option) => (
+                        <option key={option.id} value={String(option.id)}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  )}
+                />
               </Field>
 
               <Field name="lineId" label="Machine Line No." help={FIELD_HELP.lineId} {...fieldProps}>

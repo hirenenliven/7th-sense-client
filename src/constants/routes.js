@@ -10,6 +10,7 @@ export const ROUTES = {
   MACHINE_ADD: '/machines/add',
   MACHINE_EDIT: '/machines/:id/edit',
   MACHINE_DIAGNOSTICS: '/machines/:id/diagnostics',
+  MACHINE_PLC_VARIABLES: '/machines/:id/plc-variables',
   // Operations › Monitoring (constants/monitoring.js): the machine list, then one machine's
   // Productivity / Health / Tool List / Tool Life / Virtual Screen tabs. Kept apart from the
   // machine set-up under /machines.
@@ -59,6 +60,8 @@ export const ROUTES = {
   OPERATOR_TASKS: '/masters/operator-tasks',
   // The task list those operator tasks pick from (Account Center › Operator Task › Task List)
   MAINTENANCE_TASKS: '/masters/maintenance-tasks',
+  // Machine accuracy levels of the machine and part forms, one list for every customer (superadmin)
+  MACHINE_ACCURACY: '/masters/machine-accuracy',
   // Users: members of a customer's company (the Customer pages, see pages/Customers/accountPages.js)
   USERS: '/masters/users',
   USER_ADD: '/masters/users/add',

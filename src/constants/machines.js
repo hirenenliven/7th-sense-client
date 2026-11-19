@@ -1,12 +1,6 @@
 // Fixed option lists of the Add / Edit Machine form. Values are what the machines API stores
-// (dto/machine_dto.go); there are no lookup tables for these in the database.
-
-// machines.accuracy_id
-export const MACHINE_ACCURACIES = [
-  { id: 1, label: 'Good' },
-  { id: 2, label: 'Average' },
-  { id: 3, label: 'Poor' },
-]
+// (dto/machine_dto.go); there are no lookup tables for these in the database. Machine accuracy is
+// not here: it is a list in the database (GET /machine-accuracies, Account Center › Machine Accuracy).
 
 // machines.controller_version_type
 export const CONTROLLER_VERSION_TYPES = [

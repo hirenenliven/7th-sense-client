@@ -4296,6 +4296,12 @@ $ts-toast-colors: (
   &.is-critical::before { border-top-color: $ts-red; }
 }
 
+// A chart you can drag across to select a range (LineTrendChart onSelectRange, e.g. zoom)
+.ts-chart-selectable {
+  cursor: crosshair;
+  user-select: none;
+}
+
 // Range buttons scroll sideways on narrow screens instead of wrapping into a ragged block
 .ts-chart-range {
   max-width: 100%;
@@ -5216,6 +5222,28 @@ li:last-child > .ts-ops-action { border-bottom: 0; }
 }
 
 .ts-diag-step-icon { color: var(--ts-tone); }
+
+// Check machine (MachinePowerCheck.jsx): the answer in its tone above the IP and port rows
+.ts-diag-power {
+  display: flex;
+  align-items: center;
+  gap: $ts-space-3;
+  padding: $ts-space-3;
+  border-left: $ts-diag-var-bar solid var(--ts-tone);
+  border-radius: $ts-radius-sm;
+}
+
+.ts-diag-power-icon {
+  flex-shrink: 0;
+  color: var(--ts-tone);
+  font-size: $ts-fs-xl;
+}
+
+.ts-diag-power-title {
+  color: var(--ts-tone);
+  font-size: $ts-fs-lg;
+  font-weight: $font-weight-semibold;
+}
 
 .ts-diag-state {
   display: inline-flex;
