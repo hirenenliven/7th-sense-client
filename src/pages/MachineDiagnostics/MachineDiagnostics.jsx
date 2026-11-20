@@ -262,9 +262,7 @@ function MachineDiagnostics() {
             <DiagnosticsPlcVariables
               machineId={machineId}
               plc={diagnostics.plc}
-              liveOn={liveOn}
               liveEnabled={diagnostics.liveEnabled}
-              intervalMs={intervalMs}
             />
           </Col>
         )}

@@ -1,19 +1,38 @@
-import { useMemo, useState } from 'react'
-import { Form, InputGroup, Table } from 'react-bootstrap'
+import { useCallback, useMemo, useState } from 'react'
+import { Button, ButtonGroup, Form, InputGroup } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import ChartCard from '@/components/charts/ChartCard'
 import { NoResults } from '@/components/common/TableNoResults'
 import useMachineLive from '@/hooks/useMachineLive'
 import { PICKER_LOCALE } from '@/utils/dateTime'
-import { PLC_FILTERS, PLC_STATE, PLC_STATE_LOOK, STATUS_LOOK, formatValue, plcVariableState, trackChanges } from './diagnosticsSettings'
+import DiagnosticsVariableCard from './DiagnosticsVariableCard'
+import {
+  DEFAULT_LIVE_INTERVAL,
+  LIVE_INTERVALS,
+  PLC_FILTERS,
+  PLC_STATE,
+  PLC_STATE_LOOK,
+  STATUS_LOOK,
+  plcVariableState,
+  trackChanges,
+} from './diagnosticsSettings'
 
-const clock = new Intl.DateTimeFormat(PICKER_LOCALE, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 const dayClock = new Intl.DateTimeFormat(PICKER_LOCALE, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' })
 const when = (value) => (value ? dayClock.format(new Date(value)) : '—')
 const NO_VALUES = {}
 
 // The policy URI's last part: "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256" → "Basic256Sha256"
 const policyName = (uri) => (uri ? uri.slice(uri.lastIndexOf('#') + 1) : '')
+
+// Words a PLC variable's data state on its card
+const plcState = (row, connected) => plcVariableState({ variable: row, value: row.shownValue, changes: row.changes, connected })
+
+// Why a PLC variable shows no value, or cannot be put on the socket ('' when it can)
+const plcReason = (variable, connected) => {
+  if (!variable.enabled) return 'Turned off for this machine (machine_variables).'
+  if (variable.nodeStatus) return `The controller answered ${variable.nodeStatus} for this node ID.`
+  return connected ? '' : 'The PLC reader is not connected, so this variable cannot be received live.'
+}
 
 function Fact({ label, children }) {
   return (
@@ -27,16 +46,29 @@ function Fact({ label, children }) {
 Fact.propTypes = { label: PropTypes.string.isRequired, children: PropTypes.node }
 
 // Machines › Diagnostics › PLC variables (server ADR 0021): what the OPC UA PLC reader does for this
-// machine — its connection and verdict from GET /machines/{id}/diagnostics (`plc`), and every PLC
-// variable with its node ID, the controller's answer and its value live from the socket. It
-// subscribes to the subscribed PLC codes itself (useMachineLive merges them with the snapshot
-// variables' subscription of the page), following the page's Live socket switch and interval.
-function DiagnosticsPlcVariables({ machineId, plc, liveOn, liveEnabled, intervalMs }) {
+// machine — its connection and verdict from GET /machines/{id}/diagnostics (`plc`) — and every PLC
+// variable as a card, like the snapshot variables: tick the ones to receive over the live socket,
+// with its own Live socket switch and interval. Its useMachineLive is merged with the snapshot
+// variables' into one subscription per machine (services/liveSocket.js), at the shorter interval.
+function DiagnosticsPlcVariables({ machineId, plc, liveEnabled }) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('')
+  const [category, setCategory] = useState('')
+  const [liveOn, setLiveOn] = useState(true)
+  const [intervalMs, setIntervalMs] = useState(DEFAULT_LIVE_INTERVAL)
+  // null = every subscribed PLC variable, until the user picks
+  const [picked, setPicked] = useState(null)
 
   const connected = plc.state === PLC_STATE.CONNECTED
-  const codes = useMemo(() => plc.variables.filter((row) => row.subscribed).map((row) => row.code).sort(), [plc.variables])
+  // Only nodes the reader subscribed to can be received: the socket answers others as unknown
+  const pickableCodes = useMemo(() => plc.variables.filter((row) => row.subscribed).map((row) => row.code), [plc.variables])
+  const pickableKey = pickableCodes.join(',')
+  const selected = useMemo(() => picked ?? new Set(pickableKey ? pickableKey.split(',') : []), [picked, pickableKey])
+  const codes = useMemo(() => {
+    const pickable = new Set(pickableKey ? pickableKey.split(',') : [])
+    return [...selected].filter((code) => pickable.has(code)).sort()
+  }, [selected, pickableKey])
+
   const watching = liveOn && liveEnabled && connected && codes.length > 0
   const live = useMachineLive(watching ? machineId : null, { codes, intervalMs })
   const liveValues = watching ? live.values : NO_VALUES
@@ -45,22 +77,55 @@ function DiagnosticsPlcVariables({ machineId, plc, liveOn, liveEnabled, interval
   const [tracked, setTracked] = useState({ source: null, rows: {} })
   if (liveValues !== tracked.source) setTracked(trackChanges(tracked, liveValues, live.at))
 
+  const rows = useMemo(
+    () =>
+      plc.variables.map((variable) => {
+        const change = tracked.rows[variable.code]
+        return {
+          ...variable,
+          address: variable.nodeId,
+          readable: variable.enabled && !variable.nodeStatus,
+          reason: plcReason(variable, connected),
+          shownValue: selected.has(variable.code) && variable.code in liveValues ? liveValues[variable.code] : variable.value,
+          changes: change?.changes ?? 0,
+          changedAt: change?.changedAt ?? null,
+        }
+      }),
+    [plc.variables, tracked, selected, liveValues, connected],
+  )
+
+  const categories = useMemo(() => [...new Set(rows.map((row) => row.category).filter(Boolean))].sort(), [rows])
   const term = search.trim().toLowerCase()
-  const rows = plc.variables.filter((row) => {
+  const matched = rows.filter((row) => {
     if (filter === 'subscribed' && !row.subscribed) return false
     if (filter === 'problems' && row.enabled && !row.nodeStatus) return false
+    if (category && row.category !== category) return false
     return !term || [row.code, row.name, row.nodeId].some((text) => text?.toLowerCase().includes(term))
   })
 
+  const toggle = useCallback(
+    (code) => {
+      const next = new Set(selected)
+      if (next.has(code)) next.delete(code)
+      else next.add(code)
+      setPicked(next)
+    },
+    [selected],
+  )
+  const clearFilters = () => {
+    setSearch('')
+    setFilter('')
+    setCategory('')
+  }
+
   const stateLook = PLC_STATE_LOOK[plc.state] ?? PLC_STATE_LOOK[PLC_STATE.NOT_REPORTED]
   const verdictLook = STATUS_LOOK[plc.status] ?? STATUS_LOOK.skipped
-  const subscribedCount = codes.length
   const socketLive = watching && live.connected
 
   return (
     <ChartCard
       title="PLC variables (OPC UA)"
-      subtitle={`${subscribedCount} of ${plc.variables.length} subscribed · ${plc.endpoint}`}
+      subtitle={`${pickableCodes.length} of ${plc.variables.length} subscribed · ${codes.length} picked for the live socket · ${plc.endpoint}`}
       icon="bi-diagram-3"
       actions={
         <div className="d-flex flex-wrap gap-2">
@@ -100,6 +165,26 @@ function DiagnosticsPlcVariables({ machineId, plc, liveOn, liveEnabled, interval
       {plc.variables.length > 0 && (
         <>
           <div className="ts-toolbar">
+            <Form.Check
+              type="switch"
+              id="diagnostics-plc-live"
+              className="mb-0 align-self-center"
+              label="Live socket"
+              checked={liveOn}
+              disabled={!liveEnabled}
+              onChange={(event) => setLiveOn(event.target.checked)}
+            />
+            <Form.Select className="w-auto" value={intervalMs} onChange={(event) => setIntervalMs(Number(event.target.value))} aria-label="PLC socket interval" disabled={!liveOn}>
+              {LIVE_INTERVALS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Form.Select>
+            <ButtonGroup aria-label="Pick PLC variables">
+              <Button variant="ghost" onClick={() => setPicked(new Set(pickableCodes))}>Pick all</Button>
+              <Button variant="ghost" onClick={() => setPicked(new Set())}>Pick none</Button>
+            </ButtonGroup>
             <InputGroup className="flex-grow-1 w-auto">
               <Form.Control
                 type="search"
@@ -119,64 +204,37 @@ function DiagnosticsPlcVariables({ machineId, plc, liveOn, liveEnabled, interval
                 </option>
               ))}
             </Form.Select>
+            {categories.length > 0 && (
+              <Form.Select className="w-auto text-capitalize" value={category} onChange={(event) => setCategory(event.target.value)} aria-label="PLC variable category">
+                <option value="">All categories</option>
+                {categories.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
           </div>
 
-          {rows.length ? (
-            <div className="ts-table-panel">
-              <Table size="sm" responsive className="mb-0 align-middle">
-                <thead>
-                  <tr>
-                    <th>Variable</th>
-                    <th>Node ID</th>
-                    <th>Data</th>
-                    <th className="text-end">Live value</th>
-                    <th>Last change</th>
-                    <th>Last stored</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row) => {
-                    const change = tracked.rows[row.code]
-                    const value = row.code in liveValues ? liveValues[row.code] : row.value
-                    const state = plcVariableState({ variable: row, value, changes: change?.changes ?? 0, connected })
-                    return (
-                      <tr key={row.id}>
-                        <td>
-                          <div className="font-monospace fw-semibold">{row.code}</div>
-                          <div className="small text-body-secondary">{row.name}</div>
-                        </td>
-                        <td className="font-monospace small text-break">{row.nodeId}</td>
-                        <td>
-                          <span className={`ts-diag-state small ts-tone-${state.tone}`} title={state.title}>
-                            <i className="ts-dot" aria-hidden="true" />
-                            {state.label}
-                          </span>
-                        </td>
-                        <td className="text-end font-tabular fw-semibold">
-                          <span key={change?.changes ?? 0} className={change?.changes ? 'ts-diag-var-flash' : undefined}>
-                            {formatValue(value, value != null ? row.unit : '')}
-                          </span>
-                        </td>
-                        <td className="small font-tabular text-nowrap">
-                          {change?.changedAt ? `${clock.format(new Date(change.changedAt))} · ${change.changes}` : '—'}
-                        </td>
-                        <td className="small font-tabular text-nowrap">
-                          {row.storedValue != null ? `${formatValue(row.storedValue, row.unit)} · ${when(row.storedAt)}` : 'Not stored'}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </Table>
+          {matched.length ? (
+            <div className="ts-diag-vars">
+              {matched.map((row) => (
+                <DiagnosticsVariableCard
+                  key={row.id}
+                  row={row}
+                  idPrefix="diagnostics-plc-variable"
+                  addressLabel="Node ID"
+                  stateOf={plcState}
+                  connected={connected}
+                  pickable={row.subscribed}
+                  picked={selected.has(row.code)}
+                  onToggle={toggle}
+                  liveOn={liveOn}
+                />
+              ))}
             </div>
           ) : (
-            <NoResults
-              message="No PLC variable matches these filters."
-              onClear={() => {
-                setSearch('')
-                setFilter('')
-              }}
-            />
+            <NoResults message="No PLC variable matches these filters." onClear={clearFilters} />
           )}
         </>
       )}
@@ -203,9 +261,7 @@ DiagnosticsPlcVariables.propTypes = {
     changeCount: PropTypes.number,
     variables: PropTypes.arrayOf(PropTypes.object).isRequired,
   }).isRequired,
-  liveOn: PropTypes.bool.isRequired,
   liveEnabled: PropTypes.bool.isRequired,
-  intervalMs: PropTypes.number.isRequired,
 }
 
 export default DiagnosticsPlcVariables

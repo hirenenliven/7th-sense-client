@@ -128,24 +128,27 @@ sequenceDiagram
   participant Machine as Siemens NCU (OPC UA)
   Worker->>Machine: connect, subscribe to every PLC node ID
   Machine-->>Worker: changed values (each publish)
+  Worker->>Machine: read the nodes refused for lack of room (every PLC_POLL_INTERVAL_MS)
   Worker->>Board: state, node statuses, last change
   User->>Page: opens the machine's diagnostics
   Page->>API: GET /machines/{id}/diagnostics (every 5 s)
   API->>Diagnostics: GetDiagnostics() → plcSection()
   Diagnostics->>Board: Get(machineId)
   Diagnostics-->>Page: plc: state, verdict, endpoint, variables (node ID, status, value)
-  Page->>Socket: subscribe (the subscribed PLC codes)
+  User->>Page: ticks PLC variables, Live socket switch, interval
+  Page->>Socket: subscribe (the picked PLC codes, merged with the snapshot ones)
   Worker-->>Socket: machine:values (hub), then stored
   Socket-->>Page: live PLC values
 ```
 
-1. [DiagnosticsPlcVariables.jsx](../../src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx) → the "PLC variables (OPC UA)" card below the snapshot variables: connection chip, the server's verdict (`plc.status` / `message` / `hint`), facts (endpoint, security mode · policy, connected since, last value change, changes received, last error) and a table per PLC variable: code / name, node ID, Data state, live value (flashes on change), last change (time · count), last stored.
-2. It calls `useMachineLive` itself with the subscribed PLC codes (merged with the snapshot subscription of the page into one socket subscribe), following the page's **Live socket** switch and interval; only while the PLC reader is connected.
+1. [DiagnosticsPlcVariables.jsx](../../src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx) → the "PLC variables (OPC UA)" card below the snapshot variables: connection chip, the server's verdict (`plc.status` / `message` / `hint`), facts (endpoint, security mode · policy, connected since, last value change, changes received, last error) and a card per PLC variable, the same card as the snapshot variables ([DiagnosticsVariableCard.jsx](../../src/pages/MachineDiagnostics/DiagnosticsVariableCard.jsx)): code / name, a tick to receive it live, value large (flashes on change), Data state, node ID, last change (time · count), last stored; a refused or turned-off variable shows why instead of a value.
+2. Its own toolbar, like the snapshot variables: **Live socket** switch, interval, **Pick all** / **Pick none** (every subscribed PLC variable is picked at first; only `subscribed` ones can be ticked, the socket answers others as unknown), search, status filter and category. It calls `useMachineLive` itself with the picked PLC codes, only while the PLC reader is connected; [liveSocket.js](../../src/services/liveSocket.js) merges it with the snapshot variables' into one `subscribe` per machine, at the shorter of the two intervals.
 3. [diagnosticsSettings.js](../../src/pages/MachineDiagnostics/diagnosticsSettings.js) → `PLC_STATE_LOOK` (Connected / Connecting / Not connected / Nothing to read / Not read / Not reported), `plcVariableState()` (Turned off, the controller's node status such as `BadNodeIdUnknown`, Last known, No data, Updating, Steady, No value yet).
-4. Server: [machine_diagnostics_plc.go](../../../7th-sense-server/internal/service/machine_diagnostics_plc.go) → `plcSection()`, `plcVerdict()`, `plcErrorHint()` (login, certificate, endpoint, network); the PLC reader: [plc_worker.go](../../../7th-sense-server/internal/monitor/plc_worker.go), [connection.go](../../../7th-sense-server/internal/opcua/connection.go) (server ADR 0021).
+4. Server: [machine_diagnostics_plc.go](../../../7th-sense-server/internal/service/machine_diagnostics_plc.go) → `plcSection()`, `plcVerdict()`, `plcErrorHint()` (login, certificate, endpoint, network); the PLC reader: [plc_worker.go](../../../7th-sense-server/internal/monitor/plc_worker.go), [connection.go](../../../7th-sense-server/internal/opcua/connection.go) (server ADR 0021). A node the controller has no room to monitor (`BadTooManyMonitoredItems`) is read instead every `PLC_POLL_INTERVAL_MS` and shows like a subscribed one, its values up to that interval late (server ADR 0023).
 
 - Only Siemens machines are read over OPC UA (`plc.supported`); on others the card says so and lists no live values. PLC variables appear only here, not in the snapshot variables.
-- Filters: search (code, name, node ID), All / Subscribed / Refused or off.
+- Filters: search (code, name, node ID), All / Subscribed / Refused or off, category.
+- The PLC and snapshot sections have their own Live socket switch and picks; turning one off does not stop the other. Both share one socket subscription, so its interval is the shorter one picked.
 
 ## UI states
 
@@ -164,7 +167,7 @@ sequenceDiagram
 
 ## State & storage
 
-- Route param `:id`; `useLoad()` (reload), `useMachineLive()` (socket), local state: network test `{data, error, running}` (shared by the checks and the card), live on / off, interval, picked variables, filters. Change counts live only while the page is open.
+- Route param `:id`; `useLoad()` (reload), `useMachineLive()` (socket), local state: network test `{data, error, running}` (shared by the checks and the card), live on / off, interval, picked variables, filters (snapshot variables in the page; PLC variables in `DiagnosticsPlcVariables`, each its own). Change counts live only while the page is open.
 
 ## Shared components used
 

@@ -1050,9 +1050,9 @@
     "semantic_hash": "ee8d24ea8c806653a5439915c56bacac"
   },
   "CLAUDE.md": {
-    "mtime": 1795073656.8263843,
-    "seen": 1795073723.704311,
-    "ast_hash": "68f2646dcf5be2d04f58993f680611e1",
+    "mtime": 1795153910.2757912,
+    "seen": 1795153929.9708047,
+    "ast_hash": "268ac674b704fce00f0f28aee43ee8a5",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1278,9 +1278,9 @@
     "semantic_hash": ""
   },
   "src/pages/Productivity/productivitySettings.js": {
-    "mtime": 1793855148.8915904,
-    "seen": 1793856921.630612,
-    "ast_hash": "1b21fe8c160f7070a77b84cccb68cfd8",
+    "mtime": 1795085980.9230874,
+    "seen": 1795150020.5972567,
+    "ast_hash": "2eb8a44bb4a76a3cf183ea62ee9be31d",
     "semantic_hash": ""
   },
   "src/utils/sampleData.js": {
@@ -1464,9 +1464,9 @@
     "semantic_hash": ""
   },
   "docs/pages/home.md": {
-    "mtime": 1793941995.5100253,
-    "seen": 1793942055.760248,
-    "ast_hash": "985212f106c7050a621ad5114ffee7fc",
+    "mtime": 1795085980.9386637,
+    "seen": 1795150020.5974686,
+    "ast_hash": "db37fb989d4c7ca76cb5824a892b1917",
     "semantic_hash": ""
   },
   "docs/pages/licence-keys.md": {
@@ -1584,9 +1584,9 @@
     "semantic_hash": ""
   },
   "docs/pages/productivity.md": {
-    "mtime": 1793947330.9969082,
-    "seen": 1793947391.758028,
-    "ast_hash": "0725b8986787eb8c958176730a24993d",
+    "mtime": 1795085980.9386637,
+    "seen": 1795150020.5975652,
+    "ast_hash": "f1fa0a6fac0a73705371d27ef2bbe7f2",
     "semantic_hash": ""
   },
   "docs/pages/shifts.md": {
@@ -2094,15 +2094,15 @@
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/DiagnosticsVariables.jsx": {
-    "mtime": 1793950316.4490988,
-    "seen": 1793954605.3008494,
-    "ast_hash": "38c4fc661b969e3cace1894483a4380b",
+    "mtime": 1795153775.9612248,
+    "seen": 1795153929.9704406,
+    "ast_hash": "8d2e88ec67ad91d45a131e99b55cebea",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/MachineDiagnostics.jsx": {
-    "mtime": 1795067176.1888087,
-    "seen": 1795067485.9825652,
-    "ast_hash": "10de9c998ce16c1779aae067d10bbb69",
+    "mtime": 1795153867.483499,
+    "seen": 1795153929.970443,
+    "ast_hash": "0a64cf0f8cb9e8b8445310c9861a3f5d",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/diagnosticsSettings.js": {
@@ -2118,9 +2118,9 @@
     "semantic_hash": ""
   },
   "docs/pages/machine-diagnostics.md": {
-    "mtime": 1795067344.5072677,
-    "seen": 1795067485.9829907,
-    "ast_hash": "60db873e3e1a88eb5ac5ab136d564c47",
+    "mtime": 1795153910.2742856,
+    "seen": 1795153929.9709024,
+    "ast_hash": "68e0d2879150d2cedb7be645fdcbd92a",
     "semantic_hash": ""
   },
   "docs/adr/0026-plant-intelligence-owner-dashboard.md": {
@@ -2334,15 +2334,15 @@
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/MachinePlcVariables.jsx": {
-    "mtime": 1795073585.3539834,
-    "seen": 1795073723.7039819,
-    "ast_hash": "3c79980ed86c7e81fd2971757d7a9e51",
+    "mtime": 1795081839.0697541,
+    "seen": 1795150020.5970957,
+    "ast_hash": "fe2e62f1b906d43ffbaf9377351f18e9",
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/PlcVariableRow.jsx": {
-    "mtime": 1795073504.8019474,
-    "seen": 1795073723.7039835,
-    "ast_hash": "f0624156a796d8eb73189428747bf063",
+    "mtime": 1795081839.0692508,
+    "seen": 1795150020.5970988,
+    "ast_hash": "6a807c160c79a152d480c4d0e00192c6",
     "semantic_hash": ""
   },
   "src/pages/MachinePlcVariables/plcVariableSettings.js": {
@@ -2358,15 +2358,21 @@
     "semantic_hash": ""
   },
   "docs/pages/machine-plc-variables.md": {
-    "mtime": 1795073656.8243654,
-    "seen": 1795073723.7044196,
-    "ast_hash": "82de8e243ef286cbea362028abc888a5",
+    "mtime": 1795153243.940652,
+    "seen": 1795153929.9709096,
+    "ast_hash": "2c7a376c569ac065104d83609359b402",
     "semantic_hash": ""
   },
   "src/pages/MachineDiagnostics/DiagnosticsPlcVariables.jsx": {
-    "mtime": 1795067156.7681482,
-    "seen": 1795067485.9825602,
-    "ast_hash": "26f00e7a2c4fa6106b2f6aa5d60e5602",
+    "mtime": 1795153862.5242639,
+    "seen": 1795153929.970435,
+    "ast_hash": "e1d4748a9d37d8af9c7f8acd5e19ca76",
+    "semantic_hash": ""
+  },
+  "src/pages/MachineDiagnostics/DiagnosticsVariableCard.jsx": {
+    "mtime": 1795153765.556482,
+    "seen": 1795153929.970438,
+    "ast_hash": "2c78b07cfd68405a0b93b9dd6758cae6",
     "semantic_hash": ""
   }
 }
