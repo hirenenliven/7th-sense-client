@@ -98,11 +98,11 @@ function PlcVariableRow({ row, draft, saving, test, reader, socketLive, liveValu
     <tr className={dirty ? 'table-active' : undefined}>
       <td className="font-tabular text-body-secondary">{row.variableId}</td>
       <td>
-        <div className="font-monospace fw-semibold">{row.code}</div>
-        <div className="small text-body-secondary">
+        <div className="fw-semibold">
           {row.name}
-          {row.status !== 'active' && <span className="ms-2 text-uppercase">· {row.status}</span>}
+          {row.status !== 'active' && <span className="ms-2 small text-uppercase text-body-secondary">· {row.status}</span>}
         </div>
+        <div className="small font-monospace text-body-secondary">{row.code}</div>
       </td>
       <td className="text-capitalize text-body-secondary">{row.category}</td>
       <td className="w-50">

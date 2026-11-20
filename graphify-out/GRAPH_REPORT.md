@@ -6,12 +6,12 @@
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 4, .scss 4)
 
 ## Summary
-- 2489 nodes · 8621 edges · 130 communities (127 shown, 3 thin omitted)
+- 2489 nodes · 8613 edges · 130 communities (127 shown, 3 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 616 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7dff4a73`
+- Built from commit: `4a7342ff`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -152,24 +152,24 @@
 2. `prop-types` - 126 edges
 3. `unwrap()` - 118 edges
 4. `react-bootstrap` - 115 edges
-5. `Loader()` - 95 edges
+5. `Loader()` - 94 edges
 6. `useAuth()` - 92 edges
 7. `withQuery()` - 83 edges
 8. `sharedGet()` - 75 edges
 9. `ProtectedRoute()` - 59 edges
-10. `ConfirmModal()` - 57 edges
+10. `unwrapList()` - 57 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Delete machine accuracy` --references--> `ConfirmModal()`  [INFERRED]
-  docs/pages/machine-accuracy.md → src/components/common/ConfirmModal.jsx
-- `Log out one session` --references--> `ConfirmModal()`  [INFERRED]
-  docs/pages/my-sessions.md → src/components/common/ConfirmModal.jsx
-- `Delete operator task` --references--> `ConfirmModal()`  [INFERRED]
-  docs/pages/operator-tasks.md → src/components/common/ConfirmModal.jsx
-- `Delete task / Make inactive` --references--> `ConfirmModal()`  [INFERRED]
-  docs/pages/task-list.md → src/components/common/ConfirmModal.jsx
-- `Log out one session / Log out all` --references--> `ConfirmModal()`  [INFERRED]
-  docs/pages/user-sessions.md → src/components/common/ConfirmModal.jsx
+- `Test a node ID` --references--> `statusHint()`  [INFERRED]
+  docs/pages/machine-plc-variables.md → src/pages/MachinePlcVariables/plcVariableSettings.js
+- `On page load` --references--> `getBranches()`  [INFERRED]
+  docs/pages/branch-list.md → src/services/branchService.js
+- `Save branch (add / edit form)` --references--> `updateBranch()`  [INFERRED]
+  docs/pages/branch-list.md → src/services/branchService.js
+- `On page load` --references--> `getCurrentUser()`  [INFERRED]
+  docs/pages/app-shell.md → src/services/customerService.js
+- `Save user (add / edit form)` --references--> `updateUser()`  [INFERRED]
+  docs/pages/customer-user-list.md → src/services/customerService.js
 
 ## Import Cycles
 - None detected.
@@ -694,7 +694,7 @@ Nodes (4): 0025. Plant Intelligence: a period and per-machine dashboard, from on
   CLAUDE.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **42 isolated node(s):** `bootstrap`, `@types/react`, `@types/react-dom`, `eslint`, `sass` (+37 more)
+- **42 isolated node(s):** `ADR-0020`, `ADR-0020`, `ADR-0014`, `ADR-0024`, `ADR-0025` (+37 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 574 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -702,15 +702,15 @@ Nodes (4): 0025. Plant Intelligence: a period and per-machine dashboard, from on
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `ProtectedRoute()` connect `ProtectedRoute` to `0002. React Router with one route table and role guards`, `Loader`, `intelligenceSettings.js`, `react`, `All machines`, `userShopService.js`, `Downtime / idle reasons`, `User guide`, `Licence keys`, `Add / edit part`, `Brands`, `Countries`, `Machine diagnostics`, `Machine health`, `Tool List and Tool Life (machine tabs)`, `Operator tasks`, `My sessions`, `Virtual Screen (machine tab)`, `Customers / Users list`, `Machine accuracy`, `Operations Center`, `Monitoring (machine list)`, `Locations`, `Clientele`, `Productivity`, `Controllers`, `Holidays / week off`, `User sessions`, `Cells`, `Supervisors`, `Machine PLC node IDs`, `Operator wise production schedule`, `Machine models`, `Production schedules`, `States`?**
-  _High betweenness centrality (0.142) - this node is a cross-community bridge._
+  _High betweenness centrality (0.161) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `Loader()` (e.g. with `Shared components used` and `UI states`) actually correct?**
   _`Loader()` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `bootstrap`, `@types/react`, `@types/react-dom` to the rest of the system?**
+- **What connects `ADR-0020`, `ADR-0020`, `ADR-0014` to the rest of the system?**
   _42 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AddCustomer.jsx` be split into smaller, more focused modules?**
   _Cohesion score 0.09191583610188261 - nodes in this community are weakly interconnected._
 - **Why does `react` connect `react` to `prop-types`, `BarLineChart.jsx`, `liveSocket.js`, `Productivity.jsx`, `Speedometer.jsx`, `LicenceKeyGenerator.jsx`, `AxisValuesCard.jsx`, `CustomerList.jsx`, `Loader`, `AddPart.jsx`, `BreakFormModal.jsx`, `SidebarProvider.jsx`, `AddProductionSchedule.jsx`, `IconAction`, `pages.jsx`, `App.jsx`, `MachineDiagnostics.jsx`, `dateTime.js`, `OpsPanels.jsx`, `package.json`, `UserGuide.jsx`, `MachinePlcVariables.jsx`, `useOrgUser`, `dateTime.js`, `healthSensors.js`, `VirtualScreen.jsx`, `StateFormModal.jsx`, `customerForm.js`, `OperationsCenter.jsx`, `AddMachine.jsx`, `DiagnosticsPlcVariables.jsx`, `BrandFormModal.jsx`, `AuthProvider.jsx`, `IntelligencePanels.jsx`, `react-bootstrap`, `OperatorTaskEditor.jsx`, `modeReasonForm.js`, `ModelFormModal.jsx`, `toast`, `DatePicker.jsx`, `ReasonFormModal.jsx`, `HolidayFormModal.jsx`, `ControllerFormModal.jsx`, `app.js`, `ShiftCard.jsx`, `MachineAccuracyEditor.jsx`, `ShiftFormModal.jsx`, `theme.js`, `DiagnosticsVariables.jsx`, `Login.jsx`, `operatorScheduleSettings.js`, `IntelligencePanels.jsx`, `PartList.jsx`?**
-  _High betweenness centrality (0.124) - this node is a cross-community bridge._
+  _High betweenness centrality (0.128) - this node is a cross-community bridge._
 - **Should `liveSocket.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1354723707664884 - nodes in this community are weakly interconnected._
 

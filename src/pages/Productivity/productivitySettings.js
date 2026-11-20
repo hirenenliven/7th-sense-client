@@ -78,9 +78,10 @@ export const MODE_RANGES = [
   { value: 'all', label: 'All time', noun: 'all recorded time', query: () => ({ all: true }) },
 ]
 export const DEFAULT_MODE_RANGE = MODE_RANGES[0].value
-// Machine Modes card, in this order (machine_modes ids): In Production, Hold, Loading / Unloading,
-// Idle, Downtime, Offline. Setup, Rapid Mode and the planned downtimes are not shown.
-export const SUMMARY_MODE_IDS = [3, 4, 2, 5, 6, 9]
+// Machine Modes card and the dashboards' mode tiles / time charts, in this order (machine_modes ids):
+// In Production, Hold, Idle, Downtime, Offline. Loading / Unloading, Setup, Rapid Mode and the planned
+// downtimes are not shown (the dashboards count them under Other modes).
+export const SUMMARY_MODE_IDS = [3, 4, 5, 6, 9]
 // Modes a tile adds up: In Production includes Rapid Mode (12), as OEE run time does (server
 // runModes), so the tile matches the availability %
 export const SUMMARY_MODE_PARTS = { 3: [3, 12] }

@@ -129,7 +129,7 @@ function MachinePlcVariables() {
   const currentPage = Math.min(currentPageNo, pageCount)
   const columns = [
     { label: 'ID', sort: (row) => row.variableId },
-    { label: 'Variable', sort: (row) => row.code },
+    { label: 'Variable', sort: (row) => row.name },
     { label: 'Category', sort: (row) => row.category },
     { label: 'Node ID', sort: (row) => row.nodeId },
     'Live value',
